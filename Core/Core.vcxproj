@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{2e87196b-e30e-461f-878b-bc5b5927212a}</ProjectGuid>
+    <RootNamespace>Core</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;CORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;CORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;CORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;CORE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>./</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>../includes</AdditionalLibraryDirectories>
+      <AdditionalDependencies>fmt/fmt.lib;spdlog/spdlog.lib;curl/libcurl.lib;curl/zlib.lib;Oleaut32.lib;Onecore.lib;MinHook/minhook.x64.lib;detours.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Core\Public\Client.h" />
+    <ClInclude Include="Core\Public\Configuration.h" />
+    <ClInclude Include="Core\Public\Finder.h" />
+    <ClInclude Include="Core\Public\Offsets.h" />
+    <ClInclude Include="Core\Public\Utils.h" />
+    <ClInclude Include="Core\Public\Version.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\Templates\SubclassOf.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Class.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\NoExportTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Object.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\ObjectMacros.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UnrealType.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UObjectArray.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UObjectBase.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UObjectBaseUtility.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\Array.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\BitArray.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\ContainerIterator.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\Map.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\Set.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\SparseArray.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\UnrealString.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\CoreGlobals.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\HAL\MemoryBase.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\HAL\Platform.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\HAL\UnrealMemory.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\Quat.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\Rotator.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\TransformNonVectorized.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\UnrealMathUtility.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\Vector.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Misc\AssertionMacros.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Misc\Guid.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Misc\Parse.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\TypeCompatibleBytes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\UObject\NameTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\Engine.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\EngineBaseTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\EngineTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\GameInstance.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\GameViewportClient.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\Level.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\LocalPlayer.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\Player.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\ScriptViewportClient.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\World.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\Actor.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\Controller.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\Info.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\PlayerController.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\PlayerState.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Kismet\BlueprintFunctionLibrary.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Kismet\DataTableFunctionLibrary.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Kismet\GameplayStatics.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Kismet\KismetMathLibrary.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Kismet\KismetStringLibrary.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Kismet\KismetSystemLibrary.h" />
+    <ClInclude Include="Engine\Source\Runtime\Net\Core\Public\Net\Core\Connection\NetEnums.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\dllmain.cpp" />
+    <ClCompile Include="Core\Private\Client.cpp" />
+    <ClCompile Include="Core\Private\Configuration.cpp" />
+    <ClCompile Include="Core\Private\Finder.cpp" />
+    <ClCompile Include="Core\Private\Utils.cpp" />
+    <ClCompile Include="Core\Private\Version.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\Class.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\Obj.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectArray.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectBase.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectBaseUtility.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Private\HAL\UnrealMemory.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Private\Math\UnrealMath.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Private\Misc\AssertionMacros.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Private\Misc\Guid.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Private\Misc\Parse.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Private\UObject\UnrealNames.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\Actor.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\Controller.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\DataTableFunctionLibrary.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\GameInstance.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\GameplayStatics.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\KismetMathLibrary.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\KismetStringLibrary.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\KismetSystemLibrary.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\Level.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\Player.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\PlayerController.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\PlayerState.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\UnrealEngine.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\URL.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\World.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,29 @@
+#pragma once
+#include "pch.h"
+
+#include "BlueprintFunctionLibrary.h"
+
+class UKismetMathLibrary : public UBlueprintFunctionLibrary {
+public:
+	DefineUnrealClass(UKismetMathLibrary);
+public:
+	/** Return a random integer between Min and Max (>= Min and <= Max) */
+	static int32 RandomIntegerInRange(int32 Min, int32 Max);
+
+	/** Generate a random number between Min and Max */
+	static float RandomFloatInRange(float Min, float Max);
+
+	static int32 Min(int32 A, int32 B);
+
+	static int32 FTrunc(float A);
+
+	static int32 Max(int32 A, int32 B);
+
+	static int32 Clamp(int32 Value, int32 Min, int32 Max);
+
+	static float Lerp(float A, float B, float Alpha);
+
+	static int32 Round(float A);
+
+	static float RandomFloat();
+};

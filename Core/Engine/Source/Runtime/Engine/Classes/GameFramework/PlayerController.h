@@ -1,0 +1,39 @@
+#pragma once
+#include "pch.h"
+
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/Controller.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/Templates/SubclassOf.h"
+
+class ACameraActor;
+class AHUD;
+class APawn;
+class APlayerCameraManager;
+class ASpectatorPawn;
+class FDebugDisplayInfo;
+class UActorChannel;
+class UCheatManager;
+class UGameViewportClient;
+class UInterpTrackInstDirector;
+class ULocalMessage;
+class UNetConnection;
+class UPlayer;
+class UPrimitiveComponent;
+struct FActiveHapticFeedbackEffect;
+struct FCollisionQueryParams;
+
+class APlayerController : public AController {
+public:
+	DefineUnrealClass(APlayerController);
+
+	DefineUProperty(UCheatManager*, CheatManager);
+
+	DefineUProperty(TSubclassOf<UCheatManager>, CheatClass);
+public:
+	bool HasClientLoadedCurrentWorld();
+
+	void ServerAcknowledgePossession(APawn* P);
+
+	AActor* GetViewTarget() const;
+
+	void SendClientAdjustment();
+};

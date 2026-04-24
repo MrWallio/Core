@@ -1,0 +1,21 @@
+#pragma once
+#include "pch.h"
+
+struct FCoreConfig {
+	bool bIsProd = false;
+
+	bool bEnableClientConsole = false;
+	bool bIsClient = false;
+	bool bSetClientLogVerbosity = false;
+
+	FCoreConfig() = default;
+};
+
+class ConfigurationManager {
+public:
+	static FCoreConfig Config;
+public:
+	static void LoadConfig();
+
+	static FCoreConfig& GetConfig();
+};
