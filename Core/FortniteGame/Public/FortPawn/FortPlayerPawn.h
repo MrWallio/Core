@@ -13,5 +13,5 @@ public:
 
 	void ForceFinishIncomingPickups();
 
-	void ServerChoosePart(EFortCustomPartType Part, UCustomCharacterPart* ChosenCharacterPart);
+	void ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart, EFortCustomPartType Part);
 };

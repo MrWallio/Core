@@ -232,6 +232,7 @@
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Classes\Net\Serialization\FastArraySerializer.h" />
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Public\Net\Core\Connection\NetEnums.h" />
     <ClInclude Include="FortniteGame\Public\FortCharacter\CustomCharacterPart.h" />
+    <ClInclude Include="FortniteGame\Public\FortCharacter\FortCharacter.h" />
     <ClInclude Include="FortniteGame\Public\FortCharacter\FortCharacterType.h" />
     <ClInclude Include="FortniteGame\Public\FortEnums.h" />
     <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameMode.h" />
@@ -243,10 +244,12 @@
     <ClInclude Include="FortniteGame\Public\FortGameState\FortGameStateAthena.h" />
     <ClInclude Include="FortniteGame\Public\FortGameState\FortGameStatePvP.h" />
     <ClInclude Include="FortniteGame\Public\FortGameState\FortGameStateZone.h" />
+    <ClInclude Include="FortniteGame\Public\FortHero\FortHero.h" />
     <ClInclude Include="FortniteGame\Public\FortHero\FortHeroType.h" />
     <ClInclude Include="FortniteGame\Public\FortItemDefinition\FortItemDefinition.h" />
     <ClInclude Include="FortniteGame\Public\FortItemDefinition\FortWorldItemDefinition.h" />
     <ClInclude Include="FortniteGame\Public\FortItemDefinition\McpItemDefinitionBase.h" />
+    <ClInclude Include="FortniteGame\Public\FortItem\FortAccountItem.h" />
     <ClInclude Include="FortniteGame\Public\FortItem\FortItem.h" />
     <ClInclude Include="FortniteGame\Public\FortItem\ItemAndCount.h" />
     <ClInclude Include="FortniteGame\Public\FortPawn\FortPawn.h" />
@@ -262,6 +265,7 @@
     <ClInclude Include="FortniteGame\Public\FortPlaylist\PlaylistPropertyArray.h" />
     <ClInclude Include="FortniteGame\Public\FortInventory\FortQuickBars.h" />
     <ClInclude Include="FortniteGame\Public\FortInventory\FortQuickBarsAthena.h" />
+    <ClInclude Include="FortniteGame\Public\FortWorker\FortWorker.h" />
     <ClInclude Include="FortniteGame\Public\FortWorker\FortWorkerType.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\AdditionalLevelStreamed.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortAthenaMapInfo.h" />
@@ -325,6 +329,7 @@
     <ClCompile Include="FortniteGame\Private\FortPawn\FortPlayerPawn.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerController.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerAthena.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerZone.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerState\FortPlayerState.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

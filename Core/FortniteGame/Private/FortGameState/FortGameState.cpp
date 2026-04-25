@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "FortniteGame/Public/FortGameState/FortGameState.h"
 
+#include "FortniteGame/Public/FortHero/FortHeroType.h"
+#include "FortniteGame/Public/FortHero/FortHero.h"
+
 void AFortGameState::OnRep_AdditionalPlaylistLevelsStreamed()
 {
 	static UFunction* Func = nullptr;
@@ -19,4 +22,23 @@ void AFortGameState::OnFinishedStreamingAdditionalPlaylistLevel()
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnFinishedStreamingAdditionalPlaylistLevel"));
 
 	ProcessEvent(Func, nullptr);
+}
+
+void AFortGameState::ApplyHomebaseEffectsOnPlayerSetup(AFortGameState* This, FUniqueNetIdRepl* SourceAccountID, UFortMcpProfileCampaign* McpProfile, IAbilitySystemInterface* AbilityObject, UFortHero* Hero, bool bApplyTeamEffect, bool bApplyTeamEffectToOtherPlayers, bool bIgnoreStatClamp)
+{
+	UFortHeroType* ItemDefinition = StaticLoadObject<UFortHeroType>("/Game/Athena/Heroes/HID_Commando_Athena_01.HID_Commando_Athena_01");
+	if (ItemDefinition)
+	{
+		Hero->ItemDefinition = ItemDefinition;
+		Log("Set hero item definition to " + ItemDefinition->GetName().ToString());
+	}
+
+	ApplyHomebaseEffectsOnPlayerSetupOG(This, SourceAccountID, McpProfile, AbilityObject, Hero, bApplyTeamEffect, bApplyTeamEffectToOtherPlayers, bIgnoreStatClamp);
+}
+
+void AFortGameState::Hook()
+{
+	MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetup()), ApplyHomebaseEffectsOnPlayerSetup, (LPVOID*)&ApplyHomebaseEffectsOnPlayerSetupOG);
+
+	Log("Hooked AFortGameState");
 }
