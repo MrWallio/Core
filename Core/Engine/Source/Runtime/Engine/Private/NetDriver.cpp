@@ -759,7 +759,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 
 					PriorityConnection = IsActorOwnedByAndRelevantToConnection(Actor, ConnectionViewers, bHasNullViewTarget);
 
-					if (PriorityConnection == nullptr)
+					/*if (PriorityConnection == nullptr)
 					{
 						// Not owned by this connection, if we have a channel, close it, and continue
 						if (!bHasNullViewTarget && Channel != NULL && Time - Channel->RelevantTime >= RelevantTimeout)
@@ -769,7 +769,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 
 						// This connection doesn't own this actor
 						continue;
-					}
+					}*/
 				}
 				else if (CVarSetNetDormancyEnabled && *CVarSetNetDormancyEnabled != 0)
 				{

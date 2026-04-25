@@ -163,3 +163,9 @@ ULevel* UWorld::GetCurrentLevel() const
 {
 	return PersistentLevel;
 }
+
+bool UWorld::IsInSeamlessTravel()
+{
+	bool (*IsInSeamlessTravelInternal)(const UWorld*) = decltype(IsInSeamlessTravelInternal)(ImageBase + Finder::FindUWorld_IsInSeamlessTravel());
+	return IsInSeamlessTravelInternal(this);
+}

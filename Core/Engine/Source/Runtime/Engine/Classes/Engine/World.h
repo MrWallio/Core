@@ -157,6 +157,8 @@ public:
 	ULevel* GetCurrentLevelPendingInvisibility() const { return CurrentLevelPendingInvisibility; }
 
 	class ULevel* GetCurrentLevel() const;
+
+	bool IsInSeamlessTravel();
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUWorld_InternalGetNetMode()), InternalGetNetMode, nullptr);

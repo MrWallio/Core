@@ -368,10 +368,12 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameModeAthena_InitGameState = 0;
 	inline uintptr_t AFortGameModeAthena_SpawnDefaultPawnFor = 0;
 	inline uintptr_t AFortGameModeAthena_RestartPlayer = 0;
+	inline uintptr_t AFortGameModeAthena_FinishWorldInitialization = 0;
 
 	inline uintptr_t AFortGameStateAthena_OnRep_CurrentPlaylistInfo = 0;
 	inline uintptr_t AFortGameStateAthena_OnPlaylistDataLoadCompleted = 0;
 	inline uintptr_t AFortGameStateAthena_UpdatePlaylistDependentData = 0;
+	inline uintptr_t AFortGameStateAthena_SetCurrentPlaylistId = 0;
 
 	inline uintptr_t UFortPlaylistManager_InitializePlaylists = 0;
 
@@ -509,6 +511,8 @@ namespace ServerOffsets {
 	inline uintptr_t CollectGarbageInternal = 0;
 
 	inline uintptr_t AFortPlayerControllerAthena_ClientRestart = 0;
+	inline uintptr_t AFortPlayerControllerAthena_SpawnQuickBars = 0;
+	inline uintptr_t AFortPlayerControllerAthena_SetupQuickBars = 0;
 
 	inline uintptr_t AFortGameState_ApplyHomebaseEffectsOnPlayerSetup = 0;
 
@@ -522,4 +526,6 @@ namespace ServerOffsets {
 	inline uintptr_t FString_Append = 0;
 	inline uintptr_t FString_AppendInt = 0;
 	inline uintptr_t FString_ToBool = 0;
+
+	inline uintptr_t AFortPlayerController_OnReadyToStartMatch = 0;
 }

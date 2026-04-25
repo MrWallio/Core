@@ -12,6 +12,8 @@
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
 
 #include "FortniteGame/Public/FortGameSession/FortGameSession.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
+#include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -124,6 +126,8 @@ void Utils::Hook() {
 
 	// FortniteGame
 	AFortGameSession::Hook();
+	AFortGameModeAthena::Hook();
+	AFortPlayerController::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {
@@ -209,7 +213,7 @@ void Utils::SetLogVerbosity() {
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortAI VeryVerbose", nullptr);
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortAIGoalSelection VeryVerbose", nullptr);
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortThreatVisuals VeryVerbose", nullptr);
-    UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortWind VeryVerbose", nullptr);
+    //UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortWind VeryVerbose", nullptr);
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortAIDirector VeryVerbose", nullptr);
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortEQS VeryVerbose", nullptr);
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortGameDifficulty VeryVerbose", nullptr);

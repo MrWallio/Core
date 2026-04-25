@@ -6539,6 +6539,81 @@ uintptr_t Finder::FindFString_ToBool() {
 	return ServerOffsets::FString_ToBool;
 }
 
+uintptr_t Finder::FindAFortGameModeAthena_FinishWorldInitialization() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortGameModeAthena_FinishWorldInitialization)
+		return ServerOffsets::AFortGameModeAthena_FinishWorldInitialization;
+	
+	Addr = Memcury::Scanner::FindPattern("40 55 56 41 56 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B F1 E8 ? ? ? ? ? ? ? 48 8B CE").Get();
+	
+	if (Addr) {
+		ServerOffsets::AFortGameModeAthena_FinishWorldInitialization = Addr - ImageBase;
+	}
+
+	Log("AFortGameModeAthena_FinishWorldInitialization found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeAthena_FinishWorldInitialization));
+	return ServerOffsets::AFortGameModeAthena_FinishWorldInitialization;
+}
+
+uintptr_t Finder::FindAFortGameStateAthena_SetCurrentPlaylistId() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId)
+		return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
+	
+	//Addr = Memcury::Scanner::FindPattern("").Get(); // Dont have anything for this yet
+	
+	if (Addr) {
+		ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId = Addr - ImageBase;
+	}
+
+	Log("AFortGameStateAthena_SetCurrentPlaylistId found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId));
+	return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
+}
+
+uintptr_t Finder::FindAFortPlayerController_OnReadyToStartMatch() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortPlayerController_OnReadyToStartMatch)
+		return ServerOffsets::AFortPlayerController_OnReadyToStartMatch;
+	
+	Addr = Memcury::Scanner::FindPattern("40 57 48 83 EC ? 8B 81 ? ? ? ? 48 8B F9 A8 ? 0F 85 ? ? ? ? 83 C8").Get();
+	
+	if (Addr) {
+		ServerOffsets::AFortPlayerController_OnReadyToStartMatch = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerController_OnReadyToStartMatch found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_OnReadyToStartMatch));
+	return ServerOffsets::AFortPlayerController_OnReadyToStartMatch;
+}
+
+uintptr_t Finder::FindAFortPlayerControllerAthena_SpawnQuickBars() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortPlayerControllerAthena_SpawnQuickBars)
+		return ServerOffsets::AFortPlayerControllerAthena_SpawnQuickBars;
+	
+	//Addr = Memcury::Scanner::FindPattern("").Get(); Havent got this one yet
+	
+	if (Addr) {
+		ServerOffsets::AFortPlayerControllerAthena_SpawnQuickBars = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerControllerAthena_SpawnQuickBars found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerControllerAthena_SpawnQuickBars));
+	return ServerOffsets::AFortPlayerControllerAthena_SpawnQuickBars;
+}
+
+uintptr_t Finder::FindAFortPlayerControllerAthena_SetupQuickBars() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortPlayerControllerAthena_SetupQuickBars)
+		return ServerOffsets::AFortPlayerControllerAthena_SetupQuickBars;
+	
+	//Addr = Memcury::Scanner::FindPattern("").Get(); Havent got this one yet
+	
+	if (Addr) {
+		ServerOffsets::AFortPlayerControllerAthena_SetupQuickBars = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerControllerAthena_SetupQuickBars found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerControllerAthena_SetupQuickBars));
+	return ServerOffsets::AFortPlayerControllerAthena_SetupQuickBars;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

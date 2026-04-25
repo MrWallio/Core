@@ -26,6 +26,7 @@
 
 #include "Core/Public/Offsets.h"
 #include "Core/Public/Configuration.h"
+#include "Core/Public/Finder.h"
 
 inline uintptr_t ImageBase = (uintptr_t)GetModuleHandleA(0);
 
@@ -60,6 +61,80 @@ inline void Log(const std::string& msg)
 	}
 
 	std::cout << "Log" + LogType + ": " << msg << std::endl;
+}
+
+template<typename T>
+static inline T& GetFromOffset(const void* base, size_t offset)
+{
+	return *reinterpret_cast<T*>(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(base) + offset));
+}
+
+inline int True() {
+	return 1;
+}
+
+inline int False() {
+	return 0;
+}
+
+static void* RetNullptr() {
+	return nullptr;
+}
+
+static void RetNull() {}
+
+class UObject;
+
+using StaticFindObjectFn = void* (__cdecl*)(class UClass*, UObject* Package, const wchar_t* OrigInName, bool ExactClass);
+using StaticLoadObjectFn = void* (__cdecl*)(class UClass*, UObject* InOuter, const TCHAR* Name, const TCHAR* Filename, uint32_t LoadFlags, UObject* Sandbox, bool bAllowObjectReconciliation, void*);
+
+__forceinline static UObject* StaticFindObjectOG(const wchar_t* ObjectPath, const UClass* Class)
+{
+	auto StaticFindObjectInternal = (UObject * (*)(const UClass*, UObject*, const wchar_t*, bool)) (ImageBase + Finder::FindStaticFindObject());
+	return StaticFindObjectInternal(Class, nullptr, ObjectPath, false);
+}
+
+__forceinline static UObject* StaticLoadObjectOG(const wchar_t* ObjectPath, const UClass* InClass, UObject* Outer = nullptr)
+{
+	auto StaticLoadObjectInternal = (UObject * (*)(const UClass*, UObject*, const wchar_t*, const wchar_t*, uint32_t, UObject*, bool, void*)) (ImageBase + Finder::FindStaticLoadObject());
+	return StaticLoadObjectInternal(InClass, Outer, ObjectPath, nullptr, 0, nullptr, false, nullptr);
+}
+
+template <typename T>
+inline T* StaticFindObject(std::wstring ObjectName)
+{
+	return (T*)StaticFindObjectOG(ObjectName.c_str(), T::StaticClass());
+}
+
+inline UObject* StaticFindObject(const std::wstring& ObjectName, const UClass* InClass = nullptr)
+{
+	return StaticFindObjectOG(ObjectName.c_str(), InClass);
+}
+
+template<typename T = UObject>
+inline T* StaticLoadObject(const std::string& Name)
+{
+	auto ConvName = std::wstring(Name.begin(), Name.end());
+
+	T* Object = StaticFindObject<T>(ConvName);
+
+	if (!Object)
+	{
+		Object = (T*)StaticLoadObjectOG(ConvName.c_str(), T::StaticClass());
+	}
+
+	return Object;
+}
+
+inline UObject* StaticLoadObject(const std::string& Name, const UClass* InClass = nullptr, UObject* Outer = nullptr)
+{
+	auto ConvName = std::wstring(Name.begin(), Name.end());
+	UObject* Object = StaticFindObject(ConvName);
+	if (!Object)
+	{
+		Object = StaticLoadObjectOG(ConvName.c_str(), InClass, Outer);
+	}
+	return Object;
 }
 
 #endif //PCH_H

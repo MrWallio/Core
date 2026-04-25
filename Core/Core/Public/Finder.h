@@ -838,6 +838,16 @@ public:
 	static uintptr_t FindFString_AppendInt();
 
 	static uintptr_t FindFString_ToBool();
+
+	static uintptr_t FindAFortGameModeAthena_FinishWorldInitialization();
+
+	static uintptr_t FindAFortGameStateAthena_SetCurrentPlaylistId();
+
+	static uintptr_t FindAFortPlayerController_OnReadyToStartMatch();
+
+	static uintptr_t FindAFortPlayerControllerAthena_SpawnQuickBars();
+
+	static uintptr_t FindAFortPlayerControllerAthena_SetupQuickBars();
 public:
 	static void SetupOffsets();
 
