@@ -4,6 +4,9 @@
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 #include "FortniteGame/Public/FortPlayerState/FortPlayerStateZone.h"
+#include "FortniteGame/Public/FortHero/FortHeroType.h"
+#include "FortniteGame/Public/FortHero/FortHero.h"
+#include "FortniteGame/Public/FortCharacter/CustomCharacterPart.h"
 
 void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P) {
 	AFortPlayerStateZone* PlayerState = This->PlayerState ? This->PlayerState->Cast<AFortPlayerStateZone>() : nullptr;
