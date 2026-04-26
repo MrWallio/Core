@@ -10,6 +10,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/GameSession.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
+#include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h"
 
 #include "FortniteGame/Public/FortGameSession/FortGameSession.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
@@ -124,6 +125,7 @@ void Utils::Hook() {
 	AActor::Hook();
 	UNetDriver::Hook();
 	AGameSession::Hook();
+	UAbilitySystemComponent::Hook();
 
 	// FortniteGame
 	AFortGameSession::Hook();

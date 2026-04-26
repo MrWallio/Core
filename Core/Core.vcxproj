@@ -146,10 +146,19 @@
     <ClInclude Include="Core\Public\Offsets.h" />
     <ClInclude Include="Core\Public\Utils.h" />
     <ClInclude Include="Core\Public\Version.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\Abilities\GameplayAbility.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\Abilities\GameplayAbilityTypes.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\AbilitySystemComponent.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\AbilitySystemInterface.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayAbilitySpec.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayAbilitySpecHandle.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayEffectTypes.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayPrediction.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\ScalableFloat.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\Templates\SubclassOf.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Class.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\CoreNet.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Interface.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\NoExportTypes.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Object.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\ObjectMacros.h" />
@@ -185,6 +194,7 @@
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\SharedPointer.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\TypeCompatibleBytes.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\UObject\NameTypes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\ActorComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\ActorChannel.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\Channel.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\ChildConnection.h" />
@@ -229,6 +239,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Public\NetworkingDistanceConstants.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Public\Net\DataBunch.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Public\Net\DataChannel.h" />
+    <ClInclude Include="Engine\Source\Runtime\GameplayTasks\Classes\GameplayTasksComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Classes\Net\Serialization\FastArraySerializer.h" />
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Public\Net\Core\Connection\NetEnums.h" />
     <ClInclude Include="FortniteGame\Public\FortCharacter\CustomCharacterPart.h" />
@@ -280,6 +291,9 @@
     <ClCompile Include="Core\Private\Finder.cpp" />
     <ClCompile Include="Core\Private\Utils.cpp" />
     <ClCompile Include="Core\Private\Version.cpp" />
+    <ClCompile Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Private\AbilitySystemComponent.cpp" />
+    <ClCompile Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Private\GameplayAbilitySpecHandle.cpp" />
+    <ClCompile Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Private\GameplayAbilityTypes.cpp" />
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\Class.cpp" />
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\Obj.cpp" />
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectArray.cpp" />
