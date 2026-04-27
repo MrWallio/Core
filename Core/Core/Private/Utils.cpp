@@ -15,7 +15,7 @@
 #include "FortniteGame/Public/FortGameSession/FortGameSession.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
-#include "FortniteGame/Public/FortGameState/FortGameState.h"
+#include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -134,6 +134,7 @@ void Utils::Hook() {
 	AFortGameState::Hook();
 	AFortPlayerControllerZone::Hook();
 	AFortGameModeZone::Hook();
+	AFortGameStateZone::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

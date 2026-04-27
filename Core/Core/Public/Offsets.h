@@ -528,4 +528,6 @@ namespace ServerOffsets {
 	inline uintptr_t FString_ToBool = 0;
 
 	inline uintptr_t AFortPlayerController_OnReadyToStartMatch = 0;
+
+	inline uintptr_t AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup = 0;
 }

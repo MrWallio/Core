@@ -260,6 +260,7 @@
     <ClInclude Include="FortniteGame\Public\FortGameState\FortGameStatePvP.h" />
     <ClInclude Include="FortniteGame\Public\FortGameState\FortGameStateZone.h" />
     <ClInclude Include="FortniteGame\Public\FortHero\FortHero.h" />
+    <ClInclude Include="FortniteGame\Public\FortHero\FortHeroSpecialization.h" />
     <ClInclude Include="FortniteGame\Public\FortHero\FortHeroType.h" />
     <ClInclude Include="FortniteGame\Public\FortItemDefinition\FortItemDefinition.h" />
     <ClInclude Include="FortniteGame\Public\FortItemDefinition\FortWorldItemDefinition.h" />
@@ -342,6 +343,7 @@
     <ClCompile Include="FortniteGame\Private\FortGameSession\FortGameSession.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameState\FortGameState.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameState\FortGameStateAthena.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortGameState\FortGameStateZone.cpp" />
     <ClCompile Include="FortniteGame\Private\FortItemDefinition\FortItemDefinition.cpp" />
     <ClCompile Include="FortniteGame\Private\FortItem\FortItem.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPawn\FortPawn.cpp" />

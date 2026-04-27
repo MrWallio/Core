@@ -848,6 +848,8 @@ public:
 	static uintptr_t FindAFortPlayerControllerAthena_SpawnQuickBars();
 
 	static uintptr_t FindAFortPlayerControllerAthena_SetupQuickBars();
+
+	static uintptr_t FindAFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup();
 public:
 	static void SetupOffsets();
 

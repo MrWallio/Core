@@ -8,12 +8,15 @@
 
 class AFortPlayerPawnAthena;
 class AFortBroadcastRemoteClientInfo;
+class UFortHero;
 
 class AFortPlayerControllerAthena : public AFortPlayerControllerZone {
 public:
 	DefineUnrealClass(AFortPlayerControllerAthena);
 
 	DefineUProperty(AFortBroadcastRemoteClientInfo*, BroadcastRemoteClientInfo);
+
+	DefineUProperty(UFortHero*, StrongMyHero);
 public:
 	void SpawnQuickBars();
 

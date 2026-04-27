@@ -6619,6 +6619,20 @@ uintptr_t Finder::FindAFortPlayerControllerAthena_SetupQuickBars() {
 	return ServerOffsets::AFortPlayerControllerAthena_SetupQuickBars;
 }
 
+uintptr_t Finder::FindAFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup)
+		return ServerOffsets::AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup;
+	
+	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? ? ? ? 48 8B F2 49 8B D1").Get();
+	
+	if (Addr) {
+		ServerOffsets::AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup = Addr - ImageBase;
+	}
+	Log("AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup));
+	return ServerOffsets::AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

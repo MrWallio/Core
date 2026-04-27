@@ -3,6 +3,8 @@
 
 #include "FortPlayerControllerGameplay.h"
 
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
+
 class AFortPlayerPawnAthena;
 
 class AFortPlayerControllerZone : public AFortPlayerControllerGameplay {

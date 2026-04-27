@@ -5,6 +5,7 @@
 #include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 #include "FortniteGame/Public/FortHero/FortHeroType.h"
+#include "FortniteGame/Public/FortHero/FortHero.h"
 #include "FortniteGame/Public/FortCharacter/CustomCharacterPart.h"
 #include "FortniteGame/Public/FortWorld/FortWorldManager.h"
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
