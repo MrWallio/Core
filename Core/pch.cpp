@@ -4,8 +4,8 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
 
-uintptr_t GetVTableIndex(class UObject* Object, class UFunction* Func) {
-	if (!Object || !Func)
+uintptr_t GetVTableIndex(class UFunction* Func) {
+	if (!Func)
 	{
 		Log("Invalid parameters for GetVTableIndex");
 		return -1;
@@ -34,8 +34,7 @@ uintptr_t GetVTableIndex(class UObject* Object, class UFunction* Func) {
 
 	int VTableIndex = 0;
 
-	if (FuncName == "ReadyToStartMatch" || FuncName == "SpawnDefaultPawnFor"
-		|| FuncName == "HandleStartingNewPlayer")
+	if (!FuncName.contains("Server"))
 	{
 		VTableIndex = VirtualFuncIdx / 8;
 	}
@@ -44,6 +43,9 @@ uintptr_t GetVTableIndex(class UObject* Object, class UFunction* Func) {
 		VTableIndex = (VirtualFuncIdx / 8) + 1;
 	}
 
+	std::stringstream ss;
+	ss << FuncName << " (Index): 0x" << std::uppercase << std::hex << VTableIndex;
+	Log(ss.str());
 	return VTableIndex;
 }
 
@@ -78,8 +80,7 @@ void HookVTable(UObject* Object, UFunction* Func, void* Detour, void** Original)
 
 	int VTableIndex = 0;
 
-	if (FuncName == "ReadyToStartMatch" || FuncName == "SpawnDefaultPawnFor"
-		|| FuncName == "HandleStartingNewPlayer") //idfk????
+	if (!FuncName.contains("Server")) //idfk????
 	{
 		VTableIndex = VirtualFuncIdx / 8;
 	}

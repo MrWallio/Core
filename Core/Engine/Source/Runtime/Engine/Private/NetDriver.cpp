@@ -18,7 +18,7 @@
 #include "Engine/Source/Runtime/Core/Public/Misc/AssertionMacros.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/PackageMapClient.h"
 
-static int32* CVarSetNetDormancyEnabled = Finder::FindCVar<int32>(L"net.DormancyEnable");
+static int32* CVarSetNetDormancyEnabled = Finder::FindCVarDirect<int32>(L"net.DormancyEnable");
 
 FActorPriority::FActorPriority(UNetConnection* InConnection, UActorChannel* InChannel, FNetworkObjectInfo* InActorInfo, const TArray<struct FNetViewer>& Viewers, bool bLowBandwidth)
 	: ActorInfo(InActorInfo), Channel(InChannel), DestructionInfo(NULL)
@@ -154,28 +154,14 @@ bool UNetDriver::IsAdaptiveNetUpdateFrequencyEnabled()
 
 static FORCEINLINE UNetConnection* IsActorOwnedByAndRelevantToConnection(const AActor* Actor, const TArray<FNetViewer>& ConnectionViewers, bool& bOutHasNullViewTarget)
 {
-	if (!Actor) {
-		return nullptr;
-	}
-
 	if (Version::Engine_Version == 4.16) {
-		const AActor* ActorOwner = Actor->Owner;
-		if (!ActorOwner)
-		{
-			return nullptr;
-		}
+		const AActor* ActorOwner = Actor->GetNetOwner();
 
 		bOutHasNullViewTarget = false;
 
 		for (int i = 0; i < ConnectionViewers.Num(); i++)
 		{
-			FNetViewer Viewer = ConnectionViewers[i];
-
-			UNetConnection* ViewerConnection = Viewer.Connection;
-			if (!ViewerConnection)
-			{
-				continue;
-			}
+			UNetConnection* ViewerConnection = ConnectionViewers[i].Connection;
 
 			if (ViewerConnection->ViewTarget == nullptr)
 			{
@@ -183,7 +169,7 @@ static FORCEINLINE UNetConnection* IsActorOwnedByAndRelevantToConnection(const A
 			}
 
 			if (ActorOwner == ViewerConnection->PlayerController ||
-				(ViewerConnection->PlayerController && ActorOwner == ViewerConnection->PlayerController->Pawn) ||
+				(ViewerConnection->PlayerController && ActorOwner == ViewerConnection->PlayerController->K2_GetPawn()) ||
 				(ViewerConnection->ViewTarget && ViewerConnection->ViewTarget->IsRelevancyOwnerFor(Actor, ActorOwner, ViewerConnection->OwningActor)))
 			{
 				return ViewerConnection;
@@ -199,7 +185,6 @@ static FORCEINLINE UNetConnection* IsActorOwnedByAndRelevantToConnection(const A
 static FORCEINLINE bool IsActorDormant(FNetworkObjectInfo* ActorInfo, const UNetConnection* Connection)
 {
 	if (Version::Engine_Version == 4.16) {
-		// If actor is already dormant on this channel, then skip replication entirely
 		return ActorInfo->DormantConnections.Contains(TWeakObjectPtr<UNetConnection>(Connection));
 	}
 
@@ -210,7 +195,9 @@ static FORCEINLINE bool IsActorDormant(FNetworkObjectInfo* ActorInfo, const UNet
 static FORCEINLINE bool ShouldActorGoDormant(AActor* Actor, const TArray<FNetViewer>& ConnectionViewers, UActorChannel* Channel, const float Time, const bool bLowNetBandwidth)
 {
 	if (Version::Engine_Version == 4.16) {
-		if (Actor->NetDormancy <= DORM_Awake || !Channel || Channel->GetbPendingDormancy() || Channel->GetDormant())
+		UActorChannelUE416* ActorChannel = (UActorChannelUE416*)Channel;
+
+		if (Actor->NetDormancy <= DORM_Awake || !ActorChannel || ActorChannel->bPendingDormancy || ActorChannel->Dormant)
 		{
 			// Either shouldn't go dormant, or is already dormant
 			return false;
@@ -640,8 +627,8 @@ void UNetDriver::ServerReplicateActors_BuildConsiderList(TArray<FNetworkObjectIn
 			}
 
 			// Don't send actors that may still be streaming in or out
-			ULevel* Level = Actor->GetLevel();
-			if (Level->HasVisibilityChangeRequestPending() || Level->GetbIsAssociatingLevel())
+			ULevelUE416* Level = (ULevelUE416*)Actor->GetLevel();
+			if (Level->HasVisibilityChangeRequestPending() || Level->bIsAssociatingLevel)
 			{
 				continue;
 			}
@@ -752,7 +739,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 
 				UNetConnection* PriorityConnection = Connection;
 
-				/*if (Actor->bOnlyRelevantToOwner)
+				if (Actor->bOnlyRelevantToOwner)
 				{
 					// This actor should be owned by a particular connection, see if that connection is the one passed in
 					bool bHasNullViewTarget = false;
@@ -764,6 +751,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 						// Not owned by this connection, if we have a channel, close it, and continue
 						if (!bHasNullViewTarget && Channel != NULL && Time - Channel->RelevantTime >= RelevantTimeout)
 						{
+							Log(std::format("Closing channel for: {}", Actor->GetName().ToString()));
 							Channel->Close();
 						}
 
@@ -785,7 +773,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 						// Channel is marked to go dormant now once all properties have been replicated (but is not dormant yet)
 						Channel->StartBecomingDormant();
 					}
-				}*/
+				}
 
 				// Skip actor if not relevant and theres no channel already.
 				// Historically Relevancy checks were deferred until after prioritization because they were expensive (line traces).

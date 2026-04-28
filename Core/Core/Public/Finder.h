@@ -11,6 +11,8 @@ public:
 
 	static uintptr_t FindProcessEvent();
 
+	static uintptr_t FindProcessEventVFT();
+
 	static uintptr_t FindGIsClient();
 
 	static uintptr_t FindGIsServer();
@@ -152,6 +154,8 @@ public:
 	static uintptr_t FindUEngine_GetNetMode();
 
 	static uintptr_t FindUEngine_GetMaxTickRate();
+
+	static uintptr_t FindUEngine_GetMaxTickRateVFT();
 
 	static uintptr_t FindUWorld_AddController();
 
@@ -444,6 +448,8 @@ public:
 	static uintptr_t FindAActor_HasLocalNetOwner();
 
 	static uintptr_t FindUEngine_LoadMap();
+
+	static uintptr_t FindUEngine_LoadMapVFT();
 
 	static uintptr_t FindFURL_IsInternal();
 
@@ -805,6 +811,8 @@ public:
 
 	static uintptr_t FindUChannel_SendBunch();
 
+	static uintptr_t FindUChannel_SendBunchVFT();
+
 	static uintptr_t FindFNetworkObjectList_ClearRecentlyDormantConnection();
 
 	static uintptr_t FindFNetworkObjectList_Add();
@@ -850,6 +858,14 @@ public:
 	static uintptr_t FindAFortPlayerControllerAthena_SetupQuickBars();
 
 	static uintptr_t FindAFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup();
+
+	static uintptr_t FindAActor_GetNetOwnerVFT();
+
+	static uintptr_t FindUAbilitySystemComponent_FindAbilitySpecFromHandle();
+
+	static uintptr_t FindUChannel_CloseVFT();
+
+	static uintptr_t FindUChannel_StartBecomingDormantVFT();
 public:
 	static void SetupOffsets();
 
@@ -885,6 +901,54 @@ public:
 
 			if (*Ptr == 0x4C && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0x05)
 				return Memcury::Scanner(Ptr).RelativeOffset(3).GetAs<CVarT*>();
+		}
+
+		return nullptr;
+	}
+
+	template <typename CVarT>
+	static CVarT* FindCVarDirect(const wchar_t* CVarStr)
+	{
+		auto sRef = Memcury::Scanner::FindStringRef(CVarStr);
+
+		if (!sRef.IsValid())
+		{
+			return nullptr;
+		}
+
+		for (int i = 0; i < 1000; i++)
+		{
+			auto Ptr = (uint8_t*)(sRef.Get() + i);
+
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x05)
+			{
+				auto VarPtr = Memcury::Scanner(Ptr).RelativeOffset(3).GetAs<CVarT**>();
+				if (VarPtr && *VarPtr)
+				{
+					if (**VarPtr >= 0 && **VarPtr <= 1)
+					{
+						return *VarPtr;
+					}
+				}
+			}
+
+			else if (*Ptr == 0xFF && (*(Ptr + 1) == 0x50 || *(Ptr + 1) == 0x10))
+			{
+				auto NextPtr = Ptr + 3;
+
+				if (*NextPtr == 0x48 && *(NextPtr + 1) == 0x89 && *(NextPtr + 2) == 0x05)
+				{
+					auto VarPtr = Memcury::Scanner(NextPtr).RelativeOffset(3).GetAs<CVarT**>();
+
+					if (VarPtr && *VarPtr)
+					{
+						if (**VarPtr >= 0 && **VarPtr <= 1)
+						{
+							return *VarPtr;
+						}
+					}
+				}
+			}
 		}
 
 		return nullptr;

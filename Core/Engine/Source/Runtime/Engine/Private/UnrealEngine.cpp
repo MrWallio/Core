@@ -164,6 +164,6 @@ FWorldContext& UEngine::GetWorldContextFromWorldChecked(UWorld* InWorld)
 
 float UEngine::GetMaxTickRate(float DeltaTime, bool bAllowFrameRateSmoothing) const
 {
-	float (*GetMaxTickRateInternal)(const UEngine*, float, bool) = decltype(GetMaxTickRateInternal)(ImageBase + Finder::FindUEngine_GetMaxTickRate());
+	float (*&GetMaxTickRateInternal)(const UEngine*, float, bool) = decltype(GetMaxTickRateInternal)(VTable[Finder::FindUEngine_GetMaxTickRateVFT()]);
 	return GetMaxTickRateInternal(this, DeltaTime, bAllowFrameRateSmoothing);
 }

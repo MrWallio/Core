@@ -3,30 +3,6 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
 
-void UObjectBase::EmitBaseReferences(UClass* RootClass)
-{
-	void (*EmitBaseReferencesInternal)(UClass*) = decltype(EmitBaseReferencesInternal)(ImageBase + Finder::FindUObjectBase_EmitBaseReferences());
-	EmitBaseReferencesInternal(RootClass);
-}
-
-void UObjectBase::LowLevelRename(FName NewName, UObject* NewOuter)
-{
-	void (*LowLevelRenameInternal)(UObjectBase*, FName, UObject*) = decltype(LowLevelRenameInternal)(ImageBase + Finder::FindUObjectBase_LowLevelRename());
-	LowLevelRenameInternal(this, NewName, NewOuter);
-}
-
-void UObjectBase::Register(const TCHAR* PackageName, const TCHAR* InName)
-{
-	void (*RegisterInternal)(UObjectBase*, const TCHAR*, const TCHAR*) = decltype(RegisterInternal)(ImageBase + Finder::FindUObjectBase_Register());
-	RegisterInternal(this, PackageName, InName);
-}
-
-void UObjectBase::DeferredRegister(UClass* UClassStaticClass, const TCHAR* PackageName, const TCHAR* InName)
-{
-	void (*DeferredRegisterInternal)(UObjectBase*, UClass*, const TCHAR*, const TCHAR*) = decltype(DeferredRegisterInternal)(ImageBase + Finder::FindUObjectBase_DeferredRegister());
-	DeferredRegisterInternal(this, UClassStaticClass, PackageName, InName);
-}
-
 bool UObjectBase::IsValidLowLevel() const
 {
 	bool (*IsValidLowLevelInternal)(const UObjectBase*) = decltype(IsValidLowLevelInternal)(ImageBase + Finder::FindUObjectBase_IsValidLowLevel());

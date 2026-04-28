@@ -113,6 +113,8 @@ public:
 	void CallPreReplication(UNetDriver* NetDriver);
 
 	void ForceNetUpdate();
+
+	const AActor* GetNetOwner() const;
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAActor_InternalGetNetMode()), InternalGetNetMode, (LPVOID*)&InternalGetNetModeOG);
@@ -120,3 +122,9 @@ public:
 		Log("Hooked AActor");
 	}
 };
+
+FORCEINLINE const AActor* AActor::GetNetOwner() const
+{
+	AActor* (*&GetNetOwner)(const AActor*) = decltype(GetNetOwner)(VTable[Finder::FindAActor_GetNetOwnerVFT()]);
+	return GetNetOwner(this);
+}

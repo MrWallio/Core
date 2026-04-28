@@ -3,6 +3,7 @@
 
 namespace ServerOffsets {
 	inline uintptr_t ProcessEvent = 0;
+	inline uintptr_t ProcessEventVFT = 0;
 
 	inline uintptr_t GUObjectArray = 0;
 	inline uintptr_t GWorld = 0;
@@ -115,8 +116,10 @@ namespace ServerOffsets {
 	inline uintptr_t UEngine_GetFirstGamePlayer = 0;
 	inline uintptr_t UEngine_GetNetMode = 0;
 	inline uintptr_t UEngine_GetMaxTickRate = 0;
+	inline uintptr_t UEngine_GetMaxTickRateVFT = 0;
 	inline uintptr_t UEngine_CreateNetDriver = 0;
 	inline uintptr_t UEngine_LoadMap = 0;
+	inline uintptr_t UEngine_LoadMapVFT = 0;
 	inline uintptr_t UEngine_CreateNamedNetDriver = 0;
 	inline uintptr_t UEngine_GetWorldContextFromWorldChecked = 0;
 	inline uintptr_t UEngine_FindNamedNetDriver = 0;
@@ -383,6 +386,7 @@ namespace ServerOffsets {
 	inline uintptr_t UAbilitySystemComponent_InternalTryActivateAbility = 0;
 	inline uintptr_t UAbilitySystemComponent_GiveAbility = 0;
 	inline uintptr_t UAbilitySystemComponent_GiveAbilityAndActivateOnce = 0;
+	inline uintptr_t UAbilitySystemComponent_FindAbilitySpecFromHandle = 0;
 
 	inline uintptr_t ULevelStreamingDynamic_LoadLevelInstance = 0;
 	inline uintptr_t ULevelStreamingDynamic_LoadLevelInstanceBySoftObjectPtr = 0;
@@ -500,12 +504,14 @@ namespace ServerOffsets {
 
 	inline uintptr_t UChannel__NumInRec = 0;
 	inline uintptr_t UChannel__NumOutRec = 0;
+	inline uintptr_t UChannel_SendBunch = 0;
+	inline uintptr_t UChannel_SendBunchVFT = 0;
+	inline uintptr_t UChannel_CloseVFT = 0;
+	inline uintptr_t UChannel_StartBecomingDormantVFT = 0;
 
 	inline uintptr_t AFortGameSession_ValidatePlayer = 0;
 
 	inline uintptr_t UPackageMap_WriteObject = 0;
-
-	inline uintptr_t UChannel_SendBunch = 0;
 
 	inline uintptr_t CollectGarbage = 0;
 	inline uintptr_t CollectGarbageInternal = 0;
@@ -530,4 +536,6 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPlayerController_OnReadyToStartMatch = 0;
 
 	inline uintptr_t AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup = 0;
+
+	inline uintptr_t AActor_GetNetOwnerVFT = 0;
 }

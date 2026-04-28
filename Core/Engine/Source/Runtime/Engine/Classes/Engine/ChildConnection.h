@@ -8,10 +8,4 @@ class UChildConnection : public UNetConnection
 	DefineUnrealClass(UChildConnection);
 
 	DefineUProperty(UNetConnection*, Parent);
-
-public:
-	int32 IsNetReady(bool Saturate)
-	{
-		return Parent->IsNetReady(Saturate);
-	}
 };

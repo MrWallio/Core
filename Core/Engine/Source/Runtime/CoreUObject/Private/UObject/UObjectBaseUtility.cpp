@@ -20,32 +20,8 @@ UPackage* UObjectBaseUtility::GetOutermost() const
 	return GetOutermostInternal(this);
 }
 
-bool UObjectBaseUtility::MarkPackageDirty() const
-{
-	bool (*MarkPackageDirtyInternal)(const UObjectBaseUtility*) = decltype(MarkPackageDirtyInternal)(ImageBase + Finder::FindUObjectBaseUtility_MarkPackageDirty());
-	return MarkPackageDirtyInternal(this);
-}
-
-UObject* UObjectBaseUtility::GetTypedOuter(UClass* Target) const
-{
-	UObject* (*GetTypedOuterInternal)(const UObjectBaseUtility*, UClass*) = decltype(GetTypedOuterInternal)(ImageBase + Finder::FindUObjectBaseUtility_GetTypedOuter());
-	return GetTypedOuterInternal(this, Target);
-}
-
-bool UObjectBaseUtility::IsIn(const UObject* SomeOuter) const
-{
-	bool (*IsInInternal)(const UObjectBaseUtility*, const UObject*) = decltype(IsInInternal)(ImageBase + Finder::FindUObjectBaseUtility_IsIn());
-	return IsInInternal(this, SomeOuter);
-}
-
 void* UObjectBaseUtility::GetInterfaceAddress(UClass* InterfaceClass)
 {
 	void* (*GetInterfaceAddressInternal)(UObjectBaseUtility*, UClass*) = decltype(GetInterfaceAddressInternal)(ImageBase + Finder::FindUObjectBaseUtility_GetInterfaceAddress());
 	return GetInterfaceAddressInternal(this, InterfaceClass);
-}
-
-void* UObjectBaseUtility::GetNativeInterfaceAddress(UClass* InterfaceClass)
-{
-	void* (*GetNativeInterfaceAddressInternal)(UObjectBaseUtility*, UClass*) = decltype(GetNativeInterfaceAddressInternal)(ImageBase + Finder::FindUObjectBaseUtility_GetNativeInterfaceAddress());
-	return GetNativeInterfaceAddressInternal(this, InterfaceClass);
 }

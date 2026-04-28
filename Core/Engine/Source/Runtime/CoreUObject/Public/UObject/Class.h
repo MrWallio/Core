@@ -90,6 +90,10 @@ public:
 class UFunction : public UStruct {
 public:
     DefineCustomProperty(void*, Func, ServerOffsets::ExecFunction);
+public:
+    static UClass* StaticClass() {
+        return (UClass*)FUObjectArray::FindObject("Class /Script/CoreUObject.Function");
+    }
 };
 
 class UDelegateFunction : public UFunction {

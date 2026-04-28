@@ -139,6 +139,18 @@ uintptr_t Finder::FindProcessEvent() {
 	return ServerOffsets::ProcessEvent;
 }
 
+uintptr_t Finder::FindProcessEventVFT() {
+	if (ServerOffsets::ProcessEventVFT)
+		return ServerOffsets::ProcessEventVFT;
+	
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::ProcessEventVFT = 0x3E;
+	}
+
+	Log("ProcessEvent VFT found at: 0x" + std::format("{:X}", ServerOffsets::ProcessEventVFT));
+	return ServerOffsets::ProcessEventVFT;
+}
+
 uintptr_t Finder::FindGIsClient() {
 	if (ServerOffsets::GIsClient)
 		return ServerOffsets::GIsClient;
@@ -1540,6 +1552,18 @@ uintptr_t Finder::FindUEngine_GetMaxTickRate() {
 
 	Log("UEngine::GetMaxTickRate found at: 0x" + std::format("{:X}", ServerOffsets::UEngine_GetMaxTickRate));
 	return ServerOffsets::UEngine_GetMaxTickRate;
+}
+
+uintptr_t Finder::FindUEngine_GetMaxTickRateVFT() {
+	if (ServerOffsets::UEngine_GetMaxTickRateVFT)
+		return ServerOffsets::UEngine_GetMaxTickRateVFT;
+	
+	if  (Version::Engine_Version == 4.16) {
+		ServerOffsets::UEngine_GetMaxTickRateVFT = 0x4D;
+	}
+
+	Log("UEngine::GetMaxTickRateVFT found at: 0x" + std::format("{:X}", ServerOffsets::UEngine_GetMaxTickRateVFT));
+	return ServerOffsets::UEngine_GetMaxTickRateVFT;
 }
 
 uintptr_t Finder::FindUWorld_AddController() {
@@ -3651,6 +3675,18 @@ uintptr_t Finder::FindUEngine_LoadMap() {
 
 	Log("UEngine_LoadMap found at: 0x" + std::format("{:X}", ServerOffsets::UEngine_LoadMap));
 	return ServerOffsets::UEngine_LoadMap;
+}
+
+uintptr_t Finder::FindUEngine_LoadMapVFT() {
+	if (ServerOffsets::UEngine_LoadMapVFT)
+		return ServerOffsets::UEngine_LoadMapVFT;
+
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::UEngine_LoadMapVFT = 0x7E;
+	}
+
+	Log("UEngine_LoadMapVFT found at: 0x" + std::format("{:X}", ServerOffsets::UEngine_LoadMapVFT));
+	return ServerOffsets::UEngine_LoadMapVFT;
 }
 
 uintptr_t Finder::FindFURL_IsInternal() {
@@ -6289,6 +6325,18 @@ uintptr_t Finder::FindUChannel_SendBunch() {
 	return ServerOffsets::UChannel_SendBunch;
 }
 
+uintptr_t Finder::FindUChannel_SendBunchVFT() {
+	if (ServerOffsets::UChannel_SendBunchVFT)
+		return ServerOffsets::UChannel_SendBunchVFT;
+	
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::UChannel_SendBunchVFT = 0x4F;
+	}
+
+	Log("UChannel_SendBunchVFT found at: 0x" + std::format("{:X}", ServerOffsets::UChannel_SendBunchVFT));
+	return ServerOffsets::UChannel_SendBunchVFT;
+}
+
 uintptr_t Finder::FindFNetworkObjectList_ClearRecentlyDormantConnection() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::FNetworkObjectList_ClearRecentlyDormantConnection)
@@ -6631,6 +6679,59 @@ uintptr_t Finder::FindAFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup() {
 	}
 	Log("AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup));
 	return ServerOffsets::AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup;
+}
+
+uintptr_t Finder::FindAActor_GetNetOwnerVFT() {
+	if (ServerOffsets::AActor_GetNetOwnerVFT)
+		return ServerOffsets::AActor_GetNetOwnerVFT;
+
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::AActor_GetNetOwnerVFT = 0x89;
+	}
+
+	Log("AActor_GetNetOwnerVFT found at: 0x" + std::format("{:X}", ServerOffsets::AActor_GetNetOwnerVFT));
+	return ServerOffsets::AActor_GetNetOwnerVFT;
+}
+
+uintptr_t Finder::FindUAbilitySystemComponent_FindAbilitySpecFromHandle() {
+	if (ServerOffsets::UAbilitySystemComponent_FindAbilitySpecFromHandle)
+		return ServerOffsets::UAbilitySystemComponent_FindAbilitySpecFromHandle;
+	uintptr_t Addr = 0;
+	
+	if (Version::Engine_Version == 4.16) {
+		Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 6B C1 ? 4C 03 C0 49 3B C0 74 ? 66 0F 1F 44 00 ? 39 50").Get();
+	}
+
+	if (Addr) {
+		ServerOffsets::UAbilitySystemComponent_FindAbilitySpecFromHandle = Addr - ImageBase;
+	}
+
+	Log("UAbilitySystemComponent_FindAbilitySpecFromHandle found at: 0x" + std::format("{:X}", ServerOffsets::UAbilitySystemComponent_FindAbilitySpecFromHandle));
+	return ServerOffsets::UAbilitySystemComponent_FindAbilitySpecFromHandle;
+}
+
+uintptr_t Finder::FindUChannel_CloseVFT() {
+	if (ServerOffsets::UChannel_CloseVFT)
+		return ServerOffsets::UChannel_CloseVFT;
+
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::UChannel_CloseVFT = 0x47;
+	}
+
+	Log("UChannel_CloseVFT found at: 0x" + std::format("{:X}", ServerOffsets::UChannel_CloseVFT));
+	return ServerOffsets::UChannel_CloseVFT;
+}
+
+uintptr_t Finder::FindUChannel_StartBecomingDormantVFT() {
+	if (ServerOffsets::UChannel_StartBecomingDormantVFT)
+		return ServerOffsets::UChannel_StartBecomingDormantVFT;
+
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::UChannel_StartBecomingDormantVFT = 0x51;
+	}
+
+	Log("UChannel_StartBecomingDormantVFT found at: 0x" + std::format("{:X}", ServerOffsets::UChannel_StartBecomingDormantVFT));
+	return ServerOffsets::UChannel_StartBecomingDormantVFT;
 }
 
 void Finder::SetupOffsets() {

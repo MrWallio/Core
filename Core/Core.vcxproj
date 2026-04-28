@@ -181,6 +181,7 @@
     <ClInclude Include="Engine\Source\Runtime\Core\Public\HAL\MemoryBase.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\HAL\Platform.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\HAL\UnrealMemory.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\IntVector.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\Quat.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\Rotator.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Math\TransformNonVectorized.h" />

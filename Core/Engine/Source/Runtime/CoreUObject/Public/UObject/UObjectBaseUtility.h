@@ -22,18 +22,5 @@ public:
 
 	UPackage* GetOutermost() const;
 
-	bool MarkPackageDirty() const;
-
-	UObject* GetTypedOuter(UClass* Target) const;
-
-	bool IsIn(const UObject* SomeOuter) const;
-
 	void* GetInterfaceAddress(UClass* InterfaceClass);
-
-	void* GetNativeInterfaceAddress(UClass* InterfaceClass);
-
-	const void* GetNativeInterfaceAddress(UClass* InterfaceClass) const
-	{
-		return const_cast<UObjectBaseUtility*>(this)->GetNativeInterfaceAddress(InterfaceClass);
-	}
 };

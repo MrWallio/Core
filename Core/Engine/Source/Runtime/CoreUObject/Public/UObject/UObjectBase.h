@@ -11,14 +11,6 @@ class UProperty;
 
 class UObjectBase {
 public:
-	static void EmitBaseReferences(UClass* RootClass);
-public:
-	void LowLevelRename(FName NewName, UObject* NewOuter = NULL);
-
-	void Register(const TCHAR* PackageName, const TCHAR* Name);
-
-	void DeferredRegister(UClass* UClassStaticClass, const TCHAR* PackageName, const TCHAR* Name);
-public:
 	bool IsValidLowLevel() const;
 
 	bool IsValidLowLevelFast(bool bRecursive = true) const;

@@ -9,15 +9,15 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/CoreNet.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
 
-void UActorChannel::Close()
+void UChannel::Close()
 {
-	void (*CloseInternal)(UActorChannel*) = decltype(CloseInternal)(ImageBase + Finder::FindUActorChannel_Close());
+	void (*&CloseInternal)(UChannel*) = decltype(CloseInternal)(VTable[Finder::FindUChannel_CloseVFT()]);
 	CloseInternal(this);
 }
 
-void UActorChannel::StartBecomingDormant()
+void UChannel::StartBecomingDormant()
 {
-	void (*StartBecomingDormantInternal)(UActorChannel*) = decltype(StartBecomingDormantInternal)(ImageBase + Finder::FindUActorChannel_StartBecomingDormant());
+	void (*&StartBecomingDormantInternal)(UChannel*) = decltype(StartBecomingDormantInternal)(VTable[Finder::FindUChannel_StartBecomingDormantVFT()]);
 	StartBecomingDormantInternal(this);
 }
 
@@ -29,7 +29,9 @@ void UActorChannel::SetChannelActorForDestroy(FActorDestructionInfo* DestructInf
 	}
 	else {
 		if (Version::Engine_Version == 4.16) {
-			if (!GetClosing() && (Connection->State == USOCK_Open || Connection->State == USOCK_Pending))
+			UActorChannelUE416* ActorChannel = (UActorChannelUE416*)this;
+
+			if (ActorChannel->Closing && (Connection->State == USOCK_Open || Connection->State == USOCK_Pending))
 			{
 				// Send a close notify, and wait for ack.
 				FOutBunch CloseBunch(this, 1);
@@ -75,6 +77,6 @@ bool UActorChannel::ReplicateActor()
 
 FPacketIdRange UChannel::SendBunch(FOutBunch* Bunch, bool Merge)
 {
-	FPacketIdRange(*SendBunchInternal)(UChannel*, FOutBunch*, bool) = decltype(SendBunchInternal)(ImageBase + Finder::FindUChannel_SendBunch());
+	FPacketIdRange(*&SendBunchInternal)(UChannel*, FOutBunch*, bool) = decltype(SendBunchInternal)(VTable[Finder::FindUChannel_SendBunchVFT()]);
 	return SendBunchInternal(this, Bunch, Merge);
 }
