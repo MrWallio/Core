@@ -24,14 +24,7 @@ void AFortGameState::OnFinishedStreamingAdditionalPlaylistLevel()
 	ProcessEvent(Func, nullptr);
 }
 
-void AFortGameState::ApplyHomebaseEffectsOnPlayerSetup(AFortGameState* This, FUniqueNetIdRepl* SourceAccountID, UFortMcpProfileCampaign* McpProfile, IAbilitySystemInterface* AbilityObject, UFortHero* Hero, bool bApplyTeamEffect, bool bApplyTeamEffectToOtherPlayers, bool bIgnoreStatClamp)
-{
-	ApplyHomebaseEffectsOnPlayerSetupOG(This, SourceAccountID, McpProfile, AbilityObject, Hero, bApplyTeamEffect, bApplyTeamEffectToOtherPlayers, bIgnoreStatClamp);
-}
-
 void AFortGameState::Hook()
 {
-	MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetup()), ApplyHomebaseEffectsOnPlayerSetup, (LPVOID*)&ApplyHomebaseEffectsOnPlayerSetupOG);
-
 	Log("Hooked AFortGameState");
 }

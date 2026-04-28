@@ -18,7 +18,7 @@ public:
 
 	DefineUProperty(UFortHero*, StrongMyHero);
 public:
-	void SpawnQuickBars();
-
-	void SetupQuickBars();
+	static void Hook() {
+		Log("Hooked AFortPlayerControllerAthena");
+	}
 };

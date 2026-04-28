@@ -5109,6 +5109,23 @@ uintptr_t Finder::FindAFortPlayerPawn_ForceFinishIncomingPickups() {
 	return ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickups;
 }
 
+uintptr_t Finder::FindAFortPlayerPawn_ForceFinishIncomingPickupsVFT() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickupsVFT)
+		return ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickupsVFT;
+	
+	if (Version::Engine_Version == 4.16) {
+		Addr = 0x194;
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickupsVFT = Addr;
+	}
+
+	Log("AFortPlayerPawn_ForceFinishIncomingPickupsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickupsVFT));
+	return ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickupsVFT;
+}
+
 uintptr_t Finder::FindAFortPickup_SetPickupTarget() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AFortPickup_SetPickupTarget)
@@ -6619,6 +6636,18 @@ uintptr_t Finder::FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetup() {
 	return ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetup;
 }
 
+uintptr_t Finder::FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT() {
+	if (ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT)
+		return ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT;
+	
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT = 0xF3;
+	}
+
+	Log("AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT));
+	return ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT;
+}
+
 uintptr_t Finder::FindUMcpProfileGroup_SendRequestNow() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UMcpProfileGroup_SendRequestNow)
@@ -6754,6 +6783,18 @@ uintptr_t Finder::FindAFortGameModeAthena_FinishWorldInitialization() {
 	return ServerOffsets::AFortGameModeAthena_FinishWorldInitialization;
 }
 
+uintptr_t Finder::FindAFortGameMode_FinishWorldInitializationVFT() {
+	if (ServerOffsets::AFortGameMode_FinishWorldInitializationVFT)
+		return ServerOffsets::AFortGameMode_FinishWorldInitializationVFT;
+	
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::AFortGameMode_FinishWorldInitializationVFT = 0x137;
+	}
+
+	Log("AFortGameMode_FinishWorldInitializationVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_FinishWorldInitializationVFT));
+	return ServerOffsets::AFortGameMode_FinishWorldInitializationVFT;
+}
+
 uintptr_t Finder::FindAFortGameStateAthena_SetCurrentPlaylistId() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId)
@@ -6782,6 +6823,18 @@ uintptr_t Finder::FindAFortPlayerController_OnReadyToStartMatch() {
 
 	Log("AFortPlayerController_OnReadyToStartMatch found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_OnReadyToStartMatch));
 	return ServerOffsets::AFortPlayerController_OnReadyToStartMatch;
+}
+
+uintptr_t Finder::FindAFortPlayerController_OnReadyToStartMatchVFT() {
+	if (ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT)
+		return ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT;
+	
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT = 0x261;
+	}
+
+	Log("AFortPlayerController_OnReadyToStartMatchVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT));
+	return ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT;
 }
 
 uintptr_t Finder::FindAFortPlayerControllerAthena_SpawnQuickBars() {
@@ -6927,6 +6980,26 @@ uintptr_t Finder::FindUObject_GetWorldVFT() {
 
 	Log("UObject_GetWorldVFT found at: 0x" + std::format("{:X}", ServerOffsets::UObject_GetWorldVFT));
 	return ServerOffsets::UObject_GetWorldVFT;
+}
+
+uintptr_t Finder::FindAFortPlayerController_SpawnQuickBarsVFT() {
+	if (ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT)
+		return ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT;
+
+	// Not found this yet!
+
+	Log("AFortPlayerController_SpawnQuickBarsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT));
+	return ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT;
+}
+
+uintptr_t Finder::FindAFortPlayerController_SetupQuickBarsVFT() {
+	if (ServerOffsets::AFortPlayerController_SetupQuickBarsVFT)
+		return ServerOffsets::AFortPlayerController_SetupQuickBarsVFT;
+
+	// Not found this yet!
+
+	Log("AFortPlayerController_SetupQuickBarsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_SetupQuickBarsVFT));
+	return ServerOffsets::AFortPlayerController_SetupQuickBarsVFT;
 }
 
 void Finder::SetupOffsets() {

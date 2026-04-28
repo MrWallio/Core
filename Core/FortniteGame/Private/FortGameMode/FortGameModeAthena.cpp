@@ -32,7 +32,7 @@ APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, AFort
 		return nullptr;
 	}
 
-	AFortPlayerPawnAthena* Pawn = (AFortPlayerPawnAthena*)((AFortGameMode*)This)->SpawnDefaultPawnFor(NewPlayer, StartSpot);
+	APawn* Pawn = AFortGameMode::SpawnDefaultPawnForOG(This, NewPlayer, StartSpot);
 
 	Log("SpawnDefaultPawnFor: Spawned default pawn for player " + NewPlayer->GetName().ToString() + " Pawn: " + Pawn->GetName().ToString());
 	return Pawn;

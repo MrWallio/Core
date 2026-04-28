@@ -14,5 +14,9 @@ public:
 	DefineUProperty(int32, CurrentPlaylistId);
 	DefineUProperty(FName, CurrentPlaylistName);
 public:
-	APawn* SpawnDefaultPawnFor(AFortPlayerController* NewPlayer, AActor* StartSpot);
+	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameMode* This, AFortPlayerController* NewPlayer, AActor* StartSpot);
+
+	static void Hook() {
+		CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
+	}
 };

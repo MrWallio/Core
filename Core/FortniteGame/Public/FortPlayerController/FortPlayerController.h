@@ -34,9 +34,19 @@ public:
 	static inline void (*OnReadyToStartMatchOG)(AFortPlayerController* This);
 	static void OnReadyToStartMatch(AFortPlayerController* This);
 
+	void SpawnQuickBars();
+
+	void SetupQuickBars();
+
 	static void Hook() {
+		/*HookVTableIdx(
+			AFortPlayerController::GetDefaultObj(),
+			Finder::FindAFortPlayerController_OnReadyToStartMatchVFT(),
+			OnReadyToStartMatch,
+			(LPVOID*)&OnReadyToStartMatchOG
+		);*/
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_OnReadyToStartMatch()), OnReadyToStartMatch, (LPVOID*)&OnReadyToStartMatchOG);
-				
+
 		Log("Hooked AFortPlayerController");
 	}
 };

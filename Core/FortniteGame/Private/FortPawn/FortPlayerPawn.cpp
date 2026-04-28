@@ -23,21 +23,17 @@ void AFortPlayerPawn::BeginSkydiving(bool bFromBus)
 
 void AFortPlayerPawn::ForceFinishIncomingPickups()
 {
-	void (*ForceFinishIncomingPickupsInternal)(AFortPlayerPawn * This) = decltype(ForceFinishIncomingPickupsInternal)(ImageBase + Finder::FindAFortPlayerPawn_ForceFinishIncomingPickups());
+	void (*&ForceFinishIncomingPickupsInternal)(AFortPlayerPawn * This) = decltype(ForceFinishIncomingPickupsInternal)(VTable[Finder::FindAFortPlayerPawn_ForceFinishIncomingPickupsVFT()]);
 	ForceFinishIncomingPickupsInternal(this);
 }
 
 void AFortPlayerPawn::ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart, EFortCustomPartType Part)
 {
-	static UFunction* Function = nullptr;
-	if (!Function)
-		Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ServerChoosePart"));
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ServerChoosePart"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
 
-	struct
-	{
-		EFortCustomPartType Part;
-		UCustomCharacterPart* ChosenCharacterPart;
-	} Parms{ Part, ChosenCharacterPart };
-
-	ProcessEvent(Function, &Parms);
+		void (*&ServerChoosePartInternal)(AFortPlayerPawn*, EFortCustomPartType, UCustomCharacterPart*) = decltype(ServerChoosePartInternal)(VTable[VTableIdx]);
+		return ServerChoosePartInternal(this, Part, ChosenCharacterPart);
+	}
 }

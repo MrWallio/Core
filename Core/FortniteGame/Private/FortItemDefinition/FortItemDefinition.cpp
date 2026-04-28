@@ -41,27 +41,27 @@ int32 UFortItemDefinition::GetMaxStackSize() const
 	}
 	else
 	{
-		// Call GetMaxStackSize function
+		static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetMaxStackSize"));
+		if (Function) {
+			static uintptr_t VTableIdx = GetVTableIndex(Function);
+
+			int32 (*&GetMaxStackSizeInternal)(const UFortItemDefinition*) = decltype(GetMaxStackSizeInternal)(VTable[VTableIdx]);
+			return GetMaxStackSizeInternal(this);
+		}
+
 		return -1;
 	}
 }
 
 bool UFortItemDefinition::IsStackable() const
 {
-	static UFunction* Func = nullptr;
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"IsStackable"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
 
-	if (Func == nullptr)
-		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"IsStackable"));
+		bool (*&IsStackableInternal)(const UFortItemDefinition*) = decltype(IsStackableInternal)(VTable[VTableIdx]);
+		return IsStackableInternal(this);
+	}
 
-	struct FortItemDefinition_IsStackable
-	{
-	public:
-		bool ReturnValue;
-	};
-
-	FortItemDefinition_IsStackable Parms{};
-
-	const_cast<UFortItemDefinition*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return false;
 }

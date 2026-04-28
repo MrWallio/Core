@@ -136,6 +136,9 @@ void Utils::Hook() {
 	AFortPlayerControllerZone::Hook();
 	AFortGameModeZone::Hook();
 	AFortGameStateZone::Hook();
+	AFortGameMode::Hook();
+	AFortGameStateAthena::Hook();
+	AFortPlayerControllerAthena::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

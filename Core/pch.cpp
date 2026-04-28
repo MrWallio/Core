@@ -34,13 +34,13 @@ uintptr_t GetVTableIndex(class UFunction* Func) {
 
 	int VTableIndex = 0;
 
-	if (!FuncName.contains("Server"))
+	if (FuncName.contains("Server"))
 	{
-		VTableIndex = VirtualFuncIdx / 8;
+		VTableIndex = (VirtualFuncIdx / 8) + 1;
 	}
 	else
 	{
-		VTableIndex = (VirtualFuncIdx / 8) + 1;
+		VTableIndex = VirtualFuncIdx / 8;
 	}
 
 	std::stringstream ss;
@@ -115,7 +115,7 @@ void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour, void** OG)
 
 		if (Object && Object->IsA(Base) && Object->IsDefaultObject())
 		{
-			HookVTableIdx(Object, Idx, Detour, OGSet ? nullptr : (LPVOID*)&OG);
+			HookVTableIdx(Object, Idx, Detour, OGSet ? nullptr : (LPVOID*)OG);
 			if (!OGSet) OGSet = true;
 			Log("Hooked " + Object->GetName().ToString() + " at index " + std::to_string(Idx));
 		}
@@ -144,9 +144,9 @@ void HookEveryVTable(UClass* Base, class UFunction* Func, void* Detour, void** O
 
 		if (Object && Object->IsA(Base) && Object->IsDefaultObject())
 		{
-			HookVTableIdx(Object, VTableIndex, Detour, OGSet ? nullptr : (LPVOID*)&OG);
+			HookVTableIdx(Object, VTableIndex, Detour, OGSet ? nullptr : (LPVOID*)OG);
 			if (!OGSet) OGSet = true;
-			Log("Hooked " + Object->GetName().ToString() + " at index " + std::to_string(VTableIndex));
+			Log("Hooked " + Func->GetName().ToString() + " in " + Object->GetName().ToString() + " at index " + std::to_string(VTableIndex));
 		}
 	}
 }

@@ -647,6 +647,8 @@ public:
 
 	static uintptr_t FindAFortPlayerPawn_ForceFinishIncomingPickups();
 
+	static uintptr_t FindAFortPlayerPawn_ForceFinishIncomingPickupsVFT();
+
 	static uintptr_t FindAFortPickup_SetPickupTarget();
 
 	static uintptr_t FindAFortPickup_UpdateSpecialActorStat();
@@ -849,6 +851,8 @@ public:
 
 	static uintptr_t FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetup();
 
+	static uintptr_t FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT();
+
 	static uintptr_t FindUMcpProfileGroup_SendRequestNow();
 
 	static uintptr_t FindAFortPlayerPawn_ServerChoosePart();
@@ -867,9 +871,13 @@ public:
 
 	static uintptr_t FindAFortGameModeAthena_FinishWorldInitialization();
 
+	static uintptr_t FindAFortGameMode_FinishWorldInitializationVFT();
+
 	static uintptr_t FindAFortGameStateAthena_SetCurrentPlaylistId();
 
 	static uintptr_t FindAFortPlayerController_OnReadyToStartMatch();
+
+	static uintptr_t FindAFortPlayerController_OnReadyToStartMatchVFT();
 
 	static uintptr_t FindAFortPlayerControllerAthena_SpawnQuickBars();
 
@@ -892,6 +900,10 @@ public:
 	static uintptr_t FindUNetDriver_IsLevelInitializedForActorVFT();
 
 	static uintptr_t FindUObject_GetWorldVFT();
+
+	static uintptr_t FindAFortPlayerController_SpawnQuickBarsVFT();
+
+	static uintptr_t FindAFortPlayerController_SetupQuickBarsVFT();
 public:
 	static void SetupOffsets();
 

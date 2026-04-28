@@ -328,6 +328,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameMode_FinishRestartPlayer = 0;
 	inline uintptr_t AFortGameMode_SpawnDefaultPawnFor = 0;
 	inline uintptr_t AFortGameMode_SetCurrentPlaylistId = 0;
+	inline uintptr_t AFortGameMode_FinishWorldInitializationVFT = 0;
 
 	inline uintptr_t AFortWorldManager_HandleWorldQueryComplete = 0;
 
@@ -414,6 +415,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPickup_SetPickupItems = 0;
 
 	inline uintptr_t AFortPlayerPawn_ForceFinishIncomingPickups = 0;
+	inline uintptr_t AFortPlayerPawn_ForceFinishIncomingPickupsVFT = 0;
 
 	inline uintptr_t AFortQuickBars_GetFocusedQuickBar = 0;
 
@@ -534,6 +536,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPlayerControllerAthena_SetupQuickBars = 0;
 
 	inline uintptr_t AFortGameState_ApplyHomebaseEffectsOnPlayerSetup = 0;
+	inline uintptr_t AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT = 0;
 
 	inline uintptr_t UMcpProfileGroup_SendRequestNow = 0;
 
@@ -547,6 +550,9 @@ namespace ServerOffsets {
 	inline uintptr_t FString_ToBool = 0;
 
 	inline uintptr_t AFortPlayerController_OnReadyToStartMatch = 0;
+	inline uintptr_t AFortPlayerController_OnReadyToStartMatchVFT = 0;
+	inline uintptr_t AFortPlayerController_SpawnQuickBarsVFT = 0;
+	inline uintptr_t AFortPlayerController_SetupQuickBarsVFT = 0;
 
 	inline uintptr_t AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup = 0;
 

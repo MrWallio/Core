@@ -40,7 +40,7 @@ void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerControlle
 }
 
 void AFortPlayerControllerZone::Hook() {
-	HookEveryVTable(AFortPlayerControllerAthena::StaticClass(), AFortPlayerControllerAthena::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
+	HookEveryVTable(AFortPlayerControllerZone::StaticClass(), AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
 	
 	Log("Hooked AFortPlayerControllerZone");
 }

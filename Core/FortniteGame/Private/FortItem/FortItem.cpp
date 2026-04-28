@@ -23,20 +23,13 @@ void UFortItem::SetOwningControllerForTemporaryItem(AFortPlayerController* InCon
 
 FGuid UFortItem::GetItemGuid() const
 {
-	static UFunction* Func = nullptr;
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetItemGuid"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
 
-	if (Func == nullptr)
-		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetItemGuid"));
+		FGuid& (*&GetItemGuidInternal)(const UFortItem*) = decltype(GetItemGuidInternal)(VTable[VTableIdx]);
+		return GetItemGuidInternal(this);
+	}
 
-	struct FortItem_GetItemGuid final
-	{
-	public:
-		FGuid ReturnValue;
-	};
-
-	FortItem_GetItemGuid Parms{};
-
-	const_cast<UFortItem*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return FGuid();
 }

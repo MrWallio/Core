@@ -39,7 +39,11 @@ void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPl
 }
 
 void AFortGameModeZone::Hook() {
-	HookVTable(AFortGameModeAthena::GetDefaultObj(), AGameModeBase::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.HandleStartingNewPlayer"), HandleStartingNewPlayer, (LPVOID*)&HandleStartingNewPlayerOG);
+	HookEveryVTable(AFortGameModeZone::StaticClass(),
+		AGameModeBase::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.HandleStartingNewPlayer"),
+		HandleStartingNewPlayer,
+		(LPVOID*)&HandleStartingNewPlayerOG
+	);
 
-	Log("Hooked AFortGameModeAthena");
+	Log("Hooked AFortGameModeZone");
 }

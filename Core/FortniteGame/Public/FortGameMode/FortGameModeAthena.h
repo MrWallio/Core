@@ -33,11 +33,29 @@ public:
 	static void FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
 
 	static void Hook() {
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
+		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
+		HookEveryVTable(
+			AFortGameModeAthena::StaticClass(),
+			AFortGameModeAthena::StaticClass()->GetFunction("Function /Script/Engine.GameMode.ReadyToStartMatch"),
+			ReadyToStartMatch,
+			(LPVOID*)&ReadyToStartMatchOG
+		);
 
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_SpawnDefaultPawnFor()), SpawnDefaultPawnFor, (LPVOID*)&SpawnDefaultPawnForOG);
+		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_SpawnDefaultPawnFor()), SpawnDefaultPawnFor, (LPVOID*)&SpawnDefaultPawnForOG);
+		HookEveryVTable(
+			AFortGameModeAthena::StaticClass(),
+			AFortGameModeAthena::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
+			SpawnDefaultPawnFor,
+			(LPVOID*)&SpawnDefaultPawnForOG
+		);
 
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_FinishWorldInitialization()), FinishWorldInitialization, (LPVOID*)&FinishWorldInitializationOG);
+		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_FinishWorldInitialization()), FinishWorldInitialization, (LPVOID*)&FinishWorldInitializationOG);
+		HookEveryVTableIdx(
+			AFortGameModeAthena::StaticClass(),
+			Finder::FindAFortGameMode_FinishWorldInitializationVFT(),
+			FinishWorldInitialization,
+			(LPVOID*)&FinishWorldInitializationOG
+		);
 
 		Log("Hooked AFortGameModeAthena");
 	}

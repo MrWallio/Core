@@ -23,12 +23,13 @@ void AFortPlayerState::OnRep_CharacterParts()
 
 void AFortPlayerState::OnRep_HeroType()
 {
-	static UFunction* Func = nullptr;
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_HeroType"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
 
-	if (Func == nullptr)
-		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_HeroType"));
-
-	ProcessEvent(Func, nullptr);
+		void (*&OnRep_HeroTypeInternal)(AFortPlayerState*) = decltype(OnRep_HeroTypeInternal)(VTable[VTableIdx]);
+		return OnRep_HeroTypeInternal(this);
+	}
 }
 
 void AFortPlayerState::InitializeHero() {
