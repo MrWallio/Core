@@ -102,9 +102,21 @@ public:
         return nullptr;
     }
 
-    FORCEINLINE bool Contains(const SetElementType& Item) const
+    template <typename ComparisonType>
+    bool Contains(ComparisonType Item) const
     {
-        return Find(Item) != nullptr;
+        for (int Idx = 0; Idx < Num(); Idx++)
+        {
+            if (!Elements.IsValidIndex(Idx))
+                continue;
+
+            if (Elements[Idx].Value == Item)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     FORCEINLINE bool Remove(const SetElementType& Item)

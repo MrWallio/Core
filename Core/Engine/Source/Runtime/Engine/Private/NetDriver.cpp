@@ -752,7 +752,6 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 						// Not owned by this connection, if we have a channel, close it, and continue
 						if (!bHasNullViewTarget && Channel != NULL && Time - Channel->RelevantTime >= RelevantTimeout)
 						{
-							Log(std::format("Closing channel for: {}", Actor->GetName().ToString()));
 							Channel->Close();
 						}
 
@@ -828,7 +827,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 			std::sort(OutPriorityActors, OutPriorityActors + FinalSortedCount,
 				[](const FActorPriority* A, const FActorPriority* B) {
 					return A->Priority > B->Priority;
-				});
+			});
 		}
 
 		return FinalSortedCount;
