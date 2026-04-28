@@ -140,6 +140,9 @@ inline UObject* StaticLoadObject(const std::string& Name, const UClass* InClass 
 uintptr_t GetVTableIndex(class UFunction* Func);
 void HookVTable(class UObject* Object, class UFunction* Func, void* Detour, void** Original = nullptr);
 void HookVTableIdx(void* Base, int Idx, void* Detour, void** OG = nullptr);
-void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour);
+void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour, void** OG = nullptr);
+void HookEveryVTable(UClass* Base, class UFunction* Func, void* Detour, void** OG = nullptr);
+void CreateVTableOriginal(void* Base, int Idx, void** Original);
+void CreateVTableOriginal(void* Base, class UFunction* Func, void** Original);
 
 #endif //PCH_H

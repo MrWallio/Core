@@ -31,3 +31,14 @@ APawn* AController::K2_GetPawn() const
 
 	return Parms.ReturnValue;
 }
+
+AActor* AController::GetViewTarget() const
+{
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetViewTarget"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
+
+		AActor* (*&GetViewTargetInternal)(const AController*) = decltype(GetViewTargetInternal)(VTable[VTableIdx]);
+		return GetViewTargetInternal(this);
+	}
+}

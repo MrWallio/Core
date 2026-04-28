@@ -36,11 +36,11 @@ void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerControlle
 		// ApplyCharacterCustomization
 	}
 	
-	((AFortPlayerController*)This)->ServerAcknowledgePossession(P);
+	AFortPlayerController::ServerAcknowledgePossessionOG(This, P);
 }
 
 void AFortPlayerControllerZone::Hook() {
-	HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), AFortPlayerControllerAthena::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
+	HookEveryVTable(AFortPlayerControllerAthena::StaticClass(), AFortPlayerControllerAthena::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
 	
 	Log("Hooked AFortPlayerControllerZone");
 }

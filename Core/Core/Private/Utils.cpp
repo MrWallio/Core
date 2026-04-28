@@ -126,6 +126,7 @@ void Utils::Hook() {
 	UNetDriver::Hook();
 	AGameSession::Hook();
 	UAbilitySystemComponent::Hook();
+	APlayerController::Hook();
 
 	// FortniteGame
 	AFortGameSession::Hook();

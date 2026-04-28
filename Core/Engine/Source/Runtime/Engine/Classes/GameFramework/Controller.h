@@ -22,4 +22,6 @@ public:
 	void Possess(APawn* InPawn);
 
 	APawn* K2_GetPawn() const;
+
+	AActor* GetViewTarget() const;
 };

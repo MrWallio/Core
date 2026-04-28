@@ -468,6 +468,7 @@ namespace ServerOffsets {
 
 	inline uintptr_t APlayerController_GetViewTarget = 0;
 	inline uintptr_t APlayerController_SendClientAdjustment = 0;
+	inline uintptr_t APlayerController_SendClientAdjustmentVFT = 0;
 
 	inline uintptr_t FNetworkObjectList_Remove = 0;
 	inline uintptr_t FNetworkObjectList_ClearRecentlyDormantConnection = 0;

@@ -5566,6 +5566,23 @@ uintptr_t Finder::FindAPlayerController_SendClientAdjustment() {
 	return ServerOffsets::APlayerController_SendClientAdjustment;
 }
 
+uintptr_t Finder::FindAPlayerController_SendClientAdjustmentVFT() {
+	if (ServerOffsets::APlayerController_SendClientAdjustmentVFT)
+		return ServerOffsets::APlayerController_SendClientAdjustmentVFT;
+	uintptr_t Addr = 0;
+
+	if (Version::Engine_Version == 4.16) {
+		Addr = 0x1A2;
+	}
+
+	if (Addr) {
+		ServerOffsets::APlayerController_SendClientAdjustmentVFT = Addr;
+	}
+
+	Log("APlayerController_SendClientAdjustmentVFT found at: 0x" + std::format("{:X}", ServerOffsets::APlayerController_SendClientAdjustmentVFT));
+	return ServerOffsets::APlayerController_SendClientAdjustmentVFT;
+}
+
 uintptr_t Finder::FindAActor_GetNetPriority() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AActor_GetNetPriority)

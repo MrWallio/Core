@@ -717,6 +717,8 @@ public:
 
 	static uintptr_t FindAPlayerController_SendClientAdjustment();
 
+	static uintptr_t FindAPlayerController_SendClientAdjustmentVFT();
+
 	static uintptr_t FindAActor_GetNetPriority();
 
 	static uintptr_t FindAActor_GetNetPriorityVFT();

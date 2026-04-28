@@ -1,26 +1,19 @@
 #include "pch.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 
-bool APlayerController::HasClientLoadedCurrentWorld()
-{
-	bool (*HasClientLoadedCurrentWorldInternal)(APlayerController*) = decltype(HasClientLoadedCurrentWorldInternal)(ImageBase + Finder::FindAPlayerController_HasClientLoadedCurrentWorld());
-	return HasClientLoadedCurrentWorldInternal(this);
-}
-
 void APlayerController::ServerAcknowledgePossession(APawn* P)
 {
-	void (*ServerAcknowledgePossessionInternal)(APlayerController*, APawn*) = decltype(ServerAcknowledgePossessionInternal)(ImageBase + Finder::FindAPlayerController_ServerAcknowledgePossession());
-	ServerAcknowledgePossessionInternal(this, P);
-}
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ServerAcknowledgePossession"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
 
-AActor* APlayerController::GetViewTarget() const
-{
-	AActor* (*GetViewTargetInternal)(const APlayerController*) = decltype(GetViewTargetInternal)(ImageBase + Finder::FindAPlayerController_GetViewTarget());
-	return GetViewTargetInternal(this);
+		void (*&ServerAcknowledgePossessionInternal)(APlayerController*, APawn*) = decltype(ServerAcknowledgePossessionInternal)(VTable[VTableIdx]);
+		ServerAcknowledgePossessionInternal(this, P);
+	}
 }
 
 void APlayerController::SendClientAdjustment()
 {
-	void (*SendClientAdjustmentInternal)(APlayerController*) = decltype(SendClientAdjustmentInternal)(ImageBase + Finder::FindAPlayerController_SendClientAdjustment());
+	void (*&SendClientAdjustmentInternal)(APlayerController*) = decltype(SendClientAdjustmentInternal)(VTable[Finder::FindAPlayerController_SendClientAdjustmentVFT()]);
 	SendClientAdjustmentInternal(this);
 }

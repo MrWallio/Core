@@ -29,11 +29,14 @@ public:
 
 	DefineUProperty(TSubclassOf<UCheatManager>, CheatClass);
 public:
-	bool HasClientLoadedCurrentWorld();
-
+	static inline void (*ServerAcknowledgePossessionOG)(APlayerController* This, APawn* P);
 	void ServerAcknowledgePossession(APawn* P);
 
-	AActor* GetViewTarget() const;
-
 	void SendClientAdjustment();
+
+	static void Hook() {
+		CreateVTableOriginal(APlayerController::GetDefaultObj(), APlayerController::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), (LPVOID*)&ServerAcknowledgePossessionOG);
+
+		Log("Hooked APlayerController");
+	}
 };

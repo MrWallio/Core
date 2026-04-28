@@ -11,9 +11,4 @@ public:
 	DefineBitfieldUProperty(bOnlySpectator);
 
 	DefineUProperty(uint8, Ping);
-public:
-	bool IsOnlyASpectator() const
-	{
-		return bOnlySpectator;
-	}
 };

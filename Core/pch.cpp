@@ -56,42 +56,7 @@ void HookVTable(UObject* Object, UFunction* Func, void* Detour, void** Original)
 		Log("Invalid parameters for HookVTable");
 		return;
 	}
-	std::string FuncName = Func->GetFName().ToString().ToString();
-
-	std::string ValidateString = std::string(FuncName.c_str()) + "_Validate";
-	bool bHasValidate = Memcury::Scanner::FindStringRef(ValidateString.c_str()).Get() != 0;
-
-	int VirtualFuncIdx = 0;
-
-	if (bHasValidate)
-	{
-		VirtualFuncIdx = *Memcury::Scanner(Func->Func)
-			.ScanFor({ 0xFF, 0x90 }, true, 1)
-			.AbsoluteOffset(2)
-			.GetAs<int*>();
-	}
-	else
-	{
-		VirtualFuncIdx = *Memcury::Scanner(Func->Func)
-			.ScanFor({ 0xFF, 0x90 })
-			.AbsoluteOffset(2)
-			.GetAs<int*>();
-	}
-
-	int VTableIndex = 0;
-
-	if (!FuncName.contains("Server")) //idfk????
-	{
-		VTableIndex = VirtualFuncIdx / 8;
-	}
-	else
-	{
-		VTableIndex = (VirtualFuncIdx / 8) + 1;
-	}
-
-	std::stringstream ss;
-	ss << FuncName << " (Index): 0x" << std::uppercase << std::hex << VTableIndex;
-	Log(ss.str());
+	int VTableIndex = GetVTableIndex(Func);
 
 	DWORD oldProtection;
 	void** VTable = *(void***)Object;
@@ -129,13 +94,15 @@ void HookVTableIdx(void* Base, int Idx, void* Detour, void** OG)
 	VirtualProtect(&VTable[Idx], sizeof(void*), oldProtection, NULL);
 }
 
-void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour)
+void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour, void** OG)
 {
 	if (!Base || !Detour)
 	{
 		Log("Invalid parameters for HookEveryVTableIdx");
 		return;
 	}
+
+	bool OGSet = false;
 
 	for (int i = 0; i < FUObjectArray::Num(); i++) {
 		FUObjectItem* ObjectItem = FUObjectArray::IndexToObject(i);
@@ -148,9 +115,71 @@ void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour)
 
 		if (Object && Object->IsA(Base) && Object->IsDefaultObject())
 		{
-			HookVTableIdx(Object, Idx, Detour, nullptr);
+			HookVTableIdx(Object, Idx, Detour, OGSet ? nullptr : (LPVOID*)&OG);
+			if (!OGSet) OGSet = true;
 			Log("Hooked " + Object->GetName().ToString() + " at index " + std::to_string(Idx));
 		}
+	}
+}
+
+void HookEveryVTable(UClass* Base, class UFunction* Func, void* Detour, void** OG)
+{
+	if (!Base || !Detour || !Func)
+	{
+		Log("Invalid parameters for HookEveryVTableIdx");
+		return;
+	}
+	int VTableIndex = GetVTableIndex(Func);
+
+	bool OGSet = false;
+
+	for (int i = 0; i < FUObjectArray::Num(); i++) {
+		FUObjectItem* ObjectItem = FUObjectArray::IndexToObject(i);
+		if (!ObjectItem)
+			continue;
+
+		UObject* Object = (UObject*)ObjectItem->Object;
+		if (!Object)
+			continue;
+
+		if (Object && Object->IsA(Base) && Object->IsDefaultObject())
+		{
+			HookVTableIdx(Object, VTableIndex, Detour, OGSet ? nullptr : (LPVOID*)&OG);
+			if (!OGSet) OGSet = true;
+			Log("Hooked " + Object->GetName().ToString() + " at index " + std::to_string(VTableIndex));
+		}
+	}
+}
+
+void CreateVTableOriginal(void* Base, int Idx, void** Original) {
+	if (!Base)
+	{
+		Log("Invalid parameters for CreateVTableOriginal");
+		return;
+	}
+	DWORD oldProtection;
+
+	void** VTable = *(void***)Base;
+
+	if (Original)
+	{
+		*Original = VTable[Idx];
+	}
+}
+
+void CreateVTableOriginal(void* Base, class UFunction* Func, void** Original) {
+	if (!Base || !Func)
+	{
+		Log("Invalid parameters for CreateVTableOriginal");
+		return;
+	}
+	int VTableIndex = GetVTableIndex(Func);
+
+	void** VTable = *(void***)Base;
+
+	if (Original)
+	{
+		*Original = VTable[VTableIndex];
 	}
 }
 
