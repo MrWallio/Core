@@ -245,6 +245,8 @@
     <ClInclude Include="Engine\Source\Runtime\GameplayTasks\Classes\GameplayTasksComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Classes\Net\Serialization\FastArraySerializer.h" />
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Public\Net\Core\Connection\NetEnums.h" />
+    <ClInclude Include="FortniteGame\Public\AI\FortAIDirector.h" />
+    <ClInclude Include="FortniteGame\Public\AI\FortAIGoalManager.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortAbilitySet.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortGameplayAbility.h" />
     <ClInclude Include="FortniteGame\Public\FortCharacter\CustomCharacterPart.h" />

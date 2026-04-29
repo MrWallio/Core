@@ -23,6 +23,10 @@ public:
 public:
 	static inline void (*HandleStartingNewPlayerOG)(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer);
 	static void HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer);
+
+	void CreateAIDirector();
+
+	void CreateAIGoalManager();
 public:
 	static void Hook();
 };

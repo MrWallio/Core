@@ -7002,6 +7002,40 @@ uintptr_t Finder::FindAFortPlayerController_SetupQuickBarsVFT() {
 	return ServerOffsets::AFortPlayerController_SetupQuickBarsVFT;
 }
 
+uintptr_t Finder::FindAFortGameModeZone_CreateAIDirectorVFT() {
+	if (ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT)
+		return ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT;
+
+	// Not found this yet!
+
+	Log("AFortGameModeZone_CreateAIDirectorVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT));
+	return ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT;
+}
+
+uintptr_t Finder::FindAFortGameModeZone_CreateAIGoalManagerVFT() {
+	if (ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT)
+		return ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT;
+
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT = 0x160;
+	}
+
+	Log("AFortGameModeZone_CreateAIGoalManagerVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT));
+	return ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT;
+}
+
+uintptr_t Finder::FindUObject_NeedsLoadForClientVFT() {
+	if (ServerOffsets::UObject_NeedsLoadForClientVFT)
+		return ServerOffsets::UObject_NeedsLoadForClientVFT;
+
+	if (Version::Engine_Version == 4.16) {
+		ServerOffsets::UObject_NeedsLoadForClientVFT = 0x1A;
+	}
+
+	Log("UObject_NeedsLoadForClientVFT found at: 0x" + std::format("{:X}", ServerOffsets::UObject_NeedsLoadForClientVFT));
+	return ServerOffsets::UObject_NeedsLoadForClientVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

@@ -94,7 +94,7 @@ void HookVTableIdx(void* Base, int Idx, void* Detour, void** OG)
 	VirtualProtect(&VTable[Idx], sizeof(void*), oldProtection, NULL);
 }
 
-void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour, void** OG)
+void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour, void** OG, bool bSilent)
 {
 	if (!Base || !Detour)
 	{
@@ -117,7 +117,9 @@ void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour, void** OG)
 		{
 			HookVTableIdx(Object, Idx, Detour, OGSet ? nullptr : (LPVOID*)OG);
 			if (!OGSet) OGSet = true;
-			Log("Hooked " + Object->GetName().ToString() + " at index " + std::to_string(Idx));
+			if (!bSilent) {
+				Log("Hooked " + Object->GetName().ToString() + " at index " + std::to_string(Idx));
+			}
 		}
 	}
 }

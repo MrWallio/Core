@@ -75,45 +75,47 @@ public:
     inline bool operator!=(const TSet<SetElementType>& Other) const { return Elements != Other.Elements; }
 
 public:
-    FORCEINLINE SetElementType* Find(const SetElementType& Item)
+    const SetElementType* Find(const SetElementType& Item) const
     {
-        for (int32 i = 0; i < Elements.Num(); ++i)
-        {
-            if (!Elements.IsValidIndex(i))
-                continue;
+        const FBitArray& AllocationFlags = Elements.GetAllocationFlags();
 
-            if (Elements[i].Value == Item)
+        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
+        {
+            int32 Index = It.GetIndex();
+            if (Elements[Index].Value == Item)
             {
-                return &Elements[i].Value;
+                return &Elements[Index].Value;
             }
         }
+
         return nullptr;
     }
 
-    FORCEINLINE const SetElementType* Find(const SetElementType& Item) const
+    SetElementType* Find(const SetElementType& Item)
     {
-        for (int32 i = 0; i < Elements.Num(); ++i)
-        {
-            if (!Elements.IsValidIndex(i))
-                continue;
+        const FBitArray& AllocationFlags = Elements.GetAllocationFlags();
 
-            if (Elements[i].Value == Item)
+        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
+        {
+            int32 Index = It.GetIndex();
+            if (Elements[Index].Value == Item)
             {
-                return &Elements[i].Value;
+                return &Elements[Index].Value;
             }
         }
+
         return nullptr;
     }
 
     template <typename ComparisonType>
     bool Contains(ComparisonType Item) const
     {
-        for (int Idx = 0; Idx < Num(); Idx++)
-        {
-            if (!Elements.IsValidIndex(Idx))
-                continue;
+        const FBitArray& AllocationFlags = Elements.GetAllocationFlags();
 
-            if (Elements[Idx].Value == Item)
+        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
+        {
+            int32 Index = It.GetIndex();
+            if (Elements[Index].Value == Item)
             {
                 return true;
             }
@@ -122,26 +124,23 @@ public:
         return false;
     }
 
-    FORCEINLINE bool Remove(const SetElementType& Item)
+    bool Remove(const SetElementType& Item)
     {
-        if (!IsValid())
-            return false;
+        const FBitArray& AllocationFlags = Elements.GetAllocationFlags();
 
-        for (int32 i = 0; i < Elements.Num(); ++i)
+        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
         {
-            if (!Elements.IsValidIndex(i))
-				continue;
-
-            if (Elements[i].Value == Item)
+            int32 Index = It.GetIndex();
+            if (Elements[Index].Value == Item)
             {
-                Elements.RemoveAt(i);
+                Elements.RemoveAt(Index);
                 return true;
             }
         }
         return false;
     }
 
-    FORCEINLINE void RemoveAt(int32 Index)
+    void RemoveAt(int32 Index)
     {
         if (Elements.IsValidIndex(Index))
         {

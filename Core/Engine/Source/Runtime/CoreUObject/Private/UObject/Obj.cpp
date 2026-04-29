@@ -25,3 +25,20 @@ UWorld* UObject::GetWorld() const
 	UWorld* (*&GetWorldInternal)(const UObject*) = decltype(GetWorldInternal)(VTable[Finder::FindUObject_GetWorldVFT()]);
 	return GetWorldInternal(this);
 }
+
+bool UObject::NeedsLoadForClient(UObject* This)
+{
+	return true;
+}
+
+void UObject::Hook() {
+	HookEveryVTableIdx(
+		UObject::StaticClass(),
+		Finder::FindUObject_NeedsLoadForClientVFT(),
+		NeedsLoadForClient,
+		nullptr,
+		true
+	);
+	
+	Log("Hooked UObject");
+}

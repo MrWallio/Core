@@ -120,6 +120,7 @@ void Utils::Hook() {
 	}
 
 	// Engine
+	UObject::Hook();
 	UEngine::Hook();
 	UWorld::Hook();
 	AActor::Hook();

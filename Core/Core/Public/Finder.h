@@ -904,6 +904,12 @@ public:
 	static uintptr_t FindAFortPlayerController_SpawnQuickBarsVFT();
 
 	static uintptr_t FindAFortPlayerController_SetupQuickBarsVFT();
+
+	static uintptr_t FindAFortGameModeZone_CreateAIDirectorVFT();
+
+	static uintptr_t FindAFortGameModeZone_CreateAIGoalManagerVFT();
+
+	static uintptr_t FindUObject_NeedsLoadForClientVFT();
 public:
 	static void SetupOffsets();
 

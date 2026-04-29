@@ -84,6 +84,7 @@ namespace ServerOffsets {
 	inline uintptr_t UObject_PostLoad = 0;
 	inline uintptr_t UObject_FindFunctionChecked = 0;
 	inline uintptr_t UObject_GetWorldVFT = 0;
+	inline uintptr_t UObject_NeedsLoadForClientVFT = 0;
 
 	inline uintptr_t UField_GetOwnerClass = 0;
 	inline uintptr_t UField_GetOwnerStruct = 0;
@@ -344,6 +345,8 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameModeZone_InitGame = 0;
 	inline uintptr_t AFortGameModeZone_InitGameState = 0;
 	inline uintptr_t AFortGameModeZone_ChoosePlayerStart = 0;
+	inline uintptr_t AFortGameModeZone_CreateAIDirectorVFT = 0;
+	inline uintptr_t AFortGameModeZone_CreateAIGoalManagerVFT = 0;
 
 	inline uintptr_t AFortGameModeAthena_SetCurrentPlaylistId = 0;
 	inline uintptr_t AFortGameModeAthena_SetTimeOfDayManagerGameplayOverride = 0;

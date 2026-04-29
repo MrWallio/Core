@@ -6,6 +6,8 @@
 #include "FortniteGame/Public/FortPlayerState/FortPlayerStateZone.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySet.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
+#include "FortniteGame/Public/AI/FortAIDirector.h"
+#include "FortniteGame/Public/AI/FortAIGoalManager.h"
 
 void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer) {
 	HandleStartingNewPlayerOG(This, NewPlayer);
@@ -34,6 +36,38 @@ void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPl
 			AbilitySystemInterface.InterfacePointer = PlayerState->GetInterfaceAddress(IAbilitySystemInterface::StaticClass());
 
 			UFortKismetLibrary::EquipFortAbilitySet(AbilitySystemInterface, FortAbilitySet, PlayerState);
+		}
+	}
+}
+
+void AFortGameModeZone::CreateAIDirector() {
+	if (Finder::FindAFortGameModeZone_CreateAIDirectorVFT()) {
+		void (*&CreateAIDirectorInternal)(AFortGameModeZone * This) = decltype(CreateAIDirectorInternal)(VTable[Finder::FindAFortGameModeZone_CreateAIDirectorVFT()]);
+		CreateAIDirectorInternal(this);
+	}
+	if (!AIDirector) {
+		AIDirector = (AFortAIDirector*)GetWorld()->SpawnActor(AFortAIDirector::StaticClass(), FVector(), FRotator(), this);
+		if (AIDirector) {
+			Log("AFortGameModeZone::CreateAIDirector: Created AIDirector: " + AIDirector->GetName().ToString());
+		}
+		else {
+			Log("AFortGameModeZone::CreateAIDirector: Failed to create AIDirector");
+		}
+	}
+}
+
+void AFortGameModeZone::CreateAIGoalManager() {
+	if (Finder::FindAFortGameModeZone_CreateAIGoalManagerVFT()) {
+		void (*&CreateAIGoalManagerInternal)(AFortGameModeZone * This) = decltype(CreateAIGoalManagerInternal)(VTable[Finder::FindAFortGameModeZone_CreateAIGoalManagerVFT()]);
+		CreateAIGoalManagerInternal(this);
+	}
+	if (!AIGoalManager) {
+		AIGoalManager = (AFortAIGoalManager*)GetWorld()->SpawnActor(AFortAIGoalManager::StaticClass(), FVector(), FRotator(), this);
+		if (AIGoalManager) {
+			Log("AFortGameModeZone::CreateAIGoalManager: Created AIGoalManager: " + AIGoalManager->GetName().ToString());
+		}
+		else {
+			Log("AFortGameModeZone::CreateAIGoalManager: Failed to create AIGoalManager");
 		}
 	}
 }

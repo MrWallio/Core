@@ -9,6 +9,8 @@
 #include "FortniteGame/Public/FortCharacter/CustomCharacterPart.h"
 #include "FortniteGame/Public/FortWorld/FortWorldManager.h"
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
+#include "FortniteGame/Public/AI/FortAIDirector.h"
+#include "FortniteGame/Public/AI/FortAIGoalManager.h"
 
 bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
 	if (This->bWorldIsReady
@@ -46,6 +48,9 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	}
 	
 	GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
+
+	This->CreateAIDirector();
+	This->CreateAIGoalManager();
 
 	FinishWorldInitializationOG(This, WorldManager);
 	This->bWorldIsReady = true;
