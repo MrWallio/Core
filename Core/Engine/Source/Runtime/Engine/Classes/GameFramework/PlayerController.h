@@ -34,6 +34,11 @@ public:
 
 	void SendClientAdjustment();
 
+	void ClientMessage(const FString& S, FName Type, float MsgLifeTime);
+	void ClientMessage(const FString& S);
+
+	void ClientTeamMessage(APlayerState* SenderPlayerState, const FString& S, FName Type, float MsgLifeTime);
+
 	static void Hook() {
 		CreateVTableOriginal(APlayerController::GetDefaultObj(), APlayerController::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), (LPVOID*)&ServerAcknowledgePossessionOG);
 

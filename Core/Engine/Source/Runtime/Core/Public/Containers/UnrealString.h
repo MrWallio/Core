@@ -91,6 +91,33 @@ public:
 		Data.Add(L'\0');
 	}
 
+	FString(const char* Str) {
+		if (!Str)
+			return;
+
+		int32_t Length = (int32_t)strlen(Str);
+		Data.Reserve(Length + 1);
+
+		for (int32_t i = 0; i < Length; ++i)
+			Data.Add((wchar_t)Str[i]);
+
+		Data.Add(L'\0');
+	}
+
+	FString(const std::string& Str) {
+		const wchar_t* WStr = std::wstring(Str.begin(), Str.end()).c_str();
+		if (!WStr)
+			return;
+
+		int32_t Length = (int32_t)wcslen(WStr);
+		Data.Reserve(Length + 1);
+
+		for (int32_t i = 0; i < Length; ++i)
+			Data.Add(WStr[i]);
+
+		Data.Add(L'\0');
+	}
+
 	std::string ToString() const
 	{
 		const TCHAR* DataPtr = Data.GetData();
@@ -112,5 +139,10 @@ public:
 		WideCharToMultiByte(CP_UTF8, 0, DataPtr, (int)Length, &Result[0], size_needed, NULL, NULL);
 
 		return Result;
+	}
+
+	operator std::string() const
+	{
+		return ToString();
 	}
 };

@@ -1,7 +1,9 @@
 #pragma once
 #include "pch.h"
+#include "Core/Public/Utils.h"
 
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 class AFortPlayerPawn;
 class ABuildingSMActor;
@@ -38,6 +40,9 @@ public:
 
 	void SetupQuickBars();
 
+	static inline void (*ServerCheatOG)(AFortPlayerController* This, FString* Msg);
+	static void ServerCheat(AFortPlayerController* This, FString* Msg);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -46,6 +51,13 @@ public:
 			(LPVOID*)&OnReadyToStartMatchOG
 		);*/
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_OnReadyToStartMatch()), OnReadyToStartMatch, (LPVOID*)&OnReadyToStartMatchOG);
+
+		HookEveryVTable(
+			AFortPlayerController::StaticClass(),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerCheat"),
+			ServerCheat,
+			(LPVOID*)&ServerCheatOG
+		);
 
 		Log("Hooked AFortPlayerController");
 	}

@@ -25,3 +25,146 @@ public:
 	static void RemoveLocalPlayer();
 	static void LoadWorld();
 };
+
+class FCommandParser
+{
+private:
+    std::vector<std::string> Args;
+    std::string FullCommand;
+
+public:
+    FCommandParser(const std::string& Command)
+        : FullCommand(Command)
+    {
+        ParseArguments(Command);
+    }
+
+    std::string GetCommand() const
+    {
+        return Args.empty() ? "" : Args[0];
+    }
+
+    int32 GetArgCount() const
+    {
+        return Args.size() > 0 ? (int32)(Args.size() - 1) : 0;
+    }
+
+    std::string GetArg(int32 Index) const
+    {
+        int32 ActualIndex = Index + 1;
+        if (ActualIndex >= 0 && ActualIndex < (int32)Args.size())
+            return Args[ActualIndex];
+        return "";
+    }
+
+    int32 GetArgInt(int32 Index, int32 DefaultValue = 0) const
+    {
+        std::string arg = GetArg(Index);
+        if (arg.empty())
+            return DefaultValue;
+
+        try {
+            return std::stoi(arg);
+        }
+        catch (...) {
+            return DefaultValue;
+        }
+    }
+
+    float GetArgFloat(int32 Index, float DefaultValue = 0.0f) const
+    {
+        std::string arg = GetArg(Index);
+        if (arg.empty())
+            return DefaultValue;
+
+        try {
+            return std::stof(arg);
+        }
+        catch (...) {
+            return DefaultValue;
+        }
+    }
+
+    bool GetArgBool(int32 Index, bool DefaultValue = false) const
+    {
+        std::string arg = GetArg(Index);
+        if (arg.empty())
+            return DefaultValue;
+
+        std::string lower = arg;
+        std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+
+        if (lower == "true" || lower == "1" || lower == "yes" || lower == "on")
+            return true;
+        if (lower == "false" || lower == "0" || lower == "no" || lower == "off")
+            return false;
+
+        return DefaultValue;
+    }
+
+    std::string GetRemainingArgs(int32 StartIndex = 0) const
+    {
+        int32 ActualIndex = StartIndex + 1;
+        if (ActualIndex >= (int32)Args.size())
+            return "";
+
+        std::string result;
+        for (int32 i = ActualIndex; i < (int32)Args.size(); ++i)
+        {
+            if (!result.empty())
+                result += " ";
+            result += Args[i];
+        }
+        return result;
+    }
+
+    bool IsCommand(const std::string& CommandName) const
+    {
+        std::string cmd = GetCommand();
+        std::string target = CommandName;
+
+        std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
+        std::transform(target.begin(), target.end(), target.begin(), ::tolower);
+
+        return cmd == target;
+    }
+
+    const std::string& GetFullCommand() const
+    {
+        return FullCommand;
+    }
+
+private:
+    void ParseArguments(const std::string& Command)
+    {
+        std::istringstream stream(Command);
+        std::string token;
+        bool inQuotes = false;
+        std::string currentArg;
+
+        for (char c : Command)
+        {
+            if (c == '"')
+            {
+                inQuotes = !inQuotes;
+            }
+            else if (c == ' ' && !inQuotes)
+            {
+                if (!currentArg.empty())
+                {
+                    Args.push_back(currentArg);
+                    currentArg.clear();
+                }
+            }
+            else
+            {
+                currentArg += c;
+            }
+        }
+
+        if (!currentArg.empty())
+        {
+            Args.push_back(currentArg);
+        }
+    }
+};

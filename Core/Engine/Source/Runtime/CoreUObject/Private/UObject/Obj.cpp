@@ -2,10 +2,16 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h"
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
 
 UFunction* UObject::FindFunction(FName InName) const
 {
 	return GetClass()->FindFunctionByName(InName, EIncludeSuperFlag::IncludeSuper);
+}
+
+UFunction* UObject::FindFunction(std::string InName) const
+{
+	return FindFunction(UKismetStringLibrary::Conv_StringToName(InName));
 }
 
 UObject* UObject::GetArchetypeFromRequiredInfo(UClass* Class, UObject* Outer, FName Name, EObjectFlags ObjectFlags)

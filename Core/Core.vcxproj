@@ -342,6 +342,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\UnrealEngine.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\URL.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\World.cpp" />
+    <ClCompile Include="FortniteGame\Private\Cheat\FortCheatManager.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameMode\FortGameMode.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameMode\FortGameModeAthena.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameMode\FortGameModeZone.cpp" />

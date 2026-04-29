@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Engine/Source/Runtime/Core/Public/UObject/NameTypes.h"
 
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
+
 const FNameEntry* FName::GetComparisonNameEntry() const
 {
 	FNameEntry* (*GetComparisonNameEntryInternal)(const FName*) = decltype(GetComparisonNameEntryInternal)(ImageBase + Finder::FindFName_GetComparisonNameEntry());
@@ -48,4 +50,8 @@ int32 FName::Compare(const FName& Other) const
 		ImageBase + Finder::FindFName_Compare()
 		);
 	return CompareInternal(this, &Other);
+}
+
+FName::FName(std::string& Name) {
+	*this = UKismetStringLibrary::Conv_StringToName(Name);
 }

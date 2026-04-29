@@ -49,7 +49,7 @@ public:
 		return Compare(Other) < 0;
 	}
 
-	
+
 	FORCEINLINE bool operator>(const FName& Other) const
 	{
 		return Compare(Other) > 0;
@@ -83,4 +83,7 @@ public:
 	NAME_INDEX ComparisonIndex;
 
 	uint32 Number;
+public:
+	// Custom
+	FName(std::string& Name);
 };
