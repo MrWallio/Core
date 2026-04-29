@@ -36,31 +36,34 @@ inline uintptr_t ImageBase = (uintptr_t)GetModuleHandleA(0);
 
 inline void Log(const std::string& msg)
 {
-	static bool firstCall = true;
+    FCoreConfig& Config = ConfigurationManager::GetConfig();
+    std::string FileName = Config.bIsClient ? "Client_log.txt" : "Server_log.txt";
+    std::string LogType = Config.bIsClient ? "Client" : "Server";
 
-	FCoreConfig& Config = ConfigurationManager::GetConfig();
-	std::string FileName = Config.bIsClient ? "Client_log.txt" : "Server_log.txt";
-	std::string LogType = Config.bIsClient ? "Client" : "Server";
+    static bool firstCallClient = true;
+    static bool firstCallServer = true;
 
-	if (firstCall)
-	{
-		std::ofstream logFile(FileName, std::ios::trunc);
-		if (logFile.is_open())
-		{
-			logFile << "Log" + LogType + ": Log file initialized!\n";
-			logFile.close();
-		}
-		firstCall = false;
-	}
+    bool& firstCall = Config.bIsClient ? firstCallClient : firstCallServer;
 
-	std::ofstream logFile(FileName, std::ios::app);
-	if (logFile.is_open())
-	{
-		logFile << "Log" + LogType + ": " << msg << std::endl;
-		logFile.close();
-	}
+    if (firstCall)
+    {
+        std::ofstream logFile(FileName, std::ios::trunc);
+        if (logFile.is_open())
+        {
+            logFile << "Log" + LogType + ": Log file initialized!\n";
+            logFile.close();
+        }
+        firstCall = false;
+    }
 
-	std::cout << "Log" + LogType + ": " << msg << std::endl;
+    std::ofstream logFile(FileName, std::ios::app);
+    if (logFile.is_open())
+    {
+        logFile << "Log" + LogType + ": " << msg << std::endl;
+        logFile.close();
+    }
+
+    std::cout << "Log" + LogType + ": " << msg << std::endl;
 }
 
 template<typename T>

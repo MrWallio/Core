@@ -221,6 +221,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\World.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\Actor.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\Character.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\CheatManager.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\Controller.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\GameMode.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\GameModeBase.h" />
@@ -247,6 +248,7 @@
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Public\Net\Core\Connection\NetEnums.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIDirector.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIGoalManager.h" />
+    <ClInclude Include="FortniteGame\Public\Cheat\FortCheatManager.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortAbilitySet.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortGameplayAbility.h" />
     <ClInclude Include="FortniteGame\Public\FortCharacter\CustomCharacterPart.h" />
@@ -290,6 +292,7 @@
     <ClInclude Include="FortniteGame\Public\FortWorld\FortAthenaMapInfo.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldManager.h" />
     <ClInclude Include="FortniteGame\Public\Kismet\FortKismetLibrary.h" />
+    <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -356,6 +359,7 @@
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerZone.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerState\FortPlayerState.cpp" />
     <ClCompile Include="FortniteGame\Private\Kismet\FortKismetLibrary.cpp" />
+    <ClCompile Include="FortniteGame\Private\Mcp\McpProfileGroup.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

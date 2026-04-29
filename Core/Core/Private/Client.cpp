@@ -18,6 +18,8 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/LocalPlayer.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 
+#include "FortniteGame/Public/Cheat/FortCheatManager.h"
+
 void Client::Init(FCoreConfig& Config) {
     InitConsole(Config);
 
@@ -84,34 +86,30 @@ void Client::InitConsole(FCoreConfig& Config)
 }
 
 DWORD Client::ClientThread(LPVOID) {
-    UWorld* World = UWorld::GetWorld();
-
     while (true)
     {
-        if (GetAsyncKeyState(VK_F2)) {
-            if (World && World->OwningGameInstance)
-            {
-                if (World->OwningGameInstance->LocalPlayers.Num() > 0)
-                {
-                    APlayerController* PlayerController = World->OwningGameInstance->LocalPlayers[0]->PlayerController;
+        UWorld* World = UWorld::GetWorld();
 
-                    if (PlayerController && !PlayerController->CheatManager)
+        if (World && World->OwningGameInstance)
+        {
+            if (World->OwningGameInstance->LocalPlayers.Num() > 0)
+            {
+                APlayerController* PlayerController = World->OwningGameInstance->LocalPlayers[0]->PlayerController;
+                if (PlayerController && !PlayerController->CheatManager)
+                {
+                    const UClass* CheatClass = PlayerController->CheatClass.Get() ? PlayerController->CheatClass.Get() : UFortCheatManager::StaticClass();
+                    Log("Spawning CheatManager: " + CheatClass->GetName().ToString() + " for PlayerController: " + PlayerController->GetName().ToString());
+                    UObject* CheatManager = UGameplayStatics::SpawnObject(CheatClass, PlayerController);
+                    if (CheatManager) {
+                        PlayerController->CheatManager = (UCheatManager*)CheatManager;
+                        Log("Successfully spawned CheatManager: " + CheatManager->GetName().ToString());
+                    }
+                    else
                     {
-                        Log("Spawning CheatManager for PlayerController: " + PlayerController->GetName().ToString());
-                        UObject* CheatManager = UGameplayStatics::SpawnObject(PlayerController->CheatClass.Get(), PlayerController);
-                        if (CheatManager) {
-                            PlayerController->CheatManager = (UCheatManager*)CheatManager;
-                            Log("Successfully spawned CheatManager: " + CheatManager->GetName().ToString());
-                        }
-                        else
-                        {
-                            Log("Failed to spawn CheatManager!");
-                        }
+                        Log("Failed to spawn CheatManager!");
                     }
                 }
             }
         }
-
-        Sleep(33);
     }
 }
