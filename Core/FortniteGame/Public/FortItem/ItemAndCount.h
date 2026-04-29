@@ -13,7 +13,7 @@ struct FItemAndCount {
 public:
 	DefineUnrealStruct(FItemAndCount);
 public:
-	DefineStructProperty(int32, Count);
-
-	DefineStructProperty(UFortItemDefinition*, Item);
+	int32 Count;
+	uint8 Pad_4[0x4]; // im pretty sure this is an int32, but i dont know what it is
+	UFortItemDefinition* Item;
 };

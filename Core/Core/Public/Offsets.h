@@ -557,6 +557,8 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPlayerController_SpawnQuickBarsVFT = 0;
 	inline uintptr_t AFortPlayerController_SetupQuickBarsVFT = 0;
 
+	inline uintptr_t AFortPlayerControllerZone_OnReadyToStartMatch = 0;
+
 	inline uintptr_t AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup = 0;
 
 	inline uintptr_t AActor_GetNetOwnerVFT = 0;

@@ -4,6 +4,9 @@
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
 #include "FortniteGame/Public/Cheat/FortCheatManager.h"
+#include "FortniteGame/Public/FortInventory/FortInventory.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -23,6 +26,12 @@ void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
 	{
 		This->SpawnQuickBars();
 		This->SetupQuickBars();
+	}
+
+	UFortItemDefinition* DefaultPickaxeDef = (UFortItemDefinition*)StaticLoadObject("/Game/Athena/Items/Weapons/WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");
+	if (DefaultPickaxeDef) {
+		Log("HandleStartingNewPlayer: Loaded Default Pickaxe Definition: " + DefaultPickaxeDef->GetName().ToString());
+		This->WorldInventory->AddItem(DefaultPickaxeDef);
 	}
 }
 

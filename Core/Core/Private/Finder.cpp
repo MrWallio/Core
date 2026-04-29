@@ -6825,6 +6825,21 @@ uintptr_t Finder::FindAFortPlayerController_OnReadyToStartMatch() {
 	return ServerOffsets::AFortPlayerController_OnReadyToStartMatch;
 }
 
+uintptr_t Finder::FindAFortPlayerControllerZone_OnReadyToStartMatch() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch)
+		return ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch;
+	
+	Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 57 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? F6 81").Get();
+	
+	if (Addr) {
+		ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerControllerZone_OnReadyToStartMatch found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch));
+	return ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch;
+}
+
 uintptr_t Finder::FindAFortPlayerController_OnReadyToStartMatchVFT() {
 	if (ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT)
 		return ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT;

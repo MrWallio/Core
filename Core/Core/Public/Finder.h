@@ -877,6 +877,8 @@ public:
 
 	static uintptr_t FindAFortPlayerController_OnReadyToStartMatch();
 
+	static uintptr_t FindAFortPlayerControllerZone_OnReadyToStartMatch();
+
 	static uintptr_t FindAFortPlayerController_OnReadyToStartMatchVFT();
 
 	static uintptr_t FindAFortPlayerControllerAthena_SpawnQuickBars();

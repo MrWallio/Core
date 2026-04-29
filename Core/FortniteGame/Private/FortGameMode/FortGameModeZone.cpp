@@ -8,6 +8,8 @@
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "FortniteGame/Public/AI/FortAIDirector.h"
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
+#include "FortniteGame/Public/FortInventory/FortInventory.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 
 void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer) {
 	HandleStartingNewPlayerOG(This, NewPlayer);

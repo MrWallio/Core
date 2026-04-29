@@ -13,5 +13,8 @@ public:
 public:
 	static void ServerAcknowledgePossession(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P);
 
+	static inline void (*OnReadyToStartMatchOG)(AFortPlayerControllerZone* This);
+	static void OnReadyToStartMatch(AFortPlayerControllerZone* This);
+
 	static void Hook();
 };

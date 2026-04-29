@@ -480,6 +480,27 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\CheatManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortInventory\FortInventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortItem\FortItemList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortItem\FortItemEntry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortGift\FortGiftingInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortItem\FortItemEntryStateValue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortItem\FortWorldItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortItemDefinition\FortWeaponItemDefinition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">
@@ -675,6 +696,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\Cheat\FortCheatManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortInventory\FortInventory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortInventory\FortQuickBars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

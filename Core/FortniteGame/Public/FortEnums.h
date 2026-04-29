@@ -62,9 +62,8 @@ enum class EFortQuickBars : uint8
 {
 	Primary = 0,
 	Secondary = 1,
-	Creative = 2,
-	Max_None = 3,
-	EFortQuickBars_MAX = 4,
+	Max_None = 2,
+	EFortQuickBars_MAX = 3,
 };
 
 enum class EFortStructuralGridQueryResults : uint8
