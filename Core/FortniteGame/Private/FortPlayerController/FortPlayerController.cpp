@@ -77,11 +77,9 @@ void AFortPlayerController::SetupQuickBars()
 }
 
 void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Msg) {
-	ServerCheatOG(This, Msg);
-
 	std::string Command = Msg->ToString();
 	Log("ServerCheat (" + This->GetName().ToString() + "): [" + Command + "]");
-
+	
 	UFortCheatManager* CheatManager = This->CheatManager->Cast<UFortCheatManager>();
 	if (!CheatManager)
 	{
@@ -96,6 +94,8 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			return;
 		}
 	}
+
+	ServerCheatOG(This, Msg);
 
 	FCommandParser Parser(Command);
 

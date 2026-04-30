@@ -759,7 +759,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 						continue;
 					}
 				}
-				else if (CVarSetNetDormancyEnabled && *CVarSetNetDormancyEnabled != 0)
+				/*else if (CVarSetNetDormancyEnabled && *CVarSetNetDormancyEnabled != 0) // This is broken for some reason
 				{
 					// Skip Actor if dormant
 					if (IsActorDormant(ActorInfo, Connection))
@@ -773,7 +773,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 						// Channel is marked to go dormant now once all properties have been replicated (but is not dormant yet)
 						Channel->StartBecomingDormant();
 					}
-				}
+				}*/
 
 				// Skip actor if not relevant and theres no channel already.
 				// Historically Relevancy checks were deferred until after prioritization because they were expensive (line traces).
