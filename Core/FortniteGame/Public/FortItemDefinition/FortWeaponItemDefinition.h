@@ -1,7 +1,11 @@
 #pragma once
 #include "pch.h"
 
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
+
 #include "FortWorldItemDefinition.h"
+
+class UBuildingEditModeMetadata;
 
 class UFortWeaponItemDefinition : public UFortWorldItemDefinition {
 public:
@@ -18,6 +22,8 @@ public:
 class UFortBuildingItemDefinition : public UFortWeaponItemDefinition {
 public:
 	DefineUnrealClass(UFortBuildingItemDefinition);
+
+	DefineUProperty(TSoftObjectPtr<UBuildingEditModeMetadata>, BuildingMetaData);
 };
 
 class UFortDecoItemDefinition : public UFortWeaponItemDefinition {

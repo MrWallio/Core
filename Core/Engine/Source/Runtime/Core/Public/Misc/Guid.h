@@ -240,4 +240,9 @@ public:
 
 	/** Holds the fourth component. */
 	uint32 D;
+public:
+	std::string FormatGuid()
+	{
+		return std::format("{{{:08X}-{:08X}-{:08X}-{:08X}}}", A, B, C, D);
+	}
 };

@@ -38,4 +38,6 @@ public:
 	DefineUProperty(TArray<AFortPickup*>, IncomingPickups);
 public:
 	AFortWeapon* EquipWeaponDefinition(const UFortWeaponItemDefinition* WeaponData, const FGuid& ItemEntryGuid);
+
+	void OnRep_CurrentWeapon(AFortWeapon* OldWeapon);
 };

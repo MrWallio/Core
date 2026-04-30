@@ -3,7 +3,17 @@
 
 AFortWeapon* AFortPawn::EquipWeaponDefinition(const UFortWeaponItemDefinition* WeaponData, const FGuid& ItemEntryGuid)
 {
-	static class UFunction* Func = nullptr;
+	if (!this) {
+		Log("EquipWeaponDefinition: This is null!");
+		return nullptr;
+	}
+
+	if (!WeaponData) {
+		Log("EquipWeaponDefinition: WeaponData is null!");
+		return nullptr;
+	}
+
+	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"EquipWeaponDefinition"));
@@ -21,7 +31,32 @@ AFortWeapon* AFortPawn::EquipWeaponDefinition(const UFortWeaponItemDefinition* W
 	Parms.WeaponData = WeaponData;
 	Parms.ItemEntryGuid = std::move(ItemEntryGuid);
 
-	UObject::ProcessEvent(Func, &Parms);
+	ProcessEvent(Func, &Parms);
 
 	return Parms.ReturnValue;
+}
+
+void AFortPawn::OnRep_CurrentWeapon(AFortWeapon* OldWeapon)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_CurrentWeapon");
+
+	if (!Func) {
+		Log("OnRep_CurrentWeapon: Failed to find function!");
+		return;
+	}
+
+	struct FortPawn_OnRep_CurrentWeapon
+	{
+	public:
+		AFortWeapon* OldWeapon;
+	};
+
+	FortPawn_OnRep_CurrentWeapon Parms{};
+
+	Parms.OldWeapon = OldWeapon;
+
+	ProcessEvent(Func, &Parms);
 }

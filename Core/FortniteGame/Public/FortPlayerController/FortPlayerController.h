@@ -12,6 +12,7 @@ enum class EFortResourceType : uint8;
 class UFortMontageItemDefinitionBase;
 class AFortQuickBars;
 class AFortInventory;
+class FFortItemEntry;
 
 class AFortPlayerController : public APlayerController {
 public:
@@ -43,6 +44,11 @@ public:
 	static inline void (*ServerCheatOG)(AFortPlayerController* This, FString* Msg);
 	static void ServerCheat(AFortPlayerController* This, FString* Msg);
 
+	static inline void (*ServerExecuteInventoryItemOG)(AFortPlayerController* This, FGuid& ItemGuid);
+	static void ServerExecuteInventoryItem(AFortPlayerController* This, FGuid& ItemGuid);
+
+	FFortItemEntry* FindItemEntry(FGuid Guid);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -57,6 +63,13 @@ public:
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerCheat"),
 			ServerCheat,
 			(LPVOID*)&ServerCheatOG
+		);
+
+		HookEveryVTable(
+			AFortPlayerController::StaticClass(),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerExecuteInventoryItem"),
+			ServerExecuteInventoryItem,
+			(LPVOID*)&ServerExecuteInventoryItemOG
 		);
 
 		Log("Hooked AFortPlayerController");

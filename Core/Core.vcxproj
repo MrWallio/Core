@@ -293,6 +293,7 @@
     <ClInclude Include="FortniteGame\Public\FortPlaylist\PlaylistPropertyArray.h" />
     <ClInclude Include="FortniteGame\Public\FortInventory\FortQuickBars.h" />
     <ClInclude Include="FortniteGame\Public\FortInventory\FortQuickBarsAthena.h" />
+    <ClInclude Include="FortniteGame\Public\FortWeapon\FortWeapon.h" />
     <ClInclude Include="FortniteGame\Public\FortWorker\FortWorker.h" />
     <ClInclude Include="FortniteGame\Public\FortWorker\FortWorkerType.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\AdditionalLevelStreamed.h" />
@@ -300,6 +301,7 @@
     <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldManager.h" />
     <ClInclude Include="FortniteGame\Public\Kismet\FortKismetLibrary.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h" />
+    <ClInclude Include="FortniteGame\Public\Metadata\BuildingEditModeMetadata.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -368,6 +370,7 @@
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerAthena.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerZone.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerState\FortPlayerState.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortWeapon\FortWeapon.cpp" />
     <ClCompile Include="FortniteGame\Private\Kismet\FortKismetLibrary.cpp" />
     <ClCompile Include="FortniteGame\Private\Mcp\McpProfileGroup.cpp" />
     <ClCompile Include="pch.cpp">
