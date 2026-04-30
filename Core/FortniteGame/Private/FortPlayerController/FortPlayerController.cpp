@@ -167,3 +167,31 @@ UFortWorldItem* AFortPlayerController::FindItemInstance(UFortItemDefinition* Ite
 
 	return WorldInventory->FindItemInstance(ItemDefinition);
 }
+
+void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor* BuildingSMActor, uint8 PotentialResourceType, int32 PotentialResourceCount, bool bDestroyed, bool bJustHitWeakspot)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientReportDamagedResourceBuilding");
+
+	struct FortPlayerController_ClientReportDamagedResourceBuilding
+	{
+	public:
+		ABuildingSMActor* BuildingSMActor;
+		uint8 PotentialResourceType;
+		int32 PotentialResourceCount;
+		bool bDestroyed;
+		bool bJustHitWeakspot;
+	};
+
+	FortPlayerController_ClientReportDamagedResourceBuilding Parms{};
+
+	Parms.BuildingSMActor = BuildingSMActor;
+	Parms.PotentialResourceType = PotentialResourceType;
+	Parms.PotentialResourceCount = PotentialResourceCount;
+	Parms.bDestroyed = bDestroyed;
+	Parms.bJustHitWeakspot = bJustHitWeakspot;
+
+	ProcessEvent(Func, &Parms);
+}

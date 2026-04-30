@@ -121,7 +121,7 @@ public:
 
     UFunction* GetFunction(const std::string& ClassName, const std::string& FuncName) const;
 
-    UFunction* GetFunction(const std::string& FullName) const;
+    UFunction* GetFunction(const std::string& FullName, bool bSilent = false) const;
 public:
 	inline uint64_t GetCastFlags() const
 	{

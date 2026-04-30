@@ -55,6 +55,8 @@ public:
 	UFortWorldItem* FindItemInstance(FGuid Guid);
 	UFortWorldItem* FindItemInstance(UFortItemDefinition* ItemDefinition);
 
+	void ClientReportDamagedResourceBuilding(ABuildingSMActor* BuildingSMActor, uint8 PotentialResourceType, int32 PotentialResourceCount, bool bDestroyed, bool bJustHitWeakspot);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),

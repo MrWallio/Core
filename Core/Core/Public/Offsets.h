@@ -408,6 +408,7 @@ namespace ServerOffsets {
 	inline uintptr_t FRotator_Quaternion = 0;
 
 	inline uintptr_t ABuildingSMActor_ReplaceBuildingActor = 0;
+	inline uintptr_t ABuildingSMActor_ReplaceBuildingActorVFT = 0;
 
 	inline uintptr_t AFortPickup_FinishedTargetSpline = 0;
 	inline uintptr_t AFortPickup_ForceFinishedTargetSpline = 0;

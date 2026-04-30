@@ -35,3 +35,8 @@ class UFortTrapItemDefinition : public UFortDecoItemDefinition {
 public:
 	DefineUnrealClass(UFortTrapItemDefinition);
 };
+
+class UFortWeaponMeleeItemDefinition : public UFortWeaponItemDefinition {
+public:
+	DefineUnrealClass(UFortWeaponMeleeItemDefinition);
+};

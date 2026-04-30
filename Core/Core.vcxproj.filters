@@ -516,6 +516,9 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\HitResult.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingSMActor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">
@@ -726,6 +729,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingSMActor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

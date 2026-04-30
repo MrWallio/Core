@@ -179,3 +179,11 @@ enum class EFortCustomPartType : uint8
 	NumTypes = 6,
 	EFortCustomPartType_MAX = 7,
 };
+
+enum class EBuildingReplacementType : uint8
+{
+	BRT_None = 0,
+	BRT_Edited = 1,
+	BRT_Conversion = 2,
+	BRT_MAX = 3,
+};

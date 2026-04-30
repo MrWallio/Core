@@ -5,10 +5,13 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
 
 class UBuildingEditModeMetadata;
+class UFortWeaponItemDefinition;
 
 class AFortWeapon : public AActor {
 public:
 	DefineUnrealClass(AFortWeapon);
+
+	DefineUProperty(UFortWeaponItemDefinition*, WeaponData);
 };
 
 class AFortWeap_BuildingToolBase : public AFortWeapon {

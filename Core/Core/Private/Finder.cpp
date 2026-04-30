@@ -5013,6 +5013,23 @@ uintptr_t Finder::FindABuildingSMActor_ReplaceBuildingActor() {
 	return ServerOffsets::ABuildingSMActor_ReplaceBuildingActor;
 }
 
+uintptr_t Finder::FindABuildingSMActor_ReplaceBuildingActorVFT() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::ABuildingSMActor_ReplaceBuildingActorVFT)
+		return ServerOffsets::ABuildingSMActor_ReplaceBuildingActorVFT;
+	
+	if (Version::Engine_Version == 4.16) {
+		Addr = 0x149;
+	}
+
+	if (Addr) {
+		ServerOffsets::ABuildingSMActor_ReplaceBuildingActorVFT = Addr;
+	}
+
+	Log("ABuildingSMActor_ReplaceBuildingActorVFT found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingSMActor_ReplaceBuildingActorVFT));
+	return ServerOffsets::ABuildingSMActor_ReplaceBuildingActorVFT;
+}
+
 uintptr_t Finder::FindAFortGameMode_SpawnDefaultPawnFor() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AFortGameMode_SpawnDefaultPawnFor)

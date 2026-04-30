@@ -9,29 +9,54 @@
 
 class UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinition(const uint8 ResourceType)
 {
-	static class UFunction* Func = nullptr;
+	if (Version::Fortnite_Version >= 1.8) {
+		static UFunction* Func = nullptr;
 
-	if (Func == nullptr)
-		Func = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.K2_GetResourceItemDefinition");
+		if (Func == nullptr)
+			Func = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.K2_GetResourceItemDefinition");
 
-	if (!Func) {
-		return nullptr;
+		struct FortKismetLibrary_K2_GetResourceItemDefinition final
+		{
+		public:
+			uint8 ResourceType;
+			UFortResourceItemDefinition* ReturnValue;
+		};
+
+		FortKismetLibrary_K2_GetResourceItemDefinition Parms{};
+
+		Parms.ResourceType = ResourceType;
+
+		GetDefaultObj()->ProcessEvent(Func, &Parms);
+
+		return Parms.ReturnValue;
 	}
+	else {
+		UObject* ItemDefinition = nullptr;
 
-	struct FortKismetLibrary_K2_GetResourceItemDefinition final
-	{
-	public:
-		uint8 ResourceType;
-		UFortResourceItemDefinition* ReturnValue;
-	};
+		switch (ResourceType)
+		{
+		case 0:
+			ItemDefinition = StaticLoadObject("/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
+			break;
+		case 1:
+			ItemDefinition = StaticLoadObject("/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
+			break;
+		case 2:
+			ItemDefinition = StaticLoadObject("/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
+			break;
+		case 3:
+			ItemDefinition = StaticLoadObject("/Game/Items/ResourcePickups/PermaniteItemData.PermaniteItemData");
+			break;
+		case 4:
+			Log("UFortKismetLibrary::K2_GetResourceItemDefinition: ResourceType " + std::to_string(ResourceType) + " is not valid!");
+			break;
+		}
 
-	FortKismetLibrary_K2_GetResourceItemDefinition Parms{};
+		if (!ItemDefinition)
+			return nullptr;
 
-	Parms.ResourceType = ResourceType;
-
-	GetDefaultObj()->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+		return (UFortResourceItemDefinition*)ItemDefinition;
+	}
 }
 
 EFortStructuralGridQueryResults UFortKismetLibrary::CanPlaceBuildableClassInStructuralGrid(

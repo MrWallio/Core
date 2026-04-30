@@ -639,6 +639,8 @@ public:
 
 	static uintptr_t FindABuildingSMActor_ReplaceBuildingActor();
 
+	static uintptr_t FindABuildingSMActor_ReplaceBuildingActorVFT();
+
 	static uintptr_t FindUAbilitySystemComponent_GiveAbilityAndActivateOnce();
 
 	static uintptr_t FindAFortPickup_FinishedTargetSpline();
