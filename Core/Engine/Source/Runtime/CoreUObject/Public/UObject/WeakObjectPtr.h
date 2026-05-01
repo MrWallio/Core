@@ -86,4 +86,9 @@ public:
 	{
 		return !HasSameIndexAndSerialNumber(Other);
 	}
+public:
+	UEType* Get() const
+	{
+		return (UEType*)FWeakObjectPtr::Get();
+	}
 };

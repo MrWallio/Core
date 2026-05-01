@@ -14,4 +14,15 @@ public:
 	DefineStructProperty(FName, NameValue);
 
 	DefineStructProperty(EFortItemEntryState, StateType);
+public:
+	bool operator==(FFortItemEntryStateValue& Other) const {
+		return StateType == Other.StateType
+			&& IntValue == Other.IntValue
+			&& NameValue.IsEqual(Other.NameValue);
+	}
+
+	FFortItemEntryStateValue(EFortItemEntryState InStateType) {
+		StateType = InStateType;
+		IntValue = 0;
+	}
 };

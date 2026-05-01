@@ -8,6 +8,8 @@ public:
 	DefineUnrealClass(UFortWorldItemDefinition);
 public:
 	bool ServerExecute(UFortItem* Item, AFortPlayerController* Instigator);
+
+	UFortWorldItemDefinition* GetAmmoWorldItemDefinition_BP() const;
 };
 
 class UFortAmmoItemDefinition : public UFortWorldItemDefinition {

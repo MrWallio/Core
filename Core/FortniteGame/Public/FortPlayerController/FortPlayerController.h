@@ -57,6 +57,8 @@ public:
 
 	void ClientReportDamagedResourceBuilding(ABuildingSMActor* BuildingSMActor, uint8 PotentialResourceType, int32 PotentialResourceCount, bool bDestroyed, bool bJustHitWeakspot);
 
+	static void ServerAttemptInventoryDrop(AFortPlayerController* This, FGuid& ItemGuid, int Count, bool bTrash);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -79,6 +81,24 @@ public:
 			ServerExecuteInventoryItem,
 			(LPVOID*)&ServerExecuteInventoryItemOG
 		);
+
+		UFunction* ServerAttemptInventoryDropFunc = AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerAttemptInventoryDrop");
+		if (ServerAttemptInventoryDropFunc) {
+			HookEveryVTable(
+				AFortPlayerController::StaticClass(),
+				ServerAttemptInventoryDropFunc,
+				ServerAttemptInventoryDrop,
+				nullptr
+			);
+		}
+		else {
+			HookEveryVTable(
+				AFortPlayerController::StaticClass(),
+				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerSpawnInventoryDrop"),
+				ServerAttemptInventoryDrop,
+				nullptr
+			);
+		}
 
 		Log("Hooked AFortPlayerController");
 	}

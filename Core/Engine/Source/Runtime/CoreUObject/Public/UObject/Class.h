@@ -91,6 +91,33 @@ class UFunction : public UStruct {
 public:
     DefineCustomProperty(void*, Func, ServerOffsets::ExecFunction);
 public:
+    struct Param
+    {
+        FString Name;
+        uint32 Offset;
+        uint64 PropertyFlags;
+        uint32 ElementSize;
+    };
+
+    class Params
+    {
+    public:
+        std::vector<Param> NameOffsetMap;
+        uint32 Size;
+    };
+
+    Params GetParams() const
+    {
+        Params p{};
+
+        for (const UField* _Pr = GetChildrenOrChildProperties(); _Pr; _Pr = _Pr->Next)
+            p.NameOffsetMap.push_back({ _Pr->Name.ToString(), GetFromOffset<uint32>(_Pr, ServerOffsets::UProperty__Offset_Internal),
+                GetFromOffset<uint64>(_Pr, ServerOffsets::UProperty__PropertyFlags), GetFromOffset<uint32>(_Pr, ServerOffsets::UProperty__ElementSize) });
+
+        p.Size = PropertiesSize;
+        return p;
+    }
+public:
     static UClass* StaticClass() {
         return (UClass*)FUObjectArray::FindObject("Class /Script/CoreUObject.Function");
     }

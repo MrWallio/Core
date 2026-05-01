@@ -6,6 +6,8 @@
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
+#include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
+#include "FortniteGame/Public/FortInventory/FortInventory.h"
 
 void ABuildingActor::InitializeKismetSpawnedBuildingActor(ABuildingActor* BuildingOwner, AFortPlayerController* SpawningController, bool bUsePlayerBuildAnimations, ABuildingActor* ReplacedBuilding)
 {
@@ -31,6 +33,12 @@ float ABuildingActor::GetHealthPercent() const
 
 void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FGameplayTagContainer& DamageTags, const FVector& Momentum, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser, const FGameplayEffectContextHandle& EffectContext) {
 	if (!This) return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
+
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ABuildingActor::OnDamageServer: World is null!");
+		return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
+	}
 
 	AFortPlayerController* PC = InstigatedBy->Cast<AFortPlayerController>();
 	if (!PC) {
@@ -70,6 +78,28 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 			This->bDestroyed,
 			(Damage == 100.f)
 		);
+
+		if (PC->WorldInventory) {
+			int32 ExcessCount = PC->WorldInventory->GetOverflowFromAddingItem(ResourceDef, MaterialCount);
+			if (ExcessCount > 0) {
+				AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+					World,
+					ResourceDef,
+					ExcessCount,
+					PC->MyFortPawn->K2_GetActorLocation(),
+					FVector(),
+					-1,
+					true,
+					true,
+					false,
+					-1,
+					EFortPickupSourceTypeFlag::Player,
+					EFortPickupSpawnSource::TossedByPlayer,
+					PC,
+					false
+				);
+			}
+		}
 	}
 	else {
 		Log("ABuildingActor::OnDamageServer: Failed to get ResourceDef for ResourceType: " + std::to_string(BuildingSMActor->ResourceType));

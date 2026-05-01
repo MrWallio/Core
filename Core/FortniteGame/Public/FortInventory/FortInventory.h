@@ -35,8 +35,12 @@ public:
 	UFortWorldItem* FindItemInstance(UFortItemDefinition* ItemDefinition);
 
 	FFortItemEntry* AddItem(UFortItemDefinition* Def, int32 Count = 1);
+	int32 GetOverflowFromAddingItem(UFortItemDefinition* Def, int32 Count = 1);
 
 	bool Update(FFortItemEntry* ItemEntry = nullptr);
 
 	void InitializeExistingItem(UFortWorldItem* ExistingItem);
+
+	bool RemoveItem(FGuid Guid, int32 Count = INT_MAX);
+	bool RemoveItem(UFortItemDefinition* Def, int32 Count = INT_MAX);
 };

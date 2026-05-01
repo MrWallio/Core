@@ -14,6 +14,8 @@ public:
 	int32 GetMaxStackSize() const;
 
 	bool IsStackable() const;
+
+	int32 GetClipSize();
 };
 
 class UFortAccountItemDefinition : public UFortItemDefinition {

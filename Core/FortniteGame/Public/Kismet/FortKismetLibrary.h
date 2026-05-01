@@ -23,6 +23,8 @@ class AFortPickup;
 class AFortPawn;
 class UFortResourceItemDefinition;
 class IAbilitySystemInterface;
+class AFortPlayerController;
+class UFortItemDefinition;
 
 class UFortKismetLibrary : public UBlueprintFunctionLibrary {
 public:
@@ -49,4 +51,28 @@ public:
 		EFortBuildPreviewMarkerOptionalAdjustment* MarkerOptionalAdjustment);
 	
 	static FFortAbilitySetHandle EquipFortAbilitySet(TScriptInterface<IAbilitySystemInterface> AbilitySystemInterfaceActor, UFortAbilitySet* AbilitySet, UObject* OverrideSourceObject);
+
+	static AFortPickup* K2_SpawnPickupInWorld(
+		UObject* WorldContextObject,
+		UFortItemDefinition* ItemDefinition,
+		int NumberToSpawn,
+		FVector Position,
+		FVector Direction,
+		int32 OverrideMaxStackCount,
+		bool bToss,
+		bool bRandomRotation,
+		bool bBlockedFromAutoPickup,
+		int32 PickupInstigatorHandle,
+		EFortPickupSourceTypeFlag SourceType,
+		EFortPickupSpawnSource Source,
+		AFortPlayerController* OptionalOwnerPC,
+		bool bPickupOnlyRelevantToOwner
+	);
+	static void execK2_SpawnPickupInWorld(UObject* Object, FFrame& Stack, AFortPickup** Result);
+
+	static void Hook() {
+		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.K2_SpawnPickupInWorld", execK2_SpawnPickupInWorld);
+
+		Log("Hooked UFortKismetLibrary");
+	}
 };

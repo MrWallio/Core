@@ -6,6 +6,9 @@
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 #include "FortniteGame/Public/FortAbility/FortGameplayAbility.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortPickup/FortPickup.h"
+#include "FortniteGame/Public/FortInventory/FortInventory.h"
 
 class UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinition(const uint8 ResourceType)
 {
@@ -115,4 +118,158 @@ FFortAbilitySetHandle UFortKismetLibrary::EquipFortAbilitySet(TScriptInterface<I
 	GetDefaultObj()->ProcessEvent(Func, &Parms);
 
 	return Parms.ReturnValue;
+}
+
+AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
+	UObject* WorldContextObject,
+	UFortItemDefinition* ItemDefinition,
+	int NumberToSpawn,
+	FVector Position,
+	FVector Direction,
+	int32 OverrideMaxStackCount,
+	bool bToss,
+	bool bRandomRotation,
+	bool bBlockedFromAutoPickup,
+	int32 PickupInstigatorHandle,
+	EFortPickupSourceTypeFlag SourceType,
+	EFortPickupSpawnSource Source,
+	AFortPlayerController* OptionalOwnerPC,
+	bool bPickupOnlyRelevantToOwner) {
+	if (!ItemDefinition) {
+		Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Failed to get item definition from stack!");
+		return nullptr;
+	}
+
+	UWorld* World = WorldContextObject->GetWorld();
+	if (!World) {
+		Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Failed to get world!");
+		return nullptr;
+	}
+
+	Log(
+		"UFortKismetLibrary::K2_SpawnPickupInWorld: Spawning Pickup for Item: "
+		+ ItemDefinition->GetName().ToString() +
+		" Amount: " + std::to_string(NumberToSpawn) +
+		" In World: " + World->GetName().ToString()
+	);
+
+	AFortPickup* Pickup = World->SpawnActor(AFortPickup::StaticClass(), Position)->Cast<AFortPickup>();
+	if (!Pickup) {
+		Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Failed to spawn pickup!");
+		return nullptr;
+	}
+	Pickup->bRandomRotation = bRandomRotation;
+
+	FFortItemEntry& PickupEntry = Pickup->PrimaryPickupItemEntry;
+	PickupEntry.ItemDefinition = ItemDefinition;
+	PickupEntry.Count = NumberToSpawn;
+	PickupEntry.LoadedAmmo = ItemDefinition->GetClipSize();
+	PickupEntry.ReplicationKey++;
+	Pickup->OnRep_PrimaryPickupItemEntry();
+
+	Pickup->SetPickupItems(&PickupEntry, &Pickup->MultiItemPickupEntries, SourceType, false, Source);
+
+	AFortPawn* ItemOwner = nullptr;
+	if (OptionalOwnerPC) {
+		ItemOwner = OptionalOwnerPC->Pawn->Cast<AFortPawn>();
+	}
+	if (ItemOwner) {
+		Pickup->PawnWhoDroppedPickup = ItemOwner;
+	}
+
+	Pickup->TossPickup(
+		Position,
+		OptionalOwnerPC ? OptionalOwnerPC->Pawn->Cast<AFortPawn>() : nullptr,
+		OverrideMaxStackCount,
+		bToss,
+		false,
+		SourceType,
+		Source
+	);
+
+	if (SourceType == EFortPickupSourceTypeFlag::Container)
+	{
+		Pickup->bTossedFromContainer = true;
+		Pickup->OnRep_TossedFromContainer();
+	}
+
+	Pickup->ForceNetUpdate();
+
+	Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Spawned Pickup: " + Pickup->GetName().ToString());
+	return Pickup;
+}
+
+void UFortKismetLibrary::execK2_SpawnPickupInWorld(UObject* Object, FFrame& Stack, AFortPickup** Result)
+{
+	static UFunction* K2_SpawnPickupInWorldFn = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.K2_SpawnPickupInWorld");
+	if (!K2_SpawnPickupInWorldFn) {
+		Log("UFortKismetLibrary::execK2_SpawnPickupInWorld: Failed to find function!");
+		return;
+	}
+	UObject* WorldContextObject = nullptr;
+	UFortWorldItemDefinition* ItemDefinition = nullptr;
+	int32 NumberToSpawn = 0;
+	FVector Position = FVector();
+	FVector Direction = FVector();
+	int32 OverrideMaxStackCount = 0;
+	bool bToss = false;
+	bool bRandomRotation = false;
+	bool bBlockedFromAutoPickup = false;
+	int32 PickupInstigatorHandle = 0;
+	EFortPickupSourceTypeFlag SourceType = EFortPickupSourceTypeFlag();
+	EFortPickupSpawnSource Source = EFortPickupSpawnSource();
+	AFortPlayerController* OptionalOwnerPC = nullptr;
+	bool bPickupOnlyRelevantToOwner = false;
+	for (auto& Param : K2_SpawnPickupInWorldFn->GetParams().NameOffsetMap)
+	{
+		std::string Name = Param.Name.ToString();
+		if (Name == "WorldContextObject") {
+			Stack.StepCompiledIn(&WorldContextObject);
+		}
+		else if (Name == "ItemDefinition") {
+			Stack.StepCompiledIn(&ItemDefinition);
+		}
+		else if (Name == "NumberToSpawn") {
+			Stack.StepCompiledIn(&NumberToSpawn);
+		}
+		else if (Name == "Position") {
+			Stack.StepCompiledIn(&Position);
+		}
+		else if (Name == "Direction") {
+			Stack.StepCompiledIn(&Direction);
+		}
+		else if (Name == "OverrideMaxStackCount") {
+			Stack.StepCompiledIn(&OverrideMaxStackCount);
+		}
+		else if (Name == "bToss") {
+			Stack.StepCompiledIn(&bToss);
+		}
+		else if (Name == "bRandomRotation") {
+			Stack.StepCompiledIn(&bRandomRotation);
+		}
+		else if (Name == "bBlockedFromAutoPickup") {
+			Stack.StepCompiledIn(&bBlockedFromAutoPickup);
+		}
+		else if (Name == "PickupInstigatorHandle") {
+			Stack.StepCompiledIn(&PickupInstigatorHandle);
+		}
+		else if (Name == "SourceType") {
+			Stack.StepCompiledIn(&SourceType);
+		}
+		else if (Name == "Source") {
+			Stack.StepCompiledIn(&Source);
+		}
+		else if (Name == "OptionalOwnerPC") {
+			Stack.StepCompiledIn(&OptionalOwnerPC);
+		}
+		else if (Name == "bPickupOnlyRelevantToOwner") {
+			Stack.StepCompiledIn(&bPickupOnlyRelevantToOwner);
+		}
+		else {
+			Log("UFortKismetLibrary::execK2_SpawnPickupInWorld: Unhandled parameter: " + Name);
+		}
+	}
+	Stack.IncrementCode();
+
+	*Result = K2_SpawnPickupInWorld(WorldContextObject, ItemDefinition, NumberToSpawn, Position, Direction, OverrideMaxStackCount, bToss, bRandomRotation, bBlockedFromAutoPickup, PickupInstigatorHandle, SourceType, Source, OptionalOwnerPC, bPickupOnlyRelevantToOwner);
 }

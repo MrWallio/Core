@@ -3,8 +3,10 @@
 
 #include "FortniteGame/Public/FortItem/FortWorldItem.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWorldItemDefinition.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 #include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
+#include "FortniteGame/Public/FortWeapon/FortWeaponStats.h"
 
 void AFortInventory::HandleInventoryLocalUpdate()
 {
@@ -20,14 +22,21 @@ FFortItemEntry* AFortInventory::FindItemEntry(FGuid Guid)
 {
 	if (!Guid.IsValid())
 		return nullptr;
+
+	if (!Inventory.ReplicatedEntries.IsValid())
+		return nullptr;
+
 	for (int i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
 	{
+		if (!Inventory.ReplicatedEntries.IsValidIndex(i)) continue;
+
 		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
 		if (Entry.ItemGuid == Guid)
 		{
 			return &Entry;
 		}
 	}
+
 	return nullptr;
 }
 
@@ -35,14 +44,21 @@ FFortItemEntry* AFortInventory::FindItemEntry(UFortItemDefinition* ItemDefinitio
 {
 	if (!ItemDefinition)
 		return nullptr;
+
+	if (!Inventory.ReplicatedEntries.IsValid())
+		return nullptr;
+
 	for (int i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
 	{
+		if (!Inventory.ReplicatedEntries.IsValidIndex(i)) continue;
+
 		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
 		if (Entry.ItemDefinition == ItemDefinition)
 		{
 			return &Entry;
 		}
 	}
+
 	return nullptr;
 }
 
@@ -50,8 +66,14 @@ UFortWorldItem* AFortInventory::FindItemInstance(FGuid Guid)
 {
 	if (!Guid.IsValid())
 		return nullptr;
+
+	if (!Inventory.ItemInstances.IsValid())
+		return nullptr;
+
 	for (int i = 0; i < Inventory.ItemInstances.Num(); i++)
 	{
+		if (!Inventory.ItemInstances.IsValidIndex(i)) continue;
+
 		auto& Item = Inventory.ItemInstances[i];
 		if (Item && Item->ItemEntry.ItemGuid == Guid)
 		{
@@ -65,8 +87,14 @@ UFortWorldItem* AFortInventory::FindItemInstance(UFortItemDefinition* ItemDefini
 {
 	if (!ItemDefinition)
 		return nullptr;
+
+	if (!Inventory.ItemInstances.IsValid())
+		return nullptr;
+
 	for (int i = 0; i < Inventory.ItemInstances.Num(); i++)
 	{
+		if (!Inventory.ItemInstances.IsValidIndex(i)) continue;
+
 		auto& Item = Inventory.ItemInstances[i];
 		if (Item && Item->ItemEntry.ItemDefinition == ItemDefinition)
 		{
@@ -96,12 +124,45 @@ FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count)
 		PC->QuickBars->ServerAddItemInternal(Item->ItemEntry.ItemGuid, EFortQuickBars::Max_None, -3);
 	}
 
-	return &Item->ItemEntry;
+	return FindItemEntry(Item->ItemEntry.ItemGuid);
+}
+
+int32 AFortInventory::GetOverflowFromAddingItem(UFortItemDefinition* Def, int32 Count) {
+	if (!Def || Count <= 0 || !Owner)
+		return 0;
+
+	int32 MaxStackSize = Def->GetMaxStackSize();
+	FFortItemEntry* ItemEntry = FindItemEntry(Def);
+
+	if (!ItemEntry) {
+		int32 ToAdd = (Count > MaxStackSize) ? MaxStackSize : Count;
+		AddItem(Def, ToAdd);
+		return Count - ToAdd;
+	}
+	else {
+		if (ItemEntry->Count >= MaxStackSize) {
+			return Count;
+		}
+		else {
+			int32 AvailableSpace = MaxStackSize - ItemEntry->Count;
+
+			if (AvailableSpace <= 0)
+			{
+				return Count;
+			}
+
+			int32 ToAdd = (Count > AvailableSpace) ? AvailableSpace : Count;
+			ItemEntry->Count += ToAdd;
+			Update(ItemEntry);
+
+			return Count - ToAdd;
+		}
+	}
 }
 
 bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 {
-	if (!this || !Owner) return false;
+	if (!Owner) return false;
 
 	if (ItemEntry == nullptr) {
 		Inventory.MarkArrayDirty();
@@ -123,4 +184,82 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 void AFortInventory::InitializeExistingItem(UFortWorldItem* ExistingItem) {
 	void (*InitializeExistingItemInternal)(AFortInventory * This, UFortWorldItem * ExistingItem) = decltype(InitializeExistingItemInternal)(ImageBase + Finder::FindAFortInventory_InitializeExistingItem());
 	return InitializeExistingItemInternal(this, ExistingItem);
+}
+
+bool AFortInventory::RemoveItem(FGuid Guid, int32 Count) {
+	if (!Guid.IsValid())
+	{
+		Log("AFortInventory::RemoveItem: Invalid GUID!");
+		return false;
+	}
+	
+	if (Count <= 0) {
+		Log("AFortInventory::RemoveItem: Count must be greater than 0!");
+		return false;
+	}
+
+	if (!Inventory.ReplicatedEntries.IsValid() || !Inventory.ItemInstances.IsValid())
+	{
+		Log("AFortInventory::RemoveItem: Inventory arrays are invalid!");
+		return false;
+	}
+
+	for (int i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
+	{
+		if (!Inventory.ReplicatedEntries.IsValidIndex(i))
+			continue;
+
+		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
+
+		if (Entry.ItemGuid != Guid)
+			continue;
+
+		if (Entry.Count <= Count)
+		{
+			Inventory.ReplicatedEntries.RemoveAt(i);
+
+			for (int j = 0; j < Inventory.ItemInstances.Num(); j++)
+			{
+				if (!Inventory.ItemInstances.IsValidIndex(j))
+					continue;
+
+				UFortWorldItem* Item = Inventory.ItemInstances[j];
+				if (Item && Item->ItemEntry.ItemGuid == Guid)
+				{
+					Inventory.ItemInstances.RemoveAt(j);
+					break;
+				}
+			}
+
+			return Update();
+		}
+		else
+		{
+			Entry.Count -= Count;
+			return Update(&Entry);
+		}
+	}
+
+	Log("AFortInventory::RemoveItem: Item not found for GUID: " + Guid.FormatGuid());
+	return false;
+}
+
+bool AFortInventory::RemoveItem(UFortItemDefinition* Def, int32 Count) {
+	if (!Def) {
+		Log("AFortInventory::RemoveItem: ItemDefinition is invalid!");
+		return false;
+	}
+
+	if (Count <= 0) {
+		Log("AFortInventory::RemoveItem: Count must be greater than 0!");
+		return false;
+	}
+
+	FFortItemEntry* ItemEntry = FindItemEntry(Def);
+	if (!ItemEntry) {
+		Log("AFortInventory::RemoveItem: ItemEntry not found for ItemDefinition: " + Def->GetName().ToString());
+		return false;
+	}
+
+	return RemoveItem(ItemEntry->ItemGuid, Count);
 }

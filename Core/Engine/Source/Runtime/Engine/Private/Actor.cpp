@@ -98,6 +98,26 @@ FVector AActor::GetActorUpVector() const
 	return Parms.ReturnValue;
 }
 
+FVector AActor::K2_GetActorLocation() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"K2_GetActorLocation"));
+
+	struct Actor_K2_GetActorLocation final
+	{
+	public:
+		FVector ReturnValue;
+	};
+
+	Actor_K2_GetActorLocation Parms{};
+
+	const_cast<AActor*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}
+
 ENetRole AActor::GetRemoteRole() const
 {
 	if (!this) {

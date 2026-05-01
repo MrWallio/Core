@@ -18,6 +18,7 @@
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 #include "FortniteGame/Public/Mcp/McpProfileGroup.h"
 #include "FortniteGame/Public/BuildingActor/BuildingActor.h"
+#include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -144,6 +145,7 @@ void Utils::Hook() {
 	AFortPlayerControllerAthena::Hook();
 	UMcpProfileGroup::Hook();
 	ABuildingActor::Hook();
+	UFortKismetLibrary::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

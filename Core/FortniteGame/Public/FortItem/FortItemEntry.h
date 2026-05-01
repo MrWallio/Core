@@ -45,4 +45,8 @@ public:
 	DefineStructProperty(TArray<float>, GenericAttributeValues);
 public:
 	uint8_t Padding[0x9C];
+public:
+	void SetStateValue(EFortItemEntryState StateType, int32 InValue);
+
+	void SetToDirty();
 };

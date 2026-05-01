@@ -12,6 +12,7 @@ public:
 	DefineUnrealClass(AFortWeapon);
 
 	DefineUProperty(UFortWeaponItemDefinition*, WeaponData);
+	DefineUProperty(FGuid, ItemEntryGuid);
 };
 
 class AFortWeap_BuildingToolBase : public AFortWeapon {

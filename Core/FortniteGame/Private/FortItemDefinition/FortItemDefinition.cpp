@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "FortniteGame/Public/FortItemDefinition/FortItemDefinition.h"
 
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortWeapon/FortWeaponStats.h"
+
 class UFortItem* UFortItemDefinition::CreateTemporaryItemInstanceBP(int32 Count, int32 Level) const
 {
 	static class UFunction* Func = nullptr;
@@ -64,4 +67,37 @@ bool UFortItemDefinition::IsStackable() const
 	}
 
 	return false;
+}
+
+int32 UFortItemDefinition::GetClipSize() {
+	auto RangedDef = Cast<UFortWeaponRangedItemDefinition>();
+	if (!RangedDef) {
+		return 1;
+	}
+
+	auto DataTable = RangedDef->WeaponStatHandle.DataTable;
+	auto RowName = RangedDef->WeaponStatHandle.RowName;
+
+	if (!DataTable || !RowName.IsNone()) {
+		Log("GetClipSize: Invalid DataTable or RowName in WeaponStatHandle.");
+		return 1;
+	}
+
+	auto& RowMap = DataTable->RowMap;
+
+	for (int i = 0; i < RowMap.Num(); i++)
+	{
+		auto& Pair = RowMap[i];
+
+		FName CurrentRowName = Pair.Key();
+		FFortRangedWeaponStats* PackageData = (FFortRangedWeaponStats*)Pair.Value();
+
+		if (CurrentRowName == RowName && PackageData)
+		{
+			return PackageData->ClipSize;
+		}
+	}
+
+	Log("GetClipSize: Row not found in DataTable or PackageData is null.");
+	return 1;
 }

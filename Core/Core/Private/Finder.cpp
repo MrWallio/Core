@@ -5147,10 +5147,15 @@ uintptr_t Finder::FindAFortPickup_SetPickupTarget() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AFortPickup_SetPickupTarget)
 		return ServerOffsets::AFortPickup_SetPickupTarget;
-	Addr = Memcury::Scanner::FindPattern("40 55 53 57 41 55 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 44 0F 29 8C 24").Get();
+
+	if (Version::Engine_Version == 4.16) {
+		Addr = Memcury::Scanner::FindPattern("48 8B C4 4C 89 48 ? 48 89 50 ? 55 53 57 48 8D 68").Get();
+	}
+	
 	if (Addr) {
 		ServerOffsets::AFortPickup_SetPickupTarget = Addr - ImageBase;
 	}
+
 	Log("AFortPickup_SetPickupTarget found at: 0x" + std::format("{:X}", ServerOffsets::AFortPickup_SetPickupTarget));
 	return ServerOffsets::AFortPickup_SetPickupTarget;
 }
@@ -5225,6 +5230,23 @@ uintptr_t Finder::FindAFortPickup_SetPickupItems() {
 	}
 	Log("AFortPickup_SetPickupItems found at: 0x" + std::format("{:X}", ServerOffsets::AFortPickup_SetPickupItems));
 	return ServerOffsets::AFortPickup_SetPickupItems;
+}
+
+uintptr_t Finder::FindAFortPickup_SetPickupItemsVFT() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::AFortPickup_SetPickupItemsVFT)
+		return ServerOffsets::AFortPickup_SetPickupItemsVFT;
+	
+	if (Version::Engine_Version == 4.16) {
+		Addr = 0xC5;
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortPickup_SetPickupItemsVFT = Addr;
+	}
+
+	Log("AFortPickup_SetPickupItemsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPickup_SetPickupItemsVFT));
+	return ServerOffsets::AFortPickup_SetPickupItemsVFT;
 }
 
 uintptr_t Finder::FindAFortInventory_Destroyed() {

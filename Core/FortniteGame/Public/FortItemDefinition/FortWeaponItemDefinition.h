@@ -40,3 +40,8 @@ class UFortWeaponMeleeItemDefinition : public UFortWeaponItemDefinition {
 public:
 	DefineUnrealClass(UFortWeaponMeleeItemDefinition);
 };
+
+class UFortWeaponRangedItemDefinition : public UFortWeaponItemDefinition {
+public:
+	DefineUnrealClass(UFortWeaponRangedItemDefinition);
+};

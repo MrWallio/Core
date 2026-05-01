@@ -86,6 +86,8 @@ public:
 
 	FVector GetActorUpVector() const;
 
+	FVector K2_GetActorLocation() const;
+
 	ENetRole GetRemoteRole() const;
 
 	ULevel* GetLevel() const { return GetOuter()->Cast<ULevel>(); }

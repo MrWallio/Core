@@ -10,6 +10,8 @@
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
 #include "FortniteGame/Public/FortItem/FortWorldItem.h"
+#include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
+#include "FortniteGame/Public/FortItem/FortItemEntry.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -102,6 +104,181 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 	if (Parser.IsCommand("Help"))
 	{
 		This->ClientMessage("=== Available Commands ===");
+		This->ClientMessage("GiveItem <ItemDefinitionName> [Count] [bStack] - Gives an item to the player's inventory.");
+		This->ClientMessage("SetLoadedAmmo <LoadedAmmo> - Sets the loaded ammo of the currently equipped weapon.");
+	}
+	else if (Parser.IsCommand("GiveItem")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: GiveItem <ItemDefinitionName> [Count] [bStack]");
+			return;
+		}
+
+		if (!This->WorldInventory) {
+			This->ClientMessage("WorldInventory is null!");
+			return;
+		}
+		
+		std::string ItemDefName = Parser.GetArg(0);
+		int32 Count = Parser.GetArgInt(1, 1);
+		bool bStack = Parser.GetArgBool(2, true);
+
+		UObject* ItemObj;
+		if (ItemDefName.contains("/")) {
+			if (ItemDefName.starts_with("FortniteGame/"))
+			{
+				ItemDefName = "/Game/" + ItemDefName.substr(strlen("FortniteGame/"));
+			}
+
+			size_t contentPos = ItemDefName.find("/Content/");
+			if (contentPos != std::string::npos)
+			{
+				if (ItemDefName.contains("/Game/Content/"))
+				{
+					ItemDefName.replace(ItemDefName.find("/Game/Content/"), strlen("/Game/Content/"), "/Game/");
+				}
+				else
+				{
+					size_t contentPos = ItemDefName.find("/Content/");
+					ItemDefName = ItemDefName.substr(0, contentPos)
+						+ "/Game/"
+						+ ItemDefName.substr(contentPos + strlen("/Content/"));
+				}
+			}
+
+			if (!ItemDefName.contains("."))
+			{
+				size_t lastSlash = ItemDefName.find_last_of('/');
+				if (lastSlash != std::string::npos)
+				{
+					std::string className = ItemDefName.substr(lastSlash + 1);
+					ItemDefName += "." + className;
+				}
+				else
+				{
+					This->ClientMessage("Invalid ItemDefinition path: " + ItemDefName);
+					return;
+				}
+			}
+
+			ItemObj = StaticLoadObject(ItemDefName);
+		}
+		else {
+			ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
+		}
+		if (!ItemObj) {
+			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
+			return;
+		}
+
+		UFortItemDefinition* ItemDef = ItemObj->Cast<UFortItemDefinition>();
+		if (!ItemDef) {
+			This->ClientMessage("Object is not a UFortItemDefinition: " + ItemObj->GetName().ToString());
+			return;
+		}
+
+		FFortItemEntry* ExistingEntry = This->WorldInventory->FindItemEntry(ItemDef);
+		if (ExistingEntry && bStack)
+		{
+			ExistingEntry->Count += Count;
+			This->WorldInventory->Update(ExistingEntry);
+			This->ClientMessage("Added " + std::to_string(Count) + " to existing stack of " + ItemDefName);
+		}
+		else
+		{
+			ExistingEntry = This->WorldInventory->AddItem(ItemDef, Count);
+			if (ExistingEntry) {
+				ExistingEntry->LoadedAmmo = ItemDef->GetClipSize();
+				This->ClientMessage("Added new item entry: " + ItemDefName + " x" + std::to_string(Count));
+			}
+			else {
+				This->ClientMessage("Failed to add item: " + ItemDefName);
+			}
+		}
+
+		if (ExistingEntry) {
+			ExistingEntry->SetStateValue(EFortItemEntryState::ShouldShowItemToast, 1);
+		}
+	}
+	else if (Parser.IsCommand("SetLoadedAmmo")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SetLoadedAmmo <LoadedAmmo>");
+			return;
+		}
+
+		int32 LoadedAmmo = Parser.GetArgInt(0, 30);
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+		AFortWeapon* CurrentWeapon = This->MyFortPawn->CurrentWeapon;
+		if (!CurrentWeapon) {
+			This->ClientMessage("CurrentWeapon is null!");
+			return;
+		}
+
+		FFortItemEntry* WeaponEntry = This->FindItemEntry(CurrentWeapon->ItemEntryGuid);
+		if (!WeaponEntry) {
+			This->ClientMessage("Weapon entry not found in inventory!");
+			return;
+		}
+
+		WeaponEntry->LoadedAmmo = LoadedAmmo;
+		This->WorldInventory->Update(WeaponEntry);
+		This->ClientMessage("Set loaded ammo of current weapon to " + std::to_string(LoadedAmmo));
+	}
+	else if (Parser.IsCommand("GiveAmmo")) {
+		int32 AmmoAmount = Parser.GetArgInt(0, 30);
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		AFortWeapon* CurrentWeapon = This->MyFortPawn->CurrentWeapon;
+		if (!CurrentWeapon) {
+			This->ClientMessage("CurrentWeapon is null!");
+			return;
+		}
+
+		if (!CurrentWeapon->WeaponData) {
+			This->ClientMessage("WeaponData is null!");
+			return;
+		}
+
+		UFortWorldItemDefinition* ItemDef = CurrentWeapon->WeaponData->Cast<UFortWorldItemDefinition>();
+		if (!ItemDef) {
+			This->ClientMessage("WeaponData is not a UFortWorldItemDefinition!");
+			return;
+		}
+
+		UFortWorldItemDefinition* AmmoItemDef = ItemDef->GetAmmoWorldItemDefinition_BP();
+		if (!AmmoItemDef) {
+			This->ClientMessage("AmmoWorldItemDefinition is null!");
+			return;
+		}
+
+		FFortItemEntry* AmmoEntry = This->FindItemEntry(AmmoItemDef);
+		if (AmmoEntry) {
+			AmmoEntry->Count += AmmoAmount;
+			This->WorldInventory->Update(AmmoEntry);
+			This->ClientMessage("Added " + AmmoItemDef->GetName().ToString() + " " + std::to_string(AmmoAmount) + " ammo to existing stack.");
+		}
+		else {
+			AmmoEntry = This->WorldInventory->AddItem(AmmoItemDef, AmmoAmount);
+			if (AmmoEntry) {
+				This->ClientMessage("Added new ammo entry: " + AmmoItemDef->GetName().ToString() + " x" + std::to_string(AmmoAmount));
+			}
+			else {
+				This->ClientMessage("Failed to add ammo item: " + AmmoItemDef->GetName().ToString());
+			}
+		}
+
+		if (AmmoEntry) {
+			AmmoEntry->SetStateValue(EFortItemEntryState::ShouldShowItemToast, 1);
+		}
 	}
 }
 
@@ -194,4 +371,43 @@ void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor
 	Parms.bJustHitWeakspot = bJustHitWeakspot;
 
 	ProcessEvent(Func, &Parms);
+}
+
+void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* This, FGuid& ItemGuid, int Count, bool bTrash) {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortPlayerController::ServerAttemptInventoryDrop: World is null!");
+		return;
+	}
+
+	if (!This->MyFortPawn) {
+		Log("AFortPlayerController::ServerAttemptInventoryDrop: MyFortPawn is null!");
+		return;
+	}
+
+	FVector PawnLocation = This->MyFortPawn->K2_GetActorLocation();
+
+	FFortItemEntry* ItemEntry = This->FindItemEntry(ItemGuid);
+	if (ItemEntry) {
+		if (ItemEntry->ItemDefinition && This->WorldInventory->RemoveItem(ItemEntry->ItemDefinition, Count)) {
+			if (!bTrash) {
+				AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+					World,
+					ItemEntry->ItemDefinition,
+					ItemEntry->Count,
+					PawnLocation,
+					FVector(),
+					-1,
+					true,
+					true,
+					false,
+					-1,
+					EFortPickupSourceTypeFlag::Player,
+					EFortPickupSpawnSource::TossedByPlayer,
+					This,
+					false
+				);
+			}
+		}
+	}
 }

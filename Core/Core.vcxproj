@@ -158,6 +158,8 @@
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\Templates\SubclassOf.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Class.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\CoreNet.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\MovementComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\ProjectileMovementComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\GameplayTags\Classes\GameplayTagContainer.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Interface.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\NoExportTypes.h" />
@@ -287,6 +289,8 @@
     <ClInclude Include="FortniteGame\Public\FortPawn\FortPawn.h" />
     <ClInclude Include="FortniteGame\Public\FortPawn\FortPlayerPawn.h" />
     <ClInclude Include="FortniteGame\Public\FortPawn\FortPlayerPawnAthena.h" />
+    <ClInclude Include="FortniteGame\Public\FortPickup\FortPickup.h" />
+    <ClInclude Include="FortniteGame\Public\FortPickup\FortPickupLocationData.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerController\FortPlayerController.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerController\FortPlayerControllerAthena.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerController\FortPlayerControllerGameplay.h" />
@@ -298,6 +302,7 @@
     <ClInclude Include="FortniteGame\Public\FortInventory\FortQuickBars.h" />
     <ClInclude Include="FortniteGame\Public\FortInventory\FortQuickBarsAthena.h" />
     <ClInclude Include="FortniteGame\Public\FortWeapon\FortWeapon.h" />
+    <ClInclude Include="FortniteGame\Public\FortWeapon\FortWeaponStats.h" />
     <ClInclude Include="FortniteGame\Public\FortWorker\FortWorker.h" />
     <ClInclude Include="FortniteGame\Public\FortWorker\FortWorkerType.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\AdditionalLevelStreamed.h" />
@@ -371,8 +376,10 @@
     <ClCompile Include="FortniteGame\Private\FortItemDefinition\FortItemDefinition.cpp" />
     <ClCompile Include="FortniteGame\Private\FortItemDefinition\FortWorldItemDefinition.cpp" />
     <ClCompile Include="FortniteGame\Private\FortItem\FortItem.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortItem\FortItemEntry.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPawn\FortPawn.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPawn\FortPlayerPawn.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortPickup\FortPickup.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerController.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerAthena.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerZone.cpp" />

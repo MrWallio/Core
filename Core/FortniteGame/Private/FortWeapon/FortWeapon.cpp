@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
 
+#include "FortniteGame/Public/FortItem/FortItemEntry.h"
+
 void AFortWeap_BuildingTool::OnRep_DefaultMetadata(UBuildingEditModeMetadata* OldMetadata)
 {
 	static UFunction* Func = nullptr;

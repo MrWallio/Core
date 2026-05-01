@@ -665,6 +665,8 @@ public:
 
 	static uintptr_t FindAFortPickup_SetPickupItems();
 
+	static uintptr_t FindAFortPickup_SetPickupItemsVFT();
+
 	static uintptr_t FindAFortInventory_Destroyed();
 
 	static uintptr_t FindAFortInventory_DumpInventoryToLog();
