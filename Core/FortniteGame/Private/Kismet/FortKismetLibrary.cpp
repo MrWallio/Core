@@ -50,7 +50,7 @@ class UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinit
 		case 3:
 			ItemDefinition = StaticLoadObject("/Game/Items/ResourcePickups/PermaniteItemData.PermaniteItemData");
 			break;
-		case 4:
+		default:
 			Log("UFortKismetLibrary::K2_GetResourceItemDefinition: ResourceType " + std::to_string(ResourceType) + " is not valid!");
 			break;
 		}
