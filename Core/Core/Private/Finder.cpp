@@ -440,7 +440,7 @@ uintptr_t Finder::FindUNetDriver_InitListenVFT() {
 	if (ServerOffsets::UNetDriver_InitListenVFT)
 		return ServerOffsets::UNetDriver_InitListenVFT;
 
-	static void** NetDriverVFT = ((UClass*)FUObjectArray::FindObject("Class /Script/OnlineSubsystemUtils.IpNetDriver"))->GetDefaultObject()->VTable;
+	static void** NetDriverVFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.NetDriver"))->GetDefaultObject()->VTable;
 
 	for (int i = 0; i < 400; i++)
 	{
@@ -5494,7 +5494,7 @@ uintptr_t Finder::FindUNetConnection_IsNetReadyVFT() {
 	if (Version::Engine_Version == 4.16) {
 		Addr = 0x51;
 	}
-
+	 
 	if (Addr) {
 		ServerOffsets::UNetConnection_IsNetReadyVFT = Addr;
 	}
@@ -5506,15 +5506,8 @@ uintptr_t Finder::FindUNetConnection_IsNetReadyVFT() {
 uintptr_t Finder::FindUNetDriver__ReplicationFrame() {
 	if (ServerOffsets::UNetDriver__ReplicationFrame)
 		return ServerOffsets::UNetDriver__ReplicationFrame;
-	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x288;
-	}
-
-	if (Addr) {
-		ServerOffsets::UNetDriver__ReplicationFrame = Addr;
-	}
+	
+	ServerOffsets::UNetDriver__ReplicationFrame = *Memcury::Scanner::FindStringRef(L"Attempt to replicate function '%s' on Actor '%s' while it is in the middle of variable replication!").ScanFor({ 0x41, 0xFF }, true).AbsoluteOffset(4).GetAs<uint32_t*>();
 
 	Log("UNetDriver__ReplicationFrame found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver__ReplicationFrame));
 	return ServerOffsets::UNetDriver__ReplicationFrame;
@@ -5547,14 +5540,18 @@ uintptr_t Finder::FindAPlayerController_GetViewTarget() {
 uintptr_t Finder::FindUNetDriver__NetworkObjects() {
 	if (ServerOffsets::UNetDriver__NetworkObjects)
 		return ServerOffsets::UNetDriver__NetworkObjects;
-	uintptr_t Addr = 0;
+	
+	uintptr_t strAddr = Memcury::Scanner::FindStringRef(L"FlushDormancy: %s. Connection: %s").Get();
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x3F8;
-	}
+	for (int i = 0; i < 300; i++)
+	{
+		uintptr_t addr = strAddr + i;
 
-	if (Addr) {
-		ServerOffsets::UNetDriver__NetworkObjects = Addr;
+		if (*(uint8*)(addr) == 0x49 && *(uint8*)(addr + 1) == 0x8B && *(uint8*)(addr + 2) == 0x89)
+		{
+			ServerOffsets::UNetDriver__NetworkObjects = *((uint32*)(addr + 3));
+			break;
+		}
 	}
 
 	Log("UNetDriver__NetworkObjects found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver__NetworkObjects));
@@ -5956,16 +5953,20 @@ uintptr_t Finder::FindAActor_GetWorld() {
 }
 
 uintptr_t Finder::FindUWorld__TimeSeconds() {
-	static uintptr_t Addr = 0;
 	if (ServerOffsets::UWorld__TimeSeconds)
 		return ServerOffsets::UWorld__TimeSeconds;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x900;
-	}
+	uintptr_t straddr = Memcury::Scanner::FindStringRef(L"DeactivateSystem @ %fs %s").Get();
 
-	if (Addr) {
-		ServerOffsets::UWorld__TimeSeconds = Addr;
+	for (int i = 0; i < 60; i++)
+	{
+		uintptr_t addr = straddr - i;
+
+		if (*(uint8*)(addr) == 0xF3 && *(uint8*)(addr + 1) == 0x0F && *(uint8*)(addr + 2) == 0x10)
+		{
+			ServerOffsets::UWorld__TimeSeconds = *(uint32_t*)(addr + 4);
+			break;
+		}
 	}
 
 	Log("UWorld__TimeSeconds found at: 0x" + std::format("{:X}", ServerOffsets::UWorld__TimeSeconds));
