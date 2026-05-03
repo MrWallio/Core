@@ -7139,10 +7139,10 @@ uintptr_t Finder::FindAFortInventory_GetInventoryCapacity()
 		StringAddr = Memcury::Scanner::FindStringRef(L"GetInventoryCapacityInternal is returning an overridden value of %i").Get();
 	}
 
+	uintptr_t InternalFunctionAddr = 0;
+
 	if (bOld)
 	{
-		uintptr_t InternalFunctionAddr = 0;
-
 		for (int i = 0; i < 300; i++)
 		{
 			if (*(uint8*)(StringAddr - i + 0) == 0x48 && *(uint8*)(StringAddr - i + 1) == 0x89 && *(uint8*)(StringAddr - i + 2) == 0x5C)
@@ -7151,33 +7151,44 @@ uintptr_t Finder::FindAFortInventory_GetInventoryCapacity()
 				break;
 			}
 		}
-
-		auto textSection = Memcury::PE::Section::GetSection(".text");
-		const auto scanBytes = reinterpret_cast<std::uint8_t*>(textSection.GetSectionStart().Get());
-		uintptr_t FunctionAddr = 0;
-		uintptr_t InternalFunctionRefAddr = 0;
-		for (DWORD i = 0x0; i < textSection.GetSectionSize(); i++)
+	}
+	else
+	{
+		for (int i = 0; i < 300; i++)
 		{
-			if (scanBytes[i] == 0xE9)
+			if (*(uint8*)(StringAddr - i + 0) == 0x40 && *(uint8*)(StringAddr - i + 1) == 0x55)
 			{
-				if (Utils::GetCallDestination(textSection.GetSectionStart().Get() + i) == InternalFunctionAddr)
-				{
-					InternalFunctionRefAddr = Memcury::PE::Address(&scanBytes[i]).Get();
-					break;
-				}
-			}
-		}
-
-		for (int i = 0; i < 130; i++)
-		{
-			if (*(uint8*)(InternalFunctionRefAddr - i + 0) == 0x48 && *(uint8*)(InternalFunctionRefAddr - i + 1) == 0x89)
-			{
-				FunctionAddr = InternalFunctionRefAddr - i;
+				InternalFunctionAddr = StringAddr - i;
 				break;
 			}
 		}
-		ServerOffsets::AFortInventory_GetInventoryCapacity = FunctionAddr - ImageBase;
 	}
+
+	auto textSection = Memcury::PE::Section::GetSection(".text");
+	const auto scanBytes = reinterpret_cast<std::uint8_t*>(textSection.GetSectionStart().Get());
+	uintptr_t FunctionAddr = 0;
+	uintptr_t InternalFunctionRefAddr = 0;
+	for (DWORD i = 0x0; i < textSection.GetSectionSize(); i++)
+	{
+		if (scanBytes[i] == 0xE9)
+		{
+			if (Utils::GetCallDestination(textSection.GetSectionStart().Get() + i) == InternalFunctionAddr)
+			{
+				InternalFunctionRefAddr = Memcury::PE::Address(&scanBytes[i]).Get();
+				break;
+			}
+		}
+	}
+
+	for (int i = 0; i < 130; i++)
+	{
+		if (*(uint8*)(InternalFunctionRefAddr - i + 0) == 0x48 && *(uint8*)(InternalFunctionRefAddr - i + 1) == 0x89)
+		{
+			FunctionAddr = InternalFunctionRefAddr - i;
+			break;
+		}
+	}
+	ServerOffsets::AFortInventory_GetInventoryCapacity = FunctionAddr - ImageBase;
 
 	Log("AFortInventory_GetInventoryCapacity found at: 0x" + std::format("{:X}", ServerOffsets::AFortInventory_GetInventoryCapacity));
 

@@ -25,6 +25,7 @@ class UFortResourceItemDefinition;
 class IAbilitySystemInterface;
 class AFortPlayerController;
 class UFortItemDefinition;
+class UFortWorldItemDefinition;
 
 class UFortKismetLibrary : public UBlueprintFunctionLibrary {
 public:
