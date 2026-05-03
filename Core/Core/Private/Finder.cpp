@@ -371,29 +371,47 @@ uintptr_t Finder::FindUEngine_CreateNetDriver() {
 	return ServerOffsets::UEngine_CreateNetDriver;
 }
 
+uintptr_t Finder::FindUNetDriver_SetWorldVFT() {
+	if (ServerOffsets::UNetDriver_SetWorldVFT)
+		return ServerOffsets::UNetDriver_SetWorldVFT;
+
+	auto stringAddr = Memcury::Scanner::FindStringRef(L"All Beacon Requests Paused.").Get();
+
+	for (int i = 0; i < 300; i++)
+	{
+		if (*(uint8*)(stringAddr + i) == 0xFF && *(uint8*)(stringAddr + i + 1) == 0x90)
+		{
+			ServerOffsets::UNetDriver_SetWorldVFT = (*(uint32*)(stringAddr + i + 2)) / 8;
+			break;
+		}
+	}
+
+	Log("UNetDriver::SetWorld VFT found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_SetWorldVFT));
+	return ServerOffsets::UNetDriver_SetWorldVFT;
+}
+
 uintptr_t Finder::FindUNetDriver_SetWorld() {
-	uintptr_t Addr = 0;
 	if (ServerOffsets::UNetDriver_SetWorld)
 		return ServerOffsets::UNetDriver_SetWorld;
 
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B 99 ? ? ? ? 48 8B F2 48 8B F9 48 85 DB 0F 84 ? ? ? ? 48 8B 97").Get();
+	auto stringAddr = Memcury::Scanner::FindStringRef(L"All Beacon Requests Resumed.").Get();
 
-	if (!Addr)
+	int skipped = 0;
+
+	for (int i = 0; i < 150; i++)
 	{
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 56 48 8B EC 48 83 EC 30 48 8B 99").Get();
-	}
-
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B 99 ? ? ? ? 48 8B F2 48 8B F9 48 85 DB 0F 84 ? ? ? ? 48 8B 97").Get();
-	}
-
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B B1 ? ? ? ? 48 8B FA 48 8B D9 48 85 F6 74 ? 48 8B 93").Get();
-	}
-
-	if (Addr)
-	{
-		ServerOffsets::UNetDriver_SetWorld = Addr - ImageBase;
+		if (*(uint8*)(stringAddr + i) == 0xE8)
+		{
+			if (skipped == 1)
+			{
+				ServerOffsets::UNetDriver_SetWorld = Utils::GetCallDestination(stringAddr + i) - ImageBase;
+				break;
+			}
+			else
+			{
+				skipped++;
+			}
+		}
 	}
 
 	Log("UNetDriver::SetWorld found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_SetWorld));

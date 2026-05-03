@@ -315,6 +315,7 @@ namespace ServerOffsets {
 	inline uintptr_t UNetDriver_InitListen = 0;
 	inline uintptr_t UNetDriver_InitListenVFT = 0;
 	inline uintptr_t UNetDriver_SetWorld = 0;
+	inline uintptr_t UNetDriver_SetWorldVFT = 0;
 	inline uintptr_t UNetDriver_TickFlush = 0;
 	inline uintptr_t UNetDriver_IsServerVFT = 0;
 	inline uintptr_t UNetDriver_IsLevelInitializedForActorVFT = 0;

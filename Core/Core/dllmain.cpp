@@ -24,7 +24,6 @@ DWORD Main(LPVOID)
         Finder::FindGIsServer();
         Finder::FindGEngine();
         Finder::FindGWorld();
-        Finder::FindProcessEvent();
 
         Sleep(1000);
 
