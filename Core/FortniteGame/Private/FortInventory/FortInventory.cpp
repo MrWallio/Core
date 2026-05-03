@@ -7,6 +7,7 @@
 #include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/FortWeapon/FortWeaponStats.h"
+#include "FortniteGame/Public/Interface/FortInventoryOwnerInterface.h"
 
 void AFortInventory::HandleInventoryLocalUpdate()
 {
@@ -262,4 +263,13 @@ bool AFortInventory::RemoveItem(UFortItemDefinition* Def, int32 Count) {
 	}
 
 	return RemoveItem(ItemEntry->ItemGuid, Count);
+}
+
+int32 AFortInventory::GetInventoryCapactity() {
+	int32(*GetInventoryCapacityInternal)(AFortInventory * This) = decltype(GetInventoryCapacityInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryCapacity());
+	return GetInventoryCapacityInternal(this);
+}
+
+int32 AFortInventory::GetInventoryUsed() {
+	return 0;
 }

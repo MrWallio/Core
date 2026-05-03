@@ -534,6 +534,9 @@
     <ClInclude Include="FortniteGame\Public\FortWeapon\FortWeaponStats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\Interface\FortInventoryOwnerInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">

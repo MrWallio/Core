@@ -308,6 +308,7 @@
     <ClInclude Include="FortniteGame\Public\FortWorld\AdditionalLevelStreamed.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortAthenaMapInfo.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldManager.h" />
+    <ClInclude Include="FortniteGame\Public\Interface\FortInventoryOwnerInterface.h" />
     <ClInclude Include="FortniteGame\Public\Kismet\FortKismetLibrary.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h" />
     <ClInclude Include="FortniteGame\Public\Metadata\BuildingEditModeMetadata.h" />

@@ -43,4 +43,8 @@ public:
 
 	bool RemoveItem(FGuid Guid, int32 Count = INT_MAX);
 	bool RemoveItem(UFortItemDefinition* Def, int32 Count = INT_MAX);
+
+	int32 GetInventoryCapactity();
+
+	int32 GetInventoryUsed();
 };

@@ -298,10 +298,7 @@ UFortWorldItem* UFortKismetLibrary::GiveItemToInventoryOwner(
 		+ FortPlayerController->GetName().ToString()
 	);
 
-	FortPlayerController->WorldInventory->GetOverflowFromAddingItem(
-		ItemDefinition,
-		NumberToGive
-	);
+	
 
 	return FortPlayerController->WorldInventory->FindItemInstance(ItemDefinition);
 }

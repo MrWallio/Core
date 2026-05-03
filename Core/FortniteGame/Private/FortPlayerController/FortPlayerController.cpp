@@ -107,6 +107,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("GiveItem <ItemDefinitionName> [Count] [bStack] - Gives an item to the player's inventory.");
 		This->ClientMessage("SetLoadedAmmo <LoadedAmmo> - Sets the loaded ammo of the currently equipped weapon.");
 		This->ClientMessage("GiveAmmo [Amount] - Gives ammo for the currently equipped weapon.");
+		This->ClientMessage("DumpInventory - Dump Inventory Stats");
 	}
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
@@ -278,7 +279,12 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			return;
 		}
 		This->ClientMessage("=== Inventory Dump ===");
-		
+
+		This->ClientMessage("Stats: ");
+		This->ClientMessage("Inventory Capacity: " + std::to_string(This->WorldInventory->GetInventoryCapactity()));
+		This->ClientMessage("Inventory Used: " + std::to_string(This->WorldInventory->GetInventoryUsed()));
+
+		This->ClientMessage("Items: ");
 		for (UFortWorldItem* ItemEntry : This->WorldInventory->Inventory.ItemInstances) {
 			std::string ItemName = ItemEntry->ItemEntry.ItemDefinition ? ItemEntry->ItemEntry.ItemDefinition->GetName().ToString() : "Unknown";
 			int32 Count = ItemEntry->ItemEntry.Count;
