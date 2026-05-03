@@ -70,8 +70,17 @@ public:
 	);
 	static void execK2_SpawnPickupInWorld(UObject* Object, FFrame& Stack, AFortPickup** Result);
 
+	static UFortWorldItem* GiveItemToInventoryOwner(
+		TScriptInterface<IFortInventoryOwnerInterface> InventoryOwner,
+		UFortWorldItemDefinition* ItemDefinition,
+		FGuid& ItemVariantGuid,
+		int NumberToGive
+	);
+	static void execGiveItemToInventoryOwner(UObject* Object, FFrame& Stack, UFortWorldItem** Result);
+
 	static void Hook() {
 		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.K2_SpawnPickupInWorld", execK2_SpawnPickupInWorld);
+		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.GiveItemToInventoryOwner", execGiveItemToInventoryOwner);
 
 		Log("Hooked UFortKismetLibrary");
 	}

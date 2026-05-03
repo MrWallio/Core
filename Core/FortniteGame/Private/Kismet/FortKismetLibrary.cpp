@@ -273,3 +273,83 @@ void UFortKismetLibrary::execK2_SpawnPickupInWorld(UObject* Object, FFrame& Stac
 
 	*Result = K2_SpawnPickupInWorld(WorldContextObject, ItemDefinition, NumberToSpawn, Position, Direction, OverrideMaxStackCount, bToss, bRandomRotation, bBlockedFromAutoPickup, PickupInstigatorHandle, SourceType, Source, OptionalOwnerPC, bPickupOnlyRelevantToOwner);
 }
+
+UFortWorldItem* UFortKismetLibrary::GiveItemToInventoryOwner(
+	TScriptInterface<IFortInventoryOwnerInterface> InventoryOwner,
+	UFortWorldItemDefinition* ItemDefinition,
+	FGuid& ItemVariantGuid,
+	int NumberToGive)
+{
+	if (!ItemDefinition) {
+		Log("UFortKismetLibrary::GiveItemToInventoryOwner: Failed to get item definition from stack!");
+		return nullptr;
+	}
+
+	AFortPlayerController* FortPlayerController = (AFortPlayerController*)InventoryOwner.ObjectPointer;
+	if (!FortPlayerController) {
+		Log("UFortKismetLibrary::GiveItemToInventoryOwner: Failed to get player controller from inventory owner!");
+		return nullptr;
+	}
+
+	Log(
+		"UFortKismetLibrary::GiveItemToInventoryOwner: Giving Item: "
+		+ ItemDefinition->GetName().ToString() +
+		" To PlayerController: "
+		+ FortPlayerController->GetName().ToString()
+	);
+
+	FortPlayerController->WorldInventory->GetOverflowFromAddingItem(
+		ItemDefinition,
+		NumberToGive
+	);
+
+	return FortPlayerController->WorldInventory->FindItemInstance(ItemDefinition);
+}
+
+void UFortKismetLibrary::execGiveItemToInventoryOwner(UObject* Object, FFrame& Stack, UFortWorldItem** Result)
+{
+	static UFunction* GiveItemToInventoryOwnerFn = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.GiveItemToInventoryOwner");
+	if (!GiveItemToInventoryOwnerFn) {
+		Log("UFortKismetLibrary::execGiveItemToInventoryOwner: Failed to find function!");
+		return;
+	}
+
+	TScriptInterface<IFortInventoryOwnerInterface> InventoryOwner;
+	UFortWorldItemDefinition* ItemDefinition = nullptr;
+	FGuid ItemVariantGuid = FGuid();
+	int32 NumberToGive = 0;
+	bool bNotifyPlayer = false;
+	int32 ItemLevel = 0;
+	int32 PickupInstigatorHandle = 0;
+	for (auto& Param : GiveItemToInventoryOwnerFn->GetParams().NameOffsetMap)
+	{
+		std::string Name = Param.Name.ToString();
+		if (Name == "InventoryOwner") {
+			Stack.StepCompiledIn(&InventoryOwner);
+		}
+		else if (Name == "ItemDefinition") {
+			Stack.StepCompiledIn(&ItemDefinition);
+		}
+		else if (Name == "ItemVariantGuid") {
+			Stack.StepCompiledIn(&ItemVariantGuid);
+		}
+		else if (Name == "NumberToGive") {
+			Stack.StepCompiledIn(&NumberToGive);
+		}
+		else if (Name == "bNotifyPlayer") {
+			Stack.StepCompiledIn(&bNotifyPlayer);
+		}
+		else if (Name == "ItemLevel") {
+			Stack.StepCompiledIn(&ItemLevel);
+		}
+		else if (Name == "PickupInstigatorHandle") {
+			Stack.StepCompiledIn(&PickupInstigatorHandle);
+		}
+		else {
+			Log("UFortKismetLibrary::execGiveItemToInventoryOwner: Unhandled parameter: " + Name);
+		}
+	}
+	Stack.IncrementCode();
+
+	*Result = GiveItemToInventoryOwner(InventoryOwner, ItemDefinition, ItemVariantGuid, NumberToGive);
+}
