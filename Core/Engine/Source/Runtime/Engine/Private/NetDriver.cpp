@@ -72,7 +72,15 @@ FActorPriority::FActorPriority(class UNetConnection* InConnection, struct FActor
 
 void UNetDriver::SetWorld(class UWorld* InWorld)
 {
-	void (*SetWorldInternal)(UNetDriver*, UWorld*) = decltype(SetWorldInternal)(ImageBase + Finder::FindUNetDriver_SetWorld());
+	void (*SetWorldInternal)(UNetDriver*, UWorld*);
+	if (Version::Engine_Version >= 4.26)
+	{
+		SetWorldInternal = decltype(SetWorldInternal)(this->VTable[Finder::FindUNetDriver_SetWorldVFT()]);
+	}
+	else
+	{
+		SetWorldInternal = decltype(SetWorldInternal)(ImageBase + Finder::FindUNetDriver_SetWorld());
+	}
 	SetWorldInternal(this, InWorld);
 }
 

@@ -24,6 +24,8 @@ public:
 
 	static void RemoveLocalPlayer();
 	static void LoadWorld();
+
+    static uintptr_t GetCallDestination(uintptr_t callAddr);
 };
 
 class FCommandParser

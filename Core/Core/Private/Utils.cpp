@@ -293,3 +293,12 @@ void Utils::LoadWorld() {
 	Log("Travel URL: " + TravelURL.ToString());
 	World->ServerTravel(TravelURL);
 }
+
+uintptr_t Utils::GetCallDestination(uintptr_t callAddr)
+{
+	int32_t rel = *reinterpret_cast<int32_t*>(callAddr + 1);
+
+	uintptr_t nextInstr = callAddr + 5;
+
+	return nextInstr + rel;
+}

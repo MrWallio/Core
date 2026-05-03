@@ -23,6 +23,8 @@ public:
 
 	static uintptr_t FindUEngine_CreateNetDriver();
 
+	static uintptr_t FindUNetDriver_SetWorldVFT();
+
 	static uintptr_t FindUNetDriver_SetWorld();
 
 	static uintptr_t FindUNetDriver_InitListen();
