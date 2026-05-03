@@ -6,6 +6,9 @@
 #include "../Public/Offsets.h"
 #include "../Public/Utils.h"
 
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
+
 // TODO: Find GWorld and set it in ServerOffsets
 
 uintptr_t Finder::FindGUObjectArray() {
@@ -117,38 +120,45 @@ uintptr_t Finder::FindGWorld() {
 	return ServerOffsets::GWorld;
 }
 
+uintptr_t Finder::FindProcessEventVFT() {
+	if (ServerOffsets::ProcessEventVFT)
+		return ServerOffsets::ProcessEventVFT;
+
+	auto addr1 = Memcury::Scanner::FindStringRef(L"FLatentActionManager::ProcessLatentActions: Could not find latent action resume point named '%s' on '%s' called by '%s'").Get();
+
+	uintptr_t addr2 = 0x0;
+
+	for (int i = 0; i < 1000; i++)
+	{
+		auto Address = addr1 - i;
+
+		if (*(uint8*)(Address) == 0x48 && *(uint8*)(Address + 1) == 0x8B && *(uint8*)(Address + 2) == 0xD6)
+		{
+			addr2 = Address;
+			break;
+		}
+	}
+
+	auto CallInstructionAddr = addr2 + 6;
+
+	uint32 FoundValue = 0x0;
+
+	FoundValue = *(Memcury::Scanner(CallInstructionAddr).ScanFor({ 0xFF, 0x90 }, true).AbsoluteOffset(2).GetAs<uint32_t*>());
+
+	ServerOffsets::ProcessEventVFT = FoundValue / 8;
+
+	Log("ProcessEvent VFT found at: 0x" + std::format("{:X}", ServerOffsets::ProcessEventVFT));
+	return ServerOffsets::ProcessEventVFT;
+}
+
 uintptr_t Finder::FindProcessEvent() {
 	if (ServerOffsets::ProcessEvent)
 		return ServerOffsets::ProcessEvent;
 
-	static uintptr_t Addr = 0;
-
-	// 12.41 sig
-	Addr = Memcury::Scanner::FindPattern("40 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8D 6C 24 ? 48 89 9D ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C5 48 89 85 ? ? ? ? 8B 41").Get();
-	if (!Addr)
-	{
-		// 1.7.2 sig
-		Addr = Memcury::Scanner::FindPattern("40 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8D 6C 24 ? 48 89 9D ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C5 48 89 85 ? ? ? ? 48 63 41").Get();
-	}
-
-	if (Addr) {
-		ServerOffsets::ProcessEvent = Addr - ImageBase;
-	}
+	ServerOffsets::ProcessEvent = ((uintptr_t)UObject::StaticClass()->GetDefaultObject()->VTable[FindProcessEventVFT()]) - ImageBase;
 
 	Log("ProcessEvent found at: 0x" + std::format("{:X}", ServerOffsets::ProcessEvent));
 	return ServerOffsets::ProcessEvent;
-}
-
-uintptr_t Finder::FindProcessEventVFT() {
-	if (ServerOffsets::ProcessEventVFT)
-		return ServerOffsets::ProcessEventVFT;
-	
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::ProcessEventVFT = 0x3E;
-	}
-
-	Log("ProcessEvent VFT found at: 0x" + std::format("{:X}", ServerOffsets::ProcessEventVFT));
-	return ServerOffsets::ProcessEventVFT;
 }
 
 uintptr_t Finder::FindGIsClient() {

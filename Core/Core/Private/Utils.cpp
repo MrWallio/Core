@@ -28,7 +28,7 @@ void Utils::InitConsole(FCoreConfig& Config)
         freopen_s(&fptr, "CONOUT$", "w+", stdout);
     }
     SetConsoleTitleA("Core (Finding Build) | Starting...");
-    Log("Welcome to Core, Made with love by Pongo_x86!");
+    Log("Welcome to Core, Made with love by Pongo_x86 and fmgnio!");
 }
 
 uintptr_t Utils::ResolveRipRelative(uintptr_t instr, int dispOffset, int instrLen)

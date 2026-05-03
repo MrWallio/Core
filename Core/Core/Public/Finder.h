@@ -9,9 +9,9 @@ public:
 
 	static uintptr_t FindGWorld();
 
-	static uintptr_t FindProcessEvent();
-
 	static uintptr_t FindProcessEventVFT();
+
+	static uintptr_t FindProcessEvent();
 
 	static uintptr_t FindGIsClient();
 
