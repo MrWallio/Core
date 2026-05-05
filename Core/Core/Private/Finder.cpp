@@ -5245,7 +5245,7 @@ uintptr_t Finder::FindAFortQuickBars_GetFocusedQuickBar() {
 	return ServerOffsets::AFortQuickBars_GetFocusedQuickBar;
 }
 
-static uintptr_t FindABuildingContainer_SpawnLootVFT() {
+uintptr_t Finder::FindABuildingContainer_SpawnLootVFT() {
 	if (ServerOffsets::ABuildingContainer_SpawnLootVFT)
 		return ServerOffsets::ABuildingContainer_SpawnLootVFT;
 
@@ -5269,12 +5269,12 @@ static uintptr_t FindABuildingContainer_SpawnLootVFT() {
 		{
 			if (*(uint8*)(ServerOnAttemptInteract_Addr + i + 0) == 0x41 && *(uint8*)(ServerOnAttemptInteract_Addr + i + 1) == 0xff)
 			{
-				ServerOffsets::ABuildingContainer_SpawnLootVFT = *(uint32_t*)(ServerOnAttemptInteract_Addr + i + 2) / 8;
+				ServerOffsets::ABuildingContainer_SpawnLootVFT = *(uint32_t*)(ServerOnAttemptInteract_Addr + i + 3) / 8;
 			}
 		}
 	}
 
-	Log("ABuildingContainer_SpawnLoot found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingContainer_SpawnLootVFT));
+	Log("ABuildingContainer_SpawnLootVFT found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingContainer_SpawnLootVFT));
 	return ServerOffsets::ABuildingContainer_SpawnLootVFT;
 }
 

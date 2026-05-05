@@ -47,4 +47,6 @@ public:
 	int32 GetInventoryCapacity();
 
 	int32 GetInventoryUsed();
+
+	bool IsInventoryFull();
 };

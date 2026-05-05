@@ -266,9 +266,14 @@ bool AFortInventory::RemoveItem(UFortItemDefinition* Def, int32 Count) {
 }
 
 int32 AFortInventory::GetInventoryCapacity() {
-	// This should be a vtable, atleast on some versions if not all
-	int32(*GetInventoryCapacityInternal)(AFortInventory * This) = decltype(GetInventoryCapacityInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryCapacity());
-	return GetInventoryCapacityInternal(this);
+	if (Version::Fortnite_Version >= 1.8) {
+		// This should be a vtable, atleast on some versions if not all
+		int32(*GetInventoryCapacityInternal)(AFortInventory * This) = decltype(GetInventoryCapacityInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryCapacity());
+		return GetInventoryCapacityInternal(this);
+	}
+	else {
+		// recreation
+	}
 }
 
 int32 AFortInventory::GetInventoryUsed() {
@@ -291,4 +296,11 @@ int32 AFortInventory::GetInventoryUsed() {
 	else {
 		return 0;
 	}
+}
+
+bool AFortInventory::IsInventoryFull() {
+	int32 Capacity = GetInventoryCapacity();
+	int32 Used = GetInventoryUsed();
+
+	return Used >= Capacity;
 }

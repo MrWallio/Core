@@ -58,8 +58,7 @@ DWORD Main(LPVOID)
         Utils::DumpClassProperties("GameplayAbilitySpec"); // DEBUG
         Utils::DumpClassProperties("ItemAndCount"); // DEBUG
 
-		//MH_CreateHook((LPVOID)(ImageBase + 0x138F980), (LPVOID)TestFunc, nullptr);
-        HookEveryVTableIdx(ABuildingContainer::StaticClass(), 0x1A8, TestFunc);
+        HookEveryVTableIdx(ABuildingContainer::StaticClass(), Finder::FindABuildingContainer_SpawnLootVFT(), TestFunc);
         Utils::Hook();
 
         *GIsClient = false;
