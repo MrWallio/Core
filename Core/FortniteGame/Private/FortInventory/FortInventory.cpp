@@ -273,13 +273,19 @@ int32 AFortInventory::GetInventoryCapacity() {
 
 int32 AFortInventory::GetInventoryUsed() {
 	if (Finder::FindAFortInventory_GetInventoryUsed() != 0) {
-		IFortInventoryOwnerInterface* InventoryOwner = (IFortInventoryOwnerInterface*)Owner->GetInterfaceAddress(IFortInventoryOwnerInterface::StaticClass());
-		if (!InventoryOwner) {
-			return 0;
-		}
+		if (Version::Fortnite_Version >= 1.8) {
+			IFortInventoryOwnerInterface* InventoryOwner = (IFortInventoryOwnerInterface*)Owner->GetInterfaceAddress(IFortInventoryOwnerInterface::StaticClass());
+			if (!InventoryOwner) {
+				return 0;
+			}
 
-		int32(*GetInventoryUsedInternal)(IFortInventoryOwnerInterface*, uint8) = decltype(GetInventoryUsedInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryUsed());
-		return GetInventoryUsedInternal(InventoryOwner, InventoryType);
+			int32(*GetInventoryUsedInternal)(IFortInventoryOwnerInterface*, uint8) = decltype(GetInventoryUsedInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryUsed());
+			return GetInventoryUsedInternal(InventoryOwner, InventoryType);
+		}
+		else {
+			int32(*GetInventoryUsedInternal)(AActor*, uint8) = decltype(GetInventoryUsedInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryUsed());
+			return GetInventoryUsedInternal(Owner, InventoryType);
+		}
 	}
 	else {
 		return 0;
