@@ -15,6 +15,8 @@ class AFortInventory;
 class FFortItemEntry;
 class UFortWorldItem;
 class UFortItemDefinition;
+class UFortRegisteredPlayerInfo;
+class UFortMcpProfileWorld;
 
 class AFortPlayerController : public APlayerController {
 public:
@@ -33,6 +35,8 @@ public:
 	DefineUProperty(bool, bHasClientFinishedLoading);
 
 	DefineUProperty(bool, bHasServerFinishedLoading);
+
+	DefineUProperty(UFortRegisteredPlayerInfo*, MyPlayerInfo);
 public:
 	void ClientForceProfileQuery();
 

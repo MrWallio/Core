@@ -265,11 +265,22 @@ bool AFortInventory::RemoveItem(UFortItemDefinition* Def, int32 Count) {
 	return RemoveItem(ItemEntry->ItemGuid, Count);
 }
 
-int32 AFortInventory::GetInventoryCapactity() {
+int32 AFortInventory::GetInventoryCapacity() {
 	int32(*GetInventoryCapacityInternal)(AFortInventory * This) = decltype(GetInventoryCapacityInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryCapacity());
 	return GetInventoryCapacityInternal(this);
 }
 
 int32 AFortInventory::GetInventoryUsed() {
-	return 0;
+	if (Finder::FindAFortInventory_GetInventoryUsed() != 0) {
+		IFortInventoryOwnerInterface* InventoryOwner = (IFortInventoryOwnerInterface*)Owner->GetInterfaceAddress(IFortInventoryOwnerInterface::StaticClass());
+		if (!InventoryOwner) {
+			return 0;
+		}
+
+		int32(*GetInventoryUsedInternal)(IFortInventoryOwnerInterface*, uint8) = decltype(GetInventoryUsedInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryUsed());
+		return GetInventoryUsedInternal(InventoryOwner, InventoryType);
+	}
+	else {
+		return 0;
+	}
 }

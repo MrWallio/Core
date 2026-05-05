@@ -12,6 +12,7 @@
 #include "FortniteGame/Public/FortItem/FortWorldItem.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
+#include "FortniteGame/Public/Info/FortRegisteredPlayerInfo.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
