@@ -282,7 +282,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("=== Inventory Dump ===");
 
 		This->ClientMessage("Stats: ");
-		This->ClientMessage("Inventory Capacity: " + std::to_string(This->WorldInventory->GetInventoryCapactity()));
+		This->ClientMessage("Inventory Capacity: " + std::to_string(This->WorldInventory->GetInventoryCapacity()));
 		This->ClientMessage("Inventory Used: " + std::to_string(This->WorldInventory->GetInventoryUsed()));
 
 		This->ClientMessage("Items: ");

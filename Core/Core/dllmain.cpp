@@ -7,6 +7,13 @@
 
 #include "Engine/Source/Runtime/Engine/Classes/Engine/Engine.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
+#include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
+
+static void TestFunc() {
+    uintptr_t addr = (uintptr_t)_ReturnAddress() - ImageBase;
+	Log("TestFunc called!");
+	Log("Called from address: 0x" + std::to_string(addr));
+}
 
 DWORD Main(LPVOID)
 {
@@ -51,6 +58,8 @@ DWORD Main(LPVOID)
         Utils::DumpClassProperties("GameplayAbilitySpec"); // DEBUG
         Utils::DumpClassProperties("ItemAndCount"); // DEBUG
 
+		//MH_CreateHook((LPVOID)(ImageBase + 0x138F980), (LPVOID)TestFunc, nullptr);
+        HookEveryVTableIdx(ABuildingContainer::StaticClass(), 0x1A8, TestFunc);
         Utils::Hook();
 
         *GIsClient = false;

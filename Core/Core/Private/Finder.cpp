@@ -422,7 +422,7 @@ uintptr_t Finder::FindUNetDriver_InitListen() {
 	if (ServerOffsets::UNetDriver_InitListen)
 		return ServerOffsets::UNetDriver_InitListen;
 
-	auto str_addr = Memcury::Scanner::FindStringRef(L"%s IpNetDriver listening on port %i").Get();
+	auto str_addr = Memcury::Scanner::FindStringRef(L"Failed to init net driver ListenURL: %s: %s").Get();
 
 	for (int i = 0; i < 300; i++)
 	{
@@ -440,11 +440,11 @@ uintptr_t Finder::FindUNetDriver_InitListenVFT() {
 	if (ServerOffsets::UNetDriver_InitListenVFT)
 		return ServerOffsets::UNetDriver_InitListenVFT;
 
-	static void** NetDriverVFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.NetDriver"))->GetDefaultObject()->VTable;
+	static void** NetDriverVFT = ((UClass*)FUObjectArray::FindObjectFast("IpNetDriver"))->GetDefaultObject()->VTable;
 
-	for (int i = 0; i < 400; i++)
+	for (int i = 0; i < 1000; i++)
 	{
-		if ((uintptr_t)NetDriverVFT[i] == FindUNetDriver_InitListen())
+		if ((uintptr_t)NetDriverVFT[i] == (ImageBase + FindUNetDriver_InitListen()))
 		{
 			ServerOffsets::UNetDriver_InitListenVFT = i;
 			break;
@@ -5361,11 +5361,15 @@ uintptr_t Finder::FindAFortInventory_GetOverflowFromAddingItemInNewStack() {
 uintptr_t Finder::FindAFortInventory_GetInventoryUsed() {
 	if (ServerOffsets::AFortInventory_GetInventoryUsed)
 		return ServerOffsets::AFortInventory_GetInventoryUsed;
+	uintptr_t Addr = 0;
 
-	static uintptr_t ExecFunc = (uintptr_t)StaticLoadObject<UFunction>("Function /Script/FortniteUI.FortInventoryContext.GetBackpackItemCounts")->Func;
+	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 33 DB 48 8B F9 48 85 C9 0F 84 ? ? ? ? 85 D2").Get();
 
+	if (Addr) {
+		ServerOffsets::AFortInventory_GetInventoryUsed = Addr - ImageBase;
+	}
 
-
+	Log("AFortInventory_GetInventoryUsed found at: 0x" + std::format("{:X}", ServerOffsets::AFortInventory_GetInventoryUsed));
 	return ServerOffsets::AFortInventory_GetInventoryUsed;
 }
 

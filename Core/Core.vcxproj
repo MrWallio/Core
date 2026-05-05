@@ -253,6 +253,8 @@
     <ClInclude Include="FortniteGame\Public\AI\FortAIDirector.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIGoalManager.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingActor.h" />
+    <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingAutoNav.h" />
+    <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingContainer.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingSMActor.h" />
     <ClInclude Include="FortniteGame\Public\Cheat\FortCheatManager.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortAbilitySet.h" />
@@ -308,6 +310,7 @@
     <ClInclude Include="FortniteGame\Public\FortWorld\AdditionalLevelStreamed.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortAthenaMapInfo.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldManager.h" />
+    <ClInclude Include="FortniteGame\Public\Info\FortRegisteredPlayerInfo.h" />
     <ClInclude Include="FortniteGame\Public\Interface\FortInventoryOwnerInterface.h" />
     <ClInclude Include="FortniteGame\Public\Kismet\FortKismetLibrary.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h" />
