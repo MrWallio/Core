@@ -5382,12 +5382,51 @@ uintptr_t Finder::FindAFortInventory_GetOverflowFromAddingItemInNewStack() {
 uintptr_t Finder::FindAFortInventory_GetInventoryUsed() {
 	if (ServerOffsets::AFortInventory_GetInventoryUsed)
 		return ServerOffsets::AFortInventory_GetInventoryUsed;
-	uintptr_t Addr = 0;
+	
+	uintptr_t execGetBackpackItemCounts_ADDR = (uintptr_t)(((UFunction*)FUObjectArray::FindObject("Function /Script/FortniteUI.FortInventoryContext.GetBackpackItemCounts"))->Func);
+	uintptr_t GetBackpackItemCounts_Impl_ADDR = 0x0;
 
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 33 DB 48 8B F9 48 85 C9 0F 84 ? ? ? ? 85 D2").Get();
+	uintptr_t C3_Point = 0x0; //bro if this exec function didnt have 0xC3 at the end i would fucking die
 
-	if (Addr) {
-		ServerOffsets::AFortInventory_GetInventoryUsed = Addr - ImageBase;
+	for (int i = 0; i < 1000; i++)
+	{
+		uintptr_t CurrentAddr = execGetBackpackItemCounts_ADDR + i;
+
+		if (*(uint8*)(CurrentAddr) == 0xC3)
+		{
+			C3_Point = CurrentAddr;
+			break;
+		}
+	}
+
+	for (int i = 0; i < 40; i++)
+	{
+		uintptr_t CurrentAddr2 = C3_Point - i;
+
+		if (*(uint8*)(CurrentAddr2) == 0xE8) { //look for call
+			GetBackpackItemCounts_Impl_ADDR = Utils::GetCallDestination(CurrentAddr2);
+			break;
+		}
+	}
+
+	uint8 Skipped = 0x0;
+
+	for (int i = 0; i < 70; i++)
+	{
+		//we looking for the second call instruction
+
+		uintptr_t CurrentAddress3 = GetBackpackItemCounts_Impl_ADDR + i;
+
+		if (*(uint8*)(CurrentAddress3) == 0xe8)
+		{
+			if (Skipped == 1)
+			{
+				ServerOffsets::AFortInventory_GetInventoryUsed = Utils::GetCallDestination(CurrentAddress3) - ImageBase;
+				break;
+			}
+			Skipped++;
+		}
+
 	}
 
 	Log("AFortInventory_GetInventoryUsed found at: 0x" + std::format("{:X}", ServerOffsets::AFortInventory_GetInventoryUsed));
