@@ -9,12 +9,6 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 
-static void TestFunc() {
-    uintptr_t addr = (uintptr_t)_ReturnAddress() - ImageBase;
-	Log("TestFunc called!");
-	Log("Called from address: 0x" + std::to_string(addr));
-}
-
 DWORD Main(LPVOID)
 {
     ConfigurationManager::LoadConfig();
@@ -58,7 +52,6 @@ DWORD Main(LPVOID)
         Utils::DumpClassProperties("GameplayAbilitySpec"); // DEBUG
         Utils::DumpClassProperties("ItemAndCount"); // DEBUG
 
-        HookEveryVTableIdx(ABuildingContainer::StaticClass(), Finder::FindABuildingContainer_SpawnLootVFT(), TestFunc);
         Utils::Hook();
 
         *GIsClient = false;

@@ -770,5 +770,8 @@
     <ClCompile Include="FortniteGame\Private\FortItem\FortWorldItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

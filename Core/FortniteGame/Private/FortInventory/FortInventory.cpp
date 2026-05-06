@@ -249,46 +249,61 @@ int32 AFortInventory::GetOverflowFromAddingItem(UFortItemDefinition* Def, int32 
 	if (MaxStackSize <= 0)
 		return Count;
 
-	if (!Def->IsStackable())
-	{
-		while (Count > 0 && !IsInventoryFull())
+	if (Def->GetQuickBarForItem() == EFortQuickBars::Primary) {
+		if (!Def->IsStackable())
 		{
-			AddItem(Def, 1);
-			--Count;
+			while (Count > 0 && !IsInventoryFull())
+			{
+				AddItem(Def, 1);
+				--Count;
+			}
+			return Count;
 		}
-		return Count;
-	}
 
-	TArray<FFortItemEntry*> Entries = FindItemEntries(Def);
-	if (Entries.Num() == 0)
-	{
+		TArray<FFortItemEntry*> Entries = FindItemEntries(Def);
+		for (FFortItemEntry* Entry : Entries)
+		{
+			const int32 Space = MaxStackSize - Entry->Count;
+			if (Space > 0)
+			{
+				const int32 ToAdd = (Count < Space) ? Count : Space;
+				Entry->Count += ToAdd;
+				Entry->bIsDirty = true;
+				Inventory.MarkItemDirty(*Entry);
+				Count -= ToAdd;
+			}
+		}
+
 		while (Count > 0 && !IsInventoryFull())
 		{
 			const int32 ToAdd = (Count > MaxStackSize) ? MaxStackSize : Count;
 			AddItem(Def, ToAdd);
 			Count -= ToAdd;
 		}
-		return Count;
 	}
-
-	for (FFortItemEntry* Entry : Entries)
-	{
-		const int32 Space = MaxStackSize - Entry->Count;
-		if (Space > 0)
+	else if (Def->GetQuickBarForItem() == EFortQuickBars::Secondary) {
+		FFortItemEntry* Entry = FindItemEntry(Def);
+		if (Entry)
 		{
-			const int32 ToAdd = (Count < Space) ? Count : Space;
-			Entry->Count += ToAdd;
-			Entry->bIsDirty = true;
-			Inventory.MarkItemDirty(*Entry);
+			const int32 Space = MaxStackSize - Entry->Count;
+			if (Space > 0)
+			{
+				const int32 ToAdd = (Count < Space) ? Count : Space;
+				Entry->Count += ToAdd;
+				Entry->bIsDirty = true;
+				Inventory.MarkItemDirty(*Entry);
+				Count -= ToAdd;
+			}
+		}
+		else {
+			const int32 ToAdd = (Count > MaxStackSize) ? MaxStackSize : Count;
+			AddItem(Def, ToAdd);
 			Count -= ToAdd;
 		}
 	}
-
-	while (Count > 0 && !IsInventoryFull())
-	{
-		const int32 ToAdd = (Count > MaxStackSize) ? MaxStackSize : Count;
-		AddItem(Def, ToAdd);
-		Count -= ToAdd;
+	else {
+		Log("AFortInventory::GetOverflowFromAddingItem: ItemDefinition has an invalid QuickBar type!");
+		return Count;
 	}
 
 	Update();

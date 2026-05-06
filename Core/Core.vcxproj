@@ -365,6 +365,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\URL.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\World.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingActor.cpp" />
+    <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingSMActor.cpp" />
     <ClCompile Include="FortniteGame\Private\Cheat\FortCheatManager.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameMode\FortGameMode.cpp" />
