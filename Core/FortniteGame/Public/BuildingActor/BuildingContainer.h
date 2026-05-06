@@ -21,6 +21,7 @@ public:
 	DefineBitfieldUProperty(bDestroyContainerOnSearch);
 	DefineUProperty(FFortSearchBounceData, SearchBounceData);
 	DefineUProperty(int32, ReplicatedLootTier);
+	DefineBitfieldUProperty(bStartAlreadySearched_Athena);
 
 public:
 	static bool SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* PlayerPawn, EFortPickupSourceTypeFlag InSourceTypeFlag, EFortPickupSpawnSource InSpawnSource);

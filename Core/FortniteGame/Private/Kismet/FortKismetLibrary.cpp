@@ -150,12 +150,12 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 		return nullptr;
 	}
 
-	Log(
+	/*Log(
 		"UFortKismetLibrary::K2_SpawnPickupInWorld: Spawning Pickup for Item: "
 		+ ItemDefinition->GetName().ToString() +
 		" Amount: " + std::to_string(NumberToSpawn) +
 		" In World: " + World->GetName().ToString()
-	);
+	);*/
 
 	AFortPickup* Pickup = World->SpawnActor(AFortPickup::StaticClass(), Position)->Cast<AFortPickup>();
 	if (!Pickup) {
@@ -203,7 +203,7 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 
 	Pickup->ForceNetUpdate();
 
-	Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Spawned Pickup: " + Pickup->GetName().ToString());
+	//Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Spawned Pickup: " + Pickup->GetName().ToString());
 	return Pickup;
 }
 
@@ -389,24 +389,26 @@ bool UFortKismetLibrary::PickLootDrops(
 		Log("UFortKismetLibrary::PickLootDrops: Failed to get world!");
 		return false;
 	}
+
 	AFortGameModeAthena* GameMode = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
 	if (!GameMode) {
 		Log("UFortKismetLibrary::PickLootDrops: Failed to cast AuthorityGameMode to AFortGameModeAthena, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
 		return false;
 	}
+
 	AFortGameStateAthena* GameState = World->GameState->Cast<AFortGameStateAthena>();
 	if (!GameState) {
 		Log("UFortKismetLibrary::PickLootDrops: Failed to cast GameState to AFortGameStateAthena, GameState: " + World->GameState->GetFullName());
 		return false;
 	}
 
-	Log(
+	/*Log(
 		"UFortKismetLibrary::PickLootDrops: Picking loot drops for TierGroup: "
 		+ TierGroupName.ToString().ToString() +
 		" WorldLevel: " + std::to_string(WorldLevel) +
 		" ForcedLootTier: " + std::to_string(ForcedLootTier) +
 		" In World: " + World->GetName().ToString()
-	);
+	);*/
 
 	TArray<UDataTable*> LootTierDataTables;
 	TArray<UDataTable*> LootPackagesDataTables;
@@ -475,11 +477,11 @@ bool UFortKismetLibrary::PickLootDrops(
 	}
 
 	if (OutLootToDrop.Num() > 0) {
-		Log("UFortKismetLibrary::PickLootDrops: Successfully picked " + std::to_string(OutLootToDrop.Num()) + " loot items to drop!");
+		//Log("UFortKismetLibrary::PickLootDrops: Successfully picked " + std::to_string(OutLootToDrop.Num()) + " loot items to drop!");
 		return true;
 	}
 
-	Log("UFortKismetLibrary::PickLootDrops: No loot items were picked to drop!");
+	//Log("UFortKismetLibrary::PickLootDrops: No loot items were picked to drop!");
 	return false;
 }
 

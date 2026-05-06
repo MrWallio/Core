@@ -6105,6 +6105,9 @@ uintptr_t Finder::FindUNetConnection_CreateChannel() {
 
 uintptr_t Finder::FindUActorChannel_SetChannelActorForDestroy() {
 	static uintptr_t Addr = 0;
+	if (Addr == -1) {
+		return 0;
+	}
 	if (ServerOffsets::UActorChannel_SetChannelActorForDestroy)
 		return ServerOffsets::UActorChannel_SetChannelActorForDestroy;
 
@@ -6119,6 +6122,9 @@ uintptr_t Finder::FindUActorChannel_SetChannelActorForDestroy() {
 
 	if (Addr) {
 		ServerOffsets::UActorChannel_SetChannelActorForDestroy = Addr - ImageBase;
+	}
+	else {
+		Addr = -1;
 	}
 
 	Log("UActorChannel_SetChannelActorForDestroy found at: 0x" + std::format("{:X}", ServerOffsets::UActorChannel_SetChannelActorForDestroy));

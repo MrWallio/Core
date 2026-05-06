@@ -139,6 +139,11 @@ TArray<FFortItemEntry> FFortLootPackageData::GetLootItems(TArray<UDataTable*> Lo
 			continue;
 		}
 
+		if (PickedLootPackage->Count <= 0) {
+			NumLootPackageDrops++;
+			continue;
+		}
+
 		UFortItemDefinition* ItemDefinition = PickedLootPackage->ItemDefinition.Get();
 		if (!ItemDefinition) {
 			Log("FFortLootPackageData::GetLootItems: Failed to load item definition for loot package '" + PickedLootPackage->LootPackageID.ToString().ToString() + "'!");
@@ -152,7 +157,7 @@ TArray<FFortItemEntry> FFortLootPackageData::GetLootItems(TArray<UDataTable*> Lo
 		LootDropEntry.Count = PickedLootPackage->Count;
 
 		LootItems.Add(LootDropEntry, FFortItemEntry::GetSize());
-		Log("FFortLootPackageData::GetLootItems: Added loot drop '" + LootDropEntry.ItemDefinition->GetName().ToString() + "' with count " + std::to_string(LootDropEntry.Count) + " to loot items array!");
+		//Log("FFortLootPackageData::GetLootItems: Added loot drop '" + LootDropEntry.ItemDefinition->GetName().ToString() + "' with count " + std::to_string(LootDropEntry.Count) + " to loot items array!");
 	}
 
 	return LootItems;

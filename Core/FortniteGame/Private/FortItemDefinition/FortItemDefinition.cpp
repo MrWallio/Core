@@ -79,7 +79,6 @@ int32 UFortItemDefinition::GetClipSize() {
 	auto RowName = RangedDef->WeaponStatHandle.RowName;
 
 	if (!DataTable || !RowName.IsNone()) {
-		Log("GetClipSize: Invalid DataTable or RowName in WeaponStatHandle.");
 		return 1;
 	}
 

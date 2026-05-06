@@ -51,25 +51,17 @@ public:
 public:
     ValueElementType* Find(const KeyElementType& Key)
     {
-        auto& SparseArray = Elements.Elements;
-        if (!SparseArray.IsValid()) {
-			return nullptr;
-        }
+        const FBitArray& AllocationFlags = Elements.Elements.GetAllocationFlags();
 
-        int32 NumAlloc = SparseArray.Num();
-
-        for (int32 i = 0; i < NumAlloc; ++i)
+        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
         {
-            if (SparseArray.IsValidIndex(i))
+            int32 Index = It.GetIndex();
+            auto& SetElement = Elements.Elements[Index];
+            ElementType& Pair = SetElement.Value;
+
+            if (Pair.Key() == Key)
             {
-                auto& SetElement = SparseArray[i];
-
-                ElementType& Pair = SetElement.Value;
-
-                if (Pair.Key() == Key)
-                {
-                    return &Pair.Value();
-                }
+                return &Pair.Value();
             }
         }
 
@@ -78,24 +70,17 @@ public:
 
     const ValueElementType* Find(const KeyElementType& Key) const
     {
-        auto& SparseArray = Elements.Elements;
-        if (!SparseArray.IsValid()) {
-            return nullptr;
-        }
+        const FBitArray& AllocationFlags = Elements.Elements.GetAllocationFlags();
 
-        int32 NumAlloc = SparseArray.Num();
-
-        for (int32 i = 0; i < NumAlloc; ++i)
+        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
         {
-            if (SparseArray.IsValidIndex(i))
-            {
-                auto& SetElement = SparseArray[i];
-                const ElementType& Pair = SetElement.Value;
+            int32 Index = It.GetIndex();
+            const auto& SetElement = Elements.Elements[Index];
+            const ElementType& Pair = SetElement.Value;
 
-                if (Pair.Key() == Key)
-                {
-                    return &Pair.Value();
-                }
+            if (Pair.Key() == Key)
+            {
+                return &Pair.Value();
             }
         }
 

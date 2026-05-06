@@ -168,7 +168,7 @@ FFortLootTierData* FFortLootTierData::PickLootTierData(
 	int32 TotalCategoryWeight = LootTierData->GetTotalCategoryWeight();
 	int32 TotalCategoryMin = LootTierData->GetTotalCategoryMin();
 	if (TotalCategoryWeight > TotalCategoryMin) {
-		Log("FFortLootTierData::PickLootTierData: TotalCategoryWeight (" + std::to_string(TotalCategoryWeight) + ") is greater than TotalCategoryMin (" + std::to_string(TotalCategoryMin) + ") for picked LootTierData, repicking...");
+		//Log("FFortLootTierData::PickLootTierData: TotalCategoryWeight (" + std::to_string(TotalCategoryWeight) + ") is greater than TotalCategoryMin (" + std::to_string(TotalCategoryMin) + ") for picked LootTierData, repicking...");
 		return PickLootTierData(LootTierDataTables, TierGroupName, ++RecursionDepth, WorldLevel, ForcedLootTier);
 	}
 

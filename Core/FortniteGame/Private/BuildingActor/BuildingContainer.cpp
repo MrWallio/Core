@@ -152,5 +152,9 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 		}
 	}
 
+	if (This->bStartAlreadySearched_Athena == 1) {
+		SpawnLoot(This, nullptr, EFortPickupSourceTypeFlag::Container, EFortPickupSpawnSource::Unset);
+	}
+
 	//This->bAllowInteract = false;
 }
