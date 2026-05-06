@@ -52,12 +52,15 @@ public:
     ValueElementType* Find(const KeyElementType& Key)
     {
         auto& SparseArray = Elements.Elements;
+        if (!SparseArray.IsValid()) {
+			return nullptr;
+        }
 
-        int32 NumAlloc = SparseArray.NumAllocated();
+        int32 NumAlloc = SparseArray.Num();
 
         for (int32 i = 0; i < NumAlloc; ++i)
         {
-            if (SparseArray.IsAllocated(i))
+            if (SparseArray.IsValidIndex(i))
             {
                 auto& SetElement = SparseArray[i];
 
@@ -76,12 +79,15 @@ public:
     const ValueElementType* Find(const KeyElementType& Key) const
     {
         auto& SparseArray = Elements.Elements;
+        if (!SparseArray.IsValid()) {
+            return nullptr;
+        }
 
-        int32 NumAlloc = SparseArray.NumAllocated();
+        int32 NumAlloc = SparseArray.Num();
 
         for (int32 i = 0; i < NumAlloc; ++i)
         {
-            if (SparseArray.IsAllocated(i))
+            if (SparseArray.IsValidIndex(i))
             {
                 auto& SetElement = SparseArray[i];
                 const ElementType& Pair = SetElement.Value;

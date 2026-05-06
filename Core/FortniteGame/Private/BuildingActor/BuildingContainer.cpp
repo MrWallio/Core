@@ -67,10 +67,14 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 		static FName Loot_AthenaTreasure = UKismetStringLibrary::Conv_StringToName("Loot_AthenaTreasure");
 		static FName Loot_AthenaAmmoLarge = UKismetStringLibrary::Conv_StringToName("Loot_AthenaAmmoLarge");
 
-		if (This->SearchLootTierGroup == Loot_Treasure)
+		if (This->SearchLootTierGroup == Loot_Treasure) {
 			TierGroup = Loot_AthenaTreasure;
-		else if (This->SearchLootTierGroup == Loot_Ammo)
+			This->bDestroyContainerOnSearch = false;
+		}
+		else if (This->SearchLootTierGroup == Loot_Ammo) {
 			TierGroup = Loot_AthenaAmmoLarge;
+			This->bDestroyContainerOnSearch = false;
+		}
 	}
 
 	FVector ContainerLocation = This->K2_GetActorLocation();
