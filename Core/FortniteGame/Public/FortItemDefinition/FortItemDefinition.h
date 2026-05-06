@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "McpItemDefinitionBase.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 class UFortItemDefinition : public UMcpItemDefinitionBase {
 public:
@@ -16,6 +17,8 @@ public:
 	bool IsStackable() const;
 
 	int32 GetClipSize();
+
+	EFortQuickBars GetQuickBarForItem();
 };
 
 class UFortAccountItemDefinition : public UFortItemDefinition {

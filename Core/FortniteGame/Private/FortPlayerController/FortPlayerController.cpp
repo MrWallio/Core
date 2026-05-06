@@ -105,7 +105,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 	if (Parser.IsCommand("Help"))
 	{
 		This->ClientMessage("=== Available Commands ===");
-		This->ClientMessage("GiveItem <ItemDefinitionName> [Count] [bStack] - Gives an item to the player's inventory.");
+		This->ClientMessage("GiveItem <ItemDefinitionName> [Count] - Gives an item to the player's inventory.");
 		This->ClientMessage("SetLoadedAmmo <LoadedAmmo> - Sets the loaded ammo of the currently equipped weapon.");
 		This->ClientMessage("GiveAmmo [Amount] - Gives ammo for the currently equipped weapon.");
 		This->ClientMessage("DumpInventory - Dump Inventory Stats");
@@ -113,7 +113,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: GiveItem <ItemDefinitionName> [Count] [bStack]");
+			This->ClientMessage("Usage: GiveItem <ItemDefinitionName> [Count]");
 			return;
 		}
 
@@ -124,7 +124,6 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
-		bool bStack = Parser.GetArgBool(2, true);
 
 		UObject* ItemObj;
 		if (ItemDefName.contains("/")) {
@@ -180,23 +179,24 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			return;
 		}
 
-		FFortItemEntry* ExistingEntry = This->WorldInventory->FindItemEntry(ItemDef);
-		if (ExistingEntry && bStack)
-		{
-			ExistingEntry->Count += Count;
-			This->WorldInventory->Update(ExistingEntry);
-			This->ClientMessage("Added " + std::to_string(Count) + " to existing stack of " + ItemDefName);
-		}
-		else
-		{
-			ExistingEntry = &This->WorldInventory->AddItem(ItemDef, Count)->ItemEntry;
-			if (ExistingEntry) {
-				ExistingEntry->LoadedAmmo = ItemDef->GetClipSize();
-				This->ClientMessage("Added new item entry: " + ItemDefName + " x" + std::to_string(Count));
-			}
-			else {
-				This->ClientMessage("Failed to add item: " + ItemDefName);
-			}
+		int32 Overflow = This->WorldInventory->GetOverflowFromAddingItem(ItemDef, Count);
+		if (Overflow > 0) {
+			UFortKismetLibrary::K2_SpawnPickupInWorld(
+				This->GetWorld(),
+				ItemDef,
+				Overflow,
+				This->Pawn->K2_GetActorLocation(),
+				FVector(),
+				-1,
+				true,
+				true,
+				false,
+				-1,
+				EFortPickupSourceTypeFlag::Player,
+				EFortPickupSpawnSource::Unset,
+				This,
+				false
+			);
 		}
 	}
 	else if (Parser.IsCommand("SetLoadedAmmo")) {

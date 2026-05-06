@@ -34,28 +34,3 @@ void AFortQuickBars::ServerAddItemInternal(const FGuid& Item, EFortQuickBars InQ
 
 	ProcessEvent(Func, &Parms);
 }
-
-EFortQuickBars AFortQuickBars::GetQuickBarForItem(UFortItemDefinition* ItemDefinition) {
-	if (!ItemDefinition) {
-		Log("AFortQuickBars::GetQuickBarForItem: Cannot get quick bar for item, ItemDefinition is invalid!");
-		return EFortQuickBars::Max_None;
-	}
-
-	if (ItemDefinition->IsA(UFortEditToolItemDefinition::StaticClass())
-		|| ItemDefinition->IsA(UFortBuildingItemDefinition::StaticClass())
-		|| ItemDefinition->IsA(UFortAmmoItemDefinition::StaticClass())
-		|| ItemDefinition->IsA(UFortResourceItemDefinition::StaticClass())
-		|| ItemDefinition->IsA(UFortTrapItemDefinition::StaticClass()))
-		return EFortQuickBars::Secondary;
-
-	return EFortQuickBars::Primary;
-}
-
-EFortQuickBars AFortQuickBars::GetQuickBarForItem(UFortWorldItem* Item) {
-	if (!Item) {
-		Log("AFortQuickBars::GetQuickBarForItem: Cannot get quick bar for item, Item is invalid!");
-		return EFortQuickBars::Max_None;
-	}
-
-	return GetQuickBarForItem(Item->ItemEntry.ItemDefinition);
-}

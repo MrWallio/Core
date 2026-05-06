@@ -105,6 +105,51 @@ UFortWorldItem* AFortInventory::FindItemInstance(UFortItemDefinition* ItemDefini
 	return nullptr;
 }
 
+TArray<FFortItemEntry*> AFortInventory::FindItemEntries(UFortItemDefinition* ItemDefinition)
+{
+	TArray<FFortItemEntry*> Entries;
+
+	if (!ItemDefinition)
+		return Entries;
+
+	if (!Inventory.ReplicatedEntries.IsValid())
+		return Entries;
+
+	for (int i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
+	{
+		if (!Inventory.ReplicatedEntries.IsValidIndex(i)) continue;
+		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
+		if (Entry.ItemDefinition == ItemDefinition)
+		{
+			Entries.Add(&Entry);
+		}
+	}
+
+	return Entries;
+}
+
+TArray<UFortWorldItem*> AFortInventory::FindItemInstances(UFortItemDefinition* ItemDefinition)
+{
+	TArray<UFortWorldItem*> Items;
+	if (!ItemDefinition)
+		return Items;
+
+	if (!Inventory.ItemInstances.IsValid())
+		return Items;
+
+	for (int i = 0; i < Inventory.ItemInstances.Num(); i++)
+	{
+		if (!Inventory.ItemInstances.IsValidIndex(i)) continue;
+		auto& Item = Inventory.ItemInstances[i];
+		if (Item && Item->ItemEntry.ItemDefinition == ItemDefinition)
+		{
+			Items.Add(Item);
+		}
+	}
+
+	return Items;
+}
+
 UFortWorldItem* AFortInventory::AddItem(UFortWorldItem* Item)
 {
 	if (!Item || !Owner)
@@ -201,32 +246,53 @@ int32 AFortInventory::GetOverflowFromAddingItem(UFortItemDefinition* Def, int32 
 		return 0;
 
 	int32 MaxStackSize = Def->GetMaxStackSize();
-	FFortItemEntry* ItemEntry = FindItemEntry(Def);
+	if (MaxStackSize <= 0)
+		return Count;
 
-	if (!ItemEntry) {
-		int32 ToAdd = (Count > MaxStackSize) ? MaxStackSize : Count;
+	if (!Def->IsStackable())
+	{
+		while (Count > 0 && !IsInventoryFull())
+		{
+			AddItem(Def, 1);
+			--Count;
+		}
+		return Count;
+	}
+
+	TArray<FFortItemEntry*> Entries = FindItemEntries(Def);
+	if (Entries.Num() == 0)
+	{
+		while (Count > 0 && !IsInventoryFull())
+		{
+			const int32 ToAdd = (Count > MaxStackSize) ? MaxStackSize : Count;
+			AddItem(Def, ToAdd);
+			Count -= ToAdd;
+		}
+		return Count;
+	}
+
+	for (FFortItemEntry* Entry : Entries)
+	{
+		const int32 Space = MaxStackSize - Entry->Count;
+		if (Space > 0)
+		{
+			const int32 ToAdd = (Count < Space) ? Count : Space;
+			Entry->Count += ToAdd;
+			Entry->bIsDirty = true;
+			Inventory.MarkItemDirty(*Entry);
+			Count -= ToAdd;
+		}
+	}
+
+	while (Count > 0 && !IsInventoryFull())
+	{
+		const int32 ToAdd = (Count > MaxStackSize) ? MaxStackSize : Count;
 		AddItem(Def, ToAdd);
-		return Count - ToAdd;
+		Count -= ToAdd;
 	}
-	else {
-		if (ItemEntry->Count >= MaxStackSize) {
-			return Count;
-		}
-		else {
-			int32 AvailableSpace = MaxStackSize - ItemEntry->Count;
 
-			if (AvailableSpace <= 0)
-			{
-				return Count;
-			}
-
-			int32 ToAdd = (Count > AvailableSpace) ? AvailableSpace : Count;
-			ItemEntry->Count += ToAdd;
-			Update(ItemEntry);
-
-			return Count - ToAdd;
-		}
-	}
+	Update();
+	return Count;
 }
 
 bool AFortInventory::Update(FFortItemEntry* ItemEntry)

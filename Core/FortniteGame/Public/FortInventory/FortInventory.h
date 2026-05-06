@@ -34,6 +34,9 @@ public:
 	UFortWorldItem* FindItemInstance(FGuid Guid);
 	UFortWorldItem* FindItemInstance(UFortItemDefinition* ItemDefinition);
 
+	TArray<FFortItemEntry*> FindItemEntries(UFortItemDefinition* ItemDefinition);
+	TArray<UFortWorldItem*> FindItemInstances(UFortItemDefinition* ItemDefinition);
+
 	UFortWorldItem* AddItem(UFortWorldItem* Item);
 	UFortWorldItem* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0);
 	UFortWorldItem* AddItem(FFortItemEntry& ItemEntry);

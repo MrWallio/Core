@@ -193,6 +193,10 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 		Pickup->OnRep_TossedFromContainer();
 	}
 
+	if (bPickupOnlyRelevantToOwner) {
+		Pickup->bOnlyRelevantToOwner = true;
+	}
+
 	Pickup->ForceNetUpdate();
 
 	Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Spawned Pickup: " + Pickup->GetName().ToString());
@@ -298,7 +302,25 @@ UFortWorldItem* UFortKismetLibrary::GiveItemToInventoryOwner(
 		+ FortPlayerController->GetName().ToString()
 	);
 
-	
+	int32 Overflow = FortPlayerController->WorldInventory->GetOverflowFromAddingItem(ItemDefinition, NumberToGive);
+	if (Overflow > 0) {
+		UFortKismetLibrary::K2_SpawnPickupInWorld(
+			FortPlayerController->GetWorld(),
+			ItemDefinition,
+			Overflow,
+			FortPlayerController->Pawn->K2_GetActorLocation(),
+			FVector(),
+			-1,
+			true,
+			true,
+			false,
+			-1,
+			EFortPickupSourceTypeFlag::Player,
+			EFortPickupSpawnSource::Unset,
+			FortPlayerController,
+			false
+		);
+	}
 
 	return FortPlayerController->WorldInventory->FindItemInstance(ItemDefinition);
 }

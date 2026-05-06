@@ -6,6 +6,7 @@
 
 #include "FortItemEntry.h"
 #include "FortItem.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 class AFortPlayerController;
 class UFortItemDefinition;
@@ -16,6 +17,8 @@ public:
 	DefineUnrealClass(UFortWorldItem);
 
 	DefineUProperty(FFortItemEntry, ItemEntry);
+public:
+	EFortQuickBars GetQuickBarForItem();
 
 public:
 	operator FFortItemEntry& () {

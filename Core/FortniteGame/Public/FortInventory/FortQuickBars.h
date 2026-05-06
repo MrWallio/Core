@@ -14,7 +14,4 @@ public:
 	DefineUnrealClass(AFortQuickBars);
 public:
 	void ServerAddItemInternal(const FGuid& Item, EFortQuickBars InQuickBar, int32 Slot);
-
-	static EFortQuickBars GetQuickBarForItem(UFortItemDefinition* ItemDefinition);
-	static EFortQuickBars GetQuickBarForItem(UFortWorldItem* Item);
 };
