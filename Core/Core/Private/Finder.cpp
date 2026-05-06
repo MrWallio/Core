@@ -7263,6 +7263,48 @@ uintptr_t Finder::FindAFortInventory_GetInventoryCapacity()
 	return ServerOffsets::AFortInventory_GetInventoryCapacity;
 }
 
+uintptr_t Finder::FindABuildingSMActor_PostUpdate()
+{
+	if (ServerOffsets::ABuildingSMActor_PostUpdate)
+		return ServerOffsets::ABuildingSMActor_PostUpdate;
+
+	uintptr_t stringaddr = Memcury::Scanner::FindStringRef(L"ABuildingSMActor::PostUpdate() Building: %s, AltMeshIdx: %d").Get();
+
+	for (int i = 0; i < 200; i++)
+	{
+		uintptr_t CurrentAddr = stringaddr - i;
+
+		if (*(uint8*)(CurrentAddr) == 0x40 && *(uint8*)(CurrentAddr + 1) == 0x53)
+		{
+			ServerOffsets::ABuildingSMActor_PostUpdate = CurrentAddr - ImageBase;
+			break;
+		}
+	}
+
+	Log("ABuildingSMActor_PostUpdate found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingSMActor_PostUpdate));
+	return ServerOffsets::ABuildingSMActor_PostUpdate;
+}
+
+uintptr_t Finder::FindABuildingActor_PostUpdateVFT()
+{
+	if (ServerOffsets::ABuildingActor_PostUpdateVFT)
+		return ServerOffsets::ABuildingActor_PostUpdateVFT;
+	
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.BuildingSMActor"))->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 500; i++)
+	{
+		if (VFT[i] == (void*)(FindABuildingSMActor_PostUpdate() + ImageBase))
+		{
+			ServerOffsets::ABuildingActor_PostUpdateVFT = i;
+			break;
+		}
+	}
+
+	Log("ABuildingActor_PostUpdateVFT found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingActor_PostUpdateVFT));
+	return ServerOffsets::ABuildingActor_PostUpdateVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

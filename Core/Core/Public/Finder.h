@@ -920,6 +920,10 @@ public:
 	static uintptr_t FindUObject_NeedsLoadForClientVFT();
 
 	static uintptr_t FindUFortWorldItemDefinition_ServerExecuteVFT();
+
+	static uintptr_t FindABuildingSMActor_PostUpdate();
+
+	static uintptr_t FindABuildingActor_PostUpdateVFT();
 public:
 	static void SetupOffsets();
 

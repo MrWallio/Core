@@ -31,6 +31,7 @@ namespace ServerOffsets {
 	inline uintptr_t AbilitySpecCDOConstructor = 0;
 
 	inline uintptr_t ABuildingActor_OnDamageServer = 0;
+	inline uintptr_t ABuildingActor_PostUpdateVFT = 0;
 
 	inline uintptr_t SpawnActor = 0;
 
@@ -410,6 +411,7 @@ namespace ServerOffsets {
 
 	inline uintptr_t ABuildingSMActor_ReplaceBuildingActor = 0;
 	inline uintptr_t ABuildingSMActor_ReplaceBuildingActorVFT = 0;
+	inline uintptr_t ABuildingSMActor_PostUpdate = 0;
 
 	inline uintptr_t AFortPickup_FinishedTargetSpline = 0;
 	inline uintptr_t AFortPickup_ForceFinishedTargetSpline = 0;
