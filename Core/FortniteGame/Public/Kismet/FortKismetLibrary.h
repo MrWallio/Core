@@ -89,10 +89,36 @@ public:
 	);
 	static void execPickLootDrops(UObject* Object, FFrame& Stack, bool* Result);
 
+	static AFortAIGoalManager* GetAIGoalManager(UObject* WorldContextObject);
+	static void execGetAIGoalManager(UObject* Object, FFrame& Stack, AFortAIGoalManager** Result);
+
+	static void K2_GiveItemToAllPlayers(
+		UObject* WorldContextObject,
+		UFortWorldItemDefinition* ItemDefinition,
+		FGuid& ItemVariantGuid,
+		int NumberToGive
+	);
+	static void execK2_GiveItemToAllPlayers(UObject* Object, FFrame& Stack);
+
+	static AFortAIDirector* GetAIDirector(UObject* WorldContextObject);
+	static void execGetAIDirector(UObject* Object, FFrame& Stack, AFortAIDirector** Result);
+
+	static void K2_RemoveItemFromAllPlayers(
+		UObject* WorldContextObject,
+		UFortWorldItemDefinition* ItemDefinition,
+		FGuid* ItemVariantGuid,
+		int AmountToRemove
+	);
+	static void execK2_RemoveItemFromAllPlayers(UObject* Object, FFrame& Stack);
+
 	static void Hook() {
 		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.K2_SpawnPickupInWorld", execK2_SpawnPickupInWorld);
 		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.GiveItemToInventoryOwner", execGiveItemToInventoryOwner);
 		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.PickLootDrops", execPickLootDrops);
+		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.GetAIGoalManager", execGetAIGoalManager);
+		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.K2_GiveItemToAllPlayers", execK2_GiveItemToAllPlayers);
+		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.GetAIDirector", execGetAIDirector);
+		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.K2_RemoveItemFromAllPlayers", execK2_RemoveItemFromAllPlayers);
 
 		Log("Hooked UFortKismetLibrary");
 	}

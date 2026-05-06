@@ -13,6 +13,8 @@
 #include "FortniteGame/Public/FortPlaylist/FortPlaylistAthena.h"
 #include "FortniteGame/Public/FortLoot/FortLootTierData.h"
 #include "FortniteGame/Public/FortLoot/FortLootPackageData.h"
+#include "FortniteGame/Public/AI/FortAIDirector.h"
+#include "FortniteGame/Public/AI/FortAIGoalManager.h"
 
 class UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinition(const uint8 ResourceType)
 {
@@ -523,4 +525,275 @@ void UFortKismetLibrary::execPickLootDrops(UObject* Object, FFrame& Stack, bool*
 	Stack.IncrementCode();
 
 	*Result = PickLootDrops(WorldContextObject, OutLootToDrop, TierGroupName, WorldLevel, ForcedLootTier);
+}
+
+AFortAIGoalManager* UFortKismetLibrary::GetAIGoalManager(UObject* WorldContextObject)
+{
+	UWorld* World = WorldContextObject->GetWorld();
+	if (!World) {
+		Log("UFortKismetLibrary::GetAIGoalManager: Failed to get world!");
+		return nullptr;
+	}
+
+	AFortGameModeZone* GameMode = World->AuthorityGameMode->Cast<AFortGameModeZone>();
+	if (!GameMode) {
+		Log("UFortKismetLibrary::GetAIGoalManager: Failed to cast AuthorityGameMode to AFortGameModeZone, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
+		return nullptr;
+	}
+
+	Log(
+		"UFortKismetLibrary::GetAIGoalManager: Successfully got AIGoalManager: "
+		+ GameMode->AIGoalManager->GetName().ToString() +
+		" From GameMode: "
+		+ GameMode->GetName().ToString()
+	);
+	return GameMode->AIGoalManager;
+}
+
+void UFortKismetLibrary::execGetAIGoalManager(UObject* Object, FFrame& Stack, AFortAIGoalManager** Result)
+{
+	static UFunction* GetAIGoalManagerFn = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.GetAIGoalManager");
+	if (!GetAIGoalManagerFn) {
+		Log("UFortKismetLibrary::execGetAIGoalManager: Failed to find function!");
+		return;
+	}
+	UObject* WorldContextObject = nullptr;
+	for (auto& Param : GetAIGoalManagerFn->GetParams().NameOffsetMap)
+	{
+		std::string Name = Param.Name.ToString();
+		if (Name == "WorldContextObject") {
+			Stack.StepCompiledIn(&WorldContextObject);
+		}
+		else {
+			Log("UFortKismetLibrary::execGetAIGoalManager: Unhandled parameter: " + Name);
+		}
+	}
+	Stack.IncrementCode();
+
+	*Result = GetAIGoalManager(WorldContextObject);
+}
+
+void UFortKismetLibrary::K2_GiveItemToAllPlayers(
+	UObject* WorldContextObject,
+	UFortWorldItemDefinition* ItemDefinition,
+	FGuid& ItemVariantGuid,
+	int NumberToGive)
+{
+	if (!ItemDefinition) {
+		Log("UFortKismetLibrary::K2_GiveItemToAllPlayers: Failed to get item definition from stack!");
+		return;
+	}
+
+	UWorld* World = WorldContextObject->GetWorld();
+	if (!World) {
+		Log("UFortKismetLibrary::K2_GiveItemToAllPlayers: Failed to get world!");
+		return;
+	}
+
+	AFortGameModeAthena* GameMode = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	if (!GameMode) {
+		Log("UFortKismetLibrary::K2_GiveItemToAllPlayers: Failed to cast AuthorityGameMode to AFortGameModeAthena, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
+		return;
+	}
+
+	Log(
+		"UFortKismetLibrary::K2_GiveItemToAllPlayers: Giving Item: "
+		+ ItemDefinition->GetName().ToString() +
+		" Amount: " + std::to_string(NumberToGive) +
+		" To All Players in World: "
+		+ World->GetName().ToString()
+	);
+
+	for (int i = 0; i < GameMode->AlivePlayers.Num(); i++) {
+		AFortPlayerControllerAthena* PlayerController = GameMode->AlivePlayers[i];
+		if (PlayerController) {
+			int32 Overflow = PlayerController->WorldInventory->GetOverflowFromAddingItem(ItemDefinition, NumberToGive);
+			if (Overflow > 0) {
+				UFortKismetLibrary::K2_SpawnPickupInWorld(
+					PlayerController->GetWorld(),
+					ItemDefinition,
+					Overflow,
+					PlayerController->Pawn->K2_GetActorLocation(),
+					FVector(),
+					-1,
+					true,
+					true,
+					false,
+					-1,
+					EFortPickupSourceTypeFlag::Player,
+					EFortPickupSpawnSource::Unset,
+					PlayerController,
+					false
+				);
+			}
+		}
+		else {
+			Log("UFortKismetLibrary::K2_GiveItemToAllPlayers: Failed to get player controller for player at index: " + std::to_string(i));
+		}
+	}
+}
+
+void UFortKismetLibrary::execK2_GiveItemToAllPlayers(UObject* Object, FFrame& Stack)
+{
+	static UFunction* K2_GiveItemToAllPlayersFn = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.K2_GiveItemToAllPlayers");
+	if (!K2_GiveItemToAllPlayersFn) {
+		Log("UFortKismetLibrary::execK2_GiveItemToAllPlayers: Failed to find function!");
+		return;
+	}
+	UObject* WorldContextObject = nullptr;
+	UFortWorldItemDefinition* ItemDefinition = nullptr;
+	FGuid ItemVariantGuid = FGuid();
+	int32 NumberToGive = 0;
+	bool bNotifyPlayer = false;
+	for (auto& Param : K2_GiveItemToAllPlayersFn->GetParams().NameOffsetMap)
+	{
+		std::string Name = Param.Name.ToString();
+		if (Name == "WorldContextObject") {
+			Stack.StepCompiledIn(&WorldContextObject);
+		}
+		else if (Name == "ItemDefinition") {
+			Stack.StepCompiledIn(&ItemDefinition);
+		}
+		else if (Name == "ItemVariantGuid") {
+			Stack.StepCompiledIn(&ItemVariantGuid);
+		}
+		else if (Name == "NumberToGive") {
+			Stack.StepCompiledIn(&NumberToGive);
+		}
+		else if (Name == "bNotifyPlayer") {
+			Stack.StepCompiledIn(&bNotifyPlayer);
+		}
+		else {
+			Log("UFortKismetLibrary::execK2_GiveItemToAllPlayers: Unhandled parameter: " + Name);
+		}
+	}
+	Stack.IncrementCode();
+
+	K2_GiveItemToAllPlayers(WorldContextObject, ItemDefinition, ItemVariantGuid, NumberToGive);
+}
+
+AFortAIDirector* UFortKismetLibrary::GetAIDirector(UObject* WorldContextObject)
+{
+	UWorld* World = WorldContextObject->GetWorld();
+	if (!World) {
+		Log("UFortKismetLibrary::GetAIDirector: Failed to get world!");
+		return nullptr;
+	}
+
+	AFortGameModeZone* GameMode = World->AuthorityGameMode->Cast<AFortGameModeZone>();
+	if (!GameMode) {
+		Log("UFortKismetLibrary::GetAIDirector: Failed to cast AuthorityGameMode to AFortGameModeZone, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
+		return nullptr;
+	}
+
+	Log(
+		"UFortKismetLibrary::GetAIDirector: Successfully got AIDirector: "
+		+ GameMode->AIDirector->GetName().ToString() +
+		" From GameMode: "
+		+ GameMode->GetName().ToString()
+	);
+
+	return GameMode->AIDirector;
+}
+
+void UFortKismetLibrary::execGetAIDirector(UObject* Object, FFrame& Stack, AFortAIDirector** Result)
+{
+	static UFunction* GetAIDirectorFn = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.GetAIDirector");
+	if (!GetAIDirectorFn) {
+		Log("UFortKismetLibrary::execGetAIDirector: Failed to find function!");
+		return;
+	}
+	UObject* WorldContextObject = nullptr;
+	for (auto& Param : GetAIDirectorFn->GetParams().NameOffsetMap)
+	{
+		std::string Name = Param.Name.ToString();
+		if (Name == "WorldContextObject") {
+			Stack.StepCompiledIn(&WorldContextObject);
+		}
+		else {
+			Log("UFortKismetLibrary::execGetAIDirector: Unhandled parameter: " + Name);
+		}
+	}
+	Stack.IncrementCode();
+
+	*Result = GetAIDirector(WorldContextObject);
+}
+
+void UFortKismetLibrary::K2_RemoveItemFromAllPlayers(
+	UObject* WorldContextObject,
+	UFortWorldItemDefinition* ItemDefinition,
+	FGuid* ItemVariantGuid,
+	int AmountToRemove) {
+	if (!ItemDefinition) {
+		Log("UFortKismetLibrary::K2_RemoveItemFromAllPlayers: Failed to get item definition from stack!");
+		return;
+	}
+
+	UWorld* World = WorldContextObject->GetWorld();
+	if (!World) {
+		Log("UFortKismetLibrary::K2_RemoveItemFromAllPlayers: Failed to get world!");
+		return;
+	}
+
+	AFortGameModeAthena* GameMode = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	if (!GameMode) {
+		Log("UFortKismetLibrary::K2_RemoveItemFromAllPlayers: Failed to cast AuthorityGameMode to AFortGameModeAthena, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
+		return;
+	}
+
+	Log(
+		"UFortKismetLibrary::K2_RemoveItemFromAllPlayers: Removing Item: "
+		+ ItemDefinition->GetName().ToString() +
+		" Amount: " + std::to_string(AmountToRemove) +
+		" From All Players in World: "
+		+ World->GetName().ToString()
+	);
+
+	for (int i = 0; i < GameMode->AlivePlayers.Num(); i++) {
+		AFortPlayerControllerAthena* PlayerController = GameMode->AlivePlayers[i];
+		if (PlayerController) {
+			PlayerController->WorldInventory->RemoveItem(
+				ItemDefinition,
+				AmountToRemove
+			);
+		}
+		else {
+			Log("UFortKismetLibrary::K2_RemoveItemFromAllPlayers: Failed to get player controller for player at index: " + std::to_string(i));
+		}
+	}
+}
+
+void UFortKismetLibrary::execK2_RemoveItemFromAllPlayers(UObject* Object, FFrame& Stack)
+{
+	static UFunction* K2_RemoveItemFromAllPlayersFn = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.K2_RemoveItemFromAllPlayers");
+	if (!K2_RemoveItemFromAllPlayersFn) {
+		Log("UFortKismetLibrary::execK2_RemoveItemFromAllPlayers: Failed to find function!");
+		return;
+	}
+	UObject* WorldContextObject = nullptr;
+	UFortWorldItemDefinition* ItemDefinition = nullptr;
+	FGuid ItemVariantGuid = FGuid();
+	int32 AmountToRemove = 0;
+	for (auto& Param : K2_RemoveItemFromAllPlayersFn->GetParams().NameOffsetMap)
+	{
+		std::string Name = Param.Name.ToString();
+		if (Name == "WorldContextObject") {
+			Stack.StepCompiledIn(&WorldContextObject);
+		}
+		else if (Name == "ItemDefinition") {
+			Stack.StepCompiledIn(&ItemDefinition);
+		}
+		else if (Name == "ItemVariantGuid") {
+			Stack.StepCompiledIn(&ItemVariantGuid);
+		}
+		else if (Name == "AmountToRemove") {
+			Stack.StepCompiledIn(&AmountToRemove);
+		}
+		else {
+			Log("UFortKismetLibrary::execK2_RemoveItemFromAllPlayers: Unhandled parameter: " + Name);
+		}
+	}
+	Stack.IncrementCode();
+
+	K2_RemoveItemFromAllPlayers(WorldContextObject, ItemDefinition, &ItemVariantGuid, AmountToRemove);
 }
