@@ -16,7 +16,8 @@ class AFortPlayerController;
 class IFortInventoryOwnerInterface;
 class UFortWorldItemDefinition;
 
-class AFortInventory : public AActor {
+class AFortInventory : public AActor
+{
 public:
 	DefineUnrealClass(AFortInventory);
 
@@ -25,8 +26,19 @@ public:
 	DefineUProperty(bool, bRequiresLocalUpdate);
 	DefineUProperty(bool, bRequiresSaving);
 	DefineUProperty(uint8, InventoryType);
+
 public:
+	// =================================================================
+	// Inventory Lifecycle
+	// =================================================================
+
 	void HandleInventoryLocalUpdate();
+	bool Update(FFortItemEntry* ItemEntry = nullptr);
+	void InitializeExistingItem(UFortWorldItem* ExistingItem);
+
+	// =================================================================
+	// Inventory Lookup
+	// =================================================================
 
 	FFortItemEntry* FindItemEntry(FGuid Guid);
 	FFortItemEntry* FindItemEntry(UFortItemDefinition* ItemDefinition);
@@ -37,22 +49,60 @@ public:
 	TArray<FFortItemEntry*> FindItemEntries(UFortItemDefinition* ItemDefinition);
 	TArray<UFortWorldItem*> FindItemInstances(UFortItemDefinition* ItemDefinition);
 
+	FFortItemEntry* GetCurrentItemEntry();
+	AFortPlayerController* GetOwnerPlayerController() const;
+
+	// =================================================================
+	// Inventory Mutation
+	// =================================================================
+
 	UFortWorldItem* AddItem(UFortWorldItem* Item);
 	UFortWorldItem* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0);
-	UFortWorldItem* AddItem(FFortItemEntry& ItemEntry);
+	UFortWorldItem* AddItem(const FFortItemEntry& ItemEntry);
 
 	int32 GetOverflowFromAddingItem(UFortItemDefinition* Def, int32 Count = 1);
-
-	bool Update(FFortItemEntry* ItemEntry = nullptr);
-
-	void InitializeExistingItem(UFortWorldItem* ExistingItem);
 
 	bool RemoveItem(FGuid Guid, int32 Count = INT_MAX);
 	bool RemoveItem(UFortItemDefinition* Def, int32 Count = INT_MAX);
 
+	// =================================================================
+	// Inventory State
+	// =================================================================
+
 	int32 GetInventoryCapacity();
-
 	int32 GetInventoryUsed();
-
 	bool IsInventoryFull();
+
+	// =================================================================
+	// High-Level Item Handling
+	// =================================================================
+
+	bool CanSwapForItem(UFortItemDefinition* Def);
+
+	bool SwapCurrentItem(
+		UFortItemDefinition* NewItemDef,
+		int32 NewCount,
+		bool bSpawnPickup = true
+	);
+
+	bool AddItemAndHandleOverflow(
+		UFortItemDefinition* Def,
+		int32 Count = 1,
+		bool bAllowSwap = true,
+		bool bSpawnOverflowPickup = true
+	);
+
+	// =================================================================
+	// Internal Helpers
+	// =================================================================
+
+	bool CanAddItem(UFortItemDefinition* Def, int32 Count = 1) const;
+	bool IsPrimaryItem(UFortItemDefinition* Def) const;
+	bool IsSecondaryItem(UFortItemDefinition* Def) const;
+
+	int32 TryAddToEntry(FFortItemEntry& ItemEntry, int32 Count = 1, int32 MaxStackSize = 1);
+	int32 TryCreateStack(UFortItemDefinition* Def, int32 Count = 1, int32 MaxStackSize = 1);
+
+	bool SpawnPickupFromDefinition(UFortItemDefinition* Def, int32 Count = 1);
+	bool SpawnPickupFromEntry(const FFortItemEntry& ItemEntry);
 };

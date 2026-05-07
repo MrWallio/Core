@@ -23,4 +23,7 @@ struct FFortPickupLocationData
 {
 public:
 	DefineUnrealStruct(FFortPickupLocationData);
+
+	DefineStructProperty(AFortPawn*, PickupTarget);
+	DefineStructProperty(AFortPawn*, ItemOwner);
 };

@@ -127,7 +127,25 @@ void AFortPickup::GivePickupTo(AFortPickup* This, IFortInventoryOwnerInterface* 
 
 	GivePickupToOG(This, InventoryOwner, DestroyAfterPickup);
 
-	if (InventoryOwner) {
+	if (This->PickupLocationData.PickupTarget || This->PickupLocationData.ItemOwner) {
+		AFortPawn* PickupTargetPawn = This->PickupLocationData.PickupTarget ? This->PickupLocationData.PickupTarget : This->PickupLocationData.ItemOwner;
+		if (!PickupTargetPawn->Controller) {
+			Log("AFortPickup::GivePickupTo: PickupTargetPawn->Controller is null!");
+			return;
+		}
 
+		AFortPlayerController* PickupTargetController = PickupTargetPawn->Controller->Cast<AFortPlayerController>();
+		if (!PickupTargetController) {
+			Log("AFortPickup::GivePickupTo: PickupTargetPawn->Controller is not a FortPlayerController!");
+			return;
+		}
+
+		PickupTargetController->WorldInventory->AddItemAndHandleOverflow(
+			This->PrimaryPickupItemEntry.ItemDefinition,
+			This->PrimaryPickupItemEntry.Count
+		);
+	}
+	else {
+		Log("AFortPickup::GivePickupTo: No PickupLocationData found, skipping inventory addition.");
 	}
 }
