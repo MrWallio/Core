@@ -24,8 +24,6 @@ void AFortInventory::HandleInventoryLocalUpdate()
 
 bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 {
-	if (!Owner) return false;
-
 	if (ItemEntry == nullptr) {
 		Inventory.MarkArrayDirty();
 	}
@@ -223,7 +221,7 @@ UFortWorldItem* AFortInventory::AddItem(UFortWorldItem* Item)
 	InitializeExistingItem(Item);
 
 	if (Version::Fortnite_Version <= 1.8) {
-		PC->QuickBars->ServerAddItemInternal(Item->ItemEntry.ItemGuid, EFortQuickBars::Max_None, -3);
+		PC->QuickBars->ServerAddItemInternal(Item->ItemEntry.ItemGuid, EFortQuickBars::Max_None, -1);
 	}
 
 	return Item;
@@ -349,17 +347,8 @@ bool AFortInventory::RemoveItem(FGuid Guid, int32 Count) {
 		return false;
 	}
 
-	if (!Inventory.ReplicatedEntries.IsValid() || !Inventory.ItemInstances.IsValid())
-	{
-		Log("AFortInventory::RemoveItem: Inventory arrays are invalid!");
-		return false;
-	}
-
 	for (int i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
 	{
-		if (!Inventory.ReplicatedEntries.IsValidIndex(i))
-			continue;
-
 		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
 
 		if (Entry.ItemGuid != Guid)
@@ -371,9 +360,6 @@ bool AFortInventory::RemoveItem(FGuid Guid, int32 Count) {
 
 			for (int j = 0; j < Inventory.ItemInstances.Num(); j++)
 			{
-				if (!Inventory.ItemInstances.IsValidIndex(j))
-					continue;
-
 				UFortWorldItem* Item = Inventory.ItemInstances[j];
 				if (Item && Item->ItemEntry.ItemGuid == Guid)
 				{
@@ -495,34 +481,51 @@ bool AFortInventory::CanSwapForItem(UFortItemDefinition* Def) {
 }
 
 bool AFortInventory::SwapCurrentItem(UFortItemDefinition* NewItemDef, int32 NewCount, bool bSpawnPickup) {
-	if (!CanAddItem(NewItemDef, NewCount))
+	if (!CanAddItem(NewItemDef, NewCount)) {
+		Log("AFortInventory::SwapCurrentItem: Cannot add new item " + NewItemDef->GetName().ToString() + " with count " + std::to_string(NewCount));
 		return false;
+	}
 
-	if (!CanSwapForItem(NewItemDef))
+	if (!CanSwapForItem(NewItemDef)) {
+		Log("AFortInventory::SwapCurrentItem: Cannot swap for item " + NewItemDef->GetName().ToString());
 		return false;
+	}
+
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC) {
+		Log("AFortInventory::SwapCurrentItem: PlayerController is null!");
+		return false;
+	}
 
 	FFortItemEntry* CurrentItemEntry = GetCurrentItemEntry();
-	if (!CurrentItemEntry)
+	if (!CurrentItemEntry) {
+		Log("AFortInventory::SwapCurrentItem: CurrentItemEntry is null!");
 		return false;
+	}
 
-	const FFortItemEntry OldEntryCopy = *CurrentItemEntry;
+	UFortItemDefinition* CurrentItemDef = CurrentItemEntry->ItemDefinition;
+	if (!CurrentItemDef) {
+		Log("AFortInventory::SwapCurrentItem: CurrentItemDef is null!");
+		return false;
+	}
 
 	const FGuid CurrentGuid = CurrentItemEntry->ItemGuid;
 	const int32 CurrentCount = CurrentItemEntry->Count;
 
-	if (!RemoveItem(CurrentGuid, CurrentCount))
-		return false;
-
-	UFortWorldItem* NewItem = AddItem(NewItemDef, NewCount);
-	if (!NewItem)
-	{
-		AddItem(OldEntryCopy);
+	if (!RemoveItem(CurrentGuid, CurrentCount)) {
+		Log("AFortInventory::SwapCurrentItem: Failed to remove current item from inventory!");
 		return false;
 	}
 
 	if (bSpawnPickup)
 	{
-		SpawnPickupFromEntry(OldEntryCopy);
+		SpawnPickupFromDefinition(CurrentItemDef, CurrentCount);
+	}
+
+	UFortWorldItem* NewItem = AddItem(NewItemDef, NewCount);
+	if (!NewItem) {
+		Log("AFortInventory::SwapCurrentItem: Failed to add new item to inventory!");
+		return false;
 	}
 
 	return true;
@@ -534,13 +537,12 @@ bool AFortInventory::AddItemAndHandleOverflow(UFortItemDefinition* Def, int32 Co
 		return false;
 
 	int32 Overflow = GetOverflowFromAddingItem(Def, Count);
-
 	if (Overflow <= 0)
 		return true;
 
 	if (bAllowSwap && CanSwapForItem(Def))
 	{
-		if (SwapCurrentItem(Def, Overflow, bSpawnOverflowPickup))
+		if (SwapCurrentItem(Def, Count, bSpawnOverflowPickup))
 		{
 			return true;
 		}
@@ -601,15 +603,19 @@ bool AFortInventory::SpawnPickupFromDefinition(UFortItemDefinition* Def, int32 C
 	if (!CanAddItem(Def, Count))
 		return false;
 
+	UWorld* World = UWorld::GetWorld();
+	if (!World)
+		return false;
+
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC)
 		return false;
 
 	return UFortKismetLibrary::K2_SpawnPickupInWorld(
-		GetWorld(),
+		World,
 		Def,
 		Count,
-		Owner->K2_GetActorLocation(),
+		PC->Pawn->K2_GetActorLocation(),
 		FVector(),
 		-1,
 		true,

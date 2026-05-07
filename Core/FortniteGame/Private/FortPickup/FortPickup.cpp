@@ -123,8 +123,6 @@ void AFortPickup::SetPickupItems(FFortItemEntry* PrimaryEntry, TArray<FFortItemE
 }
 
 void AFortPickup::GivePickupTo(AFortPickup* This, IFortInventoryOwnerInterface* InventoryOwner, bool DestroyAfterPickup) {
-	Log("AFortPickup::GivePickupTo called!");
-
 	GivePickupToOG(This, InventoryOwner, DestroyAfterPickup);
 
 	if (This->PickupLocationData.PickupTarget || This->PickupLocationData.ItemOwner) {
@@ -144,8 +142,5 @@ void AFortPickup::GivePickupTo(AFortPickup* This, IFortInventoryOwnerInterface* 
 			This->PrimaryPickupItemEntry.ItemDefinition,
 			This->PrimaryPickupItemEntry.Count
 		);
-	}
-	else {
-		Log("AFortPickup::GivePickupTo: No PickupLocationData found, skipping inventory addition.");
 	}
 }

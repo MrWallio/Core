@@ -1004,7 +1004,7 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 
 					if (!bLevelInitializedForActor || !Actor->IsNetStartupActor())
 					{
-						Log("- Closing channel for no longer relevant actor " + Actor->GetName().ToString());
+						//Log("- Closing channel for no longer relevant actor " + Actor->GetName().ToString());
 						Channel->Close();
 					}
 				}

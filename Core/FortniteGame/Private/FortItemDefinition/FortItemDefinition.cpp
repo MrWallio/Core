@@ -58,12 +58,27 @@ int32 UFortItemDefinition::GetMaxStackSize() const
 
 bool UFortItemDefinition::IsStackable() const
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"IsStackable"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	if (Version::Fortnite_Version >= 1.8) {
+		static UFunction* Func = nullptr;
 
-		bool (*&IsStackableInternal)(const UFortItemDefinition*) = decltype(IsStackableInternal)(VTable[VTableIdx]);
-		return IsStackableInternal(this);
+		if (Func == nullptr)
+			Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"IsStackable"));
+
+		struct FortItemDefinition_IsStackable final
+		{
+		public:
+			bool ReturnValue;
+		};
+
+		FortItemDefinition_IsStackable Parms{};
+
+		const_cast<UFortItemDefinition*>(this)->ProcessEvent(Func, &Parms);
+
+		return Parms.ReturnValue;
+	}
+	else {
+		if (GetMaxStackSize() > 1)
+			return true;
 	}
 
 	return false;
