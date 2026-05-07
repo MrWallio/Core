@@ -51,6 +51,7 @@ DWORD Main(LPVOID)
         Utils::DumpClassProperties("WorldContext"); // DEBUG
         Utils::DumpClassProperties("GameplayAbilitySpec"); // DEBUG
         Utils::DumpClassProperties("ItemAndCount"); // DEBUG
+		Utils::DumpEnumProperties("EFortQuickBars"); // DEBUG
 
         Utils::Hook();
 

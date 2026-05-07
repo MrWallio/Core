@@ -90,6 +90,25 @@ FFortItemEntry* AFortInventory::FindItemEntry(UFortItemDefinition* ItemDefinitio
 	return nullptr;
 }
 
+FFortItemEntry* AFortInventory::FindItemEntry(int32 ItemType)
+{
+	if (!Inventory.ReplicatedEntries.IsValid())
+		return nullptr;
+
+	for (int i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
+	{
+		if (!Inventory.ReplicatedEntries.IsValidIndex(i)) continue;
+
+		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
+		if (Entry.ItemDefinition && Entry.ItemDefinition->ItemType == ItemType)
+		{
+			return &Entry;
+		}
+	}
+
+	return nullptr;
+}
+
 UFortWorldItem* AFortInventory::FindItemInstance(FGuid Guid)
 {
 	if (!Guid.IsValid())
@@ -221,7 +240,7 @@ UFortWorldItem* AFortInventory::AddItem(UFortWorldItem* Item)
 	InitializeExistingItem(Item);
 
 	if (Version::Fortnite_Version <= 1.8) {
-		PC->QuickBars->ServerAddItemInternal(Item->ItemEntry.ItemGuid, EFortQuickBars::Max_None, -1);
+		PC->QuickBars->ServerAddItemInternal(Item->ItemEntry.ItemGuid, EFortQuickBars::GetMax_None(), -1);
 	}
 
 	return Item;
@@ -347,6 +366,13 @@ bool AFortInventory::RemoveItem(FGuid Guid, int32 Count) {
 		return false;
 	}
 
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC)
+	{
+		Log("AFortInventory::RemoveItem: Owner is not a valid AFortPlayerController!");
+		return false;
+	}
+
 	for (int i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
 	{
 		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
@@ -356,6 +382,26 @@ bool AFortInventory::RemoveItem(FGuid Guid, int32 Count) {
 
 		if (Entry.Count <= Count)
 		{
+			if (Version::Fortnite_Version <= 1.8) {
+				if (IsCurrentItem(Guid)) {
+					EquipHarvestingTool();
+				}
+
+				FQuickBar QuickBar = IsPrimaryItem(Entry.ItemDefinition) ? PC->QuickBars->PrimaryQuickBar : PC->QuickBars->SecondaryQuickBar;
+				for (int j = 0; j < QuickBar.Slots.Num(); j++)
+				{
+					FQuickBarSlot Slot = QuickBar.Slots.GetWithSize(j, FQuickBarSlot::GetSize());
+					for (FGuid& ItemGuid : Slot.Items)
+					{
+						if (ItemGuid == Guid)
+						{
+							PC->QuickBars->EmptySlot(IsPrimaryItem(Entry.ItemDefinition) ? EFortQuickBars::GetPrimary() : EFortQuickBars::GetSecondary(), j);
+							PC->QuickBars->ServerRemoveItemInternal(Guid, false, true);
+						}
+					}
+				}
+			}
+
 			Inventory.ReplicatedEntries.RemoveAt(i);
 
 			for (int j = 0; j < Inventory.ItemInstances.Num(); j++)
@@ -557,6 +603,31 @@ bool AFortInventory::AddItemAndHandleOverflow(UFortItemDefinition* Def, int32 Co
 	return false;
 }
 
+bool AFortInventory::IsCurrentItem(FGuid& ItemGuid) {
+	FFortItemEntry* CurrentItemEntry = GetCurrentItemEntry();
+	if (!CurrentItemEntry)
+		return false;
+
+	return CurrentItemEntry->ItemGuid == ItemGuid;
+}
+
+void AFortInventory::EquipHarvestingTool() {
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC)
+		return;
+
+	FFortItemEntry* PickaxeEntry = FindItemEntry(EFortItemType::GetWeaponHarvest());
+	if (!PickaxeEntry) {
+		Log("AFortInventory::EquipPickaxe: Pickaxe not found in inventory!");
+		return;
+	}
+
+	PC->ServerExecuteInventoryItem(PC, PickaxeEntry->ItemGuid);
+	if (Version::Fortnite_Version <= 1.8) {
+		PC->QuickBars->ServerActivateSlotInternal(EFortQuickBars::GetPrimary(), 0, 0.f, true);
+	}
+}
+
 bool AFortInventory::CanAddItem(UFortItemDefinition* Def, int32 Count) const
 {
 	return Owner && Def && Count > 0;
@@ -564,12 +635,12 @@ bool AFortInventory::CanAddItem(UFortItemDefinition* Def, int32 Count) const
 
 bool AFortInventory::IsPrimaryItem(UFortItemDefinition* Def) const
 {
-	return Def && Def->GetQuickBarForItem() == EFortQuickBars::Primary;
+	return Def && Def->GetQuickBarForItem() == EFortQuickBars::GetPrimary();
 }
 
 bool AFortInventory::IsSecondaryItem(UFortItemDefinition* Def) const
 {
-	return Def && Def->GetQuickBarForItem() == EFortQuickBars::Secondary;
+	return Def && Def->GetQuickBarForItem() == EFortQuickBars::GetSecondary();
 }
 
 int32 AFortInventory::TryAddToEntry(FFortItemEntry& ItemEntry, int32 Count, int32 MaxStackSize)

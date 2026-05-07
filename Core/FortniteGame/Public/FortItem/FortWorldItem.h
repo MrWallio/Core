@@ -18,7 +18,7 @@ public:
 
 	DefineUProperty(FFortItemEntry, ItemEntry);
 public:
-	EFortQuickBars GetQuickBarForItem();
+	uint8 GetQuickBarForItem();
 
 public:
 	operator FFortItemEntry& () {

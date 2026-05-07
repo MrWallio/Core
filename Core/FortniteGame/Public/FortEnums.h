@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "Engine/Source/Runtime/Core/Public/HAL/Platform.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
 
 enum class EFortPickupSourceTypeFlag : uint8
 {
@@ -58,12 +59,15 @@ enum class ESpecialActorStatType : uint8
 	ESpecialActorStatType_MAX = 10,
 };
 
-enum class EFortQuickBars : uint8
-{
-	Primary = 0,
-	Secondary = 1,
-	Max_None = 2,
-	EFortQuickBars_MAX = 3,
+class EFortQuickBars {
+public:
+	DefineUnrealEnum(EFortQuickBars);
+
+	DefineEnumProperty(Primary);
+	DefineEnumProperty(Secondary);
+	DefineEnumProperty(Creative);
+
+	DefineEnumProperty(Max_None);
 };
 
 enum class EFortStructuralGridQueryResults : uint8
@@ -186,4 +190,18 @@ enum class EBuildingReplacementType : uint8
 	BRT_Edited = 1,
 	BRT_Conversion = 2,
 	BRT_MAX = 3,
+};
+
+class EFortItemType
+{
+public:
+	DefineUnrealEnum(EFortItemType);
+
+	DefineEnumProperty(WeaponHarvest);
+	DefineEnumProperty(WorldResource);
+	DefineEnumProperty(EditTool);
+	DefineEnumProperty(Trap);
+	DefineEnumProperty(Ammo);
+	DefineEnumProperty(BuildingPiece);
+	DefineEnumProperty(Ingredient);
 };

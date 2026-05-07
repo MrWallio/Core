@@ -13,6 +13,8 @@ public:
 
 	static void DumpGObjects(bool bLog = false);
 	static void DumpClassProperties(const char* ClassName);
+	static void DumpEnumProperties(const char* EnumName);
+	static uint8 GetEnumValueFromName(const char* EnumName, const char* EnumMemberName);
 
 	static void Hook();
 

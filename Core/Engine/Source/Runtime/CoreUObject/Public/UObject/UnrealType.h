@@ -367,3 +367,18 @@ public: \
         } \
     } \
     __declspec(property(get=_Get##Name, put=_Set##Name)) bool Name;
+
+#define DefineEnumProperty(Name) \
+private: \
+    static inline bool Name##__Initialized = false; \
+    static inline uint8 Name##__Value = 0; \
+public: \
+    static uint8 Get##Name() \
+    { \
+        if (!Name##__Initialized) \
+        { \
+            Name##__Value = static_cast<uint8>(StaticEnum()->GetValue(#Name)); \
+            Name##__Initialized = true; \
+        } \
+        return Name##__Value; \
+    }

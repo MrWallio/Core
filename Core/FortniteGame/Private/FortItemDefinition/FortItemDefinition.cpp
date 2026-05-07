@@ -116,13 +116,13 @@ int32 UFortItemDefinition::GetClipSize() {
 	return 1;
 }
 
-EFortQuickBars UFortItemDefinition::GetQuickBarForItem() {
+uint8 UFortItemDefinition::GetQuickBarForItem() {
 	if (IsA(UFortEditToolItemDefinition::StaticClass())
 		|| IsA(UFortBuildingItemDefinition::StaticClass())
 		|| IsA(UFortAmmoItemDefinition::StaticClass())
 		|| IsA(UFortResourceItemDefinition::StaticClass())
 		|| IsA(UFortTrapItemDefinition::StaticClass()))
-		return EFortQuickBars::Secondary;
+		return EFortQuickBars::GetSecondary();
 
-	return EFortQuickBars::Primary;
+	return EFortQuickBars::GetPrimary();
 }

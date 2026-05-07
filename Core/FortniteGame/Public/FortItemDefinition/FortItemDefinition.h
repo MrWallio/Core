@@ -9,6 +9,8 @@ public:
 	DefineUnrealClass(UFortItemDefinition);
 
 	DefineUProperty(FScalableFloat, MaxStackSize);
+
+	DefineUProperty(uint8, ItemType);
 public:
 	UFortItem* CreateTemporaryItemInstanceBP(int32 Count, int32 Level) const;
 
@@ -18,7 +20,7 @@ public:
 
 	int32 GetClipSize();
 
-	EFortQuickBars GetQuickBarForItem();
+	uint8 GetQuickBarForItem();
 };
 
 class UFortAccountItemDefinition : public UFortItemDefinition {

@@ -117,6 +117,56 @@ void Utils::DumpClassProperties(const char* ClassName)
 	Log("Dumped properties for " + std::string(ClassName));
 }
 
+void Utils::DumpEnumProperties(const char* EnumName) {
+	std::ofstream logFile(std::string(EnumName) + "_Properties.txt", std::ios::trunc);
+	if (!logFile.is_open()) {
+		Log("Failed to open file!");
+		return;
+	}
+
+	UEnum* Enum = (UEnum*)FUObjectArray::FindObjectFast(EnumName);
+	if (!Enum) {
+		Log("Enum not found: " + std::string(EnumName));
+		return;
+	}
+
+	logFile << "==========Properties for " << EnumName << "==========\n";
+
+	auto Names = *(TArray<TPair<FName, int64>>*)(__int64(Enum) + 0x40);
+
+	for (int i = 0; i < Names.Num(); i++)
+	{
+		auto& Pair = Names[i];
+		auto& Name = Pair.Key();
+		auto& Value = Pair.Value();
+
+		if (Name.ComparisonIndex)
+		{
+			auto str = Name.ToString().ToString();
+			auto colcolIdx = str.find_last_of("::");
+
+			auto RealName = colcolIdx == -1 ? str : str.substr(colcolIdx + 1);
+
+			logFile << std::format("{:40} | Value: {}\n", RealName, Value);
+		}
+	}
+
+	logFile << "==========End Properties==========\n";
+	logFile.close();
+
+	Log("Dumped properties for " + std::string(EnumName));
+}
+
+uint8 Utils::GetEnumValueFromName(const char* EnumName, const char* EnumMemberName) {
+	UEnum* Enum = (UEnum*)FUObjectArray::FindObjectFast(EnumName);
+	if (!Enum) {
+		Log("Enum not found: " + std::string(EnumName));
+		return 0;
+	}
+
+	return Enum->GetValue(EnumMemberName);
+}
+
 void Utils::Hook() {
 	MH_STATUS status = MH_Initialize();
 	if (status != MH_OK) {

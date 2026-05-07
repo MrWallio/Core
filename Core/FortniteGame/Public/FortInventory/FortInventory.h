@@ -42,6 +42,7 @@ public:
 
 	FFortItemEntry* FindItemEntry(FGuid Guid);
 	FFortItemEntry* FindItemEntry(UFortItemDefinition* ItemDefinition);
+	FFortItemEntry* FindItemEntry(int32 ItemType);
 
 	UFortWorldItem* FindItemInstance(FGuid Guid);
 	UFortWorldItem* FindItemInstance(UFortItemDefinition* ItemDefinition);
@@ -91,6 +92,10 @@ public:
 		bool bAllowSwap = true,
 		bool bSpawnOverflowPickup = true
 	);
+
+	bool IsCurrentItem(FGuid& ItemGuid);
+
+	void EquipHarvestingTool();
 
 	// =================================================================
 	// Internal Helpers

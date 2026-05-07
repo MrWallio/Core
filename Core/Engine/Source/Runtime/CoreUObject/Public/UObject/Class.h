@@ -130,7 +130,7 @@ public:
 
 class UEnum : public UField {
 public:
-
+    int64 GetValue(const char* EnumMemberName) const;
 };
 
 namespace EIncludeSuperFlag
@@ -277,4 +277,18 @@ public:
             } \
         } \
         return Size; \
+    }
+
+#define DefineUnrealEnum(__Class) \
+    static UEnum* StaticEnum() \
+    { \
+        static UEnum* CachedStaticEnum = nullptr; \
+        static bool bInitialized = false; \
+        \
+        if (!bInitialized) \
+        { \
+            bInitialized = true; \
+            CachedStaticEnum = (UEnum*)FUObjectArray::FindObjectFast(#__Class);  \
+        } \
+        return CachedStaticEnum; \
     }

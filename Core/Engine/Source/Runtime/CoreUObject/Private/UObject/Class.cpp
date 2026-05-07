@@ -3,6 +3,7 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
+#include "Engine/Source/Runtime/Core/Public/Containers/Map.h"
 
 UClass* UField::GetOwnerClass() const
 {
@@ -67,6 +68,34 @@ uintptr_t UStruct::GetPropertyOffset(std::string InName) const
 bool UStruct::IsChildOf(const UStruct* SomeBase) const {
 	bool (*IsChildOfInternal)(const UStruct*, const UStruct*) = decltype(IsChildOfInternal)(ImageBase + Finder::FindUStruct_IsChildOf());
 	return IsChildOfInternal(this, SomeBase);
+}
+
+int64 UEnum::GetValue(const char* EnumMemberName) const
+{
+	if (!this)
+		return -1;
+
+	auto Names = *(TArray<TPair<FName, int64>>*)(__int64(this) + 0x40);
+
+	for (int i = 0; i < Names.Num(); i++)
+	{
+		auto& Pair = Names[i];
+		auto& Name = Pair.Key();
+		auto& Value = Pair.Value();
+
+		if (Name.ComparisonIndex)
+		{
+			auto str = Name.ToString().ToString();
+			auto colcolIdx = str.find_last_of("::");
+
+			auto RealName = colcolIdx == -1 ? str : str.substr(colcolIdx + 1);
+
+			if (RealName == EnumMemberName)
+				return Value;
+		}
+	}
+
+	return -1;
 }
 
 UFunction* UClass::FindFunctionByName(FName InName, EIncludeSuperFlag::Type IncludeSuper) const
