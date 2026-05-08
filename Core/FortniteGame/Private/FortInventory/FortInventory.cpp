@@ -24,6 +24,11 @@ void AFortInventory::HandleInventoryLocalUpdate()
 
 bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 {
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC) {
+		return false;
+	}
+
 	if (ItemEntry == nullptr) {
 		Inventory.MarkArrayDirty();
 	}
@@ -38,7 +43,8 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 	HandleInventoryLocalUpdate();
 
 	ForceNetUpdate();
-	return true;
+
+	return PC->QuickBars->Update();
 }
 
 void AFortInventory::InitializeExistingItem(UFortWorldItem* ExistingItem) {
@@ -234,8 +240,12 @@ UFortWorldItem* AFortInventory::AddItem(UFortWorldItem* Item)
 
 	InitializeExistingItem(Item);
 
-	if (Version::Fortnite_Version <= 1.8) {
+	if (PC->IsUsingOldQuickBars()) {
 		PC->QuickBars->AddItemToQuickBar(Item->ItemEntry.ItemGuid, Item->ItemEntry.ItemDefinition->GetQuickBarForItem());
+	}
+
+	if (!Update(&Item->ItemEntry)) {
+		return nullptr;
 	}
 
 	return Item;
@@ -368,7 +378,7 @@ bool AFortInventory::RemoveItem(FGuid Guid, int32 Count)
 		return Update(Entry);
 	}
 
-	if (Version::Fortnite_Version <= 1.8) {
+	if (PC->IsUsingOldQuickBars()) {
 		PC->QuickBars->EmptyQuickbarSlot(Guid);
 	}
 	RemoveEntryAndInstance(Guid);
@@ -595,7 +605,7 @@ void AFortInventory::EquipHarvestingTool() {
 	}
 
 	PC->ServerExecuteInventoryItem(PC, PickaxeEntry->ItemGuid);
-	if (Version::Fortnite_Version <= 1.8) {
+	if (PC->IsUsingOldQuickBars()) {
 		PC->QuickBars->EquipHarvestingTool();
 	}
 }

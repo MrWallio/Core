@@ -63,6 +63,12 @@ public:
 
 	static void ServerAttemptInventoryDrop(AFortPlayerController* This, FGuid& ItemGuid, int Count, bool bTrash);
 
+	void ClientForceUpdateQuickbar(uint8 QuickbarToRefresh);
+
+	void OnRep_QuickBar();
+
+	static bool IsUsingOldQuickBars();
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),

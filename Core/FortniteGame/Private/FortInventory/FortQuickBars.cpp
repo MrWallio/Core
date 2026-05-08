@@ -219,3 +219,45 @@ int32 AFortQuickBars::GetNextAvailableSlot(uint8 QuickBar, FGuid Guid) const
 {
 	return -1;
 }
+
+void AFortQuickBars::OnRep_PrimaryQuickBar()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_PrimaryQuickBar");
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortQuickBars::OnRep_SecondaryQuickBar()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_SecondaryQuickBar");
+
+	ProcessEvent(Func, nullptr);
+}
+
+bool AFortQuickBars::Update() {
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC)
+		return false;
+
+	if (PC->IsUsingOldQuickBars())
+	{
+		OnRep_PrimaryQuickBar();
+		OnRep_SecondaryQuickBar();
+		PC->OnRep_QuickBar();
+	}
+	else
+	{
+		PC->ClientForceUpdateQuickbar(EFortQuickBars::GetPrimary());
+		PC->ClientForceUpdateQuickbar(EFortQuickBars::GetSecondary());
+	}
+
+	ForceNetUpdate();
+
+	return true;
+}

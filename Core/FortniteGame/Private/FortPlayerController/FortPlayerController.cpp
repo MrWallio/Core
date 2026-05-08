@@ -42,7 +42,7 @@ void AFortPlayerController::SpawnQuickBars()
 		SpawnQuickBarsInternal(this);
 	}
 	else {
-		if (Version::Fortnite_Version <= 1.72) {
+		if (IsUsingOldQuickBars()) {
 			if (!QuickBars)
 			{
 				UWorld* World = GetWorld();
@@ -56,7 +56,7 @@ void AFortPlayerController::SpawnQuickBars()
 			}
 		}
 		else {
-			if (!QuickBars)
+			if (!ClientQuickBars)
 			{
 				UWorld* World = GetWorld();
 				if (!World) {
@@ -428,4 +428,40 @@ void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* Th
 			This->WorldInventory->RemoveItem(ItemEntry->ItemDefinition, Count);
 		}
 	}
+}
+
+void AFortPlayerController::ClientForceUpdateQuickbar(uint8 QuickbarToRefresh)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientForceUpdateQuickbar");
+
+	struct FortPlayerController_ClientForceUpdateQuickbar
+	{
+	public:
+		uint8 QuickbarToRefresh;
+	};
+
+	FortPlayerController_ClientForceUpdateQuickbar Parms{};
+
+	Parms.QuickbarToRefresh = QuickbarToRefresh;
+
+	ProcessEvent(Func, &Parms);
+}
+
+void AFortPlayerController::OnRep_QuickBar()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_QuickBar");
+
+	ProcessEvent(Func, nullptr);
+}
+
+bool AFortPlayerController::IsUsingOldQuickBars() {
+	static uintptr_t ClientQuickBarsOffset = StaticClass()->GetPropertyOffset("ClientQuickBars");
+
+	return ClientQuickBarsOffset == 0;
 }
