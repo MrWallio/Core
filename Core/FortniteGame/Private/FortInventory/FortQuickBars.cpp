@@ -212,10 +212,10 @@ void AFortQuickBars::AddItemToQuickBar(FGuid Guid, uint8 QuickBar)
 	if (!Guid.IsValid())
 		return;
 
-	ServerAddItemInternal(Guid, QuickBar, GetNextAvailableSlot(QuickBar));
+	ServerAddItemInternal(Guid, QuickBar, GetNextAvailableSlot(QuickBar, Guid));
 }
 
-int32 AFortQuickBars::GetNextAvailableSlot(uint8 QuickBar) const
+int32 AFortQuickBars::GetNextAvailableSlot(uint8 QuickBar, FGuid Guid) const
 {
 	return -1;
 }

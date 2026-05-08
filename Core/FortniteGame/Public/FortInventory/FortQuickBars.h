@@ -72,5 +72,5 @@ public:
 
 	void AddItemToQuickBar(FGuid Guid, uint8 QuickBar);
 
-	int32 GetNextAvailableSlot(uint8 QuickBar) const;
+	int32 GetNextAvailableSlot(uint8 QuickBar, FGuid Guid) const;
 };
