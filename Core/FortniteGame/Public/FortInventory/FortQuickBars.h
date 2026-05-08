@@ -3,6 +3,7 @@
 
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
 #include "Engine/Source/Runtime/Core/Public/Containers/Set.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
 
 #include "FortniteGame/Public/FortEnums.h"
 
@@ -10,6 +11,7 @@ class UFortItemDefinition;
 class UFortItem;
 class UFortWorldItem;
 class AFortPlayerController;
+class UFortWorldItemDefinition;
 
 struct FQuickBarSlot {
 public:
@@ -24,7 +26,10 @@ struct FQuickBarSlotData
 public:
 	DefineUnrealStruct(FQuickBarSlotData);
 
-	DefineStructProperty(bool, bStaticSlot);
+	TArray<EFortItemType> AcceptedItemTypes;
+	bool bStaticSlot;
+	uint8 Pad_11[0x7];
+	TSoftObjectPtr<UFortWorldItemDefinition> DefaultItem;
 };
 
 struct FQuickBarData {
@@ -78,6 +83,4 @@ public:
 	void OnRep_PrimaryQuickBar();
 
 	void OnRep_SecondaryQuickBar();
-
-	bool Update();
 };

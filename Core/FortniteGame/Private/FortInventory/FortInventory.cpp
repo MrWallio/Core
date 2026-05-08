@@ -44,7 +44,7 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 
 	ForceNetUpdate();
 
-	return PC->QuickBars->Update();
+	return true;
 }
 
 void AFortInventory::InitializeExistingItem(UFortWorldItem* ExistingItem) {

@@ -34,10 +34,10 @@ class TSoftObjectPtr : public FSoftObjectPtr
 public:
 	UEType* Get() const
 	{
-		return static_cast<UEType*>(static_cast<void*>(TPersistentObjectPtr::Get()));
+		return static_cast<UEType*>(TPersistentObjectPtr::Get());
 	}
 	UEType* operator->() const
 	{
-		return static_cast<UEType*>(static_cast<void*>(TPersistentObjectPtr::Get()));
+		return static_cast<UEType*>(TPersistentObjectPtr::Get());
 	}
 };
