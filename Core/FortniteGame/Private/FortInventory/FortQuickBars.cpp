@@ -207,10 +207,15 @@ void AFortQuickBars::EquipHarvestingTool() {
 	ServerActivateSlotInternal(EFortQuickBars::GetPrimary(), 0, 0.f, true);
 }
 
-void AFortQuickBars::AddItemToQuickBar(FGuid Guid)
+void AFortQuickBars::AddItemToQuickBar(FGuid Guid, uint8 QuickBar)
 {
 	if (!Guid.IsValid())
 		return;
 
-	ServerAddItemInternal(Guid, EFortQuickBars::GetMax_None(), -1);
+	ServerAddItemInternal(Guid, QuickBar, GetNextAvailableSlot(QuickBar));
+}
+
+int32 AFortQuickBars::GetNextAvailableSlot(uint8 QuickBar) const
+{
+	return -1;
 }

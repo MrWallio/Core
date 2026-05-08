@@ -235,7 +235,7 @@ UFortWorldItem* AFortInventory::AddItem(UFortWorldItem* Item)
 	InitializeExistingItem(Item);
 
 	if (Version::Fortnite_Version <= 1.8) {
-		PC->QuickBars->AddItemToQuickBar(Item->ItemEntry.ItemGuid);
+		PC->QuickBars->AddItemToQuickBar(Item->ItemEntry.ItemGuid, Item->ItemEntry.ItemDefinition->GetQuickBarForItem());
 	}
 
 	return Item;

@@ -70,5 +70,7 @@ public:
 
 	void EquipHarvestingTool();
 
-	void AddItemToQuickBar(FGuid Guid);
+	void AddItemToQuickBar(FGuid Guid, uint8 QuickBar);
+
+	int32 GetNextAvailableSlot(uint8 QuickBar) const;
 };
