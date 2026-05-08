@@ -425,7 +425,7 @@ void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* Th
 					false
 				);
 			}
-			This->WorldInventory->RemoveItem(ItemEntry->ItemDefinition, Count);
+			This->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
 		}
 	}
 }
