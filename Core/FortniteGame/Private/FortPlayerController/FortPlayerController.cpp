@@ -13,6 +13,11 @@
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/Info/FortRegisteredPlayerInfo.h"
+#include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
+#include "FortniteGame/Public/FortHero/FortHeroType.h"
+#include "FortniteGame/Public/FortHero/FortHero.h"
+#include "FortniteGame/Public/FortCharacter/CustomCharacterPart.h"
+#include "FortniteGame/Public/FortHero/FortHeroSpecialization.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -446,4 +451,35 @@ bool AFortPlayerController::IsUsingOldQuickBars() {
 	static uintptr_t ClientQuickBarsOffset = StaticClass()->GetPropertyOffset("ClientQuickBars");
 
 	return ClientQuickBarsOffset == 0;
+}
+
+void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, bool bIsPawnLoaded)
+{
+	ServerClientPawnLoadedOG(This, bIsPawnLoaded);
+	AFortPlayerState* PlayerState = This->PlayerState ? This->PlayerState->Cast<AFortPlayerState>() : nullptr;
+	if (!PlayerState) {
+		Log("ServerAcknowledgePossession: PlayerState is null or not AFortPlayerStateZone");
+		return;
+	}
+
+	AFortPlayerPawn* MyFortPawn = This->MyFortPawn;
+
+	AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>();
+
+	if (bIsPawnLoaded) {
+		if (Version::Fortnite_Version <= 1.72) {
+			if (FortPCAthena && MyFortPawn) {
+				if (FortPCAthena->StrongMyHero && FortPCAthena->StrongMyHero->CharacterParts.Num() > 0) {
+					for (UCustomCharacterPart* CharacterPart : FortPCAthena->StrongMyHero->CharacterParts) {
+						MyFortPawn->ServerChoosePart(CharacterPart, CharacterPart->CharacterPartType);
+					}
+				}
+			}
+
+			PlayerState->OnRep_CharacterParts();
+		}
+		else {
+			// ApplyCharacterCustomization
+		}
+	}
 }

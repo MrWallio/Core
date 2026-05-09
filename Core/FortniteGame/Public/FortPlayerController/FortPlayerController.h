@@ -69,6 +69,9 @@ public:
 
 	static bool IsUsingOldQuickBars();
 
+	static inline void (*ServerClientPawnLoadedOG)(AFortPlayerController* This, bool bIsPawnLoaded);
+	static void ServerClientPawnLoaded(AFortPlayerController* This, bool bIsPawnLoaded);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -109,6 +112,13 @@ public:
 				nullptr
 			);
 		}
+
+		HookEveryVTable(
+			AFortPlayerController::StaticClass(),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerClientPawnLoaded"),
+			ServerClientPawnLoaded,
+			(LPVOID*)&ServerClientPawnLoadedOG
+		);
 
 		Log("Hooked AFortPlayerController");
 	}

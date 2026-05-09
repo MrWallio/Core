@@ -23,9 +23,6 @@ void FFortItemEntry::SetStateValue(EFortItemEntryState StateType, int32 InValue)
 }
 
 void FFortItemEntry::SetToDirty() {
-	if (ParentInventory.Get()) {
-		ParentInventory.Get()->Update(this);
-	}
 	bIsDirty = true;
 }
 
