@@ -20,5 +20,11 @@ public:
 	void OnRep_AdditionalPlaylistLevelsStreamed();
 	void OnFinishedStreamingAdditionalPlaylistLevel();
 
+	static inline void (*OnRep_CurrentWUIDOG)(AFortGameState* This);
+	static void OnRep_CurrentWUID(AFortGameState* This);
+
+	static inline void (*OnRep_WorldManagerOG)(AFortGameState* This);
+	static void OnRep_WorldManager(AFortGameState* This);
+
 	static void Hook();
 };

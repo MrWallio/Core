@@ -17,11 +17,7 @@ public:
 
 	DefineUProperty(uint8, TeamIndex);
 public:
-	static void OnRep_Downs(AFortPlayerStateAthena* This);
-	
 	static void Hook() {
-		ExecHook("Function /Script/FortniteGame.FortPlayerStateAthena.OnRep_Downs", OnRep_Downs);
-
 		Log("AFortPlayerStateAthena Hooked!");
 	}
 };
