@@ -204,6 +204,7 @@ void Utils::Hook() {
 	AFortPickup::Hook();
 	AFortPlayerStateAthena::Hook();
 	AFortPlayerPawn::Hook();
+	ABuildingSMActor::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

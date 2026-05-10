@@ -150,6 +150,7 @@
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\Abilities\GameplayAbilityTypes.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\AbilitySystemComponent.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\AbilitySystemInterface.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\AttributeSet.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayAbilitySpec.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayAbilitySpecHandle.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayEffectTypes.h" />
@@ -256,6 +257,8 @@
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingAutoNav.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingContainer.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingSMActor.h" />
+    <ClInclude Include="FortniteGame\Public\FortSet\FortAttributeSet.h" />
+    <ClInclude Include="FortniteGame\Public\FortSet\FortBuildingActorSet.h" />
     <ClInclude Include="FortniteGame\Public\Cheat\FortCheatManager.h" />
     <ClInclude Include="FortniteGame\Public\Data\FortSearchBounceData.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortAbilitySet.h" />
@@ -308,6 +311,7 @@
     <ClInclude Include="FortniteGame\Public\FortPlaylist\PlaylistPropertyArray.h" />
     <ClInclude Include="FortniteGame\Public\FortInventory\FortQuickBars.h" />
     <ClInclude Include="FortniteGame\Public\FortInventory\FortQuickBarsAthena.h" />
+    <ClInclude Include="FortniteGame\Public\FortSet\FortHealthSet.h" />
     <ClInclude Include="FortniteGame\Public\FortWeapon\FortWeapon.h" />
     <ClInclude Include="FortniteGame\Public\FortWeapon\FortWeaponStats.h" />
     <ClInclude Include="FortniteGame\Public\FortWorker\FortWorker.h" />

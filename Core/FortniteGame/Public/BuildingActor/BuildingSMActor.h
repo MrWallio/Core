@@ -37,4 +37,18 @@ public:
 		AFortPlayerController* EditingController);
 
 	void RepairBuilding(AFortPlayerController* RepairingController, int32 ResourcesSpent);
+
+	static inline void (*BlueprintOnStructurallyStableOG)(ABuildingSMActor* This);
+	static void BlueprintOnStructurallyStable(ABuildingSMActor* This);
+
+	static void Hook() {
+		HookEveryVTable(
+			ABuildingSMActor::StaticClass(),
+			ABuildingSMActor::StaticClass()->GetFunction("Function /Script/FortniteGame.BuildingSMActor.BlueprintOnStructurallyStable"),
+			BlueprintOnStructurallyStable,
+			(LPVOID*)&BlueprintOnStructurallyStableOG
+		);
+
+		Log("ABuildingSMActor Hooked!");
+	}
 };

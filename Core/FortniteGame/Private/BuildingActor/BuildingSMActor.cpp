@@ -16,3 +16,9 @@ void ABuildingSMActor::RepairBuilding(AFortPlayerController* RepairingController
 		return RepairBuildingInternal(this, RepairingController, ResourcesSpent);
 	}
 }
+
+void ABuildingSMActor::BlueprintOnStructurallyStable(ABuildingSMActor* This) {
+	BlueprintOnStructurallyStableOG(This);
+	
+	Log("BlueprintOnStructurallyStable Called. Actor: " + std::string(This ? This->GetName().ToString() : "None"));
+}
