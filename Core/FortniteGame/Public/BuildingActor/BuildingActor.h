@@ -16,6 +16,7 @@ class ABuildingSMActor;
 class AFortPlayerController;
 class AFortPlayerStateZone;
 class UFortWorldItemDefinition;
+class UFortBuildingActorSet;
 
 class ABuildingActor : public AActor {
 public:
@@ -29,11 +30,15 @@ public:
 	DefineUProperty(uint8, TeamIndex);
 
 	DefineUProperty(bool, bAllowInteract);
+
+	DefineUProperty(UFortBuildingActorSet*, BuildingAttributeSet);
 public:
 	void InitializeKismetSpawnedBuildingActor(ABuildingActor* BuildingOwner, AFortPlayerController* SpawningController, bool bUsePlayerBuildAnimations, ABuildingActor* ReplacedBuilding);
 
 	float GetHealthPercent() const;
-public:
+
+	float GetMaxHealth() const;
+
 	static inline void (*OnDamageServerOG)(ABuildingActor* This, float Damage, const FGameplayTagContainer& DamageTags, const FVector& Momentum, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser, const FGameplayEffectContextHandle& EffectContext);
 	static void OnDamageServer(ABuildingActor* This, float Damage, const FGameplayTagContainer& DamageTags, const FVector& Momentum, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser, const FGameplayEffectContextHandle& EffectContext);
 

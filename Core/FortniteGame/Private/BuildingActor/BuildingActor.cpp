@@ -8,6 +8,7 @@
 #include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
+#include "FortniteGame/Public/FortSet/FortBuildingActorSet.h"
 
 void ABuildingActor::InitializeKismetSpawnedBuildingActor(ABuildingActor* BuildingOwner, AFortPlayerController* SpawningController, bool bUsePlayerBuildAnimations, ABuildingActor* ReplacedBuilding)
 {
@@ -28,6 +29,17 @@ float ABuildingActor::GetHealthPercent() const
 
 		float (*&GetHealthPercentInternal)(const ABuildingActor*) = decltype(GetHealthPercentInternal)(VTable[VTableIdx]);
 		return GetHealthPercentInternal(this);
+	}
+}
+
+float ABuildingActor::GetMaxHealth() const
+{
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName("GetMaxHealth"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
+
+		float (*&GetMaxHealthInternal)(const ABuildingActor*) = decltype(GetMaxHealthInternal)(VTable[VTableIdx]);
+		return GetMaxHealthInternal(this);
 	}
 }
 
@@ -95,7 +107,20 @@ void ABuildingActor::OnRep_CurrentBuildingLevel(ABuildingActor* This) {
 }
 
 void ABuildingActor::PlacedByPlacementTool(ABuildingActor* This) {
-	PlacedByPlacementToolOG(This);
+	if (!This)
+		return;
+	
+	if (Version::Fortnite_Version >= 1.8) {
+		Log("PlacedByPlacementTool Called. Actor: " + std::string(This ? This->GetName().ToString() : "None"));
 
-	Log("PlacedByPlacementTool Called!");
+		if (This->BuildingAttributeSet) {
+			This->BuildingAttributeSet->Health.CurrentValue;
+		}
+		else {
+			This->GetMaxHealth();
+		}
+	}
+	else {
+		PlacedByPlacementToolOG(This);
+	}
 }
