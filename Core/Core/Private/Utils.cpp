@@ -21,6 +21,8 @@
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
+#include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
+#include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -200,6 +202,8 @@ void Utils::Hook() {
 	UFortKismetLibrary::Hook();
 	ABuildingContainer::Hook();
 	AFortPickup::Hook();
+	AFortPlayerStateAthena::Hook();
+	AFortPlayerPawn::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

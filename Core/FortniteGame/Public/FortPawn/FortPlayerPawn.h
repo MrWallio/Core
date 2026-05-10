@@ -20,4 +20,20 @@ public:
 	void ForceFinishIncomingPickups();
 
 	void ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart, EFortCustomPartType Part);
+
+	void RandomizeCharacter(const FString& GenderString);
+
+	static inline void (*ServerReviveFromDBNOOG)(AFortPlayerPawn* This, AController* EventInstigator);
+	static void ServerReviveFromDBNO(AFortPlayerPawn* This, AController* EventInstigator);
+
+	static void Hook() {
+		HookEveryVTable(
+			AFortPlayerPawn::StaticClass(),
+			AFortPlayerPawn::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerPawn.ServerReviveFromDBNO"),
+			ServerReviveFromDBNO,
+			(LPVOID*)&ServerReviveFromDBNOOG
+		);
+		
+		Log("AFortPlayerPawn Hooked!");
+	}
 };

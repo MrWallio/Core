@@ -37,3 +37,30 @@ void AFortPlayerPawn::ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart
 		return ServerChoosePartInternal(this, Part, ChosenCharacterPart);
 	}
 }
+
+void AFortPlayerPawn::RandomizeCharacter(const FString& GenderString)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("RandomizeCharacter");
+
+	struct FortPlayerPawn_RandomizeCharacter
+	{
+	public:
+		FString GenderString;
+	};
+
+	FortPlayerPawn_RandomizeCharacter Parms{};
+
+	Parms.GenderString = std::move(GenderString);
+
+	ProcessEvent(Func, &Parms);
+}
+
+void AFortPlayerPawn::ServerReviveFromDBNO(AFortPlayerPawn* This, AController* EventInstigator)
+{
+	ServerReviveFromDBNOOG(This, EventInstigator);
+
+	Log("ServerReviveFromDBNO Called!");
+}

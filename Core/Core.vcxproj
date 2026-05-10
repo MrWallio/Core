@@ -398,6 +398,7 @@
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerAthena.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerController\FortPlayerControllerZone.cpp" />
     <ClCompile Include="FortniteGame\Private\FortPlayerState\FortPlayerState.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortPlayerState\FortPlayerStateAthena.cpp" />
     <ClCompile Include="FortniteGame\Private\FortWeapon\FortWeapon.cpp" />
     <ClCompile Include="FortniteGame\Private\Kismet\FortKismetLibrary.cpp" />
     <ClCompile Include="FortniteGame\Private\Mcp\McpProfileGroup.cpp" />
