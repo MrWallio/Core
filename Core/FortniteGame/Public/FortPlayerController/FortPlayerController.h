@@ -72,6 +72,9 @@ public:
 	static inline void (*ServerClientPawnLoadedOG)(AFortPlayerController* This, bool bIsPawnLoaded);
 	static void ServerClientPawnLoaded(AFortPlayerController* This, bool bIsPawnLoaded);
 
+	static inline void (*ServerSpotActorOG)(AFortPlayerController* This, AActor* NewlySpottedActor);
+	static void ServerSpotActor(AFortPlayerController* This, AActor* NewlySpottedActor);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -118,6 +121,13 @@ public:
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerClientPawnLoaded"),
 			ServerClientPawnLoaded,
 			(LPVOID*)&ServerClientPawnLoadedOG
+		);
+
+		HookEveryVTable(
+			AFortPlayerController::StaticClass(),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerSpotActor"),
+			ServerSpotActor,
+			(LPVOID*)&ServerSpotActorOG
 		);
 
 		Log("Hooked AFortPlayerController");

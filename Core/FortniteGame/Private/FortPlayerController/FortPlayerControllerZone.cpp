@@ -38,10 +38,25 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 	}
 }
 
+void AFortPlayerControllerZone::ServerSendLoadoutConfig(AFortPlayerControllerZone* This, int32 LoadoutSeed, TArray<uint8>& Loadout) {
+	Log("ServerSendLoadoutConfig Called!");
+	Log("LoadoutSeed: " + std::to_string(LoadoutSeed));
+	Log("Loadout count: " + std::to_string(Loadout.Num()));
+
+	ServerSendLoadoutConfigOG(This, LoadoutSeed, Loadout);
+}
+
 void AFortPlayerControllerZone::Hook() {
 	HookEveryVTable(AFortPlayerControllerZone::StaticClass(), AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
 	
 	MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerControllerZone_OnReadyToStartMatch()), OnReadyToStartMatch, (LPVOID*)&OnReadyToStartMatchOG);
+
+	HookEveryVTable(
+		AFortPlayerControllerZone::StaticClass(),
+		AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerControllerZone.ServerSendLoadoutConfig"),
+		ServerSendLoadoutConfig,
+		(LPVOID*)&ServerSendLoadoutConfigOG
+	);
 
 	Log("Hooked AFortPlayerControllerZone");
 }
