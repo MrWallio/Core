@@ -87,3 +87,15 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 
 	return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 }
+
+void ABuildingActor::OnRep_CurrentBuildingLevel(ABuildingActor* This) {
+	OnRep_CurrentBuildingLevelOG(This);
+
+	Log("OnRep_CurrentBuildingLevel Called!");
+}
+
+void ABuildingActor::PlacedByPlacementTool(ABuildingActor* This) {
+	PlacedByPlacementToolOG(This);
+
+	Log("PlacedByPlacementTool Called!");
+}
