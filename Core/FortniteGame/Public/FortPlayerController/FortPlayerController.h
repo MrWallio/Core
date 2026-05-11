@@ -75,6 +75,8 @@ public:
 	static inline void (*ServerSpotActorOG)(AFortPlayerController* This, AActor* NewlySpottedActor);
 	static void ServerSpotActor(AFortPlayerController* This, AActor* NewlySpottedActor);
 
+	static bool RemoveInventoryItem(AFortPlayerController* This, FGuid* ItemGuid, int32 Count, bool bForceRemoval);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -128,6 +130,13 @@ public:
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerSpotActor"),
 			ServerSpotActor,
 			(LPVOID*)&ServerSpotActorOG
+		);
+
+		HookEveryVTableIdx(
+			AFortPlayerController::StaticClass(),
+			Finder::FindAFortPlayerController_RemoveInventoryItemVFT(),
+			RemoveInventoryItem,
+			nullptr
 		);
 
 		Log("Hooked AFortPlayerController");

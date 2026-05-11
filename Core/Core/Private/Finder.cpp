@@ -7416,6 +7416,100 @@ uintptr_t Finder::FindUFortWorldItem_SetPhantomReserveAmmoVFT() {
 	return ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT;
 }
 
+uintptr_t Finder::FindAFortPlayerController_RemoveInventoryItem() {
+	if (ServerOffsets::AFortPlayerController_RemoveInventoryItem)
+		return ServerOffsets::AFortPlayerController_RemoveInventoryItem;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		std::vector<uint8_t> funcStart = Version::Engine_Version == 4.16
+			? std::vector<uint8_t> { 0x44, 0x88, 0x4C }
+		: (Version::Fortnite_Version >= 16 && (Version::Fortnite_Version < 20 || Version::Fortnite_Version >= 22) ? std::vector<uint8_t> { 0x48, 0x8B, 0xC4 }
+		: std::vector<uint8_t>{ 0x48, 0x89, 0x5C });
+
+		auto sRef = FindNameRef(L"ServerRemoveInventoryItem", 0, false);
+		uintptr_t uFuncCall = 0;
+		for (int i = 0; i < 2000; i++)
+		{
+			if (Version::Engine_Version == 4.16)
+			{
+				if (*(uint8_t*)(sRef - i) == 0x44 && *(uint8_t*)(sRef - i + 1) == 0x88 && *(uint8_t*)(sRef - i + 2) == 0x4C)
+				{
+					uFuncCall = sRef - i;
+					break;
+				}
+			}
+			else
+			{
+				if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x89 && *(uint8_t*)(sRef - i + 2) == 0x5C)
+				{
+					uFuncCall = sRef - i;
+					break;
+				}
+				else if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x8B && *(uint8_t*)(sRef - i + 2) == 0xC4)
+				{
+					uFuncCall = sRef - i;
+					break;
+				}
+			}
+		}
+
+		auto ServerRemoveInventoryItemCall = Memcury::Scanner::FindPointerRef((PVOID)uFuncCall, 0, true);
+
+		for (int i = 0; i < 400; i++)
+		{
+			if (
+				*(uint8_t*)(ServerRemoveInventoryItemCall.Get() - i) == 0x48
+				&& *(uint8_t*)(ServerRemoveInventoryItemCall.Get() - i + 1) == 0x89
+				&& *(uint8_t*)(ServerRemoveInventoryItemCall.Get() - i + 2) == 0x5C
+				) {
+				Addr = ServerRemoveInventoryItemCall.Get() - i;
+				break;
+			}
+				
+
+			else if (
+				*(uint8_t*)(ServerRemoveInventoryItemCall.Get() - i) == 0x48
+				&& *(uint8_t*)(ServerRemoveInventoryItemCall.Get() - i + 1) == 0x83
+				&& *(uint8_t*)(ServerRemoveInventoryItemCall.Get() - i + 2) == 0xEC
+				) {
+				Addr = ServerRemoveInventoryItemCall.Get() - i;
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::AFortPlayerController_RemoveInventoryItem = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerController_RemoveInventoryItem found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_RemoveInventoryItem));
+	return ServerOffsets::AFortPlayerController_RemoveInventoryItem;
+}
+
+uintptr_t Finder::FindAFortPlayerController_RemoveInventoryItemVFT() {
+	if (ServerOffsets::AFortPlayerController_RemoveInventoryItemVFT)
+		return ServerOffsets::AFortPlayerController_RemoveInventoryItemVFT;
+	
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortPlayerControllerAthena"))->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortPlayerController_RemoveInventoryItem() + ImageBase))
+		{
+			ServerOffsets::AFortPlayerController_RemoveInventoryItemVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortPlayerController_RemoveInventoryItemVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_RemoveInventoryItemVFT));
+	return ServerOffsets::AFortPlayerController_RemoveInventoryItemVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

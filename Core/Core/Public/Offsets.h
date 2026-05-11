@@ -562,6 +562,8 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPlayerController_OnReadyToStartMatchVFT = 0;
 	inline uintptr_t AFortPlayerController_SpawnQuickBarsVFT = 0;
 	inline uintptr_t AFortPlayerController_SetupQuickBarsVFT = 0;
+	inline uintptr_t AFortPlayerController_RemoveInventoryItem = 0;
+	inline uintptr_t AFortPlayerController_RemoveInventoryItemVFT = 0;
 
 	inline uintptr_t AFortPlayerControllerZone_OnReadyToStartMatch = 0;
 
