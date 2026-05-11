@@ -44,6 +44,7 @@ AActor* UWorld::SpawnActor(UClass* Class, FTransform Transform, AActor* Owner) {
 		return UGameplayStatics::FinishSpawningActor(Actor, Transform);
 	}
 	else {
+		Log("Failed to spawn actor of class " + Class->GetName().ToString());
 		return nullptr;
 	}
 }

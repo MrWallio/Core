@@ -6,6 +6,8 @@
 class UFortWorldItemDefinition : public UFortItemDefinition {
 public:
 	DefineUnrealClass(UFortWorldItemDefinition);
+
+	DefineBitfieldUProperty(bShouldShowItemToast);
 public:
 	bool ServerExecute(UFortItem* Item, AFortPlayerController* Instigator);
 

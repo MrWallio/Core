@@ -60,7 +60,7 @@ uintptr_t UStruct::GetPropertyOffset(std::string InName) const
 	FName PropertyName = UKismetStringLibrary::Conv_StringToName(PropertyNameString);
 	UProperty* Prop = FindPropertyByName(PropertyName);
 	if (!Prop) {
-		return 0;
+		return -1;
 	}
 	return Prop->Offset_Internal;
 }

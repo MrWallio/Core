@@ -52,6 +52,7 @@ DWORD Main(LPVOID)
         Utils::DumpClassProperties("GameplayAbilitySpec"); // DEBUG
         Utils::DumpClassProperties("ItemAndCount"); // DEBUG
 		Utils::DumpEnumProperties("EFortQuickBars"); // DEBUG
+		Utils::DumpClassProperties("FortItemEntryStateValue"); // DEBUG
 
         Utils::Hook();
 

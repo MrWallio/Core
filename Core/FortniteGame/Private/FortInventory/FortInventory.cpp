@@ -43,7 +43,7 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 
 	HandleInventoryLocalUpdate();
 
-	ForceNetUpdate();
+	//ForceNetUpdate();
 
 	return true;
 }
@@ -231,7 +231,7 @@ AFortPlayerController* AFortInventory::GetOwnerPlayerController() const
 	return Owner ? Owner->Cast<AFortPlayerController>() : nullptr;
 }
 
-UFortWorldItem* AFortInventory::AddItem(UFortWorldItem* Item)
+FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
 {
 	if (!Item)
 		return nullptr;
@@ -241,6 +241,15 @@ UFortWorldItem* AFortInventory::AddItem(UFortWorldItem* Item)
 		return nullptr;
 
 	Item->SetOwningControllerForTemporaryItem(PC);
+
+	if (UFortWorldItemDefinition* ItemDef = Item->ItemEntry.ItemDefinition->Cast<UFortWorldItemDefinition>())
+	{
+		if (ItemDef->bShouldShowItemToast)
+		{
+			Item->ItemEntry.SetStateValue(EFortItemEntryState::GetShouldShowItemToast(), 1);
+		}
+	}
+
 	InitializeExistingItem(Item);
 
 	if (PC->IsUsingOldQuickBars())
@@ -248,10 +257,12 @@ UFortWorldItem* AFortInventory::AddItem(UFortWorldItem* Item)
 		PC->QuickBars->AddItemToQuickBar(Item->ItemEntry.ItemGuid, Item->ItemEntry.ItemDefinition->GetQuickBarForItem());
 	}
 
-	return Item;
+	FFortItemEntry* RepEntry = FindItemEntry(Item->ItemEntry.ItemGuid);
+
+	return RepEntry;
 }
 
-UFortWorldItem* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, int32 Level)
+FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, int32 Level)
 {
 	if (!CanAddItem(Def, Count))
 		return nullptr;
@@ -266,7 +277,7 @@ UFortWorldItem* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, i
 	return AddItem(Item);
 }
 
-UFortWorldItem* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
+FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
 {
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC)
@@ -279,20 +290,13 @@ UFortWorldItem* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
 		return nullptr;
 	}
 
-	UFortWorldItem* Item = AddItem(Def, ItemEntry.Count, ItemEntry.Level);
-	if (!Item)
-		return nullptr;
-
-	FFortItemEntry* RepEntry = FindItemEntry(Item->ItemEntry.ItemGuid);
+	FFortItemEntry* RepEntry = AddItem(Def, ItemEntry.Count, ItemEntry.Level);
 	if (!RepEntry)
-	{
-		Log("AFortInventory::AddItem: Could not find RepEntry for GUID " + Item->ItemEntry.ItemGuid.FormatGuid());
 		return nullptr;
-	}
 
 	RepEntry->CopyGenericValuesFrom(&ItemEntry);
 
-	return Item;
+	return RepEntry;
 }
 
 int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)

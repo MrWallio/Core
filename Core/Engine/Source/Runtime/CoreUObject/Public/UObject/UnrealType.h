@@ -156,33 +156,33 @@ public:
 
 #define DefineUProperty(Type, Name) \
 private: \
-    static inline int32 Name##_Offset = -1; \
+    static inline int32 Name##_Offset = -2; \
 public: \
     Type& _Get##Name() { \
-        if (Name##_Offset == -1) { \
+        if (Name##_Offset == -2) { \
             Name##_Offset = StaticClass()->GetPropertyOffset(#Name); \
         } \
-        if (Name##_Offset <= 0) { \
-            static Type dummy; \
+        if (Name##_Offset == -1) { \
+            static Type dummy{}; \
             return dummy; \
         } \
         return *reinterpret_cast<Type*>((uintptr_t)this + Name##_Offset); \
     } \
     Type _Get##Name() const { \
-        if (Name##_Offset == -1) { \
+        if (Name##_Offset == -2) { \
             Name##_Offset = StaticClass()->GetPropertyOffset(#Name); \
         } \
-        if (Name##_Offset <= 0) { \
-            static Type dummy; \
+        if (Name##_Offset == -1) { \
+            static Type dummy{}; \
             return dummy; \
         } \
         return *reinterpret_cast<Type*>((uintptr_t)this + Name##_Offset); \
     } \
     void _Set##Name(Type Value) { \
-        if (Name##_Offset == -1) { \
+        if (Name##_Offset == -2) { \
             Name##_Offset = StaticClass()->GetPropertyOffset(#Name); \
         } \
-        if (Name##_Offset <= 0) { \
+        if (Name##_Offset == -1) { \
             return; \
         } \
         *reinterpret_cast<Type*>((uintptr_t)this + Name##_Offset) = Value; \
@@ -191,51 +191,42 @@ public: \
 
 #define DefineStructProperty(Type, Name) \
 private: \
-    static inline int32 Name##_Offset = -1; \
+    static inline int32 Name##_Offset = -2; \
 public: \
     Type& _Get##Name() { \
-        if (Name##_Offset == -1) { \
+        if (Name##_Offset == -2) { \
             UStruct* Struct = StaticStruct(); \
             if (Struct) { \
                 Name##_Offset = Struct->GetPropertyOffset(#Name); \
             } \
-            if (Name##_Offset == -1) { \
-                Name##_Offset = 0; \
-            } \
         } \
-        if (Name##_Offset <= 0) { \
-            static Type dummy; \
+        if (Name##_Offset == -1) { \
+            static Type dummy{}; \
             return dummy; \
         } \
         return *reinterpret_cast<Type*>((uintptr_t)this + Name##_Offset); \
     } \
     Type& _Get##Name() const { \
-        if (Name##_Offset == -1) { \
+        if (Name##_Offset == -2) { \
             UStruct* Struct = StaticStruct(); \
             if (Struct) { \
                 Name##_Offset = Struct->GetPropertyOffset(#Name); \
             } \
-            if (Name##_Offset == -1) { \
-                Name##_Offset = 0; \
-            } \
         } \
-        if (Name##_Offset <= 0) { \
-            static Type dummy; \
+        if (Name##_Offset == -1) { \
+            static Type dummy{}; \
             return dummy; \
         } \
         return *reinterpret_cast<Type*>((uintptr_t)this + Name##_Offset); \
     } \
     void _Set##Name(Type Value) { \
-        if (Name##_Offset == -1) { \
+        if (Name##_Offset == -2) { \
             UStruct* Struct = StaticStruct(); \
             if (Struct) { \
                 Name##_Offset = Struct->GetPropertyOffset(#Name); \
             } \
-            if (Name##_Offset == -1) { \
-                return; \
-            } \
         } \
-        if (Name##_Offset <= 0) { \
+        if (Name##_Offset == -1) { \
             return; \
         } \
         *reinterpret_cast<Type*>((uintptr_t)this + Name##_Offset) = Value; \

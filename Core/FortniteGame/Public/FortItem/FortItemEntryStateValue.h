@@ -3,8 +3,6 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
 
-enum class EFortItemEntryState : uint8;
-
 struct FFortItemEntryStateValue {
 public:
 	DefineUnrealStruct(FFortItemEntryStateValue);
@@ -13,7 +11,9 @@ public:
 
 	DefineStructProperty(FName, NameValue);
 
-	DefineStructProperty(EFortItemEntryState, StateType);
+	DefineStructProperty(uint8, StateType);
+public:
+	uint8 Padding[0x18];
 public:
 	bool operator==(FFortItemEntryStateValue& Other) const {
 		return StateType == Other.StateType

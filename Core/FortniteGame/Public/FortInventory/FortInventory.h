@@ -58,9 +58,9 @@ public:
 	// Inventory Mutation
 	// =================================================================
 
-	UFortWorldItem* AddItem(UFortWorldItem* Item);
-	UFortWorldItem* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0);
-	UFortWorldItem* AddItem(const FFortItemEntry& ItemEntry);
+	FFortItemEntry* AddItem(UFortWorldItem* Item);
+	FFortItemEntry* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0);
+	FFortItemEntry* AddItem(const FFortItemEntry& ItemEntry);
 
 	int32 GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry);
 

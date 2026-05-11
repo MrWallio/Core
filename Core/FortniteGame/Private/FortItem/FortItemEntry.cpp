@@ -4,22 +4,21 @@
 #include "FortniteGame/Public/FortItem/FortItemEntryStateValue.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 
-void FFortItemEntry::SetStateValue(EFortItemEntryState StateType, int32 InValue) {
+void FFortItemEntry::SetStateValue(uint8 StateType, int32 InValue) {
 	for (int32 i = 0; i < StateValues.Num(); i++) {
 		FFortItemEntryStateValue& StateValue = StateValues.GetWithSize(i, FFortItemEntryStateValue::GetSize());
-
 		if (StateValue.StateType == StateType) {
 			StateValue.IntValue = InValue;
 			return;
 		}
 	}
 
-	FFortItemEntryStateValue StateValue;
+	FFortItemEntryStateValue StateValue{};
 
-	StateValue.StateType = StateType;
 	StateValue.IntValue = InValue;
+	StateValue.StateType = StateType;
 
-	StateValues.Add(StateValue);
+	StateValues.Add(StateValue, FFortItemEntryStateValue::GetSize());
 }
 
 void FFortItemEntry::SetToDirty() {
@@ -27,8 +26,6 @@ void FFortItemEntry::SetToDirty() {
 }
 
 void FFortItemEntry::CopyGenericValuesFrom(const FFortItemEntry* Other) {
-	AlterationDefinitions = Other->AlterationDefinitions;
-	AlterationInstances = Other->AlterationInstances;
 	bUpdateStatsOnCollection = Other->bUpdateStatsOnCollection;
 	ControlOverride = Other->ControlOverride;
 	Durability = Other->Durability;
@@ -36,7 +33,6 @@ void FFortItemEntry::CopyGenericValuesFrom(const FFortItemEntry* Other) {
 	ItemSource = Other->ItemSource;
 	LoadedAmmo = Other->LoadedAmmo;
 	PhantomReserveAmmo = Other->PhantomReserveAmmo;
-	StateValues = Other->StateValues;
 
 	SetToDirty();
 }

@@ -42,18 +42,20 @@ void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
 
 void AFortPlayerController::SpawnQuickBars()
 {
-	if (Finder::FindAFortPlayerController_SpawnQuickBarsVFT()) {
+	if (Finder::FindAFortPlayerController_SpawnQuickBarsVFT() != 0) {
 		void (*&SpawnQuickBarsInternal)(AFortPlayerController* This) = decltype(SpawnQuickBarsInternal)(VTable[Finder::FindAFortPlayerController_SpawnQuickBarsVFT()]);
 		SpawnQuickBarsInternal(this);
 	}
 	else {
+		UWorld* World = UWorld::GetWorld();
+		if (!World) {
+			Log("AFortPlayerController::SpawnQuickBars: World is null!");
+			return;
+		}
+
 		if (IsUsingOldQuickBars()) {
 			if (!QuickBars)
 			{
-				UWorld* World = GetWorld();
-				if (!World) {
-					return;
-				}
 				AActor* NewQuickBars = World->SpawnActor(AFortQuickBars::StaticClass(), FVector(), FRotator(), this);
 				if (NewQuickBars && NewQuickBars->Cast<AFortQuickBars>()) {
 					QuickBars = NewQuickBars->Cast<AFortQuickBars>();
@@ -63,10 +65,6 @@ void AFortPlayerController::SpawnQuickBars()
 		else {
 			if (!ClientQuickBars)
 			{
-				UWorld* World = GetWorld();
-				if (!World) {
-					return;
-				}
 				AActor* NewQuickBars = World->SpawnActor(AFortQuickBars::StaticClass(), FVector(), FRotator(), this);
 				if (NewQuickBars && NewQuickBars->Cast<AFortQuickBars>()) {
 					ClientQuickBars = NewQuickBars->Cast<AFortQuickBars>();
@@ -253,7 +251,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			This->ClientMessage("Added " + AmmoItemDef->GetName().ToString() + " " + std::to_string(AmmoAmount) + " ammo to existing stack.");
 		}
 		else {
-			AmmoEntry = &This->WorldInventory->AddItem(AmmoItemDef, AmmoAmount)->ItemEntry;
+			AmmoEntry = This->WorldInventory->AddItem(AmmoItemDef, AmmoAmount);
 			if (AmmoEntry) {
 				This->ClientMessage("Added new ammo entry: " + AmmoItemDef->GetName().ToString() + " x" + std::to_string(AmmoAmount));
 			}
@@ -435,7 +433,7 @@ void AFortPlayerController::OnRep_QuickBar()
 bool AFortPlayerController::IsUsingOldQuickBars() {
 	static uintptr_t ClientQuickBarsOffset = StaticClass()->GetPropertyOffset("ClientQuickBars");
 
-	return ClientQuickBarsOffset == 0;
+	return ClientQuickBarsOffset == -1;
 }
 
 void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, bool bIsPawnLoaded)

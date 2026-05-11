@@ -94,36 +94,13 @@ enum class EFortBuildPreviewMarkerOptionalAdjustment : uint8
 	EFortBuildPreviewMarkerOptionalAdjustment_MAX = 3,
 };
 
-enum class EFortItemEntryState : uint8
-{
-	NoneState = 0,
-	NewItemCount = 1,
-	ShouldShowItemToast = 2,
-	DurabilityInitialized = 3,
-	DoNotShowSpawnParticles = 4,
-	FromRecoveredBackpack = 5,
-	FromGift = 6,
-	PendingUpgradeCriteriaProgress = 7,
-	OwnerBuildingHandle = 8,
-	FromDroppedPickup = 9,
-	JustCrafted = 10,
-	CraftAndSlotTarget = 11,
-	GenericAttributeValueSet = 12,
-	PickupInstigatorHandle = 13,
-	RechargingWeaponServerTime = 14,
-	DisallowSwapOnNextPickUpAttempt = 15,
-	DroppedFromQuestSource = 16,
-	Tossed = 17,
-	Loaded = 18,
-	SaveMagazineAmmo = 19,
-	MultiItemLevel = 20,
-	MultiItemXP = 21,
-	FromAugment = 22,
-	PreventDropping = 23,
-	PreventDroppingExceptFromDeath = 24,
-	PreventDroppingExceptFromDeathWithCount = 25,
-	ReAddedItem = 26,
-	WeaponAmmoOverride = 27,
+class EFortItemEntryState {
+public:
+	DefineUnrealEnum(EFortItemEntryState);
+
+	DefineEnumProperty(NoneState);
+	DefineEnumProperty(NewItemCount);
+	DefineEnumProperty(ShouldShowItemToast);
 };
 
 enum class ELootQuotaLevel : uint8
