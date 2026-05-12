@@ -2,6 +2,8 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
 
 #include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
+#include "Engine/Source/Runtime/Core/Public/Math/Rotator.h"
+#include "Engine/Source/Runtime/Core/Public/Math/TransformNonVectorized.h"
 
 ENetMode AActor::InternalGetNetMode(AActor* This)
 {
@@ -118,6 +120,26 @@ FVector AActor::K2_GetActorLocation() const
 	return Parms.ReturnValue;
 }
 
+FRotator AActor::K2_GetActorRotation() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("K2_GetActorRotation");
+
+	struct Actor_K2_GetActorRotation final
+	{
+	public:
+		FRotator ReturnValue;
+	};
+
+	Actor_K2_GetActorRotation Parms{};
+
+	const_cast<AActor*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}
+
 ENetRole AActor::GetRemoteRole() const
 {
 	if (!this) {
@@ -172,4 +194,24 @@ void AActor::K2_DestroyActor()
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"K2_DestroyActor"));
 
 	ProcessEvent(Func, nullptr);
+}
+
+FTransform AActor::GetTransform() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetTransform");
+
+	struct Actor_GetTransform final
+	{
+	public:
+		FTransform ReturnValue;
+	};
+
+	Actor_GetTransform Parms{};
+
+	const_cast<AActor*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
 }

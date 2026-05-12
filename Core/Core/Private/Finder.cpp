@@ -7605,6 +7605,74 @@ uintptr_t Finder::FindAController_InitPlayerStateVFT() {
 	return ServerOffsets::AController_InitPlayerStateVFT;
 }
 
+uintptr_t Finder::FindAActor_BeginPlay() {
+	if (ServerOffsets::AActor_BeginPlay)
+		return ServerOffsets::AActor_BeginPlay;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindPattern("4C 8B DC 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? ? ? ? F3 0F 10 89").Get();
+
+	if (Addr) {
+		ServerOffsets::AActor_BeginPlay = Addr - ImageBase;
+	}
+
+	Log("AActor_BeginPlay found at: 0x" + std::format("{:X}", ServerOffsets::AActor_BeginPlay));
+	return ServerOffsets::AActor_BeginPlay;
+}
+
+uintptr_t Finder::FindAActor_BeginPlayVFT() {
+	if (ServerOffsets::AActor_BeginPlayVFT)
+		return ServerOffsets::AActor_BeginPlayVFT;
+
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.Actor"))->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAActor_BeginPlay() + ImageBase))
+		{
+			ServerOffsets::AActor_BeginPlayVFT = i;
+			break;
+		}
+	}
+
+	Log("AActor_BeginPlayVFT found at: 0x" + std::format("{:X}", ServerOffsets::AActor_BeginPlayVFT));
+	return ServerOffsets::AActor_BeginPlayVFT;
+}
+
+uintptr_t Finder::FindAGameModeBase_SpawnPlayerController() {
+	if (ServerOffsets::AGameModeBase_SpawnPlayerController)
+		return ServerOffsets::AGameModeBase_SpawnPlayerController;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindPattern("40 53 55 56 57 41 56 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B F9 4D 8B F1").Get();
+
+	if (Addr) {
+		ServerOffsets::AGameModeBase_SpawnPlayerController = Addr - ImageBase;
+	}
+
+	Log("AGameModeBase_SpawnPlayerController found at: 0x" + std::format("{:X}", ServerOffsets::AGameModeBase_SpawnPlayerController));
+	return ServerOffsets::AGameModeBase_SpawnPlayerController;
+}
+
+uintptr_t Finder::FindAGameModeBase_SpawnPlayerControllerVFT() {
+	if (ServerOffsets::AGameModeBase_SpawnPlayerControllerVFT)
+		return ServerOffsets::AGameModeBase_SpawnPlayerControllerVFT;
+	
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.GameModeBase"))->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAGameModeBase_SpawnPlayerController() + ImageBase))
+		{
+			ServerOffsets::AGameModeBase_SpawnPlayerControllerVFT = i;
+			break;
+		}
+	}
+
+	Log("AGameModeBase_SpawnPlayerControllerVFT found at: 0x" + std::format("{:X}", ServerOffsets::AGameModeBase_SpawnPlayerControllerVFT));
+	return ServerOffsets::AGameModeBase_SpawnPlayerControllerVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

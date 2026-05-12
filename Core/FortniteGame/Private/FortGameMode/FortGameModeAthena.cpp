@@ -27,16 +27,10 @@ bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
 	return false;
 }
 
-APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, AFortPlayerControllerAthena* NewPlayer, AActor* StartSpot) {
-	AFortPlayerStateAthena* PlayerState = NewPlayer->PlayerState ? NewPlayer->PlayerState->Cast<AFortPlayerStateAthena>() : nullptr;
-	if (!PlayerState) {
-		Log("SpawnDefaultPawnFor: PlayerState is null or not AFortPlayerStateAthena");
-		return nullptr;
-	}
-
+APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot) {
 	APawn* Pawn = AFortGameMode::SpawnDefaultPawnForOG(This, NewPlayer, StartSpot);
 
-	Log("SpawnDefaultPawnFor: Spawned default pawn for player " + NewPlayer->GetName().ToString() + " Pawn: " + Pawn->GetName().ToString());
+	Log("SpawnDefaultPawnFor: Spawned default pawn. NewPlayer=" + (NewPlayer ? NewPlayer->GetName().ToString() : "None") + " Pawn=" + (Pawn ? Pawn->GetName().ToString() : "None"));
 	return Pawn;
 }
 
@@ -54,4 +48,12 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 
 	FinishWorldInitializationOG(This, WorldManager);
 	This->bWorldIsReady = true;
+}
+
+void AFortGameModeAthena::BeginPlay(AFortGameModeAthena* This) {
+	BeginPlayOG(This);
+
+	if (Version::Fortnite_Version <= 1.72) {
+		This->DefaultPawnClass = AFortPlayerPawnAthena::StaticClass();
+	}
 }

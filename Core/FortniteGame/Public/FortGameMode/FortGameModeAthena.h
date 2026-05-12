@@ -27,10 +27,13 @@ public:
 	static bool ReadyToStartMatch(AFortGameModeAthena* This);
 
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameModeAthena* This, AFortPlayerControllerAthena* NewPlayer, AActor* StartSpot);
-	static APawn* SpawnDefaultPawnFor(AFortGameModeAthena* This, AFortPlayerControllerAthena* NewPlayer, AActor* StartSpot);
+	static APawn* SpawnDefaultPawnFor(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot);
 
 	static inline void (*FinishWorldInitializationOG)(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
 	static void FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
+
+	static inline void (*BeginPlayOG)(AFortGameModeAthena* This);
+	static void BeginPlay(AFortGameModeAthena* This);
 
 	static void Hook() {
 		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
@@ -55,6 +58,13 @@ public:
 			Finder::FindAFortGameMode_FinishWorldInitializationVFT(),
 			FinishWorldInitialization,
 			(LPVOID*)&FinishWorldInitializationOG
+		);
+
+		HookVTableIdx(
+			AFortGameModeAthena::GetDefaultObj(),
+			Finder::FindAActor_BeginPlayVFT(),
+			BeginPlay,
+			(LPVOID*)&BeginPlayOG
 		);
 
 		Log("Hooked AFortGameModeAthena");

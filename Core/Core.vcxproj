@@ -257,6 +257,7 @@
     <ClInclude Include="FortniteGame\Public\AI\FortAIController.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIDirector.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIGoalManager.h" />
+    <ClInclude Include="FortniteGame\Public\AI\FortAIPawn.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingAutoNav.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingContainer.h" />

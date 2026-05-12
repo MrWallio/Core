@@ -591,6 +591,9 @@
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStartWarmup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\AI\FortAIPawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">

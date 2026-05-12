@@ -944,6 +944,14 @@ public:
 	static uintptr_t FindAController_InitPlayerState();
 
 	static uintptr_t FindAController_InitPlayerStateVFT();
+
+	static uintptr_t FindAActor_BeginPlay();
+
+	static uintptr_t FindAActor_BeginPlayVFT();
+
+	static uintptr_t FindAGameModeBase_SpawnPlayerController();
+
+	static uintptr_t FindAGameModeBase_SpawnPlayerControllerVFT();
 public:
 	static void SetupOffsets();
 

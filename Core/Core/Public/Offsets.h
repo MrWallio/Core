@@ -200,6 +200,8 @@ namespace ServerOffsets {
 	inline uintptr_t AActor_HasLocalNetOwner = 0;
 	inline uintptr_t AActor_FinishSpawning = 0;
 	inline uintptr_t AActor_SetNetDormancy = 0;
+	inline uintptr_t AActor_BeginPlay = 0;
+	inline uintptr_t AActor_BeginPlayVFT = 0;
 
 	inline uintptr_t AGameSession_ApproveLogin = 0;
 	inline uintptr_t AGameSession_AtCapacity = 0;
@@ -227,6 +229,8 @@ namespace ServerOffsets {
 	inline uintptr_t AGameModeBase_FinishRestartPlayer = 0;
 	inline uintptr_t AGameModeBase_FinishRestartPlayerVFT = 0;
 	inline uintptr_t AGameModeBase_HandleStartingNewPlayer = 0;
+	inline uintptr_t AGameModeBase_SpawnPlayerController = 0;
+	inline uintptr_t AGameModeBase_SpawnPlayerControllerVFT = 0;
 
 	inline uintptr_t UKismetStringLibrary_Conv_StringToName = 0;
 

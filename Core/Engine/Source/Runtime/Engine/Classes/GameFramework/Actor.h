@@ -88,6 +88,8 @@ public:
 
 	FVector K2_GetActorLocation() const;
 
+	FRotator K2_GetActorRotation() const;
+
 	ENetRole GetRemoteRole() const;
 
 	ULevel* GetLevel() const { return GetOuter()->Cast<ULevel>(); }
@@ -117,6 +119,8 @@ public:
 	const AActor* GetNetOwner() const;
 
 	void K2_DestroyActor();
+
+	FTransform GetTransform() const;
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAActor_InternalGetNetMode()), InternalGetNetMode, (LPVOID*)&InternalGetNetModeOG);

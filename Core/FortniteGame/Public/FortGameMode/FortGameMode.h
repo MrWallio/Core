@@ -4,6 +4,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/GameMode.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Engine/Source/Runtime/Core/Public/Math/TransformNonVectorized.h"
 
 class AFortPlayerController;
 
@@ -16,7 +17,7 @@ public:
 	DefineUProperty(int32, CurrentPlaylistId);
 	DefineUProperty(FName, CurrentPlaylistName);
 public:
-	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameMode* This, AFortPlayerController* NewPlayer, AActor* StartSpot);
+	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);
 
 	bool SpawnPlayerBot(AActor* SpawnPoint = nullptr);
 

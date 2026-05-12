@@ -74,3 +74,19 @@ void AGameModeBase::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* S
 		RestartPlayerAtPlayerStartInternal(this, NewPlayer, StartSpot);
 	}
 }
+
+void AGameModeBase::RestartPlayerAtTransform(AController* NewPlayer, const FTransform& SpawnTransform)
+{
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"RestartPlayerAtTransform"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
+		void (*&RestartPlayerAtTransformInternal)(AGameModeBase*, AController*, const FTransform&) = decltype(RestartPlayerAtTransformInternal)(VTable[VTableIdx]);
+		RestartPlayerAtTransformInternal(this, NewPlayer, SpawnTransform);
+	}
+}
+
+APlayerController* AGameModeBase::SpawnPlayerController(ENetRole InRemoteRole, FVector const& SpawnLocation, FRotator const& SpawnRotation)
+{
+	APlayerController* (*&SpawnPlayerControllerInternal)(AGameModeBase*, ENetRole, const FVector&, const FRotator&) = decltype(SpawnPlayerControllerInternal)(VTable[Finder::FindAGameModeBase_SpawnPlayerControllerVFT()]);
+	return SpawnPlayerControllerInternal(this, InRemoteRole, SpawnLocation, SpawnRotation);
+}
