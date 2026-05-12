@@ -212,7 +212,6 @@ FFortItemEntry* AFortInventory::GetCurrentItemEntry()
 	AFortPawn* Pawn = PC->Pawn->Cast<AFortPawn>();
 	if (!Pawn)
 	{
-		Log("AFortInventory::GetCurrentItemEntry: Pawn is null!");
 		return nullptr;
 	}
 

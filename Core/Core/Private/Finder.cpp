@@ -7510,6 +7510,67 @@ uintptr_t Finder::FindAFortPlayerController_RemoveInventoryItemVFT() {
 	return ServerOffsets::AFortPlayerController_RemoveInventoryItemVFT;
 }
 
+uintptr_t Finder::FindUFortControllerComponent_Aircraft_EnterAircraft() {
+	if (ServerOffsets::UFortControllerComponent_Aircraft_EnterAircraft)
+		return ServerOffsets::UFortControllerComponent_Aircraft_EnterAircraft;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		auto sRef = Memcury::Scanner::FindStringRef(L"EnterAircraft: [%s] is attempting to enter aircraft after having already exited.", true, 0, Version::Fortnite_Version >= 19)
+			.Get();
+
+		if (!sRef)
+			return 0;
+
+		for (int i = 0; i < 1000; i++)
+		{
+			auto Ptr = (uint8_t*)(sRef - i);
+
+			if (*Ptr == 0x48 && (*(Ptr + 1) == 0x83 || *(Ptr + 1) == 0x81) && *(Ptr + 2) == 0xEC)
+			{
+				sRef = uint64_t(Ptr);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0xAC)
+			{
+				sRef = uint64_t(Ptr);
+				break;
+			}
+		}
+		for (int i = 0; i < 1000; i++)
+		{
+			auto Ptr = (uint8_t*)(sRef - i);
+
+			if (*(uint8_t*)(sRef - i) == 0x40 && (*(uint8_t*)(sRef - i + 1) == 0x53 || *(uint8_t*)(sRef - i + 1) == 0x55))
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+			else if (Version::Fortnite_Version >= 15 && *Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5c)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x74)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::UFortControllerComponent_Aircraft_EnterAircraft = Addr - ImageBase;
+	}
+
+	Log("UFortControllerComponent_Aircraft_EnterAircraft found at: 0x" + std::format("{:X}", ServerOffsets::UFortControllerComponent_Aircraft_EnterAircraft));
+	return ServerOffsets::UFortControllerComponent_Aircraft_EnterAircraft;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

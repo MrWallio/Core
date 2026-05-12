@@ -8,6 +8,7 @@ public:
 	DefineUnrealClass(UFortWorldItemDefinition);
 
 	DefineBitfieldUProperty(bShouldShowItemToast);
+	DefineBitfieldUProperty(bCanBeDropped);
 public:
 	bool ServerExecute(UFortItem* Item, AFortPlayerController* Instigator);
 

@@ -9,6 +9,7 @@
 class AFortPlayerPawnAthena;
 class AFortBroadcastRemoteClientInfo;
 class UFortHero;
+class AFortAircraft;
 
 class AFortPlayerControllerAthena : public AFortPlayerControllerZone {
 public:
@@ -18,7 +19,29 @@ public:
 
 	DefineUProperty(UFortHero*, StrongMyHero);
 public:
+	static inline void (*EnterAircraftOG)(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft);
+	static void EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft);
+
+	static inline void (*ServerAttemptAircraftJumpOG)(AFortPlayerControllerAthena* This, FRotator& ClientRotation);
+	static void ServerAttemptAircraftJump(AFortPlayerControllerAthena* This, FRotator& ClientRotation);
+
 	static void Hook() {
+		UObject* AircraftComp = FUObjectArray::FindObject("Class FortniteGame.FortControllerComponent_Aircraft");
+		if (!AircraftComp) {
+			MH_CreateHook(
+				(LPVOID)(ImageBase + Finder::FindUFortControllerComponent_Aircraft_EnterAircraft()),
+				EnterAircraft,
+				(LPVOID*)&EnterAircraftOG
+			);
+
+			HookEveryVTable(
+				AFortPlayerControllerAthena::StaticClass(),
+				AFortPlayerControllerAthena::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerControllerAthena.ServerAttemptAircraftJump"),
+				ServerAttemptAircraftJump,
+				(LPVOID*)&ServerAttemptAircraftJumpOG
+			);
+		}
+
 		Log("Hooked AFortPlayerControllerAthena");
 	}
 };

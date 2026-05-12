@@ -938,6 +938,8 @@ public:
 	static uintptr_t FindAFortPlayerController_RemoveInventoryItem();
 
 	static uintptr_t FindAFortPlayerController_RemoveInventoryItemVFT();
+
+	static uintptr_t FindUFortControllerComponent_Aircraft_EnterAircraft();
 public:
 	static void SetupOffsets();
 
