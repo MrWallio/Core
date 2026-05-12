@@ -103,6 +103,18 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 
 	ServerCheatOG(This, Msg);
 
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		This->ClientMessage("World is null!");
+		return;
+	}
+
+	AFortGameMode* GameMode = World->AuthorityGameMode->Cast<AFortGameMode>();
+	if (!GameMode) {
+		This->ClientMessage("GameMode is null or not a FortGameMode!");
+		return;
+	}
+
 	FCommandParser Parser(Command);
 
 	if (Parser.IsCommand("Help"))
@@ -112,6 +124,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("SetLoadedAmmo <LoadedAmmo> - Sets the loaded ammo of the currently equipped weapon.");
 		This->ClientMessage("GiveAmmo [Amount] - Gives ammo for the currently equipped weapon.");
 		This->ClientMessage("DumpInventory - Dump Inventory Stats");
+		This->ClientMessage("SpawnBot [bSpawnAtPlayer] - Spawns a bot at the player's location or playerstart.");
 	}
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
@@ -280,6 +293,17 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		}
 
 		This->ClientMessage("=== End of Inventory Dump ===");
+	}
+	else if (Parser.IsCommand("SpawnBot")) {
+		bool bSpawnAtPlayer = Parser.GetArgBool(0, false);
+		
+		bool bSuccessfulSpawn = GameMode->SpawnPlayerBot(bSpawnAtPlayer ? This->MyFortPawn : nullptr);
+		if (bSuccessfulSpawn) {
+			This->ClientMessage("Bot spawned successfully!");
+		}
+		else {
+			This->ClientMessage("Failed to spawn bot.");
+		}
 	}
 }
 

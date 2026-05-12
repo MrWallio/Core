@@ -940,6 +940,10 @@ public:
 	static uintptr_t FindAFortPlayerController_RemoveInventoryItemVFT();
 
 	static uintptr_t FindUFortControllerComponent_Aircraft_EnterAircraft();
+
+	static uintptr_t FindAController_InitPlayerState();
+
+	static uintptr_t FindAController_InitPlayerStateVFT();
 public:
 	static void SetupOffsets();
 

@@ -34,6 +34,7 @@ public:
 	DefineUProperty(int32, NumSpectators);
 
 	DefineUProperty(int32, NumPlayers);
+	DefineUProperty(int32, NumBots);
 
 	DefineUProperty(int32, NumTravellingPlayers);
 public:

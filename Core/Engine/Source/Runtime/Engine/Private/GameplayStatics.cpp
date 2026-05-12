@@ -101,3 +101,29 @@ float UGameplayStatics::GetTimeSeconds(const class UObject* WorldContextObject)
 
 	return Parms.ReturnValue;
 }
+
+void UGameplayStatics::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>* OutActors)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.GetAllActorsOfClass");
+
+	struct GameplayStatics_GetAllActorsOfClass
+	{
+	public:
+		const UObject* WorldContextObject;
+		TSubclassOf<AActor> ActorClass;
+		TArray<AActor*> OutActors;
+	};
+
+	GameplayStatics_GetAllActorsOfClass Parms{};
+
+	Parms.WorldContextObject = WorldContextObject;
+	Parms.ActorClass = ActorClass;
+
+	GetDefaultObj()->ProcessEvent(Func, &Parms);
+
+	if (OutActors != nullptr)
+		*OutActors = std::move(Parms.OutActors);
+}

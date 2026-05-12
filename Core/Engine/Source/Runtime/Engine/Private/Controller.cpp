@@ -42,3 +42,9 @@ AActor* AController::GetViewTarget() const
 		return GetViewTargetInternal(this);
 	}
 }
+
+void AController::InitPlayerState()
+{
+	void (*&InitPlayerStateInternal)(AController*) = decltype(InitPlayerStateInternal)(VTable[Finder::FindAController_InitPlayerStateVFT()]);
+	InitPlayerStateInternal(this);
+}

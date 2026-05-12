@@ -579,4 +579,7 @@ namespace ServerOffsets {
 	inline uintptr_t UFortWorldItem_SetPhantomReserveAmmoVFT = 0;
 
 	inline uintptr_t UFortControllerComponent_Aircraft_EnterAircraft = 0;
+
+	inline uintptr_t AController_InitPlayerState = 0;
+	inline uintptr_t AController_InitPlayerStateVFT = 0;
 }

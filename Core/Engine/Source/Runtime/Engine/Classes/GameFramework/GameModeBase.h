@@ -32,4 +32,8 @@ public:
 	void FinishRestartPlayer(AController* NewPlayer, const FRotator& StartRotation);
 
 	void HandleStartingNewPlayer(APlayerController* NewPlayer);
+
+	AActor* ChoosePlayerStart(AController* Player);
+
+	void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot);
 };

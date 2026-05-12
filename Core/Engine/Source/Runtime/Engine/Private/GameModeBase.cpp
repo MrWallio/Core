@@ -52,3 +52,25 @@ void AGameModeBase::HandleStartingNewPlayer(APlayerController* NewPlayer)
 		HandleStartingNewPlayerInternal(this, NewPlayer);
 	}
 }
+
+AActor* AGameModeBase::ChoosePlayerStart(AController* Player)
+{
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ChoosePlayerStart"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
+		AActor* (*&ChoosePlayerStartInternal)(AGameModeBase*, AController*) = decltype(ChoosePlayerStartInternal)(VTable[VTableIdx]);
+		return ChoosePlayerStartInternal(this, Player);
+	}
+
+	return nullptr;
+}
+
+void AGameModeBase::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot)
+{
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"RestartPlayerAtPlayerStart"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
+		void (*&RestartPlayerAtPlayerStartInternal)(AGameModeBase*, AController*, AActor*) = decltype(RestartPlayerAtPlayerStartInternal)(VTable[VTableIdx]);
+		RestartPlayerAtPlayerStartInternal(this, NewPlayer, StartSpot);
+	}
+}

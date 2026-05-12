@@ -7571,6 +7571,40 @@ uintptr_t Finder::FindUFortControllerComponent_Aircraft_EnterAircraft() {
 	return ServerOffsets::UFortControllerComponent_Aircraft_EnterAircraft;
 }
 
+uintptr_t Finder::FindAController_InitPlayerState() {
+	if (ServerOffsets::AController_InitPlayerState)
+		return ServerOffsets::AController_InitPlayerState;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindPattern("40 57 48 83 EC ? 48 8B F9 E8 ? ? ? ? 83 F8 ? 0F 84 ? ? ? ? ? ? ? 48 8B CF 48 89 5C 24 ? 48 89 74 24").Get();
+
+	if (Addr) {
+		ServerOffsets::AController_InitPlayerState = Addr - ImageBase;
+	}
+
+	Log("AController_InitPlayerState found at: 0x" + std::format("{:X}", ServerOffsets::AController_InitPlayerState));
+	return ServerOffsets::AController_InitPlayerState;
+}
+
+uintptr_t Finder::FindAController_InitPlayerStateVFT() {
+	if (ServerOffsets::AController_InitPlayerStateVFT)
+		return ServerOffsets::AController_InitPlayerStateVFT;
+	
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.Controller"))->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAController_InitPlayerState() + ImageBase))
+		{
+			ServerOffsets::AController_InitPlayerStateVFT = i;
+			break;
+		}
+	}
+
+	Log("AController_InitPlayerStateVFT found at: 0x" + std::format("{:X}", ServerOffsets::AController_InitPlayerStateVFT));
+	return ServerOffsets::AController_InitPlayerStateVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

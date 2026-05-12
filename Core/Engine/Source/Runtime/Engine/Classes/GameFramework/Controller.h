@@ -14,7 +14,6 @@ class AController : public AActor {
 public:
 	DefineUnrealClass(AController);
 public:
-	/** PlayerState containing replicated information about the player using this controller (only exists for players, not NPCs). */
 	DefineUProperty(APlayerState*, PlayerState);
 
 	DefineUProperty(APawn*, Pawn);
@@ -24,4 +23,6 @@ public:
 	APawn* K2_GetPawn() const;
 
 	AActor* GetViewTarget() const;
+
+	void InitPlayerState();
 };
