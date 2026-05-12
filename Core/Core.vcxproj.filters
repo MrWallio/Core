@@ -833,5 +833,8 @@
     <ClCompile Include="FortniteGame\Private\FortPlayerState\FortPlayerStateAthena.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\Pawn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -48,3 +48,23 @@ void AController::InitPlayerState()
 	void (*&InitPlayerStateInternal)(AController*) = decltype(InitPlayerStateInternal)(VTable[Finder::FindAController_InitPlayerStateVFT()]);
 	InitPlayerStateInternal(this);
 }
+
+void AController::OnRep_Pawn()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_Pawn");
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AController::OnRep_PlayerState()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_PlayerState");
+	
+	ProcessEvent(Func, nullptr);
+}

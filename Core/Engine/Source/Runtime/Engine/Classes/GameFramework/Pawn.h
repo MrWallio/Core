@@ -22,4 +22,8 @@ public:
 	DefineUnrealClass(APawn);
 
 	DefineUProperty(AController*, Controller);
+
+	DefineUProperty(APlayerState*, PlayerState);
+public:
+	void OnRep_PlayerState();
 };

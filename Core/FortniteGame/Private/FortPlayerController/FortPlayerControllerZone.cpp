@@ -22,7 +22,7 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 	if (GameMode) {
 		if (GameMode->StartingItems.Num() > 0)
 		{
-			Log("HandleStartingNewPlayer: Processing StartingItems for new player. Count: " + std::to_string(GameMode->StartingItems.Num()));
+			Log("OnReadyToStartMatch: Processing StartingItems for new player. Count: " + std::to_string(GameMode->StartingItems.Num()));
 			for (int i = 0; i < GameMode->StartingItems.Num(); i++)
 			{
 				auto& StartingItem = GameMode->StartingItems.GetWithSize(i, FItemAndCount::GetSize());

@@ -25,4 +25,8 @@ public:
 	AActor* GetViewTarget() const;
 
 	void InitPlayerState();
+
+	void OnRep_Pawn();
+
+	void OnRep_PlayerState();
 };

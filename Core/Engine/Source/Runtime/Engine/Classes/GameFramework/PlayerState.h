@@ -11,4 +11,6 @@ public:
 	DefineBitfieldUProperty(bOnlySpectator);
 
 	DefineUProperty(uint8, Ping);
+
+	DefineBitfieldUProperty(bIsABot);
 };
