@@ -6835,7 +6835,35 @@ uintptr_t Finder::FindUMcpProfileGroup_SendRequestNow() {
 	if (ServerOffsets::UMcpProfileGroup_SendRequestNow)
 		return ServerOffsets::UMcpProfileGroup_SendRequestNow;
 
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 83 3A").Get();
+	static bool bInitialized = false;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		auto sRef = Memcury::Scanner::FindStringRef(L"MCP-Profile: Dispatching request to %s", true, 0, Version::Fortnite_Version >= 19).Get();
+		if (!sRef)
+			sRef = Memcury::Scanner::FindStringRef(L"MCP-Profile: Dispatching request to %s - ContextCredentials: %s", true, 0, Version::Fortnite_Version >= 19).Get();
+
+		if (!sRef)
+			return 0;
+
+		for (int i = 0; i < 1000; i++)
+		{
+			auto Ptr = (uint8_t*)(sRef - i);
+
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5c)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8b && *(Ptr + 2) == 0xc4)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
 
 	if (Addr) {
 		ServerOffsets::UMcpProfileGroup_SendRequestNow = Addr - ImageBase;

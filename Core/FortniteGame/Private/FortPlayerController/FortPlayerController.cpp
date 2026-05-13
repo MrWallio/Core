@@ -505,13 +505,12 @@ bool AFortPlayerController::RemoveInventoryItem(AFortPlayerController* This, FGu
 	AFortPlayerController* PlayerController = (AFortPlayerController*)(__int64(This) - InterfaceOffset); // this is so wierd
 	if (!PlayerController) {
 		Log("RemoveInventoryItem: Failed to get PlayerController from interface pointer!");
-		return false;
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
 	}
 
 	AFortInventory* Inventory = PlayerController->WorldInventory;
 	if (!Inventory) {
-		Log("RemoveInventoryItem: WorldInventory is null!");
-		return false;
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
 	}
 
 	Inventory->RemoveItem(*ItemGuid, Count);

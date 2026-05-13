@@ -20,6 +20,9 @@
 #include <print>
 #include <array>
 #include <minmax.h>
+#include <TlHelp32.h>
+#include <sstream>
+#include <winternl.h>
 
 #include "../includes/memcury.h"
 #include "../includes/MinHook/MinHook.h"
@@ -27,6 +30,8 @@
 #include "Core/Public/Offsets.h"
 #include "Core/Public/Configuration.h"
 #include "Core/Public/Finder.h"
+
+#pragma comment(lib, "ntdll.lib")
 
 inline uintptr_t ImageBase = (uintptr_t)GetModuleHandleA(0);
 

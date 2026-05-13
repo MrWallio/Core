@@ -26,21 +26,17 @@ void AFortGameState::OnFinishedStreamingAdditionalPlaylistLevel()
 
 void AFortGameState::OnRep_CurrentWUID(AFortGameState* This)
 {
+	OnRep_CurrentWUIDOG(This);
 	if (Version::Fortnite_Version >= 1.8) {
 		Log("OnRep_CurrentWUID called!");
-	}
-	else {
-		OnRep_CurrentWUIDOG(This);
 	}
 }
 
 void AFortGameState::OnRep_WorldManager(AFortGameState* This)
 {
+	OnRep_WorldManagerOG(This);
 	if (Version::Fortnite_Version >= 1.8) {
 		Log("OnRep_WorldManager called!");
-	}
-	else {
-		OnRep_WorldManagerOG(This);
 	}
 }
 

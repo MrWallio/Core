@@ -9,8 +9,12 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 
+#include "CrashReporter/Public/CrashReporter.h"
+
 DWORD Main(LPVOID)
 {
+    FCrashReporter::Register();
+
     ConfigurationManager::LoadConfig();
     FCoreConfig& Config = ConfigurationManager::GetConfig();
 

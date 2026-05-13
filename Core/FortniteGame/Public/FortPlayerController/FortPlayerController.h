@@ -75,6 +75,7 @@ public:
 	static inline void (*ServerSpotActorOG)(AFortPlayerController* This, AActor* NewlySpottedActor);
 	static void ServerSpotActor(AFortPlayerController* This, AActor* NewlySpottedActor);
 
+	static inline bool (*RemoveInventoryItemOG)(AFortPlayerController* This, FGuid* ItemGuid, int32 Count, bool bForceRemoval);
 	static bool RemoveInventoryItem(AFortPlayerController* This, FGuid* ItemGuid, int32 Count, bool bForceRemoval);
 
 	static void Hook() {
@@ -136,7 +137,7 @@ public:
 			AFortPlayerController::StaticClass(),
 			Finder::FindAFortPlayerController_RemoveInventoryItemVFT(),
 			RemoveInventoryItem,
-			nullptr
+			(LPVOID*)&RemoveInventoryItemOG
 		);
 
 		Log("Hooked AFortPlayerController");

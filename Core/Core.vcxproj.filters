@@ -594,6 +594,9 @@
     <ClInclude Include="FortniteGame\Public\AI\FortAIPawn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CrashReporter\Public\CrashReporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">
@@ -834,6 +837,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\Pawn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashReporter\Private\CrashReporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

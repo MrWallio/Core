@@ -53,7 +53,7 @@ void Version::SetupVersion() {
             Fortnite_Version = std::stod(verStr);
             Fortnite_CL = std::stoi(clStr);
         }
-        else if (VersionString.contains("Cert")) {
+        else if (VersionString.contains("Cert") || VersionString.contains("Live")) {
             size_t firstDash = VersionString.find('-');
             size_t firstPlus = VersionString.find('+');
 
@@ -71,6 +71,12 @@ void Version::SetupVersion() {
 
                 if (Fortnite_CL == 3700114) {
                     Fortnite_Version = 1.72;
+                }
+                else if (Fortnite_CL == 3724489) {
+                    Fortnite_Version = 1.8;
+				}
+                else if (Fortnite_CL == 3729133) {
+					Fortnite_Version = 1.81;
                 }
                 else if (Fortnite_CL == 3741772) {
                     Fortnite_Version = 1.82;
