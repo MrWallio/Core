@@ -104,8 +104,8 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 			UFortHeroType* HeroType = FortPSAthena->HeroType;
 
 			if (Version::Fortnite_Version <= 1.72) {
-				if (HeroType && HeroType->GetSpecializationsPtr()->Num() > 0) {
-					UFortHeroSpecialization* RandomSpecialization = (*HeroType->GetSpecializationsPtr()).GetWithSize(UKismetMathLibrary::RandomIntegerInRange(0, HeroType->GetSpecializationsPtr()->Num() - 1), FSoftObjectPtr::GetSize()).Get();
+				if (HeroType && HeroType->Specializations.Num() > 0) {
+					UFortHeroSpecialization* RandomSpecialization = HeroType->Specializations.GetWithSize(UKismetMathLibrary::RandomIntegerInRange(0, HeroType->Specializations.Num() - 1), FSoftObjectPtr::GetSize()).Get();
 					if (RandomSpecialization) {
 						int32 NumParts = RandomSpecialization->CharacterParts.Num();
 
