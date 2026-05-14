@@ -3,6 +3,7 @@
 
 #include "FortniteGame/Public/FortWorker/FortWorkerType.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/AssetPtr.h"
 
 class UFortWorldItemDefinition;
 class UFortHeroSpecialization;
@@ -20,4 +21,9 @@ public:
 
 	DefineUProperty(TArray<TSoftObjectPtr<UFortHeroSpecialization>>, Specializations);
 	DefineUProperty(TArray<FHeroItem>, HeroItems)
+public:
+	TArray<TAssetPtr<UFortHeroSpecialization>>& GetSpecializationsAssetPtr() {
+		TArray<TSoftObjectPtr<UFortHeroSpecialization>>& SpecializationsSoftPtr = Specializations;
+		return *reinterpret_cast<TArray<TAssetPtr<UFortHeroSpecialization>>*>(&SpecializationsSoftPtr);
+	}
 };

@@ -104,13 +104,14 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 			UFortHeroType* HeroType = FortPSAthena->HeroType;
 
 			if (Version::Fortnite_Version <= 1.72) {
-				if (HeroType && HeroType->Specializations.Num() > 0) {
-					UFortHeroSpecialization* RandomSpecialization = HeroType->Specializations.GetWithSize(UKismetMathLibrary::RandomIntegerInRange(0, HeroType->Specializations.Num() - 1), FSoftObjectPtr::GetSize()).Get();
+				if (HeroType && HeroType->GetSpecializationsAssetPtr().Num() > 0) {
+					UFortHeroSpecialization* RandomSpecialization = HeroType->GetSpecializationsAssetPtr()[UKismetMathLibrary::RandomIntegerInRange(0, HeroType->GetSpecializationsAssetPtr().Num() - 1)].Get();
 					if (RandomSpecialization) {
-						int32 NumParts = RandomSpecialization->CharacterParts.Num();
+						Log("AFortGameMode::SpawnPlayerBot: Applying specialization: " + RandomSpecialization->GetName().ToString());
+						int32 NumParts = RandomSpecialization->GetCharacterPartsAssetPtr().Num();
 
 						for (int32 i = 0; i < NumParts; i++) {
-							TSoftObjectPtr<UCustomCharacterPart>& PartPtr = RandomSpecialization->CharacterParts.GetWithSize(i, FSoftObjectPtr::GetSize());
+							TAssetPtr<UCustomCharacterPart>& PartPtr = RandomSpecialization->GetCharacterPartsAssetPtr()[i];
 							
 							UCustomCharacterPart* CharacterPartAsset = PartPtr.Get();
 							
