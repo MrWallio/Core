@@ -8,6 +8,10 @@
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 
 bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* PlayerPawn, EFortPickupSourceTypeFlag InSourceTypeFlag, EFortPickupSpawnSource InSpawnSource) {
+	if (This->bAlreadySearched) {
+		return false;
+	}
+	
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ABuildingContainer::SpawnLoot: World is null!");
