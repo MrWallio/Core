@@ -7,7 +7,7 @@
 
 ENetMode AActor::InternalGetNetMode(AActor* This)
 {
-	return InternalGetNetModeOG(This);
+	//return InternalGetNetModeOG(This);
 	return NM_DedicatedServer;
 }
 

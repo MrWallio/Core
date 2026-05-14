@@ -52,6 +52,15 @@ void AFortPlayerControllerZone::ServerSetShouldDisablePlayerTeleportingDuringMis
 	Log("ServerSetShouldDisablePlayerTeleportingDuringMissionResults called!");
 }
 
+void AFortPlayerControllerZone::ClientOnPawnDied(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport) {
+	ClientOnPawnDiedOG(This, DeathReport);
+
+	Log("ClientOnPawnDied called!");
+	if (This->WorldInventory) {
+		This->WorldInventory->DropAllItems();
+	}
+}
+
 void AFortPlayerControllerZone::Hook() {
 	HookEveryVTable(AFortPlayerControllerZone::StaticClass(), AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
 	
@@ -70,6 +79,14 @@ void AFortPlayerControllerZone::Hook() {
 		ServerSetShouldDisablePlayerTeleportingDuringMissionResults,
 		(LPVOID*)&ServerSetShouldDisablePlayerTeleportingDuringMissionResultsOG
 	);
+
+	/*HookVTable(
+		AFortPlayerControllerZone::GetDefaultObj(),
+		AFortPlayerControllerZone::GetDefaultObj()->StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerControllerZone.ClientOnPawnDied"),
+		ClientOnPawnDied,
+		(LPVOID*)&ClientOnPawnDiedOG
+	);*/
+	MH_CreateHook((LPVOID)(GetOffsetFromVTable(AFortPlayerControllerZone::GetDefaultObj(), AFortPlayerControllerZone::GetDefaultObj()->StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerControllerZone.ClientOnPawnDied"))), ClientOnPawnDied, (LPVOID*)&ClientOnPawnDiedOG);
 
 	Log("Hooked AFortPlayerControllerZone");
 }

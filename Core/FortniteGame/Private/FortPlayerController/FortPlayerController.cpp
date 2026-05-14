@@ -125,6 +125,10 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("GiveAmmo [Amount] - Gives ammo for the currently equipped weapon.");
 		This->ClientMessage("DumpInventory - Dump Inventory Stats");
 		This->ClientMessage("SpawnBot [bSpawnAtPlayer] - Spawns a bot at the player's location or playerstart.");
+		This->ClientMessage("SetHealth <Health> - Sets the player's health.");
+		This->ClientMessage("SetShield <Shield> - Sets the player's shield.");
+		This->ClientMessage("SetMaxHealth <MaxHealth> - Sets the player's max health.");
+		This->ClientMessage("SetMaxShield <MaxShield> - Sets the player's max shield.");
 	}
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
@@ -304,6 +308,74 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		else {
 			This->ClientMessage("Failed to spawn bot.");
 		}
+	} else if (Parser.IsCommand("SetHealth")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SetHealth <Health>");
+			return;
+		}
+
+		float Health = Parser.GetArgFloat(0, 100.0f);
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		This->MyFortPawn->SetHealth(Health);
+
+		This->ClientMessage("Set health to " + std::to_string(Health));
+	} else if (Parser.IsCommand("SetShield")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SetShield <Shield>");
+			return;
+		}
+
+		float Shield = Parser.GetArgFloat(0, 100.0f);
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		This->MyFortPawn->SetShield(Shield);
+
+		This->ClientMessage("Set shield to " + std::to_string(Shield));
+	} else if (Parser.IsCommand("SetMaxHealth")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SetMaxHealth <MaxHealth>");
+			return;
+		}
+
+		float MaxHealth = Parser.GetArgFloat(0, 100.0f);
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		This->MyFortPawn->SetMaxHealth(MaxHealth);
+
+		This->ClientMessage("Set max health to " + std::to_string(MaxHealth));
+	} else if (Parser.IsCommand("SetMaxShield")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SetMaxShield <MaxShield>");
+			return;
+		}
+
+		float MaxShield = Parser.GetArgFloat(0, 100.0f);
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		This->MyFortPawn->SetMaxShield(MaxShield);
+
+		This->ClientMessage("Set max shield to " + std::to_string(MaxShield));
 	}
 }
 

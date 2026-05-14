@@ -12,6 +12,7 @@ class UFortItemDefinition;
 class AFortPickup;
 struct FFortPickupRequestInfo;
 class UCustomCharacterPart;
+class UFortHealthSet;
 
 class AFortPawn : public ACharacter {
 public:
@@ -36,8 +37,22 @@ public:
 	DefineUProperty(float, EmoteWalkSpeed);
 
 	DefineUProperty(TArray<AFortPickup*>, IncomingPickups);
+
+	DefineUProperty(UFortHealthSet*, HealthSet);
 public:
 	AFortWeapon* EquipWeaponDefinition(const UFortWeaponItemDefinition* WeaponData, const FGuid& ItemEntryGuid);
 
 	void OnRep_CurrentWeapon(AFortWeapon* OldWeapon);
+
+	void SetHealth(float NewHealthVal);
+
+	void SetMaxHealth(float NewHealthVal);
+
+	void SetShield(float NewShieldValue);
+
+	void SetMaxShield(float NewValue);
+
+	float GetMaxHealth() const;
+
+	float GetMaxShield() const;
 };

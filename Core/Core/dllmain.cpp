@@ -7,6 +7,7 @@
 
 #include "Engine/Source/Runtime/Engine/Classes/Engine/Engine.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
+#include "Engine/Source/Runtime/Core/Public/Templates/SharedPointer.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 
 #include "CrashReporter/Public/CrashReporter.h"

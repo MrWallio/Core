@@ -954,6 +954,10 @@ public:
 	static uintptr_t FindAGameModeBase_SpawnPlayerControllerVFT();
 
 	static uintptr_t FindAFortGameModeAthena_AddToAlivePlayers();
+
+	static uintptr_t FindUFortAnalytics_SetGameSessionID();
+
+	static uintptr_t FindUFortAnalytics_SetGameStateClassName();
 public:
 	static void SetupOffsets();
 

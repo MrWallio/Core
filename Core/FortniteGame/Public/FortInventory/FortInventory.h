@@ -104,6 +104,8 @@ public:
 
 	void EquipHarvestingTool();
 
+	bool DropAllItems(bool bSpawnPickups = true);
+
 	// =================================================================
 	// Internal Helpers
 	// =================================================================

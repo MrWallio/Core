@@ -641,6 +641,45 @@ void AFortInventory::EquipHarvestingTool()
 	}
 }
 
+bool AFortInventory::DropAllItems(bool bSpawnPickups)
+{
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC)
+		return false;
+
+	TArray<FFortItemEntry> EntriesToRemove;
+	for (int32 i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
+	{
+		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
+		if (!Entry.ItemDefinition) {
+			continue;
+		}
+
+		UFortWorldItemDefinition* ItemDef = Entry.ItemDefinition->Cast<UFortWorldItemDefinition>();
+		if (!ItemDef) {
+			continue;
+		}
+		
+		if (!ItemDef->bCanBeDropped)
+		{
+			continue;
+		}
+
+		EntriesToRemove.Add(Entry);
+	}
+
+	for (const FFortItemEntry& Entry : EntriesToRemove)
+	{
+		if (bSpawnPickups)
+		{
+			SpawnPickupFromEntry(Entry);
+		}
+		RemoveItem(Entry.ItemGuid, Entry.Count);
+	}
+
+	return true;
+}
+
 bool AFortInventory::CanAddItem(UFortItemDefinition* Def, int32 Count) const
 {
 	return Owner && Def && Count > 0;

@@ -9,4 +9,11 @@ public:
 
 	DefineUProperty(FFortGameplayAttributeData, Health);
 	DefineUProperty(FFortGameplayAttributeData, MaxHealth);
+	DefineUProperty(FFortGameplayAttributeData, CurrentShield);
+	DefineUProperty(FFortGameplayAttributeData, Shield);
+public:
+	void OnRep_CurrentShield();
+	void OnRep_Health();
+	void OnRep_MaxHealth();
+	void OnRep_Shield();
 };

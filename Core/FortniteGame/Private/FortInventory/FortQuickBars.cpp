@@ -212,7 +212,7 @@ void AFortQuickBars::AddItemToQuickBar(FGuid Guid, uint8 QuickBar)
 	if (!Guid.IsValid())
 		return;
 
-	ServerAddItemInternal(Guid, QuickBar, -1);
+	ServerAddItemInternal(Guid, QuickBar, -3);
 }
 
 void AFortQuickBars::OnRep_PrimaryQuickBar()

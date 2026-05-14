@@ -152,5 +152,6 @@ void HookEveryVTableIdx(UClass* Base, int Idx, void* Detour, void** OG = nullptr
 void HookEveryVTable(UClass* Base, class UFunction* Func, void* Detour, void** OG = nullptr);
 void CreateVTableOriginal(void* Base, int Idx, void** Original);
 void CreateVTableOriginal(void* Base, class UFunction* Func, void** Original);
+uintptr_t GetOffsetFromVTable(class UObject* Object, class UFunction* Func);
 
 #endif //PCH_H

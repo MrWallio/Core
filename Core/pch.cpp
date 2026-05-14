@@ -185,4 +185,18 @@ void CreateVTableOriginal(void* Base, class UFunction* Func, void** Original) {
 	}
 }
 
+uintptr_t GetOffsetFromVTable(class UObject* Object, class UFunction* Func) {
+	if (!Object || !Func)
+	{
+		Log("Invalid parameters for GetOffsetFromVTable");
+		return -1;
+	}
+
+	int VTableIndex = GetVTableIndex(Func);
+
+	void** VTable = *(void***)Object;
+
+	return (uintptr_t)VTable[VTableIndex];
+}
+
 // When you are using pre-compiled headers, this source file is necessary for compilation to succeed.

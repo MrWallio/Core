@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "FortniteGame/Public/FortPawn/FortPawn.h"
 
+#include "FortniteGame/Public/FortSet/FortHealthSet.h"
+
 AFortWeapon* AFortPawn::EquipWeaponDefinition(const UFortWeaponItemDefinition* WeaponData, const FGuid& ItemEntryGuid)
 {
 	if (!this) {
@@ -59,4 +61,149 @@ void AFortPawn::OnRep_CurrentWeapon(AFortWeapon* OldWeapon)
 	Parms.OldWeapon = OldWeapon;
 
 	ProcessEvent(Func, &Parms);
+}
+
+void AFortPawn::SetHealth(float NewHealthVal)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("SetHealth");
+
+	struct FortPawn_SetHealth
+	{
+	public:
+		float NewHealthVal;
+	};
+
+	FortPawn_SetHealth Parms{};
+
+	Parms.NewHealthVal = NewHealthVal;
+
+	ProcessEvent(Func, &Parms);
+}
+
+void AFortPawn::SetMaxHealth(float NewHealthVal)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("SetMaxHealth");
+
+	struct FortPawn_SetMaxHealth
+	{
+	public:
+		float NewHealthVal;
+	};
+
+	FortPawn_SetMaxHealth Parms{};
+
+	Parms.NewHealthVal = NewHealthVal;
+	
+	ProcessEvent(Func, &Parms);
+}
+
+void AFortPawn::SetShield(float NewShieldValue)
+{
+	if (Version::Fortnite_Version >= 1.8) {
+		static UFunction* Func = nullptr;
+
+		if (Func == nullptr)
+			Func = FindFunction("SetShield");
+
+		struct FortPawn_SetShield
+		{
+		public:
+			float NewShieldValue;
+		};
+
+		FortPawn_SetShield Parms{};
+
+		Parms.NewShieldValue = NewShieldValue;
+
+		ProcessEvent(Func, &Parms);
+	}
+	else {
+		if (HealthSet) {
+			HealthSet->CurrentShield.BaseValue = NewShieldValue;
+			HealthSet->CurrentShield.CurrentValue = NewShieldValue;
+			HealthSet->OnRep_CurrentShield();
+		}
+		else {
+			Log("SetShield: HealthSet is null!");
+		}
+	}
+}
+
+void AFortPawn::SetMaxShield(float NewValue)
+{
+	if (Version::Fortnite_Version >= 1.8) {
+		static UFunction* Func = nullptr;
+
+		if (Func == nullptr)
+			Func = FindFunction("SetMaxShield");
+
+		struct FortPawn_SetMaxShield
+		{
+		public:
+			float NewValue;
+		};
+
+		FortPawn_SetMaxShield Parms{};
+
+		Parms.NewValue = NewValue;
+
+		ProcessEvent(Func, &Parms);
+	}
+	else {
+		if (HealthSet) {
+			HealthSet->Shield.BaseValue = NewValue;
+			HealthSet->Shield.CurrentValue = NewValue;
+			HealthSet->Shield.Maximum = NewValue;
+			HealthSet->OnRep_Shield();
+		}
+		else {
+			Log("SetMaxShield: HealthSet is null!");
+		}
+	}
+}
+
+float AFortPawn::GetMaxHealth() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetMaxHealth");
+
+	struct FortPawn_GetMaxHealth
+	{
+	public:
+		float ReturnValue;
+	};
+
+	FortPawn_GetMaxHealth Parms{};
+
+	const_cast<AFortPawn*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}
+
+float AFortPawn::GetMaxShield() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetMaxShield");
+
+	struct FortPawn_GetMaxShield
+	{
+	public:
+		float ReturnValue;
+	};
+
+	FortPawn_GetMaxShield Parms{};
+
+	const_cast<AFortPawn*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
 }

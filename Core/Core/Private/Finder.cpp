@@ -7737,6 +7737,58 @@ uintptr_t Finder::FindAFortGameModeAthena_AddToAlivePlayers() {
 	return ServerOffsets::AFortGameModeAthena_AddToAlivePlayers;
 }
 
+uintptr_t Finder::FindUFortAnalytics_SetGameSessionID() {
+	if (ServerOffsets::UFortAnalytics_SetGameSessionID)
+		return ServerOffsets::UFortAnalytics_SetGameSessionID;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameSessionIDChanged").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::UFortAnalytics_SetGameSessionID = Addr - ImageBase;
+	}
+
+	Log("UFortAnalytics_SetGameSessionID found at: 0x" + std::format("{:X}", ServerOffsets::UFortAnalytics_SetGameSessionID));
+	return ServerOffsets::UFortAnalytics_SetGameSessionID;
+}
+
+uintptr_t Finder::FindUFortAnalytics_SetGameStateClassName() {
+	if (ServerOffsets::UFortAnalytics_SetGameStateClassName)
+		return ServerOffsets::UFortAnalytics_SetGameStateClassName;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameStateClassNameChanged").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::UFortAnalytics_SetGameStateClassName = Addr - ImageBase;
+	}
+
+	Log("UFortAnalytics_SetGameStateClassName found at: 0x" + std::format("{:X}", ServerOffsets::UFortAnalytics_SetGameStateClassName));
+	return ServerOffsets::UFortAnalytics_SetGameStateClassName;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
