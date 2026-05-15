@@ -144,6 +144,7 @@
     <ClInclude Include="Core\Public\Configuration.h" />
     <ClInclude Include="Core\Public\Finder.h" />
     <ClInclude Include="Core\Public\Offsets.h" />
+    <ClInclude Include="Core\Public\Patches.h" />
     <ClInclude Include="Core\Public\Utils.h" />
     <ClInclude Include="Core\Public\Version.h" />
     <ClInclude Include="CrashReporter\Public\CrashReporter.h" />

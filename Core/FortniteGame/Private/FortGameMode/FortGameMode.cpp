@@ -80,9 +80,6 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 		AFortPlayerStateAthena* FortPSAthena = BotController->PlayerState->Cast<AFortPlayerStateAthena>();
 
 		BotController->PlayerState->bIsABot = true;
-		if (FortPSAthena) {
-			FortPSAthena->TeamIndex = PickTeam(0, FortPC);
-		}
 
 		if (FortGameModeAthena) {
 			FortGameModeAthena->AddToAlivePlayers(FortPCAthena);

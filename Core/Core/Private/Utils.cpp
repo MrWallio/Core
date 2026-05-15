@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "../Public/Utils.h"
 
+#include "../Public/Patches.h"
+
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/Engine.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
@@ -179,6 +181,9 @@ void Utils::Hook() {
 		Log(std::format("MH_Initialize failed with status: {}", MH_StatusToString(status)));
 		return;
 	}
+
+	// Patches that i cant categorize
+	Patches::ApplyPatches();
 
 	// Engine
 	UObject::Hook();
