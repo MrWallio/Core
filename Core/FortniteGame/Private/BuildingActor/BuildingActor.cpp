@@ -69,7 +69,7 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 	}
 
 	if (!Weapon->WeaponData || !Weapon->WeaponData->IsA(UFortWeaponMeleeItemDefinition::StaticClass())) {
-		Log("ABuildingActor::OnDamageServer: WeaponData is null or not a melee weapon! WeaponData: " + std::string(Weapon->WeaponData ? Weapon->WeaponData->GetName().ToString() : "None"));
+		//Log("ABuildingActor::OnDamageServer: WeaponData is null or not a melee weapon! WeaponData: " + std::string(Weapon->WeaponData ? Weapon->WeaponData->GetName().ToString() : "None"));
 		return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 	}
 
@@ -77,7 +77,7 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 
 	ABuildingSMActor* BuildingSMActor = This->Cast<ABuildingSMActor>();
 	if (!BuildingSMActor) {
-		Log("ABuildingActor::OnDamageServer: This is not a BuildingSMActor!");
+		//Log("ABuildingActor::OnDamageServer: This is not a BuildingSMActor!");
 		return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 	}
 
