@@ -18,6 +18,14 @@ class AFortPlayerStateZone;
 class UFortWorldItemDefinition;
 class UFortBuildingActorSet;
 
+struct FBuildingClassData
+{
+public:
+	TSubclassOf<ABuildingActor> BuildingClass;
+	int32 PreviousBuildingLevel;
+	int32 UpgradeLevel;
+};
+
 class ABuildingActor : public AActor {
 public:
 	DefineUnrealClass(ABuildingActor);
@@ -32,6 +40,8 @@ public:
 	DefineUProperty(bool, bAllowInteract);
 
 	DefineUProperty(UFortBuildingActorSet*, BuildingAttributeSet);
+
+	DefineUProperty(int32, CurrentBuildingLevel);
 public:
 	void InitializeKismetSpawnedBuildingActor(ABuildingActor* BuildingOwner, AFortPlayerController* SpawningController, bool bUsePlayerBuildAnimations, ABuildingActor* ReplacedBuilding);
 

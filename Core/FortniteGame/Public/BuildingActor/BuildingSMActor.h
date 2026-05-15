@@ -27,6 +27,8 @@ public:
 	DefineUProperty(uint8, ResourceType);
 
 	DefineUProperty(AFortPlayerStateZone*, EditingPlayer);
+
+	DefineBitfieldUProperty(bMirrored);
 public:
 	ABuildingSMActor* ReplaceBuildingActor(
 		EBuildingReplacementType ReplacementType,

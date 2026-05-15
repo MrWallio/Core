@@ -18,6 +18,7 @@
 #include "FortniteGame/Public/FortHero/FortHero.h"
 #include "FortniteGame/Public/FortCharacter/CustomCharacterPart.h"
 #include "FortniteGame/Public/FortHero/FortHeroSpecialization.h"
+#include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -588,4 +589,71 @@ bool AFortPlayerController::RemoveInventoryItem(AFortPlayerController* This, FGu
 	Inventory->RemoveItem(*ItemGuid, Count);
 
 	return true;
+}
+
+void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored) {
+	Log("ServerCreateBuildingActorOld called with BuildingClass: " + (BuildingClassData.BuildingClass ? BuildingClassData.BuildingClass->GetName().ToString() : "null") + ", bMirrored: " + std::to_string(bMirrored));
+
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ServerCreateBuildingActor: World is null!");
+		return;
+	}
+
+	UFortResourceItemDefinition* Resource = UFortKismetLibrary::K2_GetResourceItemDefinition(((ABuildingSMActor*)BuildingClassData.BuildingClass->GetDefaultObj())->ResourceType);
+	if (!Resource) {
+		Log("ServerCreateBuildingActor: Failed to get resource item definition for building class!");
+		return;
+	}
+
+	if (!This->CanAffordToPlaceBuildableClass(&BuildingClassData)) {
+		Log("ServerCreateBuildingActor: Cannot afford to place building!");
+		return;
+	}
+
+	TArray<ABuildingActor*> BuildingsToRemove;
+	uint8 OptionalAdjustment;
+	if (UFortKismetLibrary::CanPlaceBuildableClassInStructuralGrid(World, BuildingClassData.BuildingClass.Get(), BuildLoc, BuildRot, bMirrored, &BuildingsToRemove, &OptionalAdjustment)) {
+		Log("ServerCreateBuildingActor: Cannot place building at location!");
+		return;
+	}
+
+	for (ABuildingActor* BuildingToRemove : BuildingsToRemove) {
+		if (BuildingToRemove) {
+			BuildingToRemove->K2_DestroyActor();
+		}
+	}
+	BuildingsToRemove.Free();
+
+	ABuildingActor* BuildingActor = World->SpawnActor(BuildingClassData.BuildingClass.Class, BuildLoc, BuildRot, This)->Cast<ABuildingActor>();
+	if (!BuildingActor) {
+		Log("ServerCreateBuildingActor: Failed to spawn building actor!");
+		return;
+	}
+	BuildingActor->InitializeKismetSpawnedBuildingActor(BuildingActor, This, true, nullptr);
+
+	BuildingActor->bPlayerPlaced = true;
+
+	AFortPlayerStateAthena* PlayerState = This->PlayerState->Cast<AFortPlayerStateAthena>();
+	if (PlayerState) {
+		BuildingActor->Team = PlayerState->TeamIndex;
+		BuildingActor->TeamIndex = PlayerState->TeamIndex;
+	}
+
+	ABuildingSMActor* BuildingSMActor = BuildingActor->Cast<ABuildingSMActor>();
+	if (BuildingSMActor) {
+		BuildingSMActor->bMirrored = bMirrored;
+	}
+
+	This->PayBuildableClassPlacementCost(&BuildingClassData);
+}
+
+bool AFortPlayerController::CanAffordToPlaceBuildableClass(FBuildingClassData* ClassToBuildData) {
+	bool (*&CanAffordToPlaceBuildableClassInternal)(AFortPlayerController * This, FBuildingClassData * ClassToBuildData) = decltype(CanAffordToPlaceBuildableClassInternal)(VTable[Finder::FindAFortPlayerController_CanAffordToPlaceBuildableClassVFT()]);
+	return CanAffordToPlaceBuildableClassInternal(this, ClassToBuildData);
+}
+
+int32 AFortPlayerController::PayBuildableClassPlacementCost(FBuildingClassData* ClassToBuildData) {
+	int32(*&PayBuildableClassPlacementCostInternal)(AFortPlayerController * This, FBuildingClassData * ClassToBuildData) = decltype(PayBuildableClassPlacementCostInternal)(VTable[Finder::FindAFortPlayerController_PayBuildableClassPlacementCostVFT()]);
+	return PayBuildableClassPlacementCostInternal(this, ClassToBuildData);
 }

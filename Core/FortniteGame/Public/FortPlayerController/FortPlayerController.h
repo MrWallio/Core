@@ -17,6 +17,7 @@ class UFortWorldItem;
 class UFortItemDefinition;
 class UFortRegisteredPlayerInfo;
 class UFortMcpProfileWorld;
+struct FBuildingClassData;
 
 class AFortPlayerController : public APlayerController {
 public:
@@ -77,6 +78,13 @@ public:
 
 	static inline bool (*RemoveInventoryItemOG)(AFortPlayerController* This, FGuid* ItemGuid, int32 Count, bool bForceRemoval);
 	static bool RemoveInventoryItem(AFortPlayerController* This, FGuid* ItemGuid, int32 Count, bool bForceRemoval);
+
+	static inline void (*ServerCreateBuildingActorOldOG)(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored);
+	static void ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored);
+
+	bool CanAffordToPlaceBuildableClass(FBuildingClassData* ClassToBuildData);
+
+	int32 PayBuildableClassPlacementCost(FBuildingClassData* ClassToBuildData);
 
 	static void Hook() {
 		/*HookVTableIdx(
@@ -139,6 +147,15 @@ public:
 			RemoveInventoryItem,
 			(LPVOID*)&RemoveInventoryItemOG
 		);
+
+		if (Version::Fortnite_Version <= 1.72) {
+			HookEveryVTable(
+				AFortPlayerController::StaticClass(),
+				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerCreateBuildingActor"),
+				ServerCreateBuildingActorOld,
+				(LPVOID*)&ServerCreateBuildingActorOldOG
+			);
+		}
 
 		Log("Hooked AFortPlayerController");
 	}

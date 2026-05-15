@@ -70,28 +70,31 @@ public:
 	DefineEnumProperty(Max_None);
 };
 
-enum class EFortStructuralGridQueryResults : uint8
-{
-	CanAdd = 0,
-	ExistingActor = 1,
-	Obstructed = 2,
-	NoStructuralSupport = 3,
-	InvalidActor = 4,
-	ReachedLimit = 5,
-	NoEditPermission = 6,
-	PatternNotPermittedByLayoutRequirement = 7,
-	ResourceTypeNotPermittedByLayoutRequirement = 8,
-	BuildingAtRequirementsDisabled = 9,
-	BuildingOtherThanRequirementsDisabled = 10,
-	EFortStructuralGridQueryResults_MAX = 11,
+class EFortStructuralGridEditMode {
+public:
+	DefineUnrealEnum(EFortStructuralGridEditMode);
+
+	DefineEnumProperty(CanAdd);
+	DefineEnumProperty(ExistingActor);
+	DefineEnumProperty(NoStructuralSupport);
+	DefineEnumProperty(InvalidActor);
+	DefineEnumProperty(ReachedLimit);
+	DefineEnumProperty(NoEditPermission);
+	DefineEnumProperty(PatternNotPermittedByLayoutRequirement);
+	DefineEnumProperty(ResourceTypeNotPermittedByLayoutRequirement);
+	DefineEnumProperty(BuildingAtRequirementsDisabled);
+	DefineEnumProperty(BuildingOtherThanRequirementsDisabled);
+	DefineEnumProperty(EFortStructuralGridQueryResults_MAX);
 };
 
-enum class EFortBuildPreviewMarkerOptionalAdjustment : uint8
-{
-	None = 0,
-	FreeWallPieceOnTop = 1,
-	FreeWallPieceOnBottom = 2,
-	EFortBuildPreviewMarkerOptionalAdjustment_MAX = 3,
+class EFortBuildPreviewMarkerOptionalAdjustment {
+public:
+	DefineUnrealEnum(EFortBuildPreviewMarkerOptionalAdjustment);
+
+	DefineEnumProperty(None);
+	DefineEnumProperty(FreeWallPieceOnTop);
+	DefineEnumProperty(FreeWallPieceOnBottom);
+	DefineEnumProperty(EFortBuildPreviewMarkerOptionalAdjustment_MAX);
 };
 
 class EFortItemEntryState {

@@ -976,6 +976,14 @@ public:
 	static uintptr_t FindAFortGameSessionDedicated_FinalizeCreationPatch1();
 
 	static uintptr_t FindAFortGameSessionDedicated_FinalizeCreationVFT();
+
+	static uintptr_t FindAFortPlayerController_CanAffordToPlaceBuildableClass();
+
+	static uintptr_t FindAFortPlayerController_CanAffordToPlaceBuildableClassVFT();
+
+	static uintptr_t FindAFortPlayerController_PayBuildableClassPlacementCost();
+
+	static uintptr_t FindAFortPlayerController_PayBuildableClassPlacementCostVFT();
 public:
 	static void SetupOffsets();
 

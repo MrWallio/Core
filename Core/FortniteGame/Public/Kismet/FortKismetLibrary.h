@@ -34,23 +34,23 @@ public:
 
 	static UFortResourceItemDefinition* K2_GetResourceItemDefinition(const uint8 ResourceType);
 
-	static EFortStructuralGridQueryResults CanPlaceBuildableClassInStructuralGrid(
+	static uint8 CanPlaceBuildableClassInStructuralGrid(
 		UObject* WorldContextObject,
 		UClass* ClassToBuild,
 		FVector WorldLocation,
 		FRotator WorldRotation,
 		bool bMirrored,
 		TArray<ABuildingActor*>* ExistingBuildings,
-		EFortBuildPreviewMarkerOptionalAdjustment* MarkerOptionalAdjustment);
+		uint8* MarkerOptionalAdjustment);
 
-	static EFortStructuralGridQueryResults CanPlaceBuildableClassInStructuralGrid(
+	static uint8 CanPlaceBuildableClassInStructuralGrid(
 		UObject* WorldContextObject,
 		TSubclassOf<ABuildingSMActor> ClassToBuild,
 		FVector WorldLocation,
 		FRotator WorldRotation,
 		bool bMirrored,
 		TArray<ABuildingActor*>* ExistingBuildings,
-		EFortBuildPreviewMarkerOptionalAdjustment* MarkerOptionalAdjustment);
+		uint8* MarkerOptionalAdjustment);
 	
 	static FFortAbilitySetHandle EquipFortAbilitySet(TScriptInterface<IAbilitySystemInterface> AbilitySystemInterfaceActor, UFortAbilitySet* AbilitySet, UObject* OverrideSourceObject);
 

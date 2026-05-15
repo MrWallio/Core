@@ -95,6 +95,17 @@ public:
 		}
 	}
 
+	inline void Free()
+	{
+		if (Data)
+		{
+			FMemory::Free(Data);
+			Data = nullptr;
+			ArrayNum = 0;
+			ArrayMax = 0;
+		}
+	}
+
 	int32 Add(const ArrayElementType& Item, int32 Size = ElementSize) {
 		Reserve(ArrayNum + 1, ElementSize);
 		std::memcpy(PBYTE(Data) + (ArrayNum * Size), (const PBYTE)&Item, Size);

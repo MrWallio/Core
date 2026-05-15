@@ -5080,10 +5080,35 @@ uintptr_t Finder::FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid(
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid)
 		return ServerOffsets::UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid;
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC ? 49 8B E9 4D 8B F0").Get();
+	
+	static bool bInitialized = false;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 10 48 89 6C 24 18 48 89 74 24 20 41 56 48 83 EC ? 49 8B E9 4D 8B F0", false).Get();
+
+		if (!Addr)
+			Addr = Memcury::Scanner::FindPattern("48 89 54 24 ? 55 56 41 56 48 83 EC 50", false).Get();
+
+		if (!Addr)
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC 60 4D 8B F1 4D 8B F8", false).Get();
+
+		if (!Addr)
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC 60 49 8B E9 4D 8B F8 48 8B DA 48 8B F9 BE ? ? ? ? 48", false).Get();
+
+		if (!Addr)
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC 70 49 8B E9 4D 8B F8 48 8B DA 48 8B F9").Get();
+
+		if (!Addr)
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 48 8B 1A 4D 8B F1").Get();
+	}
+	
 	if (Addr) {
 		ServerOffsets::UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid = Addr - ImageBase;
 	}
+
 	Log("UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid found at: 0x" + std::format("{:X}", ServerOffsets::UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid));
 	return ServerOffsets::UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid;
 }
@@ -7985,6 +8010,96 @@ uintptr_t Finder::FindAFortGameSessionDedicated_FinalizeCreationVFT() {
 
 	Log("AFortGameSessionDedicated_FinalizeCreationVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSessionDedicated_FinalizeCreationVFT));
 	return ServerOffsets::AFortGameSessionDedicated_FinalizeCreationVFT;
+}
+
+uintptr_t Finder::FindAFortPlayerController_CanAffordToPlaceBuildableClass() {
+	if (ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClass)
+		return ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClass;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Resource not found! Resource Type is %i, might be invalid").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x57)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClass = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerController_CanAffordToPlaceBuildableClass found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClass));
+	return ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClass;
+}
+
+uintptr_t Finder::FindAFortPlayerController_CanAffordToPlaceBuildableClassVFT() {
+	if (ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClassVFT)
+		return ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClassVFT;
+	
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortPlayerController"))->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortPlayerController_CanAffordToPlaceBuildableClass() + ImageBase))
+		{
+			ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClassVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortPlayerController_CanAffordToPlaceBuildableClassVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClassVFT));
+	return ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClassVFT;
+}
+
+uintptr_t Finder::FindAFortPlayerController_PayBuildableClassPlacementCost() {
+	if (ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCost)
+		return ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCost;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Failed to remove item %s during pay building costs, item duplicated!").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCost = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerController_PayBuildableClassPlacementCost found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCost));
+	return ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCost;
+}
+
+uintptr_t Finder::FindAFortPlayerController_PayBuildableClassPlacementCostVFT() {
+	if (ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCostVFT)
+		return ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCostVFT;
+
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortPlayerController"))->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortPlayerController_PayBuildableClassPlacementCost() + ImageBase))
+		{
+			ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCostVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortPlayerController_PayBuildableClassPlacementCostVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCostVFT));
+	return ServerOffsets::AFortPlayerController_PayBuildableClassPlacementCostVFT;
 }
 
 void Finder::SetupOffsets() {

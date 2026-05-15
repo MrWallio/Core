@@ -68,29 +68,29 @@ class UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinit
 	}
 }
 
-EFortStructuralGridQueryResults UFortKismetLibrary::CanPlaceBuildableClassInStructuralGrid(
+uint8 UFortKismetLibrary::CanPlaceBuildableClassInStructuralGrid(
 	UObject* WorldContextObject,
 	UClass* ClassToBuild,
 	FVector WorldLocation,
 	FRotator WorldRotation,
 	bool bMirrored,
 	TArray<ABuildingActor*>* ExistingBuildings,
-	EFortBuildPreviewMarkerOptionalAdjustment* MarkerOptionalAdjustment)
+	uint8* MarkerOptionalAdjustment)
 {
-	EFortStructuralGridQueryResults(*CanPlaceBuildableClassInStructuralGridInternal)(UObject*, UClass*, FVector, FRotator, bool, TArray<ABuildingActor*>*, EFortBuildPreviewMarkerOptionalAdjustment*) = decltype(CanPlaceBuildableClassInStructuralGridInternal)(ImageBase + Finder::FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid());
+	uint8(*CanPlaceBuildableClassInStructuralGridInternal)(UObject*, UClass*, FVector, FRotator, bool, TArray<ABuildingActor*>*, uint8*) = decltype(CanPlaceBuildableClassInStructuralGridInternal)(ImageBase + Finder::FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid());
 	return CanPlaceBuildableClassInStructuralGridInternal(WorldContextObject, ClassToBuild, WorldLocation, WorldRotation, bMirrored, ExistingBuildings, MarkerOptionalAdjustment);
 }
 
-EFortStructuralGridQueryResults UFortKismetLibrary::CanPlaceBuildableClassInStructuralGrid(
+uint8 UFortKismetLibrary::CanPlaceBuildableClassInStructuralGrid(
 	UObject* WorldContextObject,
 	TSubclassOf<ABuildingSMActor> ClassToBuild,
 	FVector WorldLocation,
 	FRotator WorldRotation,
 	bool bMirrored,
 	TArray<ABuildingActor*>* ExistingBuildings,
-	EFortBuildPreviewMarkerOptionalAdjustment* MarkerOptionalAdjustment)
+	uint8* MarkerOptionalAdjustment)
 {
-	EFortStructuralGridQueryResults(*CanPlaceBuildableClassInStructuralGridInternal)(UObject*, TSubclassOf<ABuildingSMActor>, FVector, FRotator, bool, TArray<ABuildingActor*>*, EFortBuildPreviewMarkerOptionalAdjustment*) = decltype(CanPlaceBuildableClassInStructuralGridInternal)(ImageBase + Finder::FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid());
+	uint8(*CanPlaceBuildableClassInStructuralGridInternal)(UObject*, TSubclassOf<ABuildingSMActor>, FVector, FRotator, bool, TArray<ABuildingActor*>*, uint8*) = decltype(CanPlaceBuildableClassInStructuralGridInternal)(ImageBase + Finder::FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid());
 	return CanPlaceBuildableClassInStructuralGridInternal(WorldContextObject, ClassToBuild, WorldLocation, WorldRotation, bMirrored, ExistingBuildings, MarkerOptionalAdjustment);
 }
 
