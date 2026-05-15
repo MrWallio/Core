@@ -2,6 +2,8 @@
 #include "FortniteGame/Public/FortPawn/FortPawn.h"
 
 #include "FortniteGame/Public/FortSet/FortHealthSet.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortWeapon/FortWeapon.h"
 
 AFortWeapon* AFortPawn::EquipWeaponDefinition(const UFortWeaponItemDefinition* WeaponData, const FGuid& ItemEntryGuid)
 {
@@ -206,4 +208,46 @@ float AFortPawn::GetMaxShield() const
 	const_cast<AFortPawn*>(this)->ProcessEvent(Func, &Parms);
 
 	return Parms.ReturnValue;
+}
+
+AFortWeapon* AFortPawn::FindWeapon(UFortItemDefinition* ItemDef)
+{
+	if (!ItemDef) {
+		Log("FindWeapon: ItemDef is null!");
+		return nullptr;
+	}
+
+	if (!CurrentWeaponList.IsValid()) {
+		Log("FindWeapon: CurrentWeaponList is not valid!");
+		return nullptr;
+	}
+
+	for (AFortWeapon* Weapon : CurrentWeaponList) {
+		if (Weapon && Weapon->WeaponData && Weapon->WeaponData == ItemDef) {
+			return Weapon;
+		}
+	}
+
+	return nullptr;
+}
+
+AFortWeapon* AFortPawn::FindWeapon(FGuid Guid)
+{
+	if (!Guid.IsValid()) {
+		Log("FindWeapon: Guid is not valid!");
+		return nullptr;
+	}
+
+	if (!CurrentWeaponList.IsValid()) {
+		Log("FindWeapon: CurrentWeaponList is not valid!");
+		return nullptr;
+	}
+
+	for (AFortWeapon* Weapon : CurrentWeaponList) {
+		if (Weapon && Weapon->ItemEntryGuid == Guid) {
+			return Weapon;
+		}
+	}
+
+	return nullptr;
 }

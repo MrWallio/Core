@@ -19,6 +19,7 @@ public:
 	DefineUnrealClass(AFortPawn);
 
 	DefineUProperty(AFortWeapon*, CurrentWeapon);
+	DefineUProperty(TArray<AFortWeapon*>, CurrentWeaponList);
 
 	DefineBitfieldUProperty(bMovingEmote);
 	DefineBitfieldUProperty(bMovingEmoteForwardOnly);
@@ -55,4 +56,7 @@ public:
 	float GetMaxHealth() const;
 
 	float GetMaxShield() const;
+
+	AFortWeapon* FindWeapon(UFortItemDefinition* ItemDef);
+	AFortWeapon* FindWeapon(FGuid ItemDef);
 };
