@@ -7,6 +7,7 @@ struct FCoreConfig {
 	bool bEnableClientConsole = false;
 	bool bIsClient = false;
 	bool bSetClientLogVerbosity = false;
+	bool bUseGameSessions = false;
 
 	std::string Playlist = "2";
 

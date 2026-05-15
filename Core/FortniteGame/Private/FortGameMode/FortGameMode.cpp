@@ -170,8 +170,13 @@ uint8 AFortGameMode::PickTeam(uint8 PreferredTeam, AFortPlayerController* Contro
 UClass** AFortGameMode::GetGameSessionClass(AFortGameMode* This, UClass** result) {
 	Log("AFortGameMode::GetGameSessionClass called.");
 
-	*result = AFortGameSessionDedicated::StaticClass();
-	This->GameSessionClass = *result;
+	if (ConfigurationManager::GetConfig().bUseGameSessions) {
+		*result = AFortGameSessionDedicated::StaticClass();
+		This->GameSessionClass = *result;
 
-	return result;
+		return result;
+	}
+	else {
+		return GetGameSessionClassOG(This, result);
+	}
 }

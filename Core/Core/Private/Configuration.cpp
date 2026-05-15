@@ -17,6 +17,7 @@ void ConfigurationManager::LoadConfig() {
 	NewConfig.bEnableClientConsole = FParse::Param(CmdLine, TEXT("bEnableClientConsole"));
 	NewConfig.bIsClient = FParse::Param(CmdLine, TEXT("bIsClient"));
 	NewConfig.bSetClientLogVerbosity = FParse::Param(CmdLine, TEXT("bSetClientLogVerbosity"));
+	NewConfig.bUseGameSessions = FParse::Param(CmdLine, TEXT("bUseGameSessions"));
 
 	const wchar_t* PlaylistParam = wcsstr(CmdLine, L"Playlist=");
 	if (PlaylistParam) {
@@ -35,6 +36,7 @@ void ConfigurationManager::LoadConfig() {
 	Log("bEnableClientConsole: " + std::to_string(NewConfig.bEnableClientConsole));
 	Log("bIsClient: " + std::to_string(NewConfig.bIsClient));
 	Log("bSetClientLogVerbosity: " + std::to_string(NewConfig.bSetClientLogVerbosity));
+	Log("bUseGameSessions: " + std::to_string(NewConfig.bUseGameSessions));
 	Log("Playlist: " + NewConfig.Playlist);
 
 	Config = NewConfig;
