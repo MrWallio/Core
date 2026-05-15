@@ -615,6 +615,12 @@
     <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameModeFrontEnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortAnalytics\AnalyticsProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortGameInstance\FortGameInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">
@@ -864,6 +870,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\FortAnalytics\FortAnalytics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortGameInstance\FortGameInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

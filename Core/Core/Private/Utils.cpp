@@ -25,6 +25,7 @@
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 #include "FortniteGame/Public/FortItem/FortWorldItem.h"
 #include "FortniteGame/Public/FortAnalytics/FortAnalytics.h"
+#include "FortniteGame/Public/FortGameInstance/FortGameInstance.h"
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -209,6 +210,7 @@ void Utils::Hook() {
 	ABuildingSMActor::Hook();
 	UFortWorldItem::Hook();
 	UFortAnalytics::Hook();
+	UFortGameInstance::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

@@ -5,6 +5,9 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/Core/Public/Templates/SharedPointer.h"
 
+#include "AnalyticsProvider.h"
+#include "FortniteGame/Public/FortEnums.h"
+
 class UFortAnalytics {
 public:
 	static inline void (*SetGameSessionIDOG)(void** Provider, FString GameSessionID, bool bSendEventIfChanged);
