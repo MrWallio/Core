@@ -2633,11 +2633,15 @@ uintptr_t Finder::FindAGameSession_RegisterPlayer() {
 	if (ServerOffsets::AGameSession_RegisterPlayer)
 		return ServerOffsets::AGameSession_RegisterPlayer;
 	static uintptr_t Addr = 0;
-	Addr = Memcury::Scanner::FindPattern("48 85 D2 74 ? 48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B DA").Get();
+
+	if (Version::Engine_Version == 4.16) {
+		Addr = Memcury::Scanner::FindPattern("48 85 D2 74 ? 48 89 5C 24 ? 57 48 83 EC ? 8B 05").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::AGameSession_RegisterPlayer = Addr - ImageBase;
 	}
+
 	Log("AGameSession_RegisterPlayer found at: 0x" + std::format("{:X}", ServerOffsets::AGameSession_RegisterPlayer));
 	return ServerOffsets::AGameSession_RegisterPlayer;
 }

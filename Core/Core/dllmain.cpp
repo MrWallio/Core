@@ -63,15 +63,7 @@ DWORD Main(LPVOID)
         Utils::Hook();
 
         *GIsClient = false;
-        /*
-            Setting GIsClient and GIsServer crashes unless you only set one of them, however
-            setting GIsServer to true and not setting GIsClient to false crashes when the client connects
-            so the best way to get around this is to only set GIsClient to false and not set GIsServer
-            I will hopefully fix this and be able to set both in the future.
-        */
-        if (Version::Fortnite_Version >= 1.82) {
-            *GIsServer = true;
-        }
+        *GIsServer = true;
 
         Sleep(1000);
 
