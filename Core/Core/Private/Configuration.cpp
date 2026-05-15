@@ -6,16 +6,36 @@
 FCoreConfig ConfigurationManager::Config;
 
 void ConfigurationManager::LoadConfig() {
+	const wchar_t* CmdLine = GetCommandLineW();
+	if (!CmdLine) {
+		Log("Failed to get command line arguments!");
+		return;
+	}
+
 	FCoreConfig NewConfig = FCoreConfig();
 
-	NewConfig.bEnableClientConsole = FParse::Param(GetCommandLineW(), TEXT("bEnableClientConsole"));
-	NewConfig.bIsClient = FParse::Param(GetCommandLineW(), TEXT("bIsClient"));
-	NewConfig.bSetClientLogVerbosity = FParse::Param(GetCommandLineW(), TEXT("bSetClientLogVerbosity"));
+	NewConfig.bEnableClientConsole = FParse::Param(CmdLine, TEXT("bEnableClientConsole"));
+	NewConfig.bIsClient = FParse::Param(CmdLine, TEXT("bIsClient"));
+	NewConfig.bSetClientLogVerbosity = FParse::Param(CmdLine, TEXT("bSetClientLogVerbosity"));
+
+	const wchar_t* PlaylistParam = wcsstr(CmdLine, L"Playlist=");
+	if (PlaylistParam) {
+		PlaylistParam += 9;
+		std::wstring PlaylistWide;
+		while (*PlaylistParam && *PlaylistParam != L' ' && *PlaylistParam != L'\0') {
+			PlaylistWide += *PlaylistParam;
+			PlaylistParam++;
+		}
+		if (!PlaylistWide.empty()) {
+			NewConfig.Playlist = std::string(PlaylistWide.begin(), PlaylistWide.end());
+		}
+	}
 
 	Log("Configuration Loaded:");
 	Log("bEnableClientConsole: " + std::to_string(NewConfig.bEnableClientConsole));
 	Log("bIsClient: " + std::to_string(NewConfig.bIsClient));
 	Log("bSetClientLogVerbosity: " + std::to_string(NewConfig.bSetClientLogVerbosity));
+	Log("Playlist: " + NewConfig.Playlist);
 
 	Config = NewConfig;
 }

@@ -340,7 +340,7 @@ void Utils::RemoveLocalPlayer() {
 	}
 }
 
-void Utils::LoadWorld() {
+void Utils::LoadWorld(FCoreConfig& Config) {
 	UWorld* World = UWorld::GetWorld();
 
 	FString MapName = Utils::GetDefaultMapName();
@@ -348,8 +348,8 @@ void Utils::LoadWorld() {
 
 	FString TravelURL = Utils::BuildTravelURL(MapName, {
 		{"listen", ""},
-		{"playlistId", "2"},
-		{"Playlist", "Playlist_DefaultSolo"},
+		{"playlistId", Config.Playlist},
+		{"Playlist", Config.Playlist},
 		{"RequiredPlayers", "1"}
 		});
 

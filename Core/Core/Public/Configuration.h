@@ -8,6 +8,8 @@ struct FCoreConfig {
 	bool bIsClient = false;
 	bool bSetClientLogVerbosity = false;
 
+	std::string Playlist = "2";
+
 	FCoreConfig() = default;
 };
 

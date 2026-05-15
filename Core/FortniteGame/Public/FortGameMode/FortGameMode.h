@@ -21,7 +21,11 @@ public:
 
 	bool SpawnPlayerBot(AActor* SpawnPoint = nullptr);
 
+	uint8 PickTeam(uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor);
+
 	static void Hook() {
 		CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
+
+		Log("AFortGameMode Hooked!");
 	}
 };

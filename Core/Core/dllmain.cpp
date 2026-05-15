@@ -78,7 +78,7 @@ DWORD Main(LPVOID)
         Utils::SetLogVerbosity();
 
         Utils::RemoveLocalPlayer();
-        Utils::LoadWorld();
+        Utils::LoadWorld(Config);
     }
 
     return 0;

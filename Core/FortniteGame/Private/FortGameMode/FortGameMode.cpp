@@ -78,6 +78,10 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 		AFortPlayerStateAthena* FortPSAthena = BotController->PlayerState->Cast<AFortPlayerStateAthena>();
 
 		BotController->PlayerState->bIsABot = true;
+		if (FortPSAthena) {
+			FortPSAthena->TeamIndex = PickTeam(0, FortPC);
+		}
+
 		if (FortGameModeAthena) {
 			FortGameModeAthena->AddToAlivePlayers(FortPCAthena);
 			NumBots++;
@@ -154,4 +158,9 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 	}
 
 	return false;
+}
+
+uint8 AFortGameMode::PickTeam(uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor) {
+	uint8 (*&PickTeamInternal)(AFortGameMode* This, uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor) = decltype(PickTeamInternal)(VTable[Finder::FindAFortGameMode_PickTeamVFT()]);
+	return PickTeamInternal(this, PreferredTeam, ControllerToPickFor);
 }

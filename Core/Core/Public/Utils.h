@@ -25,7 +25,7 @@ public:
 	static void SetLogVerbosity();
 
 	static void RemoveLocalPlayer();
-	static void LoadWorld();
+	static void LoadWorld(FCoreConfig& Config);
 
     static uintptr_t GetCallDestination(uintptr_t callAddr);
 };

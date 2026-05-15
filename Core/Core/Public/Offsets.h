@@ -336,6 +336,8 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameMode_SpawnDefaultPawnFor = 0;
 	inline uintptr_t AFortGameMode_SetCurrentPlaylistId = 0;
 	inline uintptr_t AFortGameMode_FinishWorldInitializationVFT = 0;
+	inline uintptr_t AFortGameMode_PickTeam = 0;
+	inline uintptr_t AFortGameMode_PickTeamVFT = 0;
 
 	inline uintptr_t AFortWorldManager_HandleWorldQueryComplete = 0;
 

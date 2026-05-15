@@ -958,6 +958,10 @@ public:
 	static uintptr_t FindUFortAnalytics_SetGameSessionID();
 
 	static uintptr_t FindUFortAnalytics_SetGameStateClassName();
+
+	static uintptr_t FindAFortGameMode_PickTeam();
+
+	static uintptr_t FindAFortGameMode_PickTeamVFT();
 public:
 	static void SetupOffsets();
 

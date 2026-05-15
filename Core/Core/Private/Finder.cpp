@@ -7789,6 +7789,61 @@ uintptr_t Finder::FindUFortAnalytics_SetGameStateClassName() {
 	return ServerOffsets::UFortAnalytics_SetGameStateClassName;
 }
 
+uintptr_t Finder::FindAFortGameMode_PickTeam() {
+	if (ServerOffsets::AFortGameMode_PickTeam)
+		return ServerOffsets::AFortGameMode_PickTeam;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Failed to find a team, resorting to smallest team %s!").Get();
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"PickTeam for %s preferred: %s actual: %s").Get();
+	}
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"Failed to find a team, resorting to smallest team %d!").Get();
+	}
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"PickTeam for %s preferred: %d actual: %d").Get();
+	}
+
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::AFortGameMode_PickTeam = Addr - ImageBase;
+	}
+
+	Log("AFortGameMode_PickTeam found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_PickTeam));
+	return ServerOffsets::AFortGameMode_PickTeam;
+}
+
+uintptr_t Finder::FindAFortGameMode_PickTeamVFT() {
+	if (ServerOffsets::AFortGameMode_PickTeamVFT)
+		return ServerOffsets::AFortGameMode_PickTeamVFT;
+	
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortGameMode"))->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortGameMode_PickTeam() + ImageBase))
+		{
+			ServerOffsets::AFortGameMode_PickTeamVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortGameMode_PickTeamVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_PickTeamVFT));
+	return ServerOffsets::AFortGameMode_PickTeamVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
