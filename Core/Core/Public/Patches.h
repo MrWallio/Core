@@ -16,6 +16,12 @@ public:
 				MH_CreateHook((LPVOID)Patch2, RetNullptr, nullptr);
 				Log("Patched: " + std::to_string(Patch2 - ImageBase) + " with RetNullptr");
 			}
+
+			uintptr_t Patch3 = Memcury::Scanner::FindPattern("40 53 55 56 48 81 EC ? ? ? ? 33 F6").Get();
+			if (Patch3) {
+				MH_CreateHook((LPVOID)Patch3, True, nullptr);
+				Log("Patched: " + std::to_string(Patch3 - ImageBase) + " with True");
+			}
 		}
 	}
 };
