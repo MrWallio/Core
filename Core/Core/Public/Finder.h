@@ -49,6 +49,8 @@ public:
 
 	static uintptr_t FindABuildingActor_OnDamageServer();
 
+	static uintptr_t FindAFortPlayerControllerZone_ClientOnPawnDied();
+
 	static uintptr_t FindSpawnActor();
 
 	static uintptr_t FindStep();

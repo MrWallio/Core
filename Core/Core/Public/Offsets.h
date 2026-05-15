@@ -576,6 +576,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPlayerController_RemoveInventoryItemVFT = 0;
 
 	inline uintptr_t AFortPlayerControllerZone_OnReadyToStartMatch = 0;
+	inline uintptr_t AFortPlayerControllerZone_ClientOnPawnDied = 0;
 
 	inline uintptr_t AFortGameStateZone_ApplyHomebaseEffectsOnPlayerSetup = 0;
 

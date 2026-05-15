@@ -23,8 +23,5 @@ public:
 	static inline void (*ServerSetShouldDisablePlayerTeleportingDuringMissionResultsOG)(AFortPlayerControllerZone* This);
 	static void ServerSetShouldDisablePlayerTeleportingDuringMissionResults(AFortPlayerControllerZone* This);
 
-	static inline void (*ClientOnPawnDiedOG)(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport);
-	static void ClientOnPawnDied(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport);
-
 	static void Hook();
 };

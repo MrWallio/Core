@@ -27,6 +27,9 @@ public:
 	static inline void (*ServerAttemptAircraftJumpOG)(AFortPlayerControllerAthena* This, FRotator& ClientRotation);
 	static void ServerAttemptAircraftJump(AFortPlayerControllerAthena* This, FRotator& ClientRotation);
 
+	static inline void (*ClientOnPawnDiedOG)(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport);
+	static void ClientOnPawnDied(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport);
+
 	static void Hook() {
 		UObject* AircraftComp = FUObjectArray::FindObject("Class FortniteGame.FortControllerComponent_Aircraft");
 		if (!AircraftComp) {
@@ -43,6 +46,14 @@ public:
 				(LPVOID*)&ServerAttemptAircraftJumpOG
 			);
 		}
+
+		/*HookEveryVTable(
+			AFortPlayerControllerAthena::StaticClass(),
+			AFortPlayerControllerAthena::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerControllerZone.ClientOnPawnDied"),
+			ClientOnPawnDied,
+			(LPVOID*)&ClientOnPawnDiedOG
+		);*/
+		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerControllerZone_ClientOnPawnDied()), ClientOnPawnDied, (LPVOID*)&ClientOnPawnDiedOG);
 
 		Log("Hooked AFortPlayerControllerAthena");
 	}

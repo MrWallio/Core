@@ -677,6 +677,22 @@ uintptr_t Finder::FindABuildingActor_OnDamageServer() {
 	return ServerOffsets::ABuildingActor_OnDamageServer;
 }
 
+uintptr_t Finder::FindAFortPlayerControllerZone_ClientOnPawnDied() {
+	uintptr_t Addr = 0;
+	if (ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied)
+		return ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied;
+
+	Addr = FindFunctionCall(L"ClientOnPawnDied", Version::Engine_Version == 4.16 ? std::vector<uint8_t> { 0x48, 0x89, 0x54 } : (Version::Fortnite_Version >= 24 && Version::Fortnite_Version < 25 ? std::vector<uint8_t> { 0x48, 0x8B, 0xC4 } : std::vector<uint8_t>{ 0x48, 0x89, 0x5C }));
+
+	if (Addr)
+	{
+		ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerControllerZone::ClientOnPawnDied found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied));
+	return ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied;
+}
+
 uintptr_t Finder::FindSpawnActor() {
 	if (ServerOffsets::SpawnActor)
 		return ServerOffsets::SpawnActor;
