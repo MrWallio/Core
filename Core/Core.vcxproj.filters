@@ -875,5 +875,8 @@
     <ClCompile Include="FortniteGame\Private\FortGameInstance\FortGameInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortGameSession\FortGameSessionDedicated.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

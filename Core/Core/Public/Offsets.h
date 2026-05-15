@@ -595,4 +595,8 @@ namespace ServerOffsets {
 
 	inline uintptr_t UFortAnalytics_SetGameSessionID = 0;
 	inline uintptr_t UFortAnalytics_SetGameStateClassName = 0;
+
+	inline uintptr_t AFortGameSessionDedicated_FinalizeCreation = 0;
+	inline uintptr_t AFortGameSessionDedicated_FinalizeCreationPatch1 = 0;
+	inline uintptr_t AFortGameSessionDedicated_FinalizeCreationVFT = 0;
 }

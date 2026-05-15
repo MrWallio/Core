@@ -7898,6 +7898,75 @@ uintptr_t Finder::FindAGameModeBase_GetGameSessionClassVFT() {
 	return ServerOffsets::AGameModeBase_GetGameSessionClassVFT;
 }
 
+uintptr_t Finder::FindAFortGameSessionDedicated_FinalizeCreation() {
+	if (ServerOffsets::AFortGameSessionDedicated_FinalizeCreation)
+		return ServerOffsets::AFortGameSessionDedicated_FinalizeCreation;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Dedicated Server Ready!").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameSessionDedicated_FinalizeCreation = Addr - ImageBase;
+	}
+
+	Log("AFortGameSessionDedicated_FinalizeCreation found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSessionDedicated_FinalizeCreation));
+	return ServerOffsets::AFortGameSessionDedicated_FinalizeCreation;
+}
+
+uintptr_t Finder::FindAFortGameSessionDedicated_FinalizeCreationPatch1() {
+	if (ServerOffsets::AFortGameSessionDedicated_FinalizeCreationPatch1)
+		return ServerOffsets::AFortGameSessionDedicated_FinalizeCreationPatch1;
+	uintptr_t Addr = 0;
+	uintptr_t FinalizeCreationAddr = FindAFortGameSessionDedicated_FinalizeCreation() + ImageBase;
+
+	for (int i = 0; i < 512; i++)
+	{
+		auto Ptr = (uint8_t*)(FinalizeCreationAddr + i);
+		if (*Ptr == 0x0F && *(Ptr + 1) == 0x84 && *(Ptr + 2) == 0x9C)
+		{
+			Addr = uint64_t(Ptr + 1);
+			break;
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::AFortGameSessionDedicated_FinalizeCreationPatch1 = Addr - ImageBase;
+	}
+
+	Log("AFortGameSessionDedicated_FinalizeCreationPatch1 found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSessionDedicated_FinalizeCreationPatch1));
+	return ServerOffsets::AFortGameSessionDedicated_FinalizeCreationPatch1;
+}
+
+uintptr_t Finder::FindAFortGameSessionDedicated_FinalizeCreationVFT() {
+	if (ServerOffsets::AFortGameSessionDedicated_FinalizeCreationVFT)
+		return ServerOffsets::AFortGameSessionDedicated_FinalizeCreationVFT;
+	
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortGameSessionDedicated"))->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortGameSessionDedicated_FinalizeCreation() + ImageBase))
+		{
+			ServerOffsets::AFortGameSessionDedicated_FinalizeCreationVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortGameSessionDedicated_FinalizeCreationVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSessionDedicated_FinalizeCreationVFT));
+	return ServerOffsets::AFortGameSessionDedicated_FinalizeCreationVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

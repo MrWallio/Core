@@ -402,6 +402,7 @@
     <ClCompile Include="FortniteGame\Private\FortGameMode\FortGameModeZone.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameMode\FortGamePvPBase.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameSession\FortGameSession.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortGameSession\FortGameSessionDedicated.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameState\FortGameState.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameState\FortGameStateAthena.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameState\FortGameStateZone.cpp" />

@@ -26,6 +26,7 @@
 #include "FortniteGame/Public/FortItem/FortWorldItem.h"
 #include "FortniteGame/Public/FortAnalytics/FortAnalytics.h"
 #include "FortniteGame/Public/FortGameInstance/FortGameInstance.h"
+#include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -211,6 +212,7 @@ void Utils::Hook() {
 	UFortWorldItem::Hook();
 	UFortAnalytics::Hook();
 	UFortGameInstance::Hook();
+	AFortGameSessionDedicated::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

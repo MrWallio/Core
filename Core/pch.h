@@ -155,4 +155,54 @@ void CreateVTableOriginal(void* Base, class UFunction* Func, void** Original);
 uintptr_t GetOffsetFromVTable(class UObject* Object, class UFunction* Func);
 uintptr_t GetOffsetFromVTable(class UObject* Object, int Idx);
 
+inline bool PatchBytes(void* address, const void* bytes, size_t size)
+{
+    if (!address || !bytes || size == 0)
+        return false;
+
+    DWORD oldProtect{};
+    if (!VirtualProtect(address, size, PAGE_EXECUTE_READWRITE, &oldProtect))
+        return false;
+
+    std::memcpy(address, bytes, size);
+    FlushInstructionCache(GetCurrentProcess(), address, size);
+
+    DWORD temp{};
+    VirtualProtect(address, size, oldProtect, &temp);
+    return true;
+}
+
+inline bool PatchByte(void* address, uint8_t value)
+{
+    return PatchBytes(address, &value, sizeof(value));
+}
+
+inline bool PatchByte(uintptr_t address, uint8_t value)
+{
+    return PatchByte(reinterpret_cast<void*>(address), value);
+}
+
+inline bool PatchByteChecked(uintptr_t address, uint8_t expected, uint8_t value)
+{
+    auto ptr = reinterpret_cast<uint8_t*>(address);
+    if (!ptr || *ptr != expected)
+        return false;
+
+    return PatchByte(address, value);
+}
+
+inline bool NopBytes(void* address, size_t count)
+{
+    if (!address || count == 0)
+        return false;
+
+    std::vector<uint8_t> nops(count, 0x90);
+    return PatchBytes(address, nops.data(), nops.size());
+}
+
+inline bool NopBytes(uintptr_t address, size_t count)
+{
+    return NopBytes(reinterpret_cast<void*>(address), count);
+}
+
 #endif //PCH_H

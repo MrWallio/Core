@@ -8,4 +8,12 @@ public:
 	DefineUnrealClass(AFortGameSessionDedicated);
 
 	DefineUProperty(float, HotfixCheckTimer);
+public:
+	bool FinalizeCreation();
+
+	static void Hook() {
+		PatchByte(ImageBase + Finder::FindAFortGameSessionDedicated_FinalizeCreationPatch1(), 0x85);
+
+		Log("AFortGameSessionDedicated Hooked!");
+	}
 };

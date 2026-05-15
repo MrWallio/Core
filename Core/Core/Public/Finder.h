@@ -968,6 +968,12 @@ public:
 	static uintptr_t FindAGameModeBase_GetGameSessionClass();
 
 	static uintptr_t FindAGameModeBase_GetGameSessionClassVFT();
+
+	static uintptr_t FindAFortGameSessionDedicated_FinalizeCreation();
+
+	static uintptr_t FindAFortGameSessionDedicated_FinalizeCreationPatch1();
+
+	static uintptr_t FindAFortGameSessionDedicated_FinalizeCreationVFT();
 public:
 	static void SetupOffsets();
 
