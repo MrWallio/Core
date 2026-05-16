@@ -11,6 +11,7 @@
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 #include "FortniteGame/Public/AI/FortAIDirector.h"
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
+#include "FortniteGame/Public/FortInventory/FortInventory.h"
 
 bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
 	if (This->bWorldIsReady
@@ -63,4 +64,22 @@ void AFortGameModeAthena::BeginPlay(AFortGameModeAthena* This) {
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
 	void (*AddToAlivePlayersInternal)(AFortGameModeAthena* This, AFortPlayerControllerAthena* PC) = decltype(AddToAlivePlayersInternal)(ImageBase + Finder::FindAFortGameModeAthena_AddToAlivePlayers());
 	AddToAlivePlayersInternal(this, PC);
+}
+
+int32 AFortGameModeAthena::StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone) {
+	Log("StartAircraftPhase: Starting aircraft phase. Dropping all items and resetting health/shield for alive players.");
+	for (AFortPlayerControllerAthena* PC : This->AlivePlayers) {
+		if (PC->WorldInventory) {
+			PC->WorldInventory->DropAllItems(false);
+		}
+
+		if (PC->MyFortPawn) {
+			AFortPlayerPawn* MyFortPawn = PC->MyFortPawn;
+
+			MyFortPawn->SetHealth(MyFortPawn->GetMaxHealth());
+			MyFortPawn->SetShield(0.0f);
+		}
+	}
+
+	return StartAircraftPhaseOG(This, bGoStraightToSafeZone);
 }

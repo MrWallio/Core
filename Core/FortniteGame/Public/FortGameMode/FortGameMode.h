@@ -26,6 +26,9 @@ public:
 	static inline UClass** (*GetGameSessionClassOG)(AFortGameMode* This, UClass** result);
 	static UClass** GetGameSessionClass(AFortGameMode* This, UClass** result);
 
+	static inline void (*RestartPlayerOG)(AFortGameMode* This, AController* NewPlayer);
+	static void RestartPlayerHK(AFortGameMode* This, AController* NewPlayer);
+
 	static void Hook() {
 		CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
 
@@ -33,6 +36,12 @@ public:
 			(LPVOID)(GetOffsetFromVTable(AFortGameMode::GetDefaultObj(), Finder::FindAGameModeBase_GetGameSessionClassVFT())),
 			GetGameSessionClass,
 			(LPVOID*)&GetGameSessionClassOG
+		);
+
+		MH_CreateHook(
+			(LPVOID)(GetOffsetFromVTable(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.RestartPlayer"))),
+			RestartPlayerHK,
+			(LPVOID*)&RestartPlayerOG
 		);
 
 		Log("AFortGameMode Hooked!");

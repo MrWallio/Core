@@ -4545,13 +4545,57 @@ uintptr_t Finder::FindAFortGameModeAthena_StartAircraftPhase() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AFortGameModeAthena_StartAircraftPhase)
 		return ServerOffsets::AFortGameModeAthena_StartAircraftPhase;
-	Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 57 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 89 5B ? 48 8D 05 ? ? ? ? 49 89 73 ? 0F B6 FA").Get();
+
+	static bool bInitialized = false;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		if (Version::Engine_Version < 4.27)
+		{
+			auto sRef = Memcury::Scanner::FindStringRef(L"STARTAIRCRAFT").Get();
+
+			if (!sRef)
+				return 0;
+
+			int numCalls = 0;
+
+			for (int i = 0; i < 150; i++) {
+				if (*(uint8_t*)(sRef + i) == 0xE8)
+				{
+					if (++numCalls == 2) {
+						Addr = Memcury::Scanner(sRef + i).RelativeOffset(1).Get();
+						break;
+					}
+					else {
+						i += 4;
+					}
+				}
+			}
+		}
+		else
+		{
+			auto sRef = Memcury::Scanner::FindStringRef(L"STAT_StartAircraftPhase").Get();
+
+			if (!sRef)
+				return 0;
+
+			for (int i = 0; i < 1000; i++) {
+				if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x8B && *(uint8_t*)(sRef - i + 2) == 0xC4) {
+					Addr = sRef - i;
+					break;
+				}
+			}
+		}
+	}
+	
 	if (Addr) {
 		ServerOffsets::AFortGameModeAthena_StartAircraftPhase = Addr - ImageBase;
-		Log("AFortGameModeAthena_StartAircraftPhase found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeAthena_StartAircraftPhase));
-		return ServerOffsets::AFortGameModeAthena_StartAircraftPhase;
 	}
-	return 0;
+
+	Log("AFortGameModeAthena_StartAircraftPhase found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeAthena_StartAircraftPhase));
+	return ServerOffsets::AFortGameModeAthena_StartAircraftPhase;
 }
 
 uintptr_t Finder::FindAFortGameModeAthena_StartSafeZonesPhase() {

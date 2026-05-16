@@ -177,3 +177,16 @@ UClass** AFortGameMode::GetGameSessionClass(AFortGameMode* This, UClass** result
 		return GetGameSessionClassOG(This, result);
 	}
 }
+
+void AFortGameMode::RestartPlayerHK(AFortGameMode* This, AController* NewPlayer) {
+	RestartPlayerOG(This, NewPlayer);
+
+	AFortPlayerController* FortPC = NewPlayer->Cast<AFortPlayerController>();
+	if (FortPC) {
+		if (FortPC->WorldInventory) {
+			if (FortPC->IsUsingOldQuickBars()) {
+				FortPC->WorldInventory->EquipHarvestingTool();
+			}
+		}
+	}
+}

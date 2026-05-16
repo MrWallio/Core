@@ -37,6 +37,9 @@ public:
 
 	void AddToAlivePlayers(AFortPlayerControllerAthena* PC);
 
+	static inline int32 (*StartAircraftPhaseOG)(AFortGameModeAthena* This, bool bGoStraightToSafeZone);
+	static int32 StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone);
+
 	static void Hook() {
 		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
 		HookEveryVTable(
@@ -68,6 +71,14 @@ public:
 			BeginPlay,
 			(LPVOID*)&BeginPlayOG
 		);
+
+		if (Finder::FindAFortGameModeAthena_StartAircraftPhase()) {
+			MH_CreateHook(
+				(LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_StartAircraftPhase()),
+				StartAircraftPhase,
+				(LPVOID*)&StartAircraftPhaseOG
+			);
+		}
 
 		Log("Hooked AFortGameModeAthena");
 	}
