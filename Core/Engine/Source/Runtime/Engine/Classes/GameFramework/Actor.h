@@ -55,6 +55,8 @@ public:
 	DefineBitfieldUProperty(bAllowReceiveTickEventOnDedicatedServer);
 
 	DefineCustomProperty(float, CreationTime, ServerOffsets::AActor__CreationTime);
+
+	DefineBitfieldUProperty(bReplicates);
 public:
 	static inline ENetMode(*InternalGetNetModeOG)(AActor* This);
 	static ENetMode InternalGetNetMode(AActor* This);

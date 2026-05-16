@@ -146,6 +146,8 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 		static FName Loot_Ammo = UKismetStringLibrary::Conv_StringToName("Loot_Ammo");
 		static FName Loot_AthenaTreasure = UKismetStringLibrary::Conv_StringToName("Loot_AthenaTreasure");
 		static FName Loot_AthenaAmmoLarge = UKismetStringLibrary::Conv_StringToName("Loot_AthenaAmmoLarge");
+		static auto Loot_AthenaFloorLoot = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaFloorLoot");
+		static auto Loot_AthenaFloorLoot_Warmup = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaFloorLoot_Warmup");
 
 		if (This->SearchLootTierGroup == Loot_Treasure) {
 			This->SearchLootTierGroup = Loot_AthenaTreasure;
@@ -154,6 +156,9 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 		else if (This->SearchLootTierGroup == Loot_Ammo) {
 			This->SearchLootTierGroup = Loot_AthenaAmmoLarge;
 			This->bDestroyContainerOnSearch = false;
+		}
+		else if (This->SearchLootTierGroup == Loot_AthenaFloorLoot || This->SearchLootTierGroup == Loot_AthenaFloorLoot_Warmup) {
+			This->bDestroyContainerOnSearch = true;
 		}
 	}
 

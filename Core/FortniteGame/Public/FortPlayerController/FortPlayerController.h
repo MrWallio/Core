@@ -86,10 +86,13 @@ public:
 
 	int32 PayBuildableClassPlacementCost(FBuildingClassData* ClassToBuildData);
 
+	static inline void (*ServerBeginEditingBuildingActorOG)(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit);
 	static void ServerBeginEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit);
 
+	static inline void (*ServerEditBuildingActorOG)(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored);
 	static void ServerEditBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored);
 
+	static inline void (*ServerEndEditingBuildingActorOG)(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing);
 	static void ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing);
 
 	static void Hook() {
@@ -167,21 +170,21 @@ public:
 			AFortPlayerController::StaticClass(),
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerBeginEditingBuildingActor"),
 			ServerBeginEditingBuildingActor,
-			nullptr
+			(LPVOID*)&ServerBeginEditingBuildingActorOG
 		);
 
 		HookEveryVTable(
 			AFortPlayerController::StaticClass(),
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerEditBuildingActor"),
 			ServerEditBuildingActor,
-			nullptr
+			(LPVOID*)&ServerEditBuildingActorOG
 		);
 
 		HookEveryVTable(
 			AFortPlayerController::StaticClass(),
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerEndEditingBuildingActor"),
 			ServerEndEditingBuildingActor,
-			nullptr
+			(LPVOID*)&ServerEndEditingBuildingActorOG
 		);
 
 		Log("Hooked AFortPlayerController");

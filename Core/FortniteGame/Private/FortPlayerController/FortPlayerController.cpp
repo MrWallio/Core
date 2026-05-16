@@ -657,6 +657,11 @@ int32 AFortPlayerController::PayBuildableClassPlacementCost(FBuildingClassData* 
 }
 
 void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit) {
+	if (Version::Fortnite_Version <= 1.72) {
+		ServerBeginEditingBuildingActorOG(This, BuildingActorToEdit);
+		return;
+	}
+	
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerBeginEditingBuildingActor: World is null!");
@@ -666,11 +671,6 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 	AFortPlayerStateZone* PlayerState = This->PlayerState->Cast<AFortPlayerStateZone>();
 	if (!PlayerState) {
 		Log("ServerBeginEditingBuildingActor: PlayerState is null or not AFortPlayerStateZone!");
-		return;
-	}
-
-	if (BuildingActorToEdit->bDestroyed) {
-		Log("ServerBeginEditingBuildingActor: BuildingActorToEdit is destroyed!");
 		return;
 	}
 
@@ -712,6 +712,11 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 }
 
 void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored) {
+	if (Version::Fortnite_Version <= 1.72) {
+		ServerEditBuildingActorOG(This, BuildingActorToEdit, NewBuildingClass, RotationIterations, bMirrored);
+		return;
+	}
+	
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerEditBuildingActor: World is null!");
@@ -720,11 +725,6 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 
 	if (!NewBuildingClass) {
 		Log("ServerEditBuildingActor: NewBuildingClass is null!");
-		return;
-	}
-
-	if (BuildingActorToEdit->bDestroyed) {
-		Log("ServerEditBuildingActor: BuildingActorToEdit is destroyed!");
 		return;
 	}
 
@@ -771,16 +771,14 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 }
 
 void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
-	Log("ServerEndEditingBuildingActor called!");
+	if (Version::Fortnite_Version <= 1.72) {
+		ServerEndEditingBuildingActorOG(This, BuildingActorToStopEditing);
+		return;
+	}
 
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerEndEditingBuildingActor: World is null!");
-		return;
-	}
-
-	if (!BuildingActorToStopEditing || BuildingActorToStopEditing->bDestroyed) {
-		Log("ServerEndEditingBuildingActor: BuildingActorToEdit is null or destroyed!");
 		return;
 	}
 
