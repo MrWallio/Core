@@ -215,3 +215,23 @@ FTransform AActor::GetTransform() const
 
 	return Parms.ReturnValue;
 }
+
+void AActor::SetNetDormancy(ENetDormancy NewDormancy)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("SetNetDormancy");
+
+	struct Actor_SetNetDormancy final
+	{
+	public:
+		ENetDormancy NewDormancy;
+	};
+
+	Actor_SetNetDormancy Parms{};
+
+	Parms.NewDormancy = NewDormancy;
+
+	ProcessEvent(Func, &Parms);
+}

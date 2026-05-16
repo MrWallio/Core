@@ -657,14 +657,14 @@ int32 AFortPlayerController::PayBuildableClassPlacementCost(FBuildingClassData* 
 }
 
 void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit) {
-	if (Version::Fortnite_Version <= 1.72) {
-		ServerBeginEditingBuildingActorOG(This, BuildingActorToEdit);
-		return;
-	}
-	
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerBeginEditingBuildingActor: World is null!");
+		return;
+	}
+
+	if (!BuildingActorToEdit) {
+		Log("ServerBeginEditingBuildingActor: BuildingActorToEdit is null!");
 		return;
 	}
 
@@ -712,19 +712,25 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 }
 
 void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored) {
-	if (Version::Fortnite_Version <= 1.72) {
-		ServerEditBuildingActorOG(This, BuildingActorToEdit, NewBuildingClass, RotationIterations, bMirrored);
-		return;
-	}
-	
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerEditBuildingActor: World is null!");
 		return;
 	}
 
+	if (!BuildingActorToEdit) {
+		Log("ServerEditBuildingActor: BuildingActorToEdit is null!");
+		return;
+	}
+
 	if (!NewBuildingClass) {
 		Log("ServerEditBuildingActor: NewBuildingClass is null!");
+		return;
+	}
+
+	AFortPawn* MyFortPawn = This->MyFortPawn;
+	if (!MyFortPawn) {
+		Log("ServerEndEditingBuildingActor: MyFortPawn is null!");
 		return;
 	}
 
@@ -763,22 +769,41 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 		return;
 	}
 
+	ReplacedBuildingActor->InitializeKismetSpawnedBuildingActor(ReplacedBuildingActor, This, true, BuildingActorToEdit);
+
 	ReplacedBuildingActor->bPlayerPlaced = true;
 	if (PlayerStateAthena) {
 		ReplacedBuildingActor->Team = PlayerStateAthena->TeamIndex;
 		ReplacedBuildingActor->TeamIndex = PlayerStateAthena->TeamIndex;
 	}
-}
 
-void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
-	if (Version::Fortnite_Version <= 1.72) {
-		ServerEndEditingBuildingActorOG(This, BuildingActorToStopEditing);
+	ReplacedBuildingActor->SetEditingPlayer(PlayerState);
+
+	FFortItemEntry* EditToolEntry = This->WorldInventory->FindItemEntry(UFortEditToolItemDefinition::StaticClass());
+	if (!EditToolEntry) {
+		Log("ServerEditBuildingActor: Failed to find edit tool in inventory!");
 		return;
 	}
 
+	AFortWeap_EditingTool* EditingTool = MyFortPawn->FindWeapon(EditToolEntry->ItemGuid)->Cast<AFortWeap_EditingTool>();
+	if (!EditingTool) {
+		Log("ServerEditBuildingActor: Failed to find editing tool weapon instance!");
+		return;
+	}
+
+	EditingTool->EditActor = ReplacedBuildingActor;
+	EditingTool->OnRep_EditActor();
+}
+
+void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerEndEditingBuildingActor: World is null!");
+		return;
+	}
+
+	if (!BuildingActorToStopEditing) {
+		Log("ServerEndEditingBuildingActor: BuildingActorToStopEditing is null!");
 		return;
 	}
 

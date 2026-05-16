@@ -123,6 +123,8 @@ public:
 	void K2_DestroyActor();
 
 	FTransform GetTransform() const;
+
+	void SetNetDormancy(ENetDormancy NewDormancy);
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAActor_InternalGetNetMode()), InternalGetNetMode, (LPVOID*)&InternalGetNetModeOG);
