@@ -132,3 +132,9 @@ UFunction* UClass::GetFunction(const std::string& FullName, bool bSilent) const
 	}
 	return (UFunction*)Function;
 }
+
+const void* UClass::GetSparseClassData(const EGetSparseClassDataMethod GetMethod)
+{
+	const void* (*GetSparseClassDataInternal)(const UClass*, const EGetSparseClassDataMethod) = decltype(GetSparseClassDataInternal)(ImageBase + Finder::FindUClass_GetSparseClassData());
+	return GetSparseClassDataInternal(this, GetMethod);
+}

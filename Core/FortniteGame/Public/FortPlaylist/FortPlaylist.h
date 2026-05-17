@@ -4,6 +4,7 @@
 #include "Engine/Source/Runtime/Net/Core/Classes/Net/Serialization/FastArraySerializer.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/DataAsset.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/DataTable.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/CurveTable.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
@@ -26,4 +27,6 @@ public:
 
 	DefineUProperty(TSoftObjectPtr<UDataTable>, LootTierData);
 	DefineUProperty(TSoftObjectPtr<UDataTable>, LootPackages);
+
+	DefineUProperty(TSoftObjectPtr<UCurveTable>, ResourceRates);
 };

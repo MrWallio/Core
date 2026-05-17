@@ -142,6 +142,36 @@ namespace EIncludeSuperFlag
     };
 }
 
+enum class EGetSparseClassDataMethod : uint8
+{
+    /**
+     * If not yet created, store and return a new instance, whether or not the class can use its archetype's instance.
+     */
+    CreateIfNull,
+    /**
+     * If not yet created, return the archetype instance (if possible to use for this class). If not possible to use
+     * the archetype's instance, store and return a new instance.
+     */
+    ArchetypeIfNull,
+    /**
+     * This is an advanced flag and should usually be avoided. Callers should instead call with ArchetypeIfNull if they
+     * are currently allowed to create an instance, or with DeferIfNull if not. Callers that want to know whether the
+     * class has sparse data of its own beyond what the archetype has should compare
+     * GetSparseClassDataStruct() != GetSparseClassDataArchetypeStruct().
+     *
+     * If not yet created, return null. An instance might still be created later when called with ArchetypeIfNull.
+     * This call never creates an instance.
+     */
+    ReturnIfNull,
+    /**
+     * If not yet created, return the archetype's instance (if possible to use for this class). If not possible to use
+     * the archetype's instance, return null. User should call later with ArchetypeIfNull when they are allowed to
+     * create an instance.
+     * This call never creates an instance.
+     */
+    DeferIfNull,
+};
+
 class UClass : public UStruct {
 public:
     UFunction* FindFunctionByName(FName InName, EIncludeSuperFlag::Type IncludeSuper = EIncludeSuperFlag::IncludeSuper) const;
@@ -149,6 +179,8 @@ public:
     UFunction* GetFunction(const std::string& ClassName, const std::string& FuncName) const;
 
     UFunction* GetFunction(const std::string& FullName, bool bSilent = false) const;
+
+    const void* GetSparseClassData(const EGetSparseClassDataMethod GetMethod);
 public:
 	inline uint64_t GetCastFlags() const
 	{

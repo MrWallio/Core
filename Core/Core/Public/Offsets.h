@@ -99,6 +99,7 @@ namespace ServerOffsets {
 	inline uintptr_t UStruct__MinAlignment = 0;
 
 	inline uintptr_t UClass_FindFunctionByName = 0;
+	inline uintptr_t UClass_GetSparseClassData = 0;
 
 	inline uintptr_t FName_GetPlainNameString1 = 0;
 	inline uintptr_t FName_GetPlainNameString2 = 0;

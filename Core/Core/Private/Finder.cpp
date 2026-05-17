@@ -8197,6 +8197,25 @@ uintptr_t Finder::FindABuildingSMActor_SetEditingPlayerVFT() {
 	return ServerOffsets::ABuildingSMActor_SetEditingPlayerVFT;
 }
 
+uintptr_t Finder::FindUClass_GetSparseClassData() {
+	if (ServerOffsets::UClass_GetSparseClassData)
+		return ServerOffsets::UClass_GetSparseClassData;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindPattern("48 83 EC ? 48 8B 81 ? ? ? ? 45 33 C0 4C 8B C9").Get();
+	if (!Addr)
+		Addr = Memcury::Scanner::FindPattern("48 83 EC ? 48 8B 81 ? ? ? ? 48 85 C0 74 ? 48 83 C4 ? C3").Get();
+	if (!Addr)
+		Addr = Memcury::Scanner::FindPattern("48 83 EC ? 48 8B 81 ? ? ? ? 45 33 C0 48 85 C0 75").Get();
+	
+	if (Addr) {
+		ServerOffsets::UClass_GetSparseClassData = Addr - ImageBase;
+	}
+
+	Log("UClass_GetSparseClassData found at: 0x" + std::format("{:X}", ServerOffsets::UClass_GetSparseClassData));
+	return ServerOffsets::UClass_GetSparseClassData;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -8308,6 +8327,9 @@ void Finder::SetupOffsets() {
 
 	FindAGameModeBase_GetGameSessionClass();
 	FindAGameModeBase_GetGameSessionClassVFT();
+
+	FindUClass_FindFunctionByName();
+	FindUClass_GetSparseClassData();
 
 	return;
 }

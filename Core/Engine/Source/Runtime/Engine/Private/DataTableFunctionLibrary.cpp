@@ -9,7 +9,7 @@ void UDataTableFunctionLibrary::EvaluateCurveTableRow(UCurveTable* CurveTable, F
 	static class UFunction* Func = nullptr;
 
 	if (Func == nullptr)
-		Func = StaticClass()->GetFunction("Function /Script/Engine.DataTableFunctionLibrary.GetDataTableColumnAsString");
+		Func = StaticClass()->GetFunction("Function /Script/Engine.DataTableFunctionLibrary.EvaluateCurveTableRow");
 
 	struct DataTableFunctionLibrary_EvaluateCurveTableRow final
 	{

@@ -988,6 +988,8 @@ public:
 	static uintptr_t FindABuildingSMActor_SetEditingPlayer();
 
 	static uintptr_t FindABuildingSMActor_SetEditingPlayerVFT();
+
+	static uintptr_t FindUClass_GetSparseClassData();
 public:
 	static void SetupOffsets();
 

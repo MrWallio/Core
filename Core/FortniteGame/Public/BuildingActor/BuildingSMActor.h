@@ -10,6 +10,9 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/Templates/SubclassOf.h"
 #include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
 #include "Engine/Source/Runtime/Core/Public/Math/Rotator.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/DataAsset.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/DataTable.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/CurveTable.h"
 
 #include "BuildingActor.h"
 #include "FortniteGame/Public/FortEnums.h"
@@ -31,6 +34,10 @@ public:
 	DefineBitfieldUProperty(bMirrored);
 
 	DefineUProperty(TArray<ABuildingSMActor*>, AttachedBuildingActors);
+
+	DefineBitfieldUProperty(bAllowResourceDrop);
+
+	DefineUProperty(FCurveTableRowHandle, BuildingResourceAmountOverride);
 public:
 	ABuildingSMActor* ReplaceBuildingActor(
 		uint8 ReplacementType,
@@ -43,6 +50,11 @@ public:
 	void RepairBuilding(AFortPlayerController* RepairingController, int32 ResourcesSpent);
 
 	void SetEditingPlayer(AFortPlayerStateZone* NewEditingPlayer);
+
+	bool HasBuildingResourceAmountOverride() {
+		UProperty* Property = FindPropertyByName("BuildingResourceAmountOverride");
+		return Property;
+	}
 
 	static void Hook() {
 		Log("ABuildingSMActor Hooked!");
