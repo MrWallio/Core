@@ -65,11 +65,6 @@ uintptr_t UStruct::GetPropertyOffset(std::string InName) const
 	return Prop->Offset_Internal;
 }
 
-bool UStruct::IsChildOf(const UStruct* SomeBase) const {
-	bool (*IsChildOfInternal)(const UStruct*, const UStruct*) = decltype(IsChildOfInternal)(ImageBase + Finder::FindUStruct_IsChildOf());
-	return IsChildOfInternal(this, SomeBase);
-}
-
 int64 UEnum::GetValue(const char* EnumMemberName) const
 {
 	if (!this)

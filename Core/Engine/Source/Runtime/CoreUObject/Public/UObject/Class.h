@@ -56,8 +56,6 @@ public:
     UProperty* FindPropertyByName(FName InName) const;
     UProperty* FindPropertyByName(std::string InName) const;
     uintptr_t GetPropertyOffset(std::string InName) const;
-
-    bool IsChildOf(const UStruct* SomeBase) const;
 public:
     UField* GetChildrenOrChildProperties() const
     {

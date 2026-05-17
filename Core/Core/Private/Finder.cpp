@@ -374,6 +374,9 @@ uintptr_t Finder::FindUEngine_CreateNetDriver() {
 uintptr_t Finder::FindUNetDriver_SetWorldVFT() {
 	if (ServerOffsets::UNetDriver_SetWorldVFT)
 		return ServerOffsets::UNetDriver_SetWorldVFT;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::UNetDriver_SetWorldVFT;
 
 	auto stringAddr = Memcury::Scanner::FindStringRef(L"All Beacon Requests Paused.").Get();
 
@@ -386,6 +389,7 @@ uintptr_t Finder::FindUNetDriver_SetWorldVFT() {
 		}
 	}
 
+	bInitialized = true;
 	Log("UNetDriver::SetWorld VFT found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_SetWorldVFT));
 	return ServerOffsets::UNetDriver_SetWorldVFT;
 }
@@ -673,7 +677,7 @@ uintptr_t Finder::FindABuildingActor_OnDamageServer() {
 		ServerOffsets::ABuildingActor_OnDamageServer = Addr - ImageBase;
 	}
 
-	Log("ABuildingActor::OnDamageServer found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingActor_OnDamageServer));
+	Log("ABuildingActor_OnDamageServer found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingActor_OnDamageServer));
 	return ServerOffsets::ABuildingActor_OnDamageServer;
 }
 
@@ -689,7 +693,7 @@ uintptr_t Finder::FindAFortPlayerControllerZone_ClientOnPawnDied() {
 		ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied = Addr - ImageBase;
 	}
 
-	Log("AFortPlayerControllerZone::ClientOnPawnDied found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied));
+	Log("AFortPlayerControllerZone_ClientOnPawnDied found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied));
 	return ServerOffsets::AFortPlayerControllerZone_ClientOnPawnDied;
 }
 
@@ -1454,23 +1458,8 @@ uintptr_t Finder::FindUStruct_FindPropertyByName() {
 		ServerOffsets::UStruct_FindPropertyByName = Addr - ImageBase;
 	}
 
-	Log("UStruct::FindPropertyByName found at: 0x" + std::format("{:X}", ServerOffsets::UStruct_FindPropertyByName));
+	Log("UStruct_FindPropertyByName found at: 0x" + std::format("{:X}", ServerOffsets::UStruct_FindPropertyByName));
 	return ServerOffsets::UStruct_FindPropertyByName;
-}
-
-uintptr_t Finder::FindUStruct_IsChildOf() {
-	if (ServerOffsets::UStruct_IsChildOf)
-		return ServerOffsets::UStruct_IsChildOf;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 85 D2 74 ? 48 63 42 ? 4C 8D 42").Get();
-
-	if (Addr) {
-		ServerOffsets::UStruct_IsChildOf = Addr - ImageBase;
-	}
-
-	Log("UStruct::IsChildOf found at: 0x" + std::format("{:X}", ServerOffsets::UStruct_IsChildOf));
-	return ServerOffsets::UStruct_IsChildOf;
 }
 
 uintptr_t Finder::FindUClass_FindFunctionByName() {
@@ -1487,7 +1476,7 @@ uintptr_t Finder::FindUClass_FindFunctionByName() {
 		ServerOffsets::UClass_FindFunctionByName = Addr - ImageBase;
 	}
 
-	Log("UClass::FindFunctionByName found at: 0x" + std::format("{:X}", ServerOffsets::UClass_FindFunctionByName));
+	Log("UClass_FindFunctionByName found at: 0x" + std::format("{:X}", ServerOffsets::UClass_FindFunctionByName));
 	return ServerOffsets::UClass_FindFunctionByName;
 }
 
@@ -1502,7 +1491,7 @@ uintptr_t Finder::FindFName_GetPlainNameString1() {
 		ServerOffsets::FName_GetPlainNameString1 = Addr - ImageBase;
 	}
 
-	Log("FName::GetPlainNameString1 found at: 0x" + std::format("{:X}", ServerOffsets::FName_GetPlainNameString1));
+	Log("FName_GetPlainNameString1 found at: 0x" + std::format("{:X}", ServerOffsets::FName_GetPlainNameString1));
 	return ServerOffsets::FName_GetPlainNameString1;
 }
 
@@ -1517,7 +1506,7 @@ uintptr_t Finder::FindFName_GetPlainNameString2() {
 		ServerOffsets::FName_GetPlainNameString2 = Addr - ImageBase;
 	}
 
-	Log("FName::GetPlainNameString2 found at: 0x" + std::format("{:X}", ServerOffsets::FName_GetPlainNameString2));
+	Log("FName_GetPlainNameString2 found at: 0x" + std::format("{:X}", ServerOffsets::FName_GetPlainNameString2));
 	return ServerOffsets::FName_GetPlainNameString2;
 }
 
@@ -7133,6 +7122,9 @@ uintptr_t Finder::FindAFortGameStateAthena_SetCurrentPlaylistId() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId)
 		return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
 	
 	//Addr = Memcury::Scanner::FindPattern("").Get(); // Dont have anything for this yet
 	
@@ -7140,6 +7132,7 @@ uintptr_t Finder::FindAFortGameStateAthena_SetCurrentPlaylistId() {
 		ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("AFortGameStateAthena_SetCurrentPlaylistId found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId));
 	return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
 }
@@ -7334,9 +7327,13 @@ uintptr_t Finder::FindUObject_GetWorldVFT() {
 uintptr_t Finder::FindAFortPlayerController_SpawnQuickBarsVFT() {
 	if (ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT)
 		return ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT;
 
 	// Not found this yet!
 
+	bInitialized = true;
 	Log("AFortPlayerController_SpawnQuickBarsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT));
 	return ServerOffsets::AFortPlayerController_SpawnQuickBarsVFT;
 }
@@ -7344,9 +7341,13 @@ uintptr_t Finder::FindAFortPlayerController_SpawnQuickBarsVFT() {
 uintptr_t Finder::FindAFortPlayerController_SetupQuickBarsVFT() {
 	if (ServerOffsets::AFortPlayerController_SetupQuickBarsVFT)
 		return ServerOffsets::AFortPlayerController_SetupQuickBarsVFT;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortPlayerController_SetupQuickBarsVFT;
 
 	// Not found this yet!
 
+	bInitialized = true;
 	Log("AFortPlayerController_SetupQuickBarsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_SetupQuickBarsVFT));
 	return ServerOffsets::AFortPlayerController_SetupQuickBarsVFT;
 }
@@ -7354,9 +7355,13 @@ uintptr_t Finder::FindAFortPlayerController_SetupQuickBarsVFT() {
 uintptr_t Finder::FindAFortGameModeZone_CreateAIDirectorVFT() {
 	if (ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT)
 		return ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT;
 
 	// Not found this yet!
 
+	bInitialized = true;
 	Log("AFortGameModeZone_CreateAIDirectorVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT));
 	return ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT;
 }
@@ -8201,6 +8206,10 @@ uintptr_t Finder::FindUClass_GetSparseClassData() {
 	if (ServerOffsets::UClass_GetSparseClassData)
 		return ServerOffsets::UClass_GetSparseClassData;
 	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::UClass_GetSparseClassData;
+	}
 
 	Addr = Memcury::Scanner::FindPattern("48 83 EC ? 48 8B 81 ? ? ? ? 45 33 C0 4C 8B C9").Get();
 	if (!Addr)
@@ -8212,6 +8221,7 @@ uintptr_t Finder::FindUClass_GetSparseClassData() {
 		ServerOffsets::UClass_GetSparseClassData = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("UClass_GetSparseClassData found at: 0x" + std::format("{:X}", ServerOffsets::UClass_GetSparseClassData));
 	return ServerOffsets::UClass_GetSparseClassData;
 }
@@ -8269,14 +8279,29 @@ void Finder::SetupOffsets() {
 	Log("UField__Name offset: 0x" + std::format("{:X}", ServerOffsets::UField__Name));
 	Log("UBoolProperty__FieldMask offset: 0x" + std::format("{:X}", ServerOffsets::UBoolProperty__FieldMask));
 
+	FindProcessEventVFT();
+
+	FindUStruct_FindPropertyByName();
+
 	FindUWorld_ServerTravel();
 	FindUWorld__TimeSeconds();
 	FindUWorld__NextSwitchCountdown();
+	FindUWorld_InternalGetNetMode();
+	FindUWorld_FindCollectionByType();
+
+	FindUEngine_GetWorldContextFromWorldChecked();
+	FindUEngine_CreateNetDriver_Local();
+
+	FindAActor_InternalGetNetMode();
+	FindAActor_FinishSpawning();
 
 	FindFWorldContext__ThisCurrentWorld();
 
 	FindUObjectBase_IsValidLowLevel();
 	FindUObjectBase_IsValidLowLevelFast();
+
+	FindUObject_NeedsLoadForClientVFT();
+	FindUObject_GetWorldVFT();
 
 	FindUNetDriver__ReplicationFrame();
 	FindUNetDriver__NetworkObjects();
@@ -8300,6 +8325,13 @@ void Finder::SetupOffsets() {
 	FindUNetDriver__PercentMissingForRxStandby();
 	FindUNetDriver__PercentMissingForTxStandby();
 	FindUNetDriver__PercentForBadPing();
+	FindUNetDriver_TickFlush();
+	FindUNetDriver_TickDispatch();
+	FindUNetDriver_SetWorld();
+	FindUNetDriver_SetWorldVFT();
+	FindUNetDriver_InitListenVFT();
+	FindUNetDriver_IsServerVFT();
+	FindUNetDriver_GetNetMode();
 
 	FindUNetConnection__ActorChannels();
 	FindUNetConnection__TimeSensitive();
@@ -8309,6 +8341,7 @@ void Finder::SetupOffsets() {
 	FindUNetConnection__ClientWorldPackageName();
 	FindUNetConnection__ClientVisibleLevelNames();
 	FindUNetConnection__LastRecvAckTime();
+	FindUNetConnection_GetUChildConnectionVFT();
 
 	FindUActorChannel__LastUpdateTime();
 	FindUActorChannel__RelevantTime();
@@ -8323,13 +8356,125 @@ void Finder::SetupOffsets() {
 
 	FindAGameSession__NextPlayerID();
 
+	FindAFortGameMode_FinishWorldInitializationVFT();
+
 	FindAFortGameModeAthena_AddToAlivePlayers();
+	FindAFortGameModeAthena_StartAircraftPhase();
 
 	FindAGameModeBase_GetGameSessionClass();
 	FindAGameModeBase_GetGameSessionClassVFT();
 
 	FindUClass_FindFunctionByName();
 	FindUClass_GetSparseClassData();
+
+	FindUEngine_LoadMap();
+
+	FindInternalServerTryActivateAbilityVFT();
+
+	FindAFortPlayerController_OnReadyToStartMatchVFT();
+	FindAFortPlayerController_RemoveInventoryItemVFT();
+
+	FindAFortPlayerControllerZone_OnReadyToStartMatch();
+	FindAFortPlayerControllerZone_ClientOnPawnDied();
+
+	FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT();
+
+	FindAFortGameStateAthena_SetCurrentPlaylistId();
+
+	FindUFortControllerComponent_Aircraft_EnterAircraft();
+
+	FindUMcpProfileGroup_SendRequestNow();
+
+	FindABuildingActor_OnDamageServer();
+	FindABuildingActor_PostUpdateVFT();
+
+	FindABuildingContainer_SpawnLootVFT();
+
+	FindAFortPickup_GivePickupToVFT();
+	FindAFortPickup_SetPickupItemsVFT();
+
+	FindUFortWorldItem_SetOwningInventoryVFT();
+	FindUFortWorldItem_SetLoadedAmmoVFT();
+
+	FindUFortAnalytics_SetGameSessionID();
+	FindUFortAnalytics_SetGameStateClassName();
+
+	FindAFortGameSessionDedicated_FinalizeCreation();
+	FindAFortGameSessionDedicated_FinalizeCreationPatch1();
+
+	FindUKismetSystemLibrary_ExecuteConsoleCommand();
+
+	FindStaticFindObject();
+	FindStaticLoadObject();
+
+	FindFRotator_Quaternion();
+
+	FindUGameplayStatics_BeginDeferredActorSpawnFromClass();
+
+	FindAFortGameModeZone_CreateAIDirectorVFT();
+	FindAFortGameModeZone_CreateAIGoalManagerVFT();
+
+	FindUObjectBaseUtility_GetInterfaceAddress();
+
+	FindUWorld_GetWorldSettings();
+
+	FindUEngine_GetMaxTickRateVFT();
+
+	FindUNetDriver_IsAdaptiveNetUpdateFrequencyEnabled();
+
+	FindAActor_IsPendingKillPending();
+	FindAActor_CallPreReplication();
+
+	FindFNetworkObjectList_Remove();
+
+	FindFNetViewer_Constructor();
+
+	FindAPlayerController_SendClientAdjustmentVFT();
+
+	FindUNetDriver_IsLevelInitializedForActorVFT();
+
+	FindAActor_IsNetRelevantForVFT();
+	FindAActor_GetNetOwnerVFT();
+
+	FindUNetConnection_IsNetReadyVFT();
+
+	FindFMemory_Free();
+	FindFMemory_Realloc();
+
+	FindFNetGUIDCache_SupportsObject();
+
+	FindUNetConnection_CreateChannel();
+
+	FindUActorChannel_SetChannelActor();
+	FindUActorChannel_ReplicateActor();
+
+	FindUObject_GetArchetypeFromRequiredInfo();
+
+	FindAFortPlayerController_SpawnQuickBarsVFT();
+	FindAFortPlayerController_SetupQuickBarsVFT();
+
+	FindAFortInventory_InitializeExistingItem();
+
+	FindUFortWorldItemDefinition_ServerExecuteVFT();
+
+	FindUAbilitySystemComponent_FindAbilitySpecFromHandle();
+	FindUAbilitySystemComponent_InternalTryActivateAbility();
+
+	FindUChannel_CloseVFT();
+
+	FindAFortGameSession_ValidatePlayer();
+
+	FindAActor_BeginPlay();
+	FindAActor_BeginPlayVFT();
+
+	FindAFortPlayerController_OnReadyToStartMatch();
+
+	FindAFortGameStateAthena_SetCurrentPlaylistId();
+
+	FindAFortGameModeZone_CreateAIDirectorVFT();
+
+	FindAFortInventory_GetInventoryUsed();
+	FindAFortInventory_GetInventoryCapacity();
 
 	return;
 }

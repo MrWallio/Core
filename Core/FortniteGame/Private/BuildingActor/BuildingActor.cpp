@@ -83,7 +83,6 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 
 	UFortResourceItemDefinition* ResourceDef = UFortKismetLibrary::K2_GetResourceItemDefinition(BuildingSMActor->ResourceType);
 	if (!ResourceDef) {
-		Log("ABuildingActor::OnDamageServer: Failed to get ResourceDef for ResourceType: " + std::to_string(BuildingSMActor->ResourceType));
 		return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 	}
 
