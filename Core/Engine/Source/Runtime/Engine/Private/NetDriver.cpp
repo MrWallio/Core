@@ -19,6 +19,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/PackageMapClient.h"
 
 static int32* CVarSetNetDormancyEnabled = Finder::FindCVarDirect<int32>(L"net.DormancyEnable");
+static int32* MaxConnectionsToTickPerServerFrame = Finder::FindCVarDirect<int32>(L"net.MaxConnectionsToTickPerServerFrame");
 
 FActorPriority::FActorPriority(UNetConnection* InConnection, UActorChannel* InChannel, FNetworkObjectInfo* InActorInfo, const TArray<struct FNetViewer>& Viewers, bool bLowBandwidth)
 	: ActorInfo(InActorInfo), Channel(InChannel), DestructionInfo(NULL)
@@ -335,7 +336,7 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 {
 	UEngine* GEngine = UEngine::GetEngine();
 
-	if (Version::Engine_Version == 4.16) {
+	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.19) {
 		if (ClientConnections.Num() == 0)
 		{
 			return 0;
@@ -411,7 +412,7 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 				// Make a list of viewers this connection should consider (this connection and children of this connection)
 				TArray<FNetViewer>& ConnectionViewers = WorldSettings->ReplicationViewers;
 
-				ConnectionViewers.Reset();
+				ConnectionViewers.Free();
 				ConnectionViewers.Add(FNetViewer(Connection, DeltaSeconds));
 				for (int32 ViewerIndex = 0; ViewerIndex < Connection->Children.Num(); ViewerIndex++)
 				{
@@ -475,7 +476,7 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 					}
 				}
 
-				ConnectionViewers.Reset();
+				ConnectionViewers.Free();
 			}
 		}
 
@@ -514,30 +515,30 @@ int32 UNetDriver::ServerReplicateActors_PrepConnections(const float DeltaSeconds
 {
 	UEngine* GEngine = UEngine::GetEngine();
 
-	if (Version::Engine_Version == 4.16) {
+	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.19) {
 		int32 NumClientsToTick = ClientConnections.Num();
 
-		// by default only throttle update for listen servers unless specified on the commandline
 		static bool bForceClientTickingThrottle = FParse::Param(GetCommandLineW(), TEXT("limitclientticks"));
 		if (bForceClientTickingThrottle || GetNetMode() == NM_ListenServer)
 		{
-			// determine how many clients to tick this frame based on GEngine->NetTickRate (always tick at least one client), double for lan play
 			static float DeltaTimeOverflow = 0.f;
-			// updates are doubled for lan play
 			static bool LanPlay = FParse::Param(GetCommandLineW(), TEXT("lanplay"));
 
-			// come up with a solution that is greedier with higher framerates, but still won't risk saturating server upstream bandwidth
 			float ClientUpdatesThisFrame = GEngine->NetClientTicksPerSecond * (DeltaSeconds + DeltaTimeOverflow) * (LanPlay ? 2.f : 1.f);
 			NumClientsToTick = UKismetMathLibrary::Min(NumClientsToTick, UKismetMathLibrary::FTrunc(ClientUpdatesThisFrame));
 
 			if (NumClientsToTick == 0)
 			{
-				// if no clients are ticked this frame accumulate the time elapsed for the next frame
 				DeltaTimeOverflow += DeltaSeconds;
 				return 0;
 			}
 			DeltaTimeOverflow = 0.f;
 		}
+
+		if (*MaxConnectionsToTickPerServerFrame > 0)
+		{
+			NumClientsToTick = UKismetMathLibrary::Min(ClientConnections.Num(), *MaxConnectionsToTickPerServerFrame);
+		} 
 
 		bool bFoundReadyConnection = false;
 
@@ -556,8 +557,22 @@ int32 UNetDriver::ServerReplicateActors_PrepConnections(const float DeltaSeconds
 
 				bFoundReadyConnection = true;
 
-				// the view target is what the player controller is looking at OR the owning actor itself when using beacons
-				Connection->ViewTarget = Connection->PlayerController ? Connection->PlayerController->GetViewTarget() : OwningActor;
+				AActor* DesiredViewTarget = OwningActor;
+				if (Connection->PlayerController)
+				{
+					if (AActor* ViewTarget = Connection->PlayerController->GetViewTarget())
+					{
+						if (ViewTarget->GetWorld())
+						{
+							DesiredViewTarget = ViewTarget;
+						}
+						else
+						{
+							Log("Player controller " + Connection->PlayerController->GetName().ToString() + "'s view target (" + ViewTarget->GetName().ToString() + ") no longer has a valid world! Was it unloaded as part a level instance?");
+						}
+					}
+				}
+				Connection->ViewTarget = DesiredViewTarget;
 
 				for (int32 ChildIdx = 0; ChildIdx < Connection->Children.Num(); ChildIdx++)
 				{
