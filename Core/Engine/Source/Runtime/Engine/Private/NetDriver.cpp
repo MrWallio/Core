@@ -19,7 +19,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/PackageMapClient.h"
 
 static int32* CVarSetNetDormancyEnabled = Finder::FindCVarDirect<int32>(L"net.DormancyEnable");
-static int32* MaxConnectionsToTickPerServerFrame = Finder::FindCVarDirect<int32>(L"net.MaxConnectionsToTickPerServerFrame");
+static int32 MaxConnectionsToTickPerServerFrame = 10; // its a cvar, idk how to get it so i just hardcoded it for now
 
 FActorPriority::FActorPriority(UNetConnection* InConnection, UActorChannel* InChannel, FNetworkObjectInfo* InActorInfo, const TArray<struct FNetViewer>& Viewers, bool bLowBandwidth)
 	: ActorInfo(InActorInfo), Channel(InChannel), DestructionInfo(NULL)
@@ -515,7 +515,7 @@ int32 UNetDriver::ServerReplicateActors_PrepConnections(const float DeltaSeconds
 {
 	UEngine* GEngine = UEngine::GetEngine();
 
-	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.19) {
+	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 5.3) {
 		int32 NumClientsToTick = ClientConnections.Num();
 
 		static bool bForceClientTickingThrottle = FParse::Param(GetCommandLineW(), TEXT("limitclientticks"));
@@ -535,9 +535,9 @@ int32 UNetDriver::ServerReplicateActors_PrepConnections(const float DeltaSeconds
 			DeltaTimeOverflow = 0.f;
 		}
 
-		if (*MaxConnectionsToTickPerServerFrame > 0)
+		if (MaxConnectionsToTickPerServerFrame > 0)
 		{
-			NumClientsToTick = UKismetMathLibrary::Min(ClientConnections.Num(), *MaxConnectionsToTickPerServerFrame);
+			NumClientsToTick = UKismetMathLibrary::Min(ClientConnections.Num(), MaxConnectionsToTickPerServerFrame);
 		} 
 
 		bool bFoundReadyConnection = false;
@@ -549,7 +549,6 @@ int32 UNetDriver::ServerReplicateActors_PrepConnections(const float DeltaSeconds
 			check(Connection->State == USOCK_Pending || Connection->State == USOCK_Open || Connection->State == USOCK_Closed);
 			checkSlow(Connection->GetUChildConnection() == NULL);
 
-			// Handle not ready channels.
 			AActor* OwningActor = Connection->OwningActor;
 			if (OwningActor != NULL && Connection->State == USOCK_Open && (Connection->Driver->Time - Connection->LastReceiveTime < 1.5f))
 			{
@@ -578,14 +577,19 @@ int32 UNetDriver::ServerReplicateActors_PrepConnections(const float DeltaSeconds
 				{
 					UNetConnection* Child = Connection->Children[ChildIdx];
 					APlayerController* ChildPlayerController = Child->PlayerController;
-					if (ChildPlayerController != NULL)
+					AActor* DesiredChildViewTarget = Child->OwningActor;
+
+					if (ChildPlayerController)
 					{
-						Child->ViewTarget = ChildPlayerController->GetViewTarget();
+						AActor* ChildViewTarget = ChildPlayerController->GetViewTarget();
+
+						if (ChildViewTarget && ChildViewTarget->GetWorld())
+						{
+							DesiredChildViewTarget = ChildViewTarget;
+						}
 					}
-					else
-					{
-						Child->ViewTarget = NULL;
-					}
+
+					Child->ViewTarget = DesiredChildViewTarget;
 				}
 			}
 			else

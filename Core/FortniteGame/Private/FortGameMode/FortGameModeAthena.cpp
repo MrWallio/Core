@@ -67,7 +67,6 @@ void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
 }
 
 int32 AFortGameModeAthena::StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone) {
-	Log("StartAircraftPhase: Starting aircraft phase. Dropping all items and resetting health/shield for alive players.");
 	for (AFortPlayerControllerAthena* PC : This->AlivePlayers) {
 		if (PC->WorldInventory) {
 			PC->WorldInventory->DropAllItems(false);
