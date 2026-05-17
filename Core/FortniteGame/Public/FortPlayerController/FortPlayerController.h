@@ -79,8 +79,8 @@ public:
 	static inline void (*ServerSpotActorOG)(AFortPlayerController* This, AActor* NewlySpottedActor);
 	static void ServerSpotActor(AFortPlayerController* This, AActor* NewlySpottedActor);
 
-	static inline bool (*RemoveInventoryItemOG)(AFortPlayerController* This, FGuid* ItemGuid, int32 Count, bool bForceRemoval);
-	static bool RemoveInventoryItem(AFortPlayerController* This, FGuid* ItemGuid, int32 Count, bool bForceRemoval);
+	static inline bool (*RemoveInventoryItemOG)(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval);
+	static bool RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval);
 
 	static inline void (*ServerCreateBuildingActorOldOG)(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored);
 	static void ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored);

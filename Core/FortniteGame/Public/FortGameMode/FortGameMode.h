@@ -7,6 +7,7 @@
 #include "Engine/Source/Runtime/Core/Public/Math/TransformNonVectorized.h"
 
 class AFortPlayerController;
+class AFortWorldManager;
 
 class AFortGameMode : public AGameMode {
 public:
@@ -18,6 +19,7 @@ public:
 	DefineUProperty(FName, CurrentPlaylistName);
 public:
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);
+	static APawn* SpawnDefaultPawnFor(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);
 
 	bool SpawnPlayerBot(AActor* SpawnPoint = nullptr);
 
@@ -29,8 +31,17 @@ public:
 	static inline void (*RestartPlayerOG)(AFortGameMode* This, AController* NewPlayer);
 	static void RestartPlayerHK(AFortGameMode* This, AController* NewPlayer);
 
+	static inline void (*FinishWorldInitializationOG)(AFortGameMode* This, AFortWorldManager* WorldManager);
+	static void FinishWorldInitialization(AFortGameMode* This, AFortWorldManager* WorldManager);
+
 	static void Hook() {
-		CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
+		//CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
+		HookVTable(
+			AFortGameMode::GetDefaultObj(),
+			AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
+			SpawnDefaultPawnFor,
+			(LPVOID*)&SpawnDefaultPawnForOG
+		);
 
 		MH_CreateHook(
 			(LPVOID)(GetOffsetFromVTable(AFortGameMode::GetDefaultObj(), Finder::FindAGameModeBase_GetGameSessionClassVFT())),
@@ -42,6 +53,13 @@ public:
 			(LPVOID)(GetOffsetFromVTable(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.RestartPlayer"))),
 			RestartPlayerHK,
 			(LPVOID*)&RestartPlayerOG
+		);
+
+		HookVTableIdx(
+			AFortGameMode::GetDefaultObj(),
+			Finder::FindAFortGameMode_FinishWorldInitializationVFT(),
+			FinishWorldInitialization,
+			(LPVOID*)&FinishWorldInitializationOG
 		);
 
 		Log("AFortGameMode Hooked!");

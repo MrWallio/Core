@@ -25,6 +25,10 @@
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 #include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
 
+APawn* AFortGameMode::SpawnDefaultPawnFor(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot) {
+	return SpawnDefaultPawnForOG(This, NewPlayer, StartSpot);
+}
+
 bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 {
 	UWorld* World = UWorld::GetWorld();
@@ -189,4 +193,11 @@ void AFortGameMode::RestartPlayerHK(AFortGameMode* This, AController* NewPlayer)
 			}
 		}
 	}
+}
+
+void AFortGameMode::FinishWorldInitialization(AFortGameMode* This, AFortWorldManager* WorldManager) {
+	Log("AFortGameMode::FinishWorldInitialization called!");
+
+	FinishWorldInitializationOG(This, WorldManager);
+	This->bWorldIsReady = true;
 }

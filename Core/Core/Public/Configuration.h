@@ -11,6 +11,7 @@ struct FCoreConfig {
 	bool bSkipSessionValidation = false;
 
 	std::string Playlist = "2";
+	std::string MapToLoad = "";
 
 	FCoreConfig() = default;
 };

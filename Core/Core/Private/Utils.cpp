@@ -229,7 +229,11 @@ void Utils::Hook() {
 	}
 }
 
-FString Utils::GetDefaultMapName() {
+FString Utils::GetDefaultMapName(FCoreConfig& Config) {
+	if (!Config.MapToLoad.empty()) {
+		return Config.MapToLoad;
+	}
+
 	FString MapName = L"Athena_Terrain";
 	if (Version::Fortnite_Version >= 11.00 && Version::Fortnite_Version < 19.00) {
 		MapName = L"Apollo_Terrain";
@@ -355,7 +359,7 @@ void Utils::RemoveLocalPlayer() {
 void Utils::LoadWorld(FCoreConfig& Config) {
 	UWorld* World = UWorld::GetWorld();
 
-	FString MapName = Utils::GetDefaultMapName();
+	FString MapName = Utils::GetDefaultMapName(Config);
 	Log("Loading World: " + MapName.ToString());
 
 	FString TravelURL = Utils::BuildTravelURL(MapName, {

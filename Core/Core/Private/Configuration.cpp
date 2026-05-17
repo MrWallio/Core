@@ -33,6 +33,19 @@ void ConfigurationManager::LoadConfig() {
 		}
 	}
 
+	const wchar_t* MapToLoadParam = wcsstr(CmdLine, L"MapToLoad=");
+	if (MapToLoadParam) {
+		MapToLoadParam += 10;
+		std::wstring MapToLoadWide;
+		while (*MapToLoadParam && *MapToLoadParam != L' ' && *MapToLoadParam != L'\0') {
+			MapToLoadWide += *MapToLoadParam;
+			MapToLoadParam++;
+		}
+		if (!MapToLoadWide.empty()) {
+			NewConfig.MapToLoad = std::string(MapToLoadWide.begin(), MapToLoadWide.end());
+		}
+	}
+
 	Log("Configuration Loaded:");
 	Log("bEnableClientConsole: " + std::to_string(NewConfig.bEnableClientConsole));
 	Log("bIsClient: " + std::to_string(NewConfig.bIsClient));
@@ -40,6 +53,7 @@ void ConfigurationManager::LoadConfig() {
 	Log("bUseGameSessions: " + std::to_string(NewConfig.bUseGameSessions));
 	Log("bSkipSessionValidation: " + std::to_string(NewConfig.bSkipSessionValidation));
 	Log("Playlist: " + NewConfig.Playlist);
+	Log("MapToLoad: " + NewConfig.MapToLoad);
 
 	Config = NewConfig;
 }

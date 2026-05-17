@@ -10,6 +10,8 @@
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
+#include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 
 void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer) {
 	HandleStartingNewPlayerOG(This, NewPlayer);
@@ -74,11 +76,38 @@ void AFortGameModeZone::CreateAIGoalManager() {
 	}
 }
 
+void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFortWorldManager* WorldManager) {
+	Log("AFortGameModeZone::FinishWorldInitialization called!");
+
+	AFortGameMode::FinishWorldInitialization(This, WorldManager);
+}
+
+APawn* AFortGameModeZone::SpawnDefaultPawnFor(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot) {
+	APawn* Pawn = AFortGameMode::SpawnDefaultPawnForOG(This, NewPlayer, StartSpot);
+
+	Log("AFortGameModeZone::SpawnDefaultPawnFor: Spawned default pawn. NewPlayer=" + (NewPlayer ? NewPlayer->GetName().ToString() : "None") + " Pawn=" + (Pawn ? Pawn->GetName().ToString() : "None"));
+	return Pawn;
+}
+
 void AFortGameModeZone::Hook() {
 	HookEveryVTable(AFortGameModeZone::StaticClass(),
 		AGameModeBase::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.HandleStartingNewPlayer"),
 		HandleStartingNewPlayer,
 		(LPVOID*)&HandleStartingNewPlayerOG
+	);
+
+	HookVTableIdx(
+		AFortGameModeZone::GetDefaultObj(),
+		Finder::FindAFortGameMode_FinishWorldInitializationVFT(),
+		FinishWorldInitialization,
+		(LPVOID*)&FinishWorldInitializationOG
+	);
+
+	HookVTable(
+		AFortGameModeZone::GetDefaultObj(),
+		AFortGameModeZone::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
+		SpawnDefaultPawnFor,
+		(LPVOID*)&SpawnDefaultPawnForOG
 	);
 
 	Log("Hooked AFortGameModeZone");

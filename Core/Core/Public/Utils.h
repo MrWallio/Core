@@ -18,7 +18,7 @@ public:
 
 	static void Hook();
 
-	static FString GetDefaultMapName();
+	static FString GetDefaultMapName(FCoreConfig& Config);
 
 	static FString BuildTravelURL(FString MapPath, std::vector<std::pair<std::string, std::string>> Options = {});
 

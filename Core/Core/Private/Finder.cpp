@@ -1194,7 +1194,9 @@ uintptr_t Finder::FindUObjectBaseUtility_GetPathName() {
 		return ServerOffsets::UObjectBaseUtility_GetPathName;
 	static uintptr_t Addr = 0;
 
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 56 48 83 EC ? 33 ED 49 8B C0").Get();
+	if (Version::Engine_Version == 4.16) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 57 48 83 EC ? 49 8B F8").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::UObjectBaseUtility_GetPathName = Addr - ImageBase;
@@ -8475,6 +8477,8 @@ void Finder::SetupOffsets() {
 
 	FindAFortInventory_GetInventoryUsed();
 	FindAFortInventory_GetInventoryCapacity();
+
+	FindUObjectBaseUtility_GetPathName();
 
 	return;
 }

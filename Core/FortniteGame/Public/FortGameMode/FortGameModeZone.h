@@ -11,6 +11,7 @@ class AFortAIGoalManager;
 class AFortAIDirector;
 class ABuildingSMActor;
 class AFortPlayerControllerZone;
+class AFortWorldManager;
 
 class AFortGameModeZone : public AFortGameMode {
 public:
@@ -27,6 +28,12 @@ public:
 	void CreateAIDirector();
 
 	void CreateAIGoalManager();
-public:
+
+	static inline void (*FinishWorldInitializationOG)(AFortGameModeZone* This, AFortWorldManager* WorldManager);
+	static void FinishWorldInitialization(AFortGameModeZone* This, AFortWorldManager* WorldManager);
+
+	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot);
+	static APawn* SpawnDefaultPawnFor(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot);
+
 	static void Hook();
 };

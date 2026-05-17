@@ -26,7 +26,7 @@ public:
 	static inline bool (*ReadyToStartMatchOG)(AFortGameModeAthena* This);
 	static bool ReadyToStartMatch(AFortGameModeAthena* This);
 
-	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameModeAthena* This, AFortPlayerControllerAthena* NewPlayer, AActor* StartSpot);
+	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot);
 	static APawn* SpawnDefaultPawnFor(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot);
 
 	static inline void (*FinishWorldInitializationOG)(AFortGameModeAthena* This, AFortWorldManager* WorldManager);

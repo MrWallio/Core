@@ -98,7 +98,7 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 
 	AFortGameModeAthena* GameMode = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
 	if (!GameMode) {
-		Log("ABuildingContainer::PostUpdate: GameMode is not AFortGameModeAthena!");
+		//Log("ABuildingContainer::PostUpdate: GameMode is not AFortGameModeAthena!");
 		return;
 	}
 
