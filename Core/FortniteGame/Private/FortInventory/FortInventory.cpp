@@ -669,7 +669,7 @@ void AFortInventory::EquipHarvestingTool()
 	FFortItemEntry* PickaxeEntry = FindItemEntry(EFortItemType::GetWeaponHarvest());
 	if (!PickaxeEntry)
 	{
-		Log("AFortInventory::EquipPickaxe: Pickaxe not found in inventory!");
+		Log("AFortInventory::EquipHarvestingTool: HarvestingTool not found in inventory!");
 		return;
 	}
 

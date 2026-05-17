@@ -34,6 +34,39 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 		}
 		else {
 			Log(" Warning: No StartingItems found!");
+
+			static UFortItemDefinition* DefaultPickaxe = nullptr;
+			if (!DefaultPickaxe && GameMode->IsA(AFortGameModeAthena::StaticClass())) {
+				DefaultPickaxe = (UFortItemDefinition*)StaticLoadObject("/Game/Athena/Items/Weapons/WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");
+			}
+			else {
+				DefaultPickaxe = (UFortItemDefinition*)StaticLoadObject("/Game/Items/Weapons/Melee/Harvest/WID_Harvest_Pickaxe_C_T01.WID_Harvest_Pickaxe_C_T01");
+			}
+
+			static UFortItemDefinition* WallBuild = (UFortItemDefinition*)StaticLoadObject("/Game/Items/Weapons/BuildingTools/BuildingItemData_Wall.BuildingItemData_Wall");
+			static UFortItemDefinition* FloorBuild = (UFortItemDefinition*)StaticLoadObject("/Game/Items/Weapons/BuildingTools/BuildingItemData_Floor.BuildingItemData_Floor");
+			static UFortItemDefinition* StairBuild = (UFortItemDefinition*)StaticLoadObject("/Game/Items/Weapons/BuildingTools/BuildingItemData_Stair_W.BuildingItemData_Stair_W");
+			static UFortItemDefinition* ConeBuild = (UFortItemDefinition*)StaticLoadObject("/Game/Items/Weapons/BuildingTools/BuildingItemData_RoofS.BuildingItemData_RoofS");
+			static UFortItemDefinition* EditTool = (UFortItemDefinition*)StaticLoadObject("/Game/Items/Weapons/BuildingTools/EditTool.EditTool");
+
+			if (DefaultPickaxe) {
+				This->WorldInventory->AddItem(DefaultPickaxe);
+			}
+			if (WallBuild) {
+				This->WorldInventory->AddItem(WallBuild);
+			}
+			if (FloorBuild) {
+				This->WorldInventory->AddItem(FloorBuild);
+			}
+			if (StairBuild) {
+				This->WorldInventory->AddItem(StairBuild);
+			}
+			if (ConeBuild) {
+				This->WorldInventory->AddItem(ConeBuild);
+			}
+			if (EditTool) {
+				This->WorldInventory->AddItem(EditTool);
+			}
 		}
 	}
 }

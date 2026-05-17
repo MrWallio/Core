@@ -379,17 +379,20 @@ bool UFortKismetLibrary::PickLootDrops(
 		return false;
 	}
 
-	AFortGameModeAthena* GameMode = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
-	if (!GameMode) {
-		Log("UFortKismetLibrary::PickLootDrops: Failed to cast AuthorityGameMode to AFortGameModeAthena, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
+	AFortGameMode* FortGameMode = World->AuthorityGameMode->Cast<AFortGameMode>();
+	if (!FortGameMode) {
+		Log("UFortKismetLibrary::PickLootDrops: Failed to cast AuthorityGameMode to AFortGameMode, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
 		return false;
 	}
 
-	AFortGameStateAthena* GameState = World->GameState->Cast<AFortGameStateAthena>();
-	if (!GameState) {
-		Log("UFortKismetLibrary::PickLootDrops: Failed to cast GameState to AFortGameStateAthena, GameState: " + World->GameState->GetFullName());
+	AFortGameState* FortGameState = World->GameState->Cast<AFortGameState>();
+	if (!FortGameState) {
+		Log("UFortKismetLibrary::PickLootDrops: Failed to cast GameState to AFortGameState, GameState: " + World->GameState->GetFullName());
 		return false;
 	}
+
+	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
 
 	/*Log(
 		"UFortKismetLibrary::PickLootDrops: Picking loot drops for TierGroup: "
@@ -402,13 +405,13 @@ bool UFortKismetLibrary::PickLootDrops(
 	TArray<UDataTable*> LootTierDataTables;
 	TArray<UDataTable*> LootPackagesDataTables;
 	if (LootTierDataTables.Num() == 0 || LootPackagesDataTables.Num() == 0) {
-		if (GameState->CurrentPlaylistInfo.BasePlaylist) {
+		if (FortGameModeAthena && FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist) {
 			UDataTable* MainLTD = StaticLoadObject<UDataTable>(
-				GameState->CurrentPlaylistInfo.BasePlaylist->LootTierData.ObjectID.AssetPathName.ToString().ToString()
+				FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist->LootTierData.ObjectID.AssetPathName.ToString().ToString()
 			);
 
 			UDataTable* MainLP = StaticLoadObject<UDataTable>(
-				GameState->CurrentPlaylistInfo.BasePlaylist->LootPackages.ObjectID.AssetPathName.ToString().ToString()
+				FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist->LootPackages.ObjectID.AssetPathName.ToString().ToString()
 			);
 
 			if (MainLTD) {
@@ -426,9 +429,17 @@ bool UFortKismetLibrary::PickLootDrops(
 			}
 		}
 		if (LootTierDataTables.Num() == 0) {
-			UDataTable* DefaultLTD = StaticLoadObject<UDataTable>(
-				"/Game/Items/Datatables/AthenaLootTierData_Client.AthenaLootTierData_Client"
-			);
+			UDataTable* DefaultLTD = nullptr;
+			if (FortGameModeAthena) {
+				DefaultLTD = StaticLoadObject<UDataTable>(
+					"/Game/Items/Datatables/AthenaLootTierData_Client.AthenaLootTierData_Client"
+				);
+			}
+			else {
+				DefaultLTD = StaticLoadObject<UDataTable>(
+					"/Game/Items/Datatables/LootTierData_Client.LootTierData_Client"
+				);
+			}
 			if (DefaultLTD) {
 				LootTierDataTables.Add(DefaultLTD);
 			}
@@ -437,9 +448,17 @@ bool UFortKismetLibrary::PickLootDrops(
 			}
 		}
 		if (LootPackagesDataTables.Num() == 0) {
-			UDataTable* DefaultLP = StaticLoadObject<UDataTable>(
-				"/Game/Items/Datatables/AthenaLootPackages_Client.AthenaLootPackages_Client"
-			);
+			UDataTable* DefaultLP = nullptr;
+			if (FortGameModeAthena) {
+				DefaultLP = StaticLoadObject<UDataTable>(
+					"/Game/Items/Datatables/AthenaLootPackages_Client.AthenaLootPackages_Client"
+				);
+			}
+			else {
+				DefaultLP = StaticLoadObject<UDataTable>(
+					"/Game/Items/Datatables/LootPackages_Client.LootPackages_Client"
+				);
+			}
 
 			if (DefaultLP) {
 				LootPackagesDataTables.Add(DefaultLP);

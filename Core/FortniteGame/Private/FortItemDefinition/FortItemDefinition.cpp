@@ -93,7 +93,8 @@ uint8 UFortItemDefinition::GetQuickBarForItem() {
 		|| ItemType == EFortItemType::GetTrap()
 		|| ItemType == EFortItemType::GetBuildingPiece()
 		|| ItemType == EFortItemType::GetEditTool()
-		|| ItemType == EFortItemType::GetIngredient())
+		|| ItemType == EFortItemType::GetIngredient()
+		|| ItemType == EFortItemType::GetWeaponHarvest())
 		return EFortQuickBars::GetSecondary();
 
 	return EFortQuickBars::GetPrimary();
