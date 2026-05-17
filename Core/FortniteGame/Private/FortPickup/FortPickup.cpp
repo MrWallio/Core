@@ -123,6 +123,8 @@ void AFortPickup::SetPickupItems(FFortItemEntry* PrimaryEntry, TArray<FFortItemE
 }
 
 void AFortPickup::GivePickupTo(AFortPickup* This, IFortInventoryOwnerInterface* InventoryOwner, bool DestroyAfterPickup) {
+	This->ForceNetUpdate();
+	
 	GivePickupToOG(This, InventoryOwner, DestroyAfterPickup);
 
 	if (This->PickupLocationData.PickupTarget || This->PickupLocationData.ItemOwner) {

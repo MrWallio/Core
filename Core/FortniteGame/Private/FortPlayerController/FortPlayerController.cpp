@@ -644,6 +644,8 @@ void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* 
 	}
 
 	This->PayBuildableClassPlacementCost(&BuildingClassData);
+
+	BuildingActor->ForceNetUpdate();
 }
 
 bool AFortPlayerController::CanAffordToPlaceBuildableClass(FBuildingClassData* ClassToBuildData) {
@@ -709,6 +711,9 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 
 	EditingTool->EditActor = BuildingActorToEdit;
 	EditingTool->OnRep_EditActor();
+
+	EditingTool->ForceNetUpdate();
+	BuildingActorToEdit->ForceNetUpdate();
 }
 
 void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored) {
@@ -793,6 +798,8 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 
 	EditingTool->EditActor = ReplacedBuildingActor;
 	EditingTool->OnRep_EditActor();
+
+	ReplacedBuildingActor->ForceNetUpdate();
 }
 
 void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
@@ -848,4 +855,7 @@ void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController*
 
 	EditingTool->EditActor = nullptr;
 	EditingTool->OnRep_EditActor();
+
+	EditingTool->ForceNetUpdate();
+	BuildingActorToStopEditing->ForceNetUpdate();
 }

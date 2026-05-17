@@ -46,6 +46,8 @@ float ABuildingActor::GetMaxHealth() const
 void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FGameplayTagContainer& DamageTags, const FVector& Momentum, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser, const FGameplayEffectContextHandle& EffectContext) {
 	if (!This) return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 
+	This->ForceNetUpdate();
+
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ABuildingActor::OnDamageServer: World is null!");

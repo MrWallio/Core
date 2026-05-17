@@ -28,6 +28,8 @@ public:
 	static void LoadWorld(FCoreConfig& Config);
 
     static uintptr_t GetCallDestination(uintptr_t callAddr);
+
+    static double NowSeconds();
 };
 
 class FCommandParser

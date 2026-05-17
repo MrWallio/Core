@@ -43,7 +43,7 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 
 	HandleInventoryLocalUpdate();
 
-	//ForceNetUpdate();
+	ForceNetUpdate();
 
 	return true;
 }
@@ -279,8 +279,12 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
 	}
 
 	FFortItemEntry* RepEntry = FindItemEntry(Item->ItemEntry.ItemGuid);
+	if (Update(RepEntry))
+	{
+		return RepEntry;
+	}
 
-	return RepEntry;
+	return nullptr;
 }
 
 FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, int32 Level)

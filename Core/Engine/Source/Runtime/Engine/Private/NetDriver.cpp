@@ -21,6 +21,9 @@
 static int32* CVarSetNetDormancyEnabled = Finder::FindCVarDirect<int32>(L"net.DormancyEnable");
 static int32 MaxConnectionsToTickPerServerFrame = 10; // its a cvar, idk how to get it so i just hardcoded it for now
 
+static float ServerReplicateActorsTimeStart = 1.f;
+static float ServerReplicateActorsTimeMs = 1.f;
+
 FActorPriority::FActorPriority(UNetConnection* InConnection, UActorChannel* InChannel, FNetworkObjectInfo* InActorInfo, const TArray<struct FNetViewer>& Viewers, bool bLowBandwidth)
 	: ActorInfo(InActorInfo), Channel(InChannel), DestructionInfo(NULL)
 {
@@ -298,18 +301,20 @@ void UNetDriver::UpdateStandbyCheatStatus(void)
 
 int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 {
+	ServerReplicateActorsTimeStart = Utils::NowSeconds();
+
 	UEngine* GEngine = UEngine::GetEngine();
 
+	if (ClientConnections.Num() == 0)
+	{
+		return 0;
+	}
+
+	check(World);
+
+	int32 Updated = 0;
+
 	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.19) {
-		if (ClientConnections.Num() == 0)
-		{
-			return 0;
-		}
-
-		check(World);
-
-		int32 Updated = 0;
-
 		ReplicationFrame++;
 
 		const int32 NumClientsToTick = ServerReplicateActors_PrepConnections(DeltaSeconds);
@@ -448,11 +453,10 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 
 			DebugRelevantActors = false;
 		}
-
-		return Updated;
 	}
 
-	return 0;
+	ServerReplicateActorsTimeMs = (Utils::NowSeconds() - ServerReplicateActorsTimeStart) * 1000.0;
+	return Updated;
 }
 
 int32 UNetDriver::ServerReplicateActors_PrepConnections(const float DeltaSeconds)
@@ -640,7 +644,8 @@ void UNetDriver::ServerReplicateActors_BuildConsiderList(TArray<FNetworkObjectIn
 			{
 				const float NextUpdateDelta = bUseAdapativeNetFrequency ? ActorInfo->OptimalNetUpdateDelta : 1.0f / Actor->NetUpdateFrequency;
 
-				ActorInfo->NextUpdateTime = World->TimeSeconds + UKismetMathLibrary::RandomFloat() * ServerTickTime + NextUpdateDelta;
+				//ActorInfo->NextUpdateTime = World->TimeSeconds + UKismetMathLibrary::RandomFloat() * ServerTickTime + NextUpdateDelta;
+				ActorInfo->NextUpdateTime = World->TimeSeconds;
 
 				ActorInfo->LastNetUpdateTime = Time;
 			}
@@ -779,27 +784,23 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 
 int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection* Connection, const TArray<FNetViewer>& ConnectionViewers, FActorPriority** PriorityActors, const int32 FinalSortedCount, int32& OutUpdated)
 {
-	if (Version::Engine_Version == 4.16) {
-		if (!Connection->IsNetReady(0))
-		{
-			// Connection saturated, don't process any actors
-			return 0;
-		}
-
+	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.21) {
 		int32 ActorUpdatesThisConnection = 0;
 		int32 ActorUpdatesThisConnectionSent = 0;
 		int32 FinalRelevantCount = 0;
 
+		if (!Connection->IsNetReady(0))
+		{
+			return 0;
+		}
+
 		for (int32 j = 0; j < FinalSortedCount; j++)
 		{
-			// Deletion entry
 			if (PriorityActors[j]->ActorInfo == NULL && PriorityActors[j]->DestructionInfo)
 			{
-				// Make sure client has streaming level loaded
 				if (PriorityActors[j]->DestructionInfo->StreamingLevelName() != UKismetStringLibrary::Conv_StringToName(L"None")
 					&& !Connection->ClientVisibleLevelNames.Contains(PriorityActors[j]->DestructionInfo->StreamingLevelName()))
 				{
-					// This deletion entry is for an actor in a streaming level the connection doesn't have loaded, so skip it
 					continue;
 				}
 
@@ -808,15 +809,14 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 				{
 					FinalRelevantCount++;
 
-					Channel->SetChannelActorForDestroy(PriorityActors[j]->DestructionInfo);	// Send a close bunch on the new channel
-					Connection->DestroyedStartupOrDormantActors().Remove(PriorityActors[j]->DestructionInfo->NetGUID()); // Remove from connections to-be-destroyed list (close bunch of reliable, so it will make it there)
+					Channel->SetChannelActorForDestroy(PriorityActors[j]->DestructionInfo);
+					Connection->DestroyedStartupOrDormantActors().Remove(PriorityActors[j]->DestructionInfo->NetGUID());
 				}
 				continue;
 			}
 
-			// Normal actor replication
 			UActorChannel* Channel = PriorityActors[j]->Channel;
-			if (!Channel || Channel->Actor) //make sure didn't just close this channel
+			if (!Channel || Channel->Actor)
 			{
 				FNetworkObjectInfo* ActorInfo = PriorityActors[j]->ActorInfo;
 
@@ -825,8 +825,6 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 
 				const bool bLevelInitializedForActor = IsLevelInitializedForActor(Actor, Connection);
 
-				// only check visibility on already visible actors every 1.0 + 0.5R seconds
-				// bTearOff actors should never be checked
 				if (bLevelInitializedForActor)
 				{
 					if (!Actor->bTearOff && (!Channel || Time - Channel->RelevantTime > 1.f))
@@ -843,34 +841,27 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 				}
 				else
 				{
-					// Actor is no longer relevant because the world it is/was in is not loaded by client
-					// exception: player controllers should never show up here
 					Log("- Level not initialized for actor " + Actor->GetName().ToString());
 				}
 
-				// if the actor is now relevant or was recently relevant
-				const bool bIsRecentlyRelevant = bIsRelevant || (Channel && Time - Channel->RelevantTime < RelevantTimeout);
+				const bool bIsRecentlyRelevant = bIsRelevant || (Channel && Time - Channel->RelevantTime < RelevantTimeout) || ActorInfo->bForceRelevantNextUpdate;
+
+				ActorInfo->bForceRelevantNextUpdate = false;
 
 				if (bIsRecentlyRelevant)
 				{
 					FinalRelevantCount++;
 
-					// Find or create the channel for this actor.
-					// we can't create the channel if the client is in a different world than we are
-					// or the package map doesn't support the actor's class/archetype (or the actor itself in the case of serializable actors)
-					// or it's an editor placed actor and the client hasn't initialized the level it's in
 					if (Channel == NULL && GuidCache->SupportsObject(Actor->GetClass()) && GuidCache->SupportsObject(Actor->IsNetStartupActor() ? Actor : Actor->GetArchetype()))
 					{
 						if (bLevelInitializedForActor)
 						{
-							// Create a new channel for this actor.
 							Channel = (UActorChannel*)Connection->CreateChannel(CHTYPE_Actor, 1);
 							if (Channel)
 							{
 								Channel->SetChannelActor(Actor);
 							}
 						}
-						// if we couldn't replicate it for a reason that should be temporary, and this Actor is updated very infrequently, make sure we update it again soon
 						else if (Actor->NetUpdateFrequency < 1.0f)
 						{
 							Log("Unable to replicate " + Actor->GetName().ToString());
@@ -880,19 +871,18 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 
 					if (Channel)
 					{
-						// if it is relevant then mark the channel as relevant for a short amount of time
 						if (bIsRelevant)
 						{
 							Channel->RelevantTime = Time + 0.5f * UKismetMathLibrary::RandomFloat();
 						}
-						// if the channel isn't saturated
 						if (Channel->IsNetReady(0))
 						{
-							// replicate the actor
 							if (DebugRelevantActors)
 							{
 								LastRelevantActors.Add(Actor);
 							}
+
+							double ChannelLastNetUpdateTime = Channel->LastUpdateTime;
 
 							if (Channel->ReplicateActor())
 							{
@@ -902,12 +892,10 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 									LastSentActors.Add(Actor);
 								}
 
-								// Calculate min delta (max rate actor will upate), and max delta (slowest rate actor will update)
 								const float MinOptimalDelta = 1.0f / Actor->NetUpdateFrequency;
 								const float MaxOptimalDelta = UKismetMathLibrary::Max(1.0f / Actor->MinNetUpdateFrequency, MinOptimalDelta);
 								const float DeltaBetweenReplications = (World->TimeSeconds - ActorInfo->LastNetReplicateTime);
 
-								// Choose an optimal time, we choose 70% of the actual rate to allow frequency to go up if needed
 								ActorInfo->OptimalNetUpdateDelta = UKismetMathLibrary::Clamp(DeltaBetweenReplications * 0.7f, MinOptimalDelta, MaxOptimalDelta);
 								ActorInfo->LastNetReplicateTime = World->TimeSeconds;
 							}
@@ -917,24 +905,17 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 						else
 						{
 							Log("- Channel saturated, forcing pending update for " + Actor->GetName().ToString());
-							// otherwise force this actor to be considered in the next tick again
 							Actor->ForceNetUpdate();
 						}
-						// second check for channel saturation
 						if (!Connection->IsNetReady(0))
 						{
-							// We can bail out now since this connection is saturated, we'll return how far we got though
 							return j;
 						}
 					}
 				}
 
-				// If the actor wasn't recently relevant, or if it was torn off, close the actor channel if it exists for this connection
 				if ((!bIsRecentlyRelevant || Actor->bTearOff) && Channel != NULL)
 				{
-					// Non startup (map) actors have their channels closed immediately, which destroys them.
-					// Startup actors get to keep their channels open.
-
 					if (!bLevelInitializedForActor || !Actor->IsNetStartupActor())
 					{
 						//Log("- Closing channel for no longer relevant actor " + Actor->GetName().ToString());

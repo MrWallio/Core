@@ -57,7 +57,7 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 	This->SearchBounceData.SearchAnimationCount++;
 	This->BounceContainer();
 
-	//This->ForceNetUpdate();
+	This->ForceNetUpdate();
 
 	if (This->bDestroyContainerOnSearch) {
 		This->K2_DestroyActor();

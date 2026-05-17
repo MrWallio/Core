@@ -377,3 +377,9 @@ uintptr_t Utils::GetCallDestination(uintptr_t callAddr)
 
 	return nextInstr + rel;
 }
+
+double Utils::NowSeconds()
+{
+	using Clock = std::chrono::high_resolution_clock;
+	return std::chrono::duration<double>(Clock::now().time_since_epoch()).count();
+}
