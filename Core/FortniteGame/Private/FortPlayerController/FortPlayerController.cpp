@@ -574,38 +574,42 @@ void AFortPlayerController::ServerSpotActor(AFortPlayerController* This, AActor*
 
 bool AFortPlayerController::RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval)
 {
-	if (!This || Count <= 0) {
-		return false;
+	if (!This) {
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
+	}
+
+	if (Count <= 0) {
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
 	}
 
 	static auto InterfaceOffset = StaticClass()->SuperStruct->PropertiesSize + (Version::Engine_Version >= 4.27 ? 16 : 8);
 	AFortPlayerController* PlayerController = (AFortPlayerController*)(__int64(This) - InterfaceOffset); // this is so wierd
 	if (!PlayerController) {
 		Log("RemoveInventoryItem: Failed to get PlayerController from interface pointer!");
-		return false;
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
 	}
+
 	if (PlayerController->IsA(AFortPlayerState::StaticClass())) {
 		AFortPlayerState* PlayerState = PlayerController->Cast<AFortPlayerState>();
 		PlayerController = (AFortPlayerController*)PlayerState->Owner;
 	}
 
+	Log("PlayerController: " + PlayerController->GetFullName());
 	if (!PlayerController->IsA(AFortPlayerController::StaticClass())) {
 		Log("RemoveInventoryItem: PlayerController is not a AFortPlayerController!");
-		return false;
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
 	}
 
 	AFortInventory* Inventory = PlayerController->WorldInventory;
 	if (!Inventory) {
-		return false;
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
 	}
 
 	if (!ItemGuid.IsValid()) {
-		return false;
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
 	}
 
-	Inventory->RemoveItem(ItemGuid, Count);
-
-	return true;
+	return Inventory->RemoveItem(ItemGuid, Count);
 }
 
 void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored) {

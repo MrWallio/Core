@@ -153,12 +153,13 @@ public:
 			(LPVOID*)&ServerSpotActorOG
 		);
 
-		HookEveryVTableIdx(
+		/*HookEveryVTableIdx(
 			AFortPlayerController::StaticClass(),
 			Finder::FindAFortPlayerController_RemoveInventoryItemVFT(),
 			RemoveInventoryItem,
 			(LPVOID*)&RemoveInventoryItemOG
-		);
+		);*/
+		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_RemoveInventoryItem()), RemoveInventoryItem, (LPVOID*)&RemoveInventoryItemOG);
 
 		if (Version::Fortnite_Version <= 1.72) {
 			HookEveryVTable(
