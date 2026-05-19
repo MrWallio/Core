@@ -7564,15 +7564,47 @@ uintptr_t Finder::FindUFortWorldItem_SetPhantomReserveAmmoVFT() {
 		return ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT;
 
 	bool bHasPhantomReserveAmmo = FFortItemEntry::StaticStruct()->FindPropertyByName("PhantomReserveAmmo") != nullptr;
-	if (!bHasPhantomReserveAmmo)
-		return 0;
+	if (bHasPhantomReserveAmmo) {
+		uintptr_t SetOwningInventoryIdx = FindUFortWorldItem_SetOwningInventoryVFT();
 
-	uintptr_t SetOwningInventoryIdx = FindUFortWorldItem_SetOwningInventoryVFT();
-
-	ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT = uint32(SetOwningInventoryIdx - (Version::Engine_Version < 4.27 ? 1 : 2));
+		ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT = uint32(SetOwningInventoryIdx - (Version::Engine_Version < 4.27 ? 1 : 2));
+	}
 
 	Log("UFortWorldItem_SetPhantomReserveAmmoVFT found at: 0x" + std::format("{:X}", ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT));
 	return ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT;
+}
+
+uintptr_t Finder::FindUFortWorldItem_SetInInventoryOverflowVFT() {
+	if (ServerOffsets::UFortWorldItem_SetInInventoryOverflowVFT)
+		return ServerOffsets::UFortWorldItem_SetInInventoryOverflowVFT;
+
+	bool bHasPhantomReserveAmmo = FFortItemEntry::StaticStruct()->FindPropertyByName("PhantomReserveAmmo") != nullptr;
+	uintptr_t SetOwningInventoryIdx = FindUFortWorldItem_SetOwningInventoryVFT();
+
+	if (bHasPhantomReserveAmmo) {
+		// im not 100% about this part
+		ServerOffsets::UFortWorldItem_SetInInventoryOverflowVFT = uint32(SetOwningInventoryIdx - (Version::Engine_Version < 4.27 ? 8 : 9));
+	}
+	else {
+		ServerOffsets::UFortWorldItem_SetInInventoryOverflowVFT = uint32(SetOwningInventoryIdx - 5);
+	}
+
+	Log("UFortWorldItem_SetInInventoryOverflowVFT found at: 0x" + std::format("{:X}", ServerOffsets::UFortWorldItem_SetInInventoryOverflowVFT));
+	return ServerOffsets::UFortWorldItem_SetInInventoryOverflowVFT;
+}
+
+uintptr_t Finder::FindUFortWorldItem_SetDurabilityVFT() {
+	if (ServerOffsets::UFortWorldItem_SetDurabilityVFT)
+		return ServerOffsets::UFortWorldItem_SetDurabilityVFT;
+
+	uintptr_t SetInInventoryOverflowIdx = FindUFortWorldItem_SetInInventoryOverflowVFT();
+	if (!SetInInventoryOverflowIdx)
+		return 0;
+
+	ServerOffsets::UFortWorldItem_SetDurabilityVFT = uint32(SetInInventoryOverflowIdx - 1);
+
+	Log("UFortWorldItem_SetDurabilityVFT found at: 0x" + std::format("{:X}", ServerOffsets::UFortWorldItem_SetDurabilityVFT));
+	return ServerOffsets::UFortWorldItem_SetDurabilityVFT;
 }
 
 uintptr_t Finder::FindAFortPlayerController_RemoveInventoryItem() {
@@ -8397,6 +8429,9 @@ void Finder::SetupOffsets() {
 
 	FindUFortWorldItem_SetOwningInventoryVFT();
 	FindUFortWorldItem_SetLoadedAmmoVFT();
+	FindUFortWorldItem_SetPhantomReserveAmmoVFT();
+	FindUFortWorldItem_SetInInventoryOverflowVFT();
+	FindUFortWorldItem_SetDurabilityVFT();
 
 	FindUFortAnalytics_SetGameSessionID();
 	FindUFortAnalytics_SetGameStateClassName();

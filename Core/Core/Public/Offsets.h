@@ -595,6 +595,8 @@ namespace ServerOffsets {
 	inline uintptr_t UFortWorldItem_SetOwningInventoryVFT = 0;
 	inline uintptr_t UFortWorldItem_SetLoadedAmmoVFT = 0;
 	inline uintptr_t UFortWorldItem_SetPhantomReserveAmmoVFT = 0;
+	inline uintptr_t UFortWorldItem_SetInInventoryOverflowVFT = 0;
+	inline uintptr_t UFortWorldItem_SetDurabilityVFT = 0;
 
 	inline uintptr_t UFortControllerComponent_Aircraft_EnterAircraft = 0;
 

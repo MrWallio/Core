@@ -939,6 +939,10 @@ public:
 
 	static uintptr_t FindUFortWorldItem_SetPhantomReserveAmmoVFT();
 
+	static uintptr_t FindUFortWorldItem_SetInInventoryOverflowVFT();
+
+	static uintptr_t FindUFortWorldItem_SetDurabilityVFT();
+
 	static uintptr_t FindAFortPlayerController_RemoveInventoryItem();
 
 	static uintptr_t FindAFortPlayerController_RemoveInventoryItemVFT();

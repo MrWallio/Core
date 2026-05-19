@@ -20,15 +20,9 @@ void UFortWorldItem::SetOwningInventory(AFortInventory* NewOwnerInventory) {
 }
 
 bool UFortWorldItem::SetLoadedAmmo(UFortWorldItem* This, int32 InCount) {
-	AFortPlayerController* PC = This->GetOwningController();
-	if (!PC) {
-		Log("UFortWorldItem::SetLoadedAmmo: OwningController is null!");
-		return false;
-	}
-
-	AFortInventory* Inventory = PC->WorldInventory;
+	AFortInventory* Inventory = This->OwnerInventory;
 	if (!Inventory) {
-		Log("UFortWorldItem::SetLoadedAmmo: WorldInventory is null!");
+		Log("UFortWorldItem::SetLoadedAmmo: OwnerInventory is null!");
 		return false;
 	}
 
@@ -39,6 +33,36 @@ bool UFortWorldItem::SetLoadedAmmo(UFortWorldItem* This, int32 InCount) {
 	}
 
 	ItemEntry->LoadedAmmo = InCount;
+	Inventory->Update(ItemEntry);
+
+	return true;
+}
+
+bool UFortWorldItem::SetPhantomReserveAmmo(UFortWorldItem* This, int32 InCount) {
+	Log("UFortWorldItem::SetPhantomReserveAmmo called!");
+	Log("InCount: " + std::to_string(InCount));
+	return false;
+}
+
+bool UFortWorldItem::SetInInventoryOverflow(UFortWorldItem* This, bool bInInventoryOverflow) {
+	Log("UFortWorldItem::SetInInventoryOverflow called!");
+	Log("bInInventoryOverflow: " + std::to_string(bInInventoryOverflow));
+	return false;
+}
+
+bool UFortWorldItem::SetDurability(UFortWorldItem* This, float InDurability) {
+	AFortInventory* Inventory = This->OwnerInventory;
+	if (!Inventory) {
+		return false;
+	}
+
+	FFortItemEntry* ItemEntry = Inventory->FindItemEntry(This->ItemEntry.ItemGuid);
+	if (!ItemEntry) {
+		Log("UFortWorldItem::SetDurability: ItemEntry is null!");
+		return false;
+	}
+
+	ItemEntry->Durability = InDurability;
 	Inventory->Update(ItemEntry);
 
 	return true;
