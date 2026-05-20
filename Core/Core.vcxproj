@@ -430,6 +430,7 @@
     <ClCompile Include="FortniteGame\Private\FortSet\FortHealthSet.cpp" />
     <ClCompile Include="FortniteGame\Private\FortWeapon\FortDecoTool.cpp" />
     <ClCompile Include="FortniteGame\Private\FortWeapon\FortWeapon.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortWeapon\FortWeaponStats.cpp" />
     <ClCompile Include="FortniteGame\Private\Kismet\FortKismetLibrary.cpp" />
     <ClCompile Include="FortniteGame\Private\Mcp\McpProfileGroup.cpp" />
     <ClCompile Include="pch.cpp">

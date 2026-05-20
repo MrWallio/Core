@@ -8286,6 +8286,61 @@ uintptr_t Finder::FindUFortKismetLibrary_GetWeaponStatsRow() {
 	return ServerOffsets::UFortKismetLibrary_GetWeaponStatsRow;
 }
 
+uintptr_t Finder::FindFFortBaseWeaponStats_GetDurability() {
+	if (ServerOffsets::FFortBaseWeaponStats_GetDurability)
+		return ServerOffsets::FFortBaseWeaponStats_GetDurability;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Base Durability Lookup").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::FFortBaseWeaponStats_GetDurability = Addr - ImageBase;
+	}
+
+	Log("FFortBaseWeaponStats_GetDurability found at: 0x" + std::format("{:X}", ServerOffsets::FFortBaseWeaponStats_GetDurability));
+	return ServerOffsets::FFortBaseWeaponStats_GetDurability;
+}
+
+uintptr_t Finder::FindUFortWeaponItemDefinition_GetMaxDurability() {
+	if (ServerOffsets::UFortWeaponItemDefinition_GetMaxDurability)
+		return ServerOffsets::UFortWeaponItemDefinition_GetMaxDurability;
+	uintptr_t Addr = 0;
+
+	uintptr_t GetDurabilityAddr = FindFFortBaseWeaponStats_GetDurability() + ImageBase;
+	if (GetDurabilityAddr) {
+		uintptr_t XrefAddr = Memcury::Scanner::FindPointerRef((LPVOID)GetDurabilityAddr, 4).Get();
+		if (XrefAddr) {
+			for (int i = 0; i < 1024; i++)
+			{
+				auto Ptr = (uint8_t*)(XrefAddr - i);
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+				{
+					Addr = uint64_t(Ptr);
+					break;
+				}
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::UFortWeaponItemDefinition_GetMaxDurability = Addr - ImageBase;
+	}
+
+	Log("UFortWeaponItemDefinition_GetMaxDurability found at: 0x" + std::format("{:X}", ServerOffsets::UFortWeaponItemDefinition_GetMaxDurability));
+	return ServerOffsets::UFortWeaponItemDefinition_GetMaxDurability;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -8543,6 +8598,8 @@ void Finder::SetupOffsets() {
 
 	FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid();
 	FindUFortKismetLibrary_GetWeaponStatsRow();
+
+	FindFFortBaseWeaponStats_GetDurability();
 
 	return;
 }

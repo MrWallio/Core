@@ -996,6 +996,10 @@ public:
 	static uintptr_t FindUClass_GetSparseClassData();
 
 	static uintptr_t FindUFortKismetLibrary_GetWeaponStatsRow();
+
+	static uintptr_t FindFFortBaseWeaponStats_GetDurability();
+
+	static uintptr_t FindUFortWeaponItemDefinition_GetMaxDurability();
 public:
 	static void SetupOffsets();
 

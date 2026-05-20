@@ -3,6 +3,7 @@
 
 #include "FortniteGame/Public/FortItem/FortItemEntryStateValue.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 
 void FFortItemEntry::SetStateValue(uint8 StateType, int32 InValue) {
 	for (int32 i = 0; i < StateValues.Num(); i++) {

@@ -14,6 +14,7 @@ public:
 
 	DefineUProperty(UFortWeaponItemDefinition*, WeaponData);
 	DefineUProperty(FGuid, ItemEntryGuid);
+	DefineUProperty(int32, WeaponLevel);
 };
 
 class AFortWeap_BuildingToolBase : public AFortWeapon {

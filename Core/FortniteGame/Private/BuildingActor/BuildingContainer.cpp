@@ -53,8 +53,9 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 		if (Pickup) {
 			UFortWeaponItemDefinition* WeaponDef = Pickup->PrimaryPickupItemEntry.ItemDefinition->Cast<UFortWeaponItemDefinition>();
 			if (WeaponDef) {
-				Pickup->PrimaryPickupItemEntry.LoadedAmmo = WeaponDef->GetClipSize();
-				Pickup->PrimaryPickupItemEntry.Durability = WeaponDef->GetDurability();
+				int32 Level = Pickup->PrimaryPickupItemEntry.Level;
+				Pickup->PrimaryPickupItemEntry.LoadedAmmo = WeaponDef->GetClipSize(Level);
+				Pickup->PrimaryPickupItemEntry.Durability = WeaponDef->GetDurability(Level);
 			}
 		}
 	}
