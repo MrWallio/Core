@@ -2838,13 +2838,36 @@ uintptr_t Finder::FindAGameMode_AddInactivePlayer() {
 	if (ServerOffsets::AGameMode_AddInactivePlayer)
 		return ServerOffsets::AGameMode_AddInactivePlayer;
 	static uintptr_t Addr = 0;
-	Addr = Memcury::Scanner::FindPattern("40 53 56 57 41 55 48 83 EC ? 48 8B 01").Get();
+
+	if (Version::Engine_Version == 4.16) {
+		Addr = Memcury::Scanner::FindPattern("40 53 56 57 41 54 48 83 EC ? ? ? ? 49 8B F0").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::AGameMode_AddInactivePlayer = Addr - ImageBase;
 	}
+
 	Log("AGameMode_AddInactivePlayer found at: 0x" + std::format("{:X}", ServerOffsets::AGameMode_AddInactivePlayer));
 	return ServerOffsets::AGameMode_AddInactivePlayer;
+}
+
+uintptr_t Finder::FindAGameMode_AddInactivePlayerVFT() {
+	if (ServerOffsets::AGameMode_AddInactivePlayerVFT)
+		return ServerOffsets::AGameMode_AddInactivePlayerVFT;
+
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.GameMode"))->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAGameMode_AddInactivePlayer() + ImageBase))
+		{
+			ServerOffsets::AGameMode_AddInactivePlayerVFT = i;
+			break;
+		}
+	}
+
+	Log("AGameMode_AddInactivePlayerVFT found at: 0x" + std::format("{:X}", ServerOffsets::AGameMode_AddInactivePlayerVFT));
+	return ServerOffsets::AGameMode_AddInactivePlayerVFT;
 }
 
 uintptr_t Finder::FindAGameMode_Broadcast() {
@@ -7368,12 +7391,45 @@ uintptr_t Finder::FindAFortGameModeZone_CreateAIDirectorVFT() {
 	return ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT;
 }
 
+uintptr_t Finder::FindAFortGameModeZone_CreateAIGoalManager() {
+	if (ServerOffsets::AFortGameModeZone_CreateAIGoalManager)
+		return ServerOffsets::AFortGameModeZone_CreateAIGoalManager;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"nullptr AI Goal Manager class specified by Game Data; created default AI Goal manager anyway, but some settings may be missing.").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C && *(Ptr + 3) == 0x24 && *(Ptr + 4) == 0x08)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameModeZone_CreateAIGoalManager = Addr - ImageBase;
+	}
+
+	Log("AFortGameModeZone_CreateAIGoalManager found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeZone_CreateAIGoalManager));
+	return ServerOffsets::AFortGameModeZone_CreateAIGoalManager;
+}
+
 uintptr_t Finder::FindAFortGameModeZone_CreateAIGoalManagerVFT() {
 	if (ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT)
 		return ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT;
 
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT = 0x160;
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortGameModeZone"))->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortGameModeZone_CreateAIGoalManager() + ImageBase))
+		{
+			ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT = i;
+			break;
+		}
 	}
 
 	Log("AFortGameModeZone_CreateAIGoalManagerVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeZone_CreateAIGoalManagerVFT));
@@ -8341,6 +8397,25 @@ uintptr_t Finder::FindUFortWeaponItemDefinition_GetMaxDurability() {
 	return ServerOffsets::UFortWeaponItemDefinition_GetMaxDurability;
 }
 
+uintptr_t Finder::FindUFortWeaponItemDefinition_GetMaxDurabilityVFT() {
+	if (ServerOffsets::UFortWeaponItemDefinition_GetMaxDurabilityVFT)
+		return ServerOffsets::UFortWeaponItemDefinition_GetMaxDurabilityVFT;
+
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortWeaponItemDefinition"))->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindUFortWeaponItemDefinition_GetMaxDurability() + ImageBase))
+		{
+			ServerOffsets::UFortWeaponItemDefinition_GetMaxDurabilityVFT = i;
+			break;
+		}
+	}
+
+	Log("UFortWeaponItemDefinition_GetMaxDurabilityVFT found at: 0x" + std::format("{:X}", ServerOffsets::UFortWeaponItemDefinition_GetMaxDurabilityVFT));
+	return ServerOffsets::UFortWeaponItemDefinition_GetMaxDurabilityVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -8600,6 +8675,12 @@ void Finder::SetupOffsets() {
 	FindUFortKismetLibrary_GetWeaponStatsRow();
 
 	FindFFortBaseWeaponStats_GetDurability();
+
+	FindUFortWeaponItemDefinition_GetMaxDurability();
+	FindUFortWeaponItemDefinition_GetMaxDurabilityVFT();
+
+	FindAGameMode_AddInactivePlayer();
+	FindAGameMode_AddInactivePlayerVFT();
 
 	return;
 }

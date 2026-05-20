@@ -35,5 +35,7 @@ public:
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot);
 	static APawn* SpawnDefaultPawnFor(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot);
 
+	static void AddInactivePlayerHK(AFortGameModeZone* This, APlayerState* PlayerState, APlayerController* PC);
+
 	static void Hook();
 };

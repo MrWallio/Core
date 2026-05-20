@@ -54,3 +54,9 @@ bool AGameMode::HasMatchEnded() const
 		HasMatchEndedInternal(this);
 	}
 }
+
+void AGameMode::AddInactivePlayer(APlayerState* PlayerState, APlayerController* PC)
+{
+	void (*&AddInactivePlayerInternal)(AGameMode*, APlayerState*, APlayerController*) = decltype(AddInactivePlayerInternal)(VTable[Finder::FindAGameMode_AddInactivePlayerVFT()]);
+	AddInactivePlayerInternal(this, PlayerState, PC);
+}

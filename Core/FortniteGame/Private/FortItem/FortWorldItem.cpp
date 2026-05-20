@@ -59,7 +59,7 @@ bool UFortWorldItem::SetInInventoryOverflow(UFortWorldItem* This, bool bInInvent
 bool UFortWorldItem::SetDurability(UFortWorldItem* This, float InDurability) {
 	AFortPlayerController* FortPC = This->GetOwningController();
 	if (!FortPC) {
-		Log("UFortWorldItem::SetDurability: GetOwningController returned null!");
+		//Log("UFortWorldItem::SetDurability: GetOwningController returned null!");
 		return false;
 	}
 

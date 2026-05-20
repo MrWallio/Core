@@ -201,3 +201,7 @@ void AFortGameMode::FinishWorldInitialization(AFortGameMode* This, AFortWorldMan
 	FinishWorldInitializationOG(This, WorldManager);
 	This->bWorldIsReady = true;
 }
+
+void AFortGameMode::AddInactivePlayerHK(AFortGameMode* This, APlayerState* PlayerState, APlayerController* PC) {
+	return AGameMode::AddInactivePlayerOG(This, PlayerState, PC);
+}

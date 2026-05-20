@@ -57,6 +57,9 @@ void AFortGameModeZone::CreateAIGoalManager() {
 }
 
 void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFortWorldManager* WorldManager) {
+	This->CreateAIDirector();
+	This->CreateAIGoalManager();
+	
 	AFortGameMode::FinishWorldInitialization(This, WorldManager);
 }
 
@@ -87,6 +90,10 @@ APawn* AFortGameModeZone::SpawnDefaultPawnFor(AFortGameModeZone* This, AControll
 	return Pawn;
 }
 
+void AFortGameModeZone::AddInactivePlayerHK(AFortGameModeZone* This, APlayerState* PlayerState, APlayerController* PC) {
+	return AGameMode::AddInactivePlayerOG(This, PlayerState, PC);
+}
+
 void AFortGameModeZone::Hook() {
 	HookEveryVTable(AFortGameModeZone::StaticClass(),
 		AGameModeBase::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.HandleStartingNewPlayer"),
@@ -106,6 +113,12 @@ void AFortGameModeZone::Hook() {
 		AFortGameModeZone::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
 		SpawnDefaultPawnFor,
 		(LPVOID*)&SpawnDefaultPawnForOG
+	);
+
+	HookVTableIdx(
+		AFortGameModeZone::GetDefaultObj(),
+		Finder::FindAGameMode_AddInactivePlayerVFT(),
+		AddInactivePlayerHK
 	);
 
 	Log("Hooked AFortGameModeZone");

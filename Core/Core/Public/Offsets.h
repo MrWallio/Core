@@ -239,6 +239,7 @@ namespace ServerOffsets {
 	inline uintptr_t UKismetStringLibrary_Conv_StringToName = 0;
 
 	inline uintptr_t AGameMode_AddInactivePlayer = 0;
+	inline uintptr_t AGameMode_AddInactivePlayerVFT = 0;
 	inline uintptr_t AGameMode_Broadcast = 0;
 	inline uintptr_t AGameMode_BroadcastLocalized = 0;
 	inline uintptr_t AGameMode_EndMatch = 0;
@@ -357,7 +358,9 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameModeZone_InitGame = 0;
 	inline uintptr_t AFortGameModeZone_InitGameState = 0;
 	inline uintptr_t AFortGameModeZone_ChoosePlayerStart = 0;
+	inline uintptr_t AFortGameModeZone_CreateAIDirector = 0;
 	inline uintptr_t AFortGameModeZone_CreateAIDirectorVFT = 0;
+	inline uintptr_t AFortGameModeZone_CreateAIGoalManager = 0;
 	inline uintptr_t AFortGameModeZone_CreateAIGoalManagerVFT = 0;
 
 	inline uintptr_t AFortGameModeAthena_SetCurrentPlaylistId = 0;
@@ -593,6 +596,7 @@ namespace ServerOffsets {
 	inline uintptr_t UFortWorldItemDefinition_ServerExecuteVFT = 0;
 
 	inline uintptr_t UFortWeaponItemDefinition_GetMaxDurability = 0;
+	inline uintptr_t UFortWeaponItemDefinition_GetMaxDurabilityVFT = 0;
 
 	inline uintptr_t UFortWorldItem_SetOwningInventory = 0;
 	inline uintptr_t UFortWorldItem_SetOwningInventoryVFT = 0;

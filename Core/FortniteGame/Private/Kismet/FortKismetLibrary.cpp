@@ -390,13 +390,13 @@ bool UFortKismetLibrary::PickLootDrops(
 	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
 	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
 
-	Log(
+	/*Log(
 		"UFortKismetLibrary::PickLootDrops: Picking loot drops for TierGroup: "
 		+ TierGroupName.ToString().ToString() +
 		" WorldLevel: " + std::to_string(WorldLevel) +
 		" ForcedLootTier: " + std::to_string(ForcedLootTier) +
 		" In World: " + World->GetName().ToString()
-	);
+	);*/
 
 	TArray<UDataTable*> LootTierDataTables;
 	TArray<UDataTable*> LootPackagesDataTables;

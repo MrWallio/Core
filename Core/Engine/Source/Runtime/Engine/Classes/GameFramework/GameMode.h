@@ -64,4 +64,13 @@ public:
 	bool IsMatchInProgress() const;
 
 	bool HasMatchEnded() const;
+
+	static inline void (*AddInactivePlayerOG)(AGameMode* This, APlayerState* PlayerState, APlayerController* PC);
+	void AddInactivePlayer(APlayerState* PlayerState, APlayerController* PC);
+
+	static void Hook() {
+		CreateVTableOriginal(AGameMode::GetDefaultObj(), Finder::FindAGameMode_AddInactivePlayerVFT(), (LPVOID*)&AddInactivePlayerOG);
+
+		Log("AGameMode Hooked!");
+	}
 };

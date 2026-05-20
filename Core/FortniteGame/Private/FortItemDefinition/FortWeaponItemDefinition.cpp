@@ -31,8 +31,8 @@ int32 UFortWeaponItemDefinition::GetClipSize(int32 Level) const {
 }
 
 float UFortWeaponItemDefinition::GetDurability(int32 Level) const {
-	if (Finder::FindUFortWeaponItemDefinition_GetMaxDurability()) {
-		float (*GetMaxDurabilityInternal)(const UFortWeaponItemDefinition* This, int32 Level) = decltype(GetMaxDurabilityInternal)(ImageBase + Finder::FindUFortWeaponItemDefinition_GetMaxDurability());
+	if (Finder::FindUFortWeaponItemDefinition_GetMaxDurabilityVFT()) {
+		float (*&GetMaxDurabilityInternal)(const UFortWeaponItemDefinition* This, int32 Level) = decltype(GetMaxDurabilityInternal)(VTable[Finder::FindUFortWeaponItemDefinition_GetMaxDurabilityVFT()]);
 		return GetMaxDurabilityInternal(this, Level);
 	}
 	else {

@@ -323,6 +323,8 @@ public:
 
 	static uintptr_t FindAGameMode_AddInactivePlayer();
 
+	static uintptr_t FindAGameMode_AddInactivePlayerVFT();
+
 	static uintptr_t FindAGameMode_Broadcast();
 
 	static uintptr_t FindAGameMode_BroadcastLocalized();
@@ -921,6 +923,8 @@ public:
 
 	static uintptr_t FindAFortGameModeZone_CreateAIDirectorVFT();
 
+	static uintptr_t FindAFortGameModeZone_CreateAIGoalManager();
+
 	static uintptr_t FindAFortGameModeZone_CreateAIGoalManagerVFT();
 
 	static uintptr_t FindUObject_NeedsLoadForClientVFT();
@@ -1000,6 +1004,8 @@ public:
 	static uintptr_t FindFFortBaseWeaponStats_GetDurability();
 
 	static uintptr_t FindUFortWeaponItemDefinition_GetMaxDurability();
+
+	static uintptr_t FindUFortWeaponItemDefinition_GetMaxDurabilityVFT();
 public:
 	static void SetupOffsets();
 

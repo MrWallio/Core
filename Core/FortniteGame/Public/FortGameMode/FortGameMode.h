@@ -34,6 +34,8 @@ public:
 	static inline void (*FinishWorldInitializationOG)(AFortGameMode* This, AFortWorldManager* WorldManager);
 	static void FinishWorldInitialization(AFortGameMode* This, AFortWorldManager* WorldManager);
 
+	static void AddInactivePlayerHK(AFortGameMode* This, APlayerState* PlayerState, APlayerController* PC);
+
 	static void Hook() {
 		//CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
 		HookVTable(
@@ -60,6 +62,13 @@ public:
 			Finder::FindAFortGameMode_FinishWorldInitializationVFT(),
 			FinishWorldInitialization,
 			(LPVOID*)&FinishWorldInitializationOG
+		);
+
+		HookVTableIdx(
+			AFortGameMode::GetDefaultObj(),
+			Finder::FindAGameMode_AddInactivePlayerVFT(),
+			AddInactivePlayerHK,
+			nullptr
 		);
 
 		Log("AFortGameMode Hooked!");
