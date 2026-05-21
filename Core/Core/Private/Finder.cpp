@@ -6178,8 +6178,18 @@ uintptr_t Finder::FindUNetDriver__DestroyedStartupOrDormantActors() {
 	if (ServerOffsets::UNetDriver__DestroyedStartupOrDormantActors)
 		return ServerOffsets::UNetDriver__DestroyedStartupOrDormantActors;
 	uintptr_t Addr = 0;
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x1E8;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Adding actor NetGUID <%s> to new connection's destroy list").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr + i);
+			if (*Ptr == 0x49 && *(Ptr + 1) == 0x8D) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
