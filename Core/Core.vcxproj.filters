@@ -630,6 +630,9 @@
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameModeOutpost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">
@@ -891,6 +894,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\FortWeapon\FortWeaponStats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortGameMode\FortGameModeOutpost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -36,6 +36,9 @@ public:
 
 	static void AddInactivePlayerHK(AFortGameMode* This, APlayerState* PlayerState, APlayerController* PC);
 
+	static inline bool (*ReadyToStartMatchOG)(AFortGameMode* This);
+	static bool ReadyToStartMatch(AFortGameMode* This);
+
 	static void Hook() {
 		//CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
 		HookVTable(
@@ -69,6 +72,13 @@ public:
 			Finder::FindAGameMode_AddInactivePlayerVFT(),
 			AddInactivePlayerHK,
 			nullptr
+		);
+
+		HookVTable(
+			AFortGameMode::StaticClass(),
+			AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameMode.ReadyToStartMatch"),
+			ReadyToStartMatch,
+			(LPVOID*)&ReadyToStartMatchOG
 		);
 
 		Log("AFortGameMode Hooked!");

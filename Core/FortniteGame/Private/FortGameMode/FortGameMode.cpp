@@ -205,3 +205,7 @@ void AFortGameMode::FinishWorldInitialization(AFortGameMode* This, AFortWorldMan
 void AFortGameMode::AddInactivePlayerHK(AFortGameMode* This, APlayerState* PlayerState, APlayerController* PC) {
 	return AGameMode::AddInactivePlayerOG(This, PlayerState, PC);
 }
+
+bool AFortGameMode::ReadyToStartMatch(AFortGameMode* This) {
+	return ReadyToStartMatchOG(This);
+}
