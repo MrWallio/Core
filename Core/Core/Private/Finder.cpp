@@ -9,6 +9,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/NetConnection.h"
 
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 
@@ -5978,10 +5979,27 @@ uintptr_t Finder::FindUNetDriver_GetNetMode() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UNetDriver_GetNetMode)
 		return ServerOffsets::UNetDriver_GetNetMode;
-	Addr = Memcury::Scanner::FindPattern("48 83 EC ? 48 8B 01 FF 90 ? ? ? ? 84 C0 74").Get();
+	
+	uintptr_t BaseAddr = FindUWorld_InternalGetNetMode();
+	if (BaseAddr) {
+		BaseAddr += ImageBase;
+
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(BaseAddr + i);
+			if (*Ptr == 0xE9 && *(Ptr + 1) == 0x5F) {
+				int32_t Rel = *reinterpret_cast<int32_t*>(Ptr + 1);
+				uintptr_t Target = reinterpret_cast<uintptr_t>(Ptr) + 5 + Rel;
+				Addr = Target;
+				break;
+			}
+		}
+	}
+	
 	if (Addr) {
 		ServerOffsets::UNetDriver_GetNetMode = Addr - ImageBase;
 	}
+
 	Log("UNetDriver_GetNetMode found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_GetNetMode));
 	return ServerOffsets::UNetDriver_GetNetMode;
 }
@@ -6048,8 +6066,17 @@ uintptr_t Finder::FindUNetConnection__ActorChannels() {
 		return ServerOffsets::UNetConnection__ActorChannels;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x33568;
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"NotifyStreamingLevelUnload: %s").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr + i);
+			if (*Ptr == 0x4D && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0x8B) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
@@ -6082,9 +6109,19 @@ uintptr_t Finder::FindUNetConnection__TimeSensitive() {
 		return ServerOffsets::UNetConnection__TimeSensitive;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x229;
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Attempting to send data before handshake is complete. %s").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0xC6 && *(Ptr + 1) == 0x87) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 2);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
+
 	if (Addr) {
 		ServerOffsets::UNetConnection__TimeSensitive = Addr;
 	}
@@ -6226,8 +6263,13 @@ uintptr_t Finder::FindUNetConnection__TickCount() {
 	if (ServerOffsets::UNetConnection__TickCount)
 		return ServerOffsets::UNetConnection__TickCount;
 	uintptr_t Addr = 0;
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x1FC;
+	
+	UClass* StaticClass = UNetConnection::StaticClass();
+	if (StaticClass) {
+		uintptr_t BaseOffset = StaticClass->GetPropertyOffset("LastReceiveTime");
+		if (BaseOffset > 0) {
+			Addr = BaseOffset + 0x2C;
+		}
 	}
 
 	if (Addr) {
@@ -6399,8 +6441,19 @@ uintptr_t Finder::FindUNetConnection__State() {
 		return ServerOffsets::UNetConnection__State;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x124;
+	uintptr_t BaseAddr = Finder::FindUNetDriver_TickDispatch();
+	if (BaseAddr) {
+		BaseAddr += ImageBase;
+
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(BaseAddr + i);
+			if (*Ptr == 0x83 && *(Ptr + 1) == 0xB9) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 2);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
