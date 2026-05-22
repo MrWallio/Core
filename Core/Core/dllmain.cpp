@@ -51,14 +51,7 @@ DWORD Main(LPVOID)
         Finder::SetupOffsets();
 
         Utils::DumpGObjects(false);
-        Utils::DumpClassProperties("Engine"); // DEBUG
-        Utils::DumpClassProperties("World"); // DEBUG
-        Utils::DumpClassProperties("WorldContext"); // DEBUG
-        Utils::DumpClassProperties("GameplayAbilitySpec"); // DEBUG
-        Utils::DumpClassProperties("ItemAndCount"); // DEBUG
-		Utils::DumpEnumProperties("EFortQuickBars"); // DEBUG
-		Utils::DumpClassProperties("FortItemEntryStateValue"); // DEBUG
-		Utils::DumpClassProperties("FortHeroSpecialization"); // DEBUG
+        Utils::DumpClassProperties("NetDriver"); // DEBUG
 
         Utils::Hook();
 

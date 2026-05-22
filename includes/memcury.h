@@ -925,108 +925,108 @@ namespace Memcury
             return -1;
         }
 
-        // Supports wide and normal strings both std and pointers
+        // Supports wide and normal strings, both std and pointers.
         template <typename T = const wchar_t*>
         static auto FindStringRef(T string, bool bWarnIfNotFound = true, int useRefNum = 0, bool bIsInFunc = false, bool bSkunky = false) -> Scanner
         {
             PE::Address add{ nullptr };
 
-            constexpr auto bIsWide = std::is_same<T, const wchar_t*>::value;
-            constexpr auto bIsChar = std::is_same<T, const char*>::value;
-
-            constexpr auto bIsPtr = bIsWide || bIsChar;
+            constexpr bool bIsWide = std::is_same_v<T, const wchar_t*>;
+            constexpr bool bIsChar = std::is_same_v<T, const char*>;
+            constexpr bool bIsPtr = bIsWide || bIsChar;
 
             auto textSection = PE::Section::GetSection(".text");
             auto rdataSection = PE::Section::GetSection(".rdata");
 
-            const auto scanBytes = reinterpret_cast<std::uint8_t*>(textSection.GetSectionStart().Get());
+            auto* textBytes = reinterpret_cast<std::uint8_t*>(textSection.GetSectionStart().Get());
+            auto* rdataBytes = reinterpret_cast<std::uint8_t*>(rdataSection.GetSectionStart().Get());
 
-            int aa = 0;
+            const auto textStart = reinterpret_cast<uintptr_t>(textBytes);
+            const auto textSize = static_cast<size_t>(textSection.GetSectionSize());
 
-            // scan only text section
-            for (DWORD i = 0x0; i < textSection.GetSectionSize(); i++)
+            const auto rdataStart = reinterpret_cast<uintptr_t>(rdataBytes);
+            const auto rdataSize = static_cast<size_t>(rdataSection.GetSectionSize());
+
+            PE::Address stringAddress{ nullptr };
+
+            if constexpr (bIsWide)
             {
-                if ((scanBytes[i] == ASM::CMOVL || scanBytes[i] == ASM::CMOVS) && scanBytes[i + 1] == ASM::LEA)
+                const wchar_t* target = string;
+                const size_t targetLen = wcslen(target);
+                const size_t targetBytes = (targetLen + 1) * sizeof(wchar_t);
+
+                for (size_t i = 0; i + targetBytes <= rdataSize; i++)
                 {
-                    auto stringAdd = PE::Address(&scanBytes[i]).RelativeOffset(3);
-
-                    // Check if the string is in the .rdata section
-                    if (rdataSection.isInSection(stringAdd))
+                    auto* candidate = reinterpret_cast<const wchar_t*>(rdataBytes + i);
+                    if (wmemcmp(candidate, target, targetLen) == 0 && candidate[targetLen] == L'\0')
                     {
-                        auto strBytes = stringAdd.GetAs<std::uint8_t*>();
-                        auto pointerToRef = *(LPVOID*)strBytes;
-
-                        if (rdataSection.isInSection(pointerToRef)) // Credit: Ender
-                        {
-                            strBytes = (std::uint8_t*)pointerToRef;
-                            stringAdd = PE::Address(pointerToRef);
-                        }
-
-                        // Check if the first char is printable
-                        if (ASM::byteIsAscii(strBytes[0]))
-                        {
-                            if constexpr (!bIsPtr)
-                            {
-                                // typedef T::value_type char_type;
-                                using char_type = std::decay_t<std::remove_pointer_t<T>>;
-
-                                auto lea = stringAdd.GetAs<char_type*>();
-
-                                T leaT(lea);
-
-                                if (leaT == string)
-                                {
-                                    add = PE::Address(&scanBytes[i]);
-
-                                    if (++aa > useRefNum)
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                auto lea = stringAdd.GetAs<T>();
-
-                                if constexpr (bIsWide)
-                                {
-                                    if (wcscmp(string, lea) == 0)
-                                    {
-                                        add = PE::Address(&scanBytes[i]);
-
-                                        if (++aa > useRefNum)
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    if (strcmp(string, lea) == 0)
-                                    {
-                                        add = PE::Address(&scanBytes[i]);
-
-                                        if (++aa > useRefNum)
-                                            break;
-                                    }
-                                }
-                            }
-                        }
+                        stringAddress = PE::Address(rdataStart + i);
+                        break;
                     }
                 }
             }
-            // MemcuryAssertM(add != 0, "FindStringRef return nullptr");
-
-            if (bWarnIfNotFound)
+            else if constexpr (bIsChar)
             {
-                if (add == 0)
-                {
-                    if constexpr (bIsWide)
-                    {
-                        std::wstring wstr = std::wstring(string);
+                const char* target = string;
+                const size_t targetLen = strlen(target);
+                const size_t targetBytes = targetLen + 1;
 
-                        // auto aaa = (L"failed FindStringRef " + std::wstring(string));
-                        // MessageBoxA(0, std::string(aaa.begin(), aaa.end()).c_str(), "Memcury", MB_ICONERROR);
-                    }
-                    else
+                for (size_t i = 0; i + targetBytes <= rdataSize; i++)
+                {
+                    auto* candidate = reinterpret_cast<const char*>(rdataBytes + i);
+                    if (memcmp(candidate, target, targetLen) == 0 && candidate[targetLen] == '\0')
                     {
-                        // MessageBoxA(0, ("failed FindStringRef " + std::string(string)).c_str(), "Memcury", MB_ICONERROR);
+                        stringAddress = PE::Address(rdataStart + i);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                using char_type = std::decay_t<std::remove_pointer_t<T>>;
+                T target = string;
+
+                for (size_t i = 0; i < rdataSize; i++)
+                {
+                    auto* candidate = reinterpret_cast<char_type*>(rdataBytes + i);
+                    T candidateValue(candidate);
+                    if (candidateValue == target)
+                    {
+                        stringAddress = PE::Address(rdataStart + i);
+                        break;
+                    }
+                }
+            }
+
+            if (!stringAddress.Get())
+            {
+                if (bWarnIfNotFound)
+                {
+                    
+                }
+                return Scanner(add);
+            }
+
+            int refCount = 0;
+
+            for (size_t i = 0; i + 7 <= textSize; i++)
+            {
+                auto* ptr = textBytes + i;
+
+                if ((ptr[0] == 0x48 || ptr[0] == 0x4C) && ptr[1] == 0x8D)
+                {
+                    if ((ptr[2] & 0x07) == 0x05)
+                    {
+                        int32_t disp = *reinterpret_cast<int32_t*>(ptr + 3);
+                        uintptr_t resolved = reinterpret_cast<uintptr_t>(ptr) + 7 + disp;
+
+                        if (resolved == stringAddress.Get())
+                        {
+                            add = PE::Address(reinterpret_cast<uintptr_t>(ptr));
+
+                            if (refCount++ >= useRefNum)
+                                break;
+                        }
                     }
                 }
             }
@@ -1037,15 +1037,14 @@ namespace Memcury
                 {
                     for (int i = 0; i < 300; i++)
                     {
-                        if (!bSkunky ? (*(uint8_t*)(add.Get() - i) == 0x48 && *(uint8_t*)(add.Get() - i + 1) == 0x83) :
-                            (*(uint8_t*)(add.Get() - i) == 0x4C && *(uint8_t*)(add.Get() - i + 1) == 0x8B && *(uint8_t*)(add.Get() - i + 2) == 0xDC))
+                        auto cur = add.Get() - i;
+
+                        if (!bSkunky
+                            ? (*(uint8_t*)(cur) == 0x48 && *(uint8_t*)(cur + 1) == 0x83)
+                            : (*(uint8_t*)(cur) == 0x4C && *(uint8_t*)(cur + 1) == 0x8B && *(uint8_t*)(cur + 2) == 0xDC))
                         {
-                            // MessageBoxA(0, std::format("0x{:x}", (__int64(add.Get() - i) - __int64(GetModuleHandleW(0)))).c_str(), "Memcury", MB_OK);
-
-                            auto beginFunc = Scanner(add.Get() - i);
-
+                            auto beginFunc = Scanner(cur);
                             auto ref = FindPointerRef(beginFunc.GetAs<void*>());
-
                             return ref;
                         }
                     }
@@ -1636,4 +1635,75 @@ inline uintptr_t FindFunctionCall(const wchar_t* Name, const std::vector<uint8_t
         return 0;
 
     return Memcury::Scanner(NameRef).ScanFor(Bytes, false).Get();
+}
+
+inline uintptr_t FindWideString(const wchar_t* target)
+{
+    auto rdataSection = Memcury::PE::Section::GetSection(".rdata");
+    auto* rdataBytes = reinterpret_cast<std::uint8_t*>(rdataSection.GetSectionStart().Get());
+    const size_t rdataSize = static_cast<size_t>(rdataSection.GetSectionSize());
+
+    const size_t len = wcslen(target);
+
+    for (size_t i = 0; i + (len + 1) * sizeof(wchar_t) <= rdataSize; i++)
+    {
+        const wchar_t* candidate = reinterpret_cast<const wchar_t*>(rdataBytes + i);
+        if (wmemcmp(candidate, target, len) == 0 && candidate[len] == L'\0')
+        {
+            return reinterpret_cast<uintptr_t>(candidate);
+        }
+    }
+
+    return 0;
+}
+
+inline std::vector<uintptr_t> FindLeaRefsToAddress(uintptr_t Target)
+{
+    std::vector<uintptr_t> Refs;
+
+    auto textSection = Memcury::PE::Section::GetSection(".text");
+    auto* textBytes = reinterpret_cast<uint8_t*>(textSection.GetSectionStart().Get());
+    size_t textSize = textSection.GetSectionSize();
+
+    for (size_t i = 0; i + 7 <= textSize; i++)
+    {
+        auto* Ptr = textBytes + i;
+
+        if ((Ptr[0] == 0x48 || Ptr[0] == 0x4C) && Ptr[1] == 0x8D)
+        {
+            if ((Ptr[2] & 0x07) == 0x05)
+            {
+                int32_t Disp = *reinterpret_cast<int32_t*>(Ptr + 3);
+                uintptr_t Resolved = reinterpret_cast<uintptr_t>(Ptr) + 7 + Disp;
+
+                if (Resolved == Target)
+                {
+                    Refs.push_back(reinterpret_cast<uintptr_t>(Ptr));
+                }
+            }
+        }
+    }
+
+    return Refs;
+}
+
+inline std::vector<uintptr_t> FindPointerRefsToAddress(uintptr_t Target)
+{
+    std::vector<uintptr_t> Refs;
+
+    auto Base = reinterpret_cast<uint8_t*>((uintptr_t)GetModuleHandleA(0));
+    auto Dos = reinterpret_cast<PIMAGE_DOS_HEADER>(Base);
+    auto Nt = reinterpret_cast<PIMAGE_NT_HEADERS>(Base + Dos->e_lfanew);
+    size_t Size = Nt->OptionalHeader.SizeOfImage;
+
+    for (size_t i = 0; i + sizeof(uintptr_t) <= Size; i++)
+    {
+        uintptr_t Value = *reinterpret_cast<uintptr_t*>(Base + i);
+        if (Value == Target)
+        {
+            Refs.push_back(reinterpret_cast<uintptr_t>(Base + i));
+        }
+    }
+
+    return Refs;
 }
