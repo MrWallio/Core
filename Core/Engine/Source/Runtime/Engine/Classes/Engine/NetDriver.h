@@ -196,8 +196,6 @@ public:
 
 	bool IsAdaptiveNetUpdateFrequencyEnabled();
 
-	void PrintDebugRelevantActors();
-
 	bool IsLevelInitializedForActor(const AActor* InActor, const UNetConnection* InConnection) const;
 
 	static inline void (*TickDispatchOG)(UNetDriver* This, float DeltaTime);

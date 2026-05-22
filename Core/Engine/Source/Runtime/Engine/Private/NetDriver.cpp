@@ -122,11 +122,6 @@ static FORCEINLINE bool IsActorRelevantToConnection(const AActor* Actor, const T
 	return false;
 }
 
-void UNetDriver::PrintDebugRelevantActors()
-{
-
-}
-
 bool UNetDriver::IsServer() const
 {
 	bool (*&IsServerInternal)(const UNetDriver*) = decltype(IsServerInternal)(VTable[Finder::FindUNetDriver_IsServerVFT()]);
@@ -219,7 +214,8 @@ void UNetDriver::TickDispatch(UNetDriver* This, float DeltaTime)
 {
 	TickDispatchOG(This, DeltaTime);
 
-	This->UpdateStandbyCheatStatus();
+	// Unless i can actually somehow make proper finders for everything in here then dont use
+	//This->UpdateStandbyCheatStatus();
 }
 
 void UNetDriver::UpdateStandbyCheatStatus(void)
@@ -441,17 +437,6 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 				ClientConnections.Add(Connection);
 				NumConnectionsToMove--;
 			}
-		}
-
-		if (DebugRelevantActors)
-		{
-			PrintDebugRelevantActors();
-			LastPrioritizedActors.Empty();
-			LastSentActors.Empty();
-			LastRelevantActors.Empty();
-			LastNonRelevantActors.Empty();
-
-			DebugRelevantActors = false;
 		}
 	}
 
@@ -750,11 +735,6 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 					OutPriorityActors[FinalSortedCount] = OutPriorityList + FinalSortedCount;
 
 					FinalSortedCount++;
-
-					if (DebugRelevantActors)
-					{
-						LastPrioritizedActors.Add(Actor);
-					}
 				}
 			}
 
@@ -832,10 +812,6 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 						{
 							bIsRelevant = true;
 						}
-						else if (DebugRelevantActors)
-						{
-							LastNonRelevantActors.Add(Actor);
-						}
 					}
 				}
 				else
@@ -876,20 +852,11 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 						}
 						if (Channel->IsNetReady(0))
 						{
-							if (DebugRelevantActors)
-							{
-								LastRelevantActors.Add(Actor);
-							}
-
 							double ChannelLastNetUpdateTime = Channel->LastUpdateTime;
 
 							if (Channel->ReplicateActor())
 							{
 								ActorUpdatesThisConnectionSent++;
-								if (DebugRelevantActors)
-								{
-									LastSentActors.Add(Actor);
-								}
 
 								const float MinOptimalDelta = 1.0f / Actor->NetUpdateFrequency;
 								const float MaxOptimalDelta = UKismetMathLibrary::Max(1.0f / Actor->MinNetUpdateFrequency, MinOptimalDelta);

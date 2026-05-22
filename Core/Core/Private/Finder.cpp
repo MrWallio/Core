@@ -8,6 +8,7 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
 
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 
@@ -6113,8 +6114,11 @@ uintptr_t Finder::FindUNetDriver__NetTag() {
 	if (ServerOffsets::UNetDriver__NetTag)
 		return ServerOffsets::UNetDriver__NetTag;
 	uintptr_t Addr = 0;
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x1A0;
+	
+	uintptr_t DestroyedStartupOrDormantActors_Addr = FindUNetDriver__DestroyedStartupOrDormantActors();
+	if (DestroyedStartupOrDormantActors_Addr) {
+		// may change on 5.0 or above
+		Addr = DestroyedStartupOrDormantActors_Addr - 0x48;
 	}
 
 	if (Addr) {
@@ -6179,12 +6183,12 @@ uintptr_t Finder::FindUNetDriver__DestroyedStartupOrDormantActors() {
 		return ServerOffsets::UNetDriver__DestroyedStartupOrDormantActors;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Adding actor NetGUID <%s> to new connection's destroy list").Get();
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"AddClientConnection: Added client connection: %s").Get();
 	if (StringAddr) {
 		for (int i = 0; i < 512; i++)
 		{
 			auto Ptr = (uint8_t*)(StringAddr + i);
-			if (*Ptr == 0x49 && *(Ptr + 1) == 0x8D) {
+			if (*Ptr == 0x4C && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0x9E) {
 				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
 				Addr = static_cast<uintptr_t>(Offset);
 				break;
@@ -6548,8 +6552,16 @@ uintptr_t Finder::FindUNetDriver__GuidCache() {
 		return ServerOffsets::UNetDriver__GuidCache;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0xB0;
+	UClass* StaticClass = UNetDriver::StaticClass();
+	if (StaticClass) {
+		uintptr_t BaseOffset = StaticClass->GetPropertyOffset("WorldPackage");
+		if (BaseOffset <= 0) {
+			BaseOffset = StaticClass->GetPropertyOffset("World");
+		}
+
+		if (BaseOffset > 0) {
+			Addr = BaseOffset + 0x8;
+		}
 	}
 
 	if (Addr) {
@@ -6659,7 +6671,17 @@ uintptr_t Finder::FindUNetDriver_TickDispatch() {
 	if (ServerOffsets::UNetDriver_TickDispatch)
 		return ServerOffsets::UNetDriver_TickDispatch;
 
-	Addr = Memcury::Scanner::FindPattern("40 57 48 83 EC ? 33 C0 0F 29 74 24").Get();
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UNetDriver::TickDispatch: Very long time between ticks. DeltaTime: %2.2f, Realtime: %2.2f. %s").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x57) {
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver_TickDispatch = Addr - ImageBase;
@@ -6674,8 +6696,19 @@ uintptr_t Finder::FindUNetDriver__SendCycles() {
 		return ServerOffsets::UNetDriver__SendCycles;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x10C;
+	uintptr_t BaseAddr = Finder::FindUNetDriver_TickDispatch();
+	if (BaseAddr) {
+		BaseAddr += ImageBase;
+
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(BaseAddr + i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
@@ -6691,8 +6724,8 @@ uintptr_t Finder::FindUNetDriver__RecvCycles() {
 		return ServerOffsets::UNetDriver__RecvCycles;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x110;
+	if (Finder::FindUNetDriver__SendCycles()) {
+		Addr = Finder::FindUNetDriver__SendCycles() + 4;
 	}
 
 	if (Addr) {
@@ -6708,8 +6741,19 @@ uintptr_t Finder::FindUNetDriver__LastTickDispatchRealtime() {
 		return ServerOffsets::UNetDriver__LastTickDispatchRealtime;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x100;
+	uintptr_t BaseAddr = Finder::FindUNetDriver_TickDispatch();
+	if (BaseAddr) {
+		BaseAddr += ImageBase;
+
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(BaseAddr + i);
+			if (*Ptr == 0xF2 && *(Ptr + 1) == 0x0F && *(Ptr + 2) == 0x11 && *(Ptr + 3) == 0x97) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 4);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
