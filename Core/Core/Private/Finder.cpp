@@ -5987,7 +5987,7 @@ uintptr_t Finder::FindUNetDriver_GetNetMode() {
 		for (int i = 0; i < 512; i++)
 		{
 			auto Ptr = (uint8_t*)(BaseAddr + i);
-			if (*Ptr == 0xE9 && *(Ptr + 1) == 0x5F) {
+			if (*Ptr == 0xE9) {
 				int32_t Rel = *reinterpret_cast<int32_t*>(Ptr + 1);
 				uintptr_t Target = reinterpret_cast<uintptr_t>(Ptr) + 5 + Rel;
 				Addr = Target;
@@ -6092,8 +6092,17 @@ uintptr_t Finder::FindUActorChannel__LastUpdateTime() {
 		return ServerOffsets::UActorChannel__LastUpdateTime;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x80;
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ActorChannel[%d]: Sending ObjKeys: %s").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr + i);
+			if (*Ptr == 0xF2 && *(Ptr + 1) == 0x41) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 5);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
@@ -6340,8 +6349,10 @@ uintptr_t Finder::FindUActorChannel__RelevantTime() {
 	if (ServerOffsets::UActorChannel__RelevantTime)
 		return ServerOffsets::UActorChannel__RelevantTime;
 	uintptr_t Addr = 0;
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x78;
+	
+	uintptr_t BaseAddr = FindUActorChannel__LastUpdateTime();
+	if (BaseAddr) {
+		Addr = BaseAddr - 0x8;
 	}
 
 	if (Addr) {
@@ -6376,19 +6387,6 @@ uintptr_t Finder::FindUActorChannel_StartBecomingDormant() {
 	}
 	Log("UActorChannel_StartBecomingDormant found at: 0x" + std::format("{:X}", ServerOffsets::UActorChannel_StartBecomingDormant));
 	return ServerOffsets::UActorChannel_StartBecomingDormant;
-}
-
-uintptr_t Finder::FindUNetDriver_IsLevelInitializedForActor() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::UNetDriver_IsLevelInitializedForActor)
-		return ServerOffsets::UNetDriver_IsLevelInitializedForActor;
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 48 8B 81 ? ? ? ? 49 8B D8 48 8B FA").Get();
-
-	if (Addr) {
-		ServerOffsets::UNetDriver_IsLevelInitializedForActor = Addr - ImageBase;
-	}
-	Log("UNetDriver_IsLevelInitializedForActor found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_IsLevelInitializedForActor));
-	return ServerOffsets::UNetDriver_IsLevelInitializedForActor;
 }
 
 uintptr_t Finder::FindAActor_IsNetRelevantFor() {
@@ -6531,8 +6529,19 @@ uintptr_t Finder::FindUNetConnection__ClientWorldPackageName() {
 		return ServerOffsets::UNetConnection__ClientWorldPackageName;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x66D5;
+	uintptr_t BaseAddr = Finder::FindUNetDriver_IsLevelInitializedForActor();
+	if (BaseAddr) {
+		BaseAddr += ImageBase;
+
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(BaseAddr + i);
+			if (*Ptr == 0x49 && *(Ptr + 1) == 0x39) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
@@ -6548,8 +6557,19 @@ uintptr_t Finder::FindUNetConnection__ClientVisibleLevelNames() {
 		return ServerOffsets::UNetConnection__ClientVisibleLevelNames;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x336B0;
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ServerUpdateLevelVisibility() Added '%s'").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if ((*Ptr == 0x49 || *Ptr == 0x48)
+				&& *(Ptr + 1) == 0x8D
+				&& (*(Ptr + 2) == 0x8F || *(Ptr + 2) == 0x8D)) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
@@ -6744,8 +6764,17 @@ uintptr_t Finder::FindUChannel__NumInRec() {
 		return ServerOffsets::UChannel__NumInRec;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x48;
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UChannel::ReceivedRawBunch: Too many reliable messages queued up").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x81 && *(Ptr + 1) == 0x7B) {
+				uint8_t Offset = *(Ptr + 2);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
@@ -6761,8 +6790,9 @@ uintptr_t Finder::FindUChannel__NumOutRec() {
 		return ServerOffsets::UChannel__NumOutRec;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x4C;
+	uintptr_t BaseAddr = Finder::FindUChannel__NumInRec();
+	if (BaseAddr) {
+		Addr = BaseAddr + 4;
 	}
 
 	if (Addr) {
@@ -7668,12 +7698,35 @@ uintptr_t Finder::FindUNetDriver_IsServerVFT() {
 	return ServerOffsets::UNetDriver_IsServerVFT;
 }
 
+uintptr_t Finder::FindUNetDriver_IsLevelInitializedForActor() {
+	if (ServerOffsets::UNetDriver_IsLevelInitializedForActor)
+		return ServerOffsets::UNetDriver_IsLevelInitializedForActor;
+	uintptr_t Addr = 0;
+
+	if (Version::Engine_Version == 4.16) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 48 8B 81 ? ? ? ? 49 8B D8 48 8B FA").Get();
+	}
+
+	if (Addr) {
+		ServerOffsets::UNetDriver_IsLevelInitializedForActor = Addr - ImageBase;
+	}
+
+	Log("UNetDriver_IsLevelInitializedForActor found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_IsLevelInitializedForActor));
+	return ServerOffsets::UNetDriver_IsLevelInitializedForActor;
+}
+
 uintptr_t Finder::FindUNetDriver_IsLevelInitializedForActorVFT() {
 	if (ServerOffsets::UNetDriver_IsLevelInitializedForActorVFT)
 		return ServerOffsets::UNetDriver_IsLevelInitializedForActorVFT;
 	
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::UNetDriver_IsLevelInitializedForActorVFT = 0x69;
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.NetDriver"))->GetDefaultObject()->VTable;
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindUNetDriver_IsLevelInitializedForActor() + ImageBase))
+		{
+			ServerOffsets::UNetDriver_IsLevelInitializedForActorVFT = i;
+			break;
+		}
 	}
 
 	Log("UNetDriver_IsLevelInitializedForActorVFT found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_IsLevelInitializedForActorVFT));
@@ -9024,6 +9077,9 @@ void Finder::SetupOffsets() {
 
 	FindAGameMode_AddInactivePlayer();
 	FindAGameMode_AddInactivePlayerVFT();
+
+	FindUNetDriver_GetNetMode();
+	FindUNetDriver_IsLevelInitializedForActorVFT();
 
 	return;
 }

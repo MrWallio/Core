@@ -759,8 +759,6 @@ public:
 
 	static uintptr_t FindUActorChannel_StartBecomingDormant();
 
-	static uintptr_t FindUNetDriver_IsLevelInitializedForActor();
-
 	static uintptr_t FindAActor_IsNetRelevantFor();
 
 	static uintptr_t FindAActor_IsNetRelevantForVFT();
@@ -912,6 +910,8 @@ public:
 	static uintptr_t FindUNetConnection_GetUChildConnectionVFT();
 
 	static uintptr_t FindUNetDriver_IsServerVFT();
+
+	static uintptr_t FindUNetDriver_IsLevelInitializedForActor();
 
 	static uintptr_t FindUNetDriver_IsLevelInitializedForActorVFT();
 
