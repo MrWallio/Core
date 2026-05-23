@@ -485,6 +485,10 @@ int32 AFortInventory::GetInventoryCapacity()
 		return 0;
 	}
 
+	if (!Owner) {
+		return 0;
+	}
+
 	if (Version::Fortnite_Version >= 1.81)
 	{
 		IFortInventoryOwnerInterface* InventoryOwner = (IFortInventoryOwnerInterface*)Owner->GetInterfaceAddress(IFortInventoryOwnerInterface::StaticClass());
@@ -506,6 +510,10 @@ int32 AFortInventory::GetInventoryUsed()
 {
 	if (Finder::FindAFortInventory_GetInventoryUsed() == 0)
 	{
+		return 0;
+	}
+
+	if (!Owner) {
 		return 0;
 	}
 
