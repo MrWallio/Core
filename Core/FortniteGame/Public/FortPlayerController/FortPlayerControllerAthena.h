@@ -11,6 +11,7 @@ class AFortBroadcastRemoteClientInfo;
 class UFortHero;
 class UFortHeroType;
 class AFortAircraft;
+struct FFortAthenaLoadout;
 
 class AFortPlayerControllerAthena : public AFortPlayerControllerZone {
 public:
@@ -20,6 +21,7 @@ public:
 
 	DefineUProperty(UFortHero*, StrongMyHero);
 	DefineUProperty(TArray<UFortHeroType*>, DefaultHeroes);
+	DefineUProperty(FFortAthenaLoadout, CustomizationLoadout);
 public:
 	static inline void (*EnterAircraftOG)(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft);
 	static void EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft);

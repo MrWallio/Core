@@ -30,4 +30,6 @@ public:
 	void OnRep_HeroType();
 
 	void InitializeHero();
+
+	void ApplyCharacterCustomization(AFortPlayerPawn* FortPlayerPawn);
 };

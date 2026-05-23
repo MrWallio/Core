@@ -536,8 +536,8 @@ bool AFortPlayerController::IsUsingOldQuickBars() {
 void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, bool bIsPawnLoaded)
 {
 	ServerClientPawnLoadedOG(This, bIsPawnLoaded);
-	AFortPlayerState* PlayerState = This->PlayerState ? This->PlayerState->Cast<AFortPlayerState>() : nullptr;
-	if (!PlayerState) {
+	AFortPlayerState* FortPlayerState = This->PlayerState ? This->PlayerState->Cast<AFortPlayerState>() : nullptr;
+	if (!FortPlayerState) {
 		Log("ServerAcknowledgePossession: PlayerState is null or not AFortPlayerStateZone");
 		return;
 	}
@@ -547,7 +547,7 @@ void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, 
 	AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>();
 
 	if (bIsPawnLoaded) {
-		if (Version::Fortnite_Version <= 1.72) {
+		if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.1 && Version::Fortnite_Version != 1.11) {
 			if (FortPCAthena && MyFortPawn) {
 				if (FortPCAthena->StrongMyHero && FortPCAthena->StrongMyHero->CharacterParts.Num() > 0) {
 					for (UCustomCharacterPart* CharacterPart : FortPCAthena->StrongMyHero->CharacterParts) {
@@ -556,10 +556,13 @@ void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, 
 				}
 			}
 
-			PlayerState->OnRep_CharacterParts();
+			FortPlayerState->OnRep_CharacterParts();
+			
+			Log("ServerClientPawnLoaded: Applied CharacterParts for PlayerState " + FortPlayerState->GetName().ToString());
 		}
 		else {
-			// ApplyCharacterCustomization
+			FortPlayerState->ApplyCharacterCustomization(MyFortPawn);
+			Log("ServerClientPawnLoaded: Applied character customization for PlayerState " + FortPlayerState->GetName().ToString());
 		}
 	}
 }

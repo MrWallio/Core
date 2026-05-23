@@ -571,6 +571,7 @@ namespace ServerOffsets {
 
 	inline uintptr_t AFortPlayerState_InitializeHero = 0;
 	inline uintptr_t AFortPlayerState_RefreshCharacterCustomization = 0;
+	inline uintptr_t AFortPlayerState_ApplyCharacterCustomization = 0;
 
 	inline uintptr_t FString_Append = 0;
 	inline uintptr_t FString_AppendInt = 0;

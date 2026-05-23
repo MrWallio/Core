@@ -9187,6 +9187,86 @@ uintptr_t Finder::FindUFortWeaponItemDefinition_GetMaxDurabilityVFT() {
 	return ServerOffsets::UFortWeaponItemDefinition_GetMaxDurabilityVFT;
 }
 
+uintptr_t Finder::FindAFortPlayerState_ApplyCharacterCustomization() {
+	if (ServerOffsets::AFortPlayerState_ApplyCharacterCustomization)
+		return ServerOffsets::AFortPlayerState_ApplyCharacterCustomization;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		if (Version::Fortnite_Version == 17.50) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 80 B9 ? ? ? ? ? 4C 8B EA").Get();
+		}
+		else if (Version::Fortnite_Version >= 24)
+		{
+			Addr = Memcury::Scanner::FindPattern(
+				"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 80 B9 ? ? ? ? ? 48 8B F1")
+				.Get();
+
+			if (!Addr)
+				Addr = Memcury::Scanner::FindPattern(
+					"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 80 B9 ? ? ? ? ? 48 8B C2")
+				.Get();
+
+			if (!Addr)
+				Addr
+				= Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8B EC 48 81 EC ? ? ? ? 80 B9").Get();
+
+			return Addr;
+		}
+		else if (std::floor(Version::Fortnite_Version) == 22) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8B EC 48 81 EC ? ? ? ? 80 B9").Get();
+		}
+		else {
+			auto sRef = Memcury::Scanner::FindStringRef(
+				L"AFortPlayerState::ApplyCharacterCustomization - Failed initialization, using default parts. Player Controller: %s PlayerState: %s, HeroId: %s", false, 0,
+				Version::Fortnite_Version >= 17, Version::Fortnite_Version < 20.40 && Version::Fortnite_Version != 19.01)
+				.Get();
+
+			if (sRef) {
+				for (int i = 100; i < 7000; i++)
+				{
+					if (*(uint8_t*)(sRef - i) == 0x40 && (*(uint8_t*)(sRef - i + 1) == 0x53 || *(uint8_t*)(sRef - i + 1) == 0x55)) {
+						Addr = sRef - i;
+						break;
+					}
+
+					if (Version::Fortnite_Version >= 15)
+					{
+						if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x89 && *(uint8_t*)(sRef - i + 2) == 0x5C) {
+							Addr = sRef - i;
+							break;
+						}
+					}
+
+					if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x8B && *(uint8_t*)(sRef - i + 2) == 0xC4) {
+						Addr = sRef - i;
+						break;
+					}
+
+					if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x89 && *(uint8_t*)(sRef - i + 2) == 0x54 && *(uint8_t*)(sRef - i + 5) == 0x55) {
+						Addr = sRef - i;
+						break;
+					}
+				}
+			}
+			else {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 50 10 55 57 48 8D 68 A1 48 81 EC ? ? ? ? 80 B9").Get();
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::AFortPlayerState_ApplyCharacterCustomization = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerState_ApplyCharacterCustomization found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerState_ApplyCharacterCustomization));
+	return ServerOffsets::AFortPlayerState_ApplyCharacterCustomization;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -9455,6 +9535,8 @@ void Finder::SetupOffsets() {
 
 	FindUNetDriver_GetNetMode();
 	FindUNetDriver_IsLevelInitializedForActorVFT();
+
+	FindAFortPlayerState_ApplyCharacterCustomization();
 
 	return;
 }

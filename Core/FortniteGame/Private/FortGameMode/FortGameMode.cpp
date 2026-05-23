@@ -81,6 +81,7 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 			return false;
 		}
 
+		AFortPlayerState* FortPS = BotController->PlayerState->Cast<AFortPlayerState>();
 		AFortPlayerStateAthena* FortPSAthena = BotController->PlayerState->Cast<AFortPlayerStateAthena>();
 
 		BotController->PlayerState->bIsABot = true;
@@ -114,18 +115,18 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 		}
 		
 		if (FortPCAthena) {
-			if (FortPSAthena) {
-				if (!FortPSAthena->HeroType && FortPCAthena->DefaultHeroes.Num() > 0) {
+			if (FortPS) {
+				if (!FortPS->HeroType && FortPCAthena->DefaultHeroes.Num() > 0) {
 					UFortHeroType* RandomHeroType = FortPCAthena->DefaultHeroes[UKismetMathLibrary::RandomIntegerInRange(0, FortPCAthena->DefaultHeroes.Num() - 1)];
 					if (RandomHeroType) {
-						FortPSAthena->HeroType = RandomHeroType;
-						FortPSAthena->HeroId = RandomHeroType->GetName();
+						FortPS->HeroType = RandomHeroType;
+						FortPS->HeroId = RandomHeroType->GetName();
 					}
 				}
 
-				UFortHeroType* HeroType = FortPSAthena->HeroType;
+				UFortHeroType* HeroType = FortPS->HeroType;
 
-				if (Version::Fortnite_Version <= 1.72) {
+				if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.1 && Version::Fortnite_Version != 1.11) {
 					if (FortPlayerPawn && HeroType && HeroType->GetSpecializationsAssetPtr().Num() > 0) {
 						UFortHeroSpecialization* RandomSpecialization = HeroType->GetSpecializationsAssetPtr()[UKismetMathLibrary::RandomIntegerInRange(0, HeroType->GetSpecializationsAssetPtr().Num() - 1)].Get();
 						if (RandomSpecialization) {
@@ -149,10 +150,10 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 						}
 					}
 
-					FortPSAthena->OnRep_CharacterParts();
+					FortPS->OnRep_CharacterParts();
 				}
 				else {
-					// ApplyCharacterCustomization
+					FortPS->ApplyCharacterCustomization(FortPlayerPawn);
 				}
 			}
 		}

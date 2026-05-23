@@ -36,3 +36,8 @@ void AFortPlayerState::InitializeHero() {
 	void (*InitializeHeroInternal)(AFortPlayerState*) = decltype(InitializeHeroInternal)(ImageBase + Finder::FindAFortPlayerState_InitializeHero());
 	InitializeHeroInternal(this);
 }
+
+void AFortPlayerState::ApplyCharacterCustomization(AFortPlayerPawn* FortPlayerPawn) {
+	void (*ApplyCharacterCustomizationInternal)(AFortPlayerState*, AFortPlayerPawn*) = decltype(ApplyCharacterCustomizationInternal)(ImageBase + Finder::FindAFortPlayerState_ApplyCharacterCustomization());
+	ApplyCharacterCustomizationInternal(this, FortPlayerPawn);
+}
