@@ -3904,9 +3904,17 @@ uintptr_t Finder::FindUEngine_LoadMap() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UEngine_LoadMap)
 		return ServerOffsets::UEngine_LoadMap;
-	Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 78 ? 44 0F 29 40 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B A5").Get();
+	
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef("LoadMap: %s").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
+				Addr = reinterpret_cast<uintptr_t>(Ptr);
+				break;
+			}
+		}
 	}
 
 	if (Addr) {
@@ -6719,7 +6727,17 @@ uintptr_t Finder::FindFNetGUIDCache_SupportsObject() {
 	if (ServerOffsets::FNetGUIDCache_SupportsObject)
 		return ServerOffsets::FNetGUIDCache_SupportsObject;
 
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 48 8B DA 48 8B F9 48 85 D2 75 ? B0").Get();
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"FNetGUIDCache::SupportsObject: %s NOT Supported.").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
+				Addr = reinterpret_cast<uintptr_t>(Ptr);
+				break;
+			}
+		}
+	}
 
 	if (Addr) {
 		ServerOffsets::FNetGUIDCache_SupportsObject = Addr - ImageBase;
@@ -7319,7 +7337,17 @@ uintptr_t Finder::FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetup() {
 	if (ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetup)
 		return ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetup;
 
-	Addr = Memcury::Scanner::FindPattern("40 55 53 57 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4C 8B A5").Get();
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ApplyHomebaseEffectsOnPlayerSetup failed with no ability object").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55) {
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
 
 	if (Addr) {
 		ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetup = Addr - ImageBase;
@@ -7333,8 +7361,14 @@ uintptr_t Finder::FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT() {
 	if (ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT)
 		return ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT;
 	
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT = 0xF3;
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortGameState"))->GetDefaultObject()->VTable;
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetup() + ImageBase))
+		{
+			ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT = i;
+			break;
+		}
 	}
 
 	Log("AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT));
@@ -7494,7 +7528,18 @@ uintptr_t Finder::FindAFortGameModeAthena_FinishWorldInitialization() {
 	if (ServerOffsets::AFortGameModeAthena_FinishWorldInitialization)
 		return ServerOffsets::AFortGameModeAthena_FinishWorldInitialization;
 	
-	Addr = Memcury::Scanner::FindPattern("40 55 56 41 56 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B F1 E8 ? ? ? ? ? ? ? 48 8B CE").Get();
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Can't find a FortAthenaMapInfo placed in map.  Skipping warmup and aircraft phases.").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1000; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
 	
 	if (Addr) {
 		ServerOffsets::AFortGameModeAthena_FinishWorldInitialization = Addr - ImageBase;
@@ -7508,8 +7553,14 @@ uintptr_t Finder::FindAFortGameMode_FinishWorldInitializationVFT() {
 	if (ServerOffsets::AFortGameMode_FinishWorldInitializationVFT)
 		return ServerOffsets::AFortGameMode_FinishWorldInitializationVFT;
 	
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::AFortGameMode_FinishWorldInitializationVFT = 0x137;
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortGameModeAthena"))->GetDefaultObject()->VTable;
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortGameModeAthena_FinishWorldInitialization() + ImageBase))
+		{
+			ServerOffsets::AFortGameMode_FinishWorldInitializationVFT = i;
+			break;
+		}
 	}
 
 	Log("AFortGameMode_FinishWorldInitializationVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_FinishWorldInitializationVFT));
@@ -7555,7 +7606,18 @@ uintptr_t Finder::FindAFortPlayerControllerZone_OnReadyToStartMatch() {
 	if (ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch)
 		return ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch;
 	
-	Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 57 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? F6 81").Get();
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ClearCachedReports IN OnReadyToStartMatch!").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1000; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x4C && *(Ptr + 1) == 0x8B)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
 	
 	if (Addr) {
 		ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch = Addr - ImageBase;
@@ -7569,8 +7631,14 @@ uintptr_t Finder::FindAFortPlayerController_OnReadyToStartMatchVFT() {
 	if (ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT)
 		return ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT;
 	
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT = 0x261;
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/FortniteGame.FortPlayerControllerZone"))->GetDefaultObject()->VTable;
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortPlayerControllerZone_OnReadyToStartMatch() + ImageBase))
+		{
+			ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT = i;
+			break;
+		}
 	}
 
 	Log("AFortPlayerController_OnReadyToStartMatchVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_OnReadyToStartMatchVFT));
