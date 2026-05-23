@@ -547,6 +547,7 @@ namespace ServerOffsets {
 	inline uintptr_t UChannel__NumOutRec = 0;
 	inline uintptr_t UChannel_SendBunch = 0;
 	inline uintptr_t UChannel_SendBunchVFT = 0;
+	inline uintptr_t UChannel_Close = 0;
 	inline uintptr_t UChannel_CloseVFT = 0;
 	inline uintptr_t UChannel_StartBecomingDormantVFT = 0;
 

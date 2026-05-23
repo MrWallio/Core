@@ -52,30 +52,10 @@ public:
 	static inline void (*OnDamageServerOG)(ABuildingActor* This, float Damage, const FGameplayTagContainer& DamageTags, const FVector& Momentum, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser, const FGameplayEffectContextHandle& EffectContext);
 	static void OnDamageServer(ABuildingActor* This, float Damage, const FGameplayTagContainer& DamageTags, const FVector& Momentum, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser, const FGameplayEffectContextHandle& EffectContext);
 
-	static inline void (*OnRep_CurrentBuildingLevelOG)(ABuildingActor* This);
-	static void OnRep_CurrentBuildingLevel(ABuildingActor* This);
-
-	static inline void (*PlacedByPlacementToolOG)(ABuildingActor* This);
-	static void PlacedByPlacementTool(ABuildingActor* This);
-
 	float GetHealth() const;
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindABuildingActor_OnDamageServer()), OnDamageServer, (LPVOID*)&OnDamageServerOG);
-
-		HookEveryVTable(
-			ABuildingActor::StaticClass(),
-			ABuildingActor::StaticClass()->GetFunction("Function /Script/FortniteGame.BuildingActor.OnRep_CurrentBuildingLevel"),
-			OnRep_CurrentBuildingLevel,
-			(LPVOID*)&OnRep_CurrentBuildingLevelOG
-		);
-
-		HookEveryVTable(
-			ABuildingActor::StaticClass(),
-			ABuildingActor::StaticClass()->GetFunction("Function /Script/FortniteGame.BuildingActor.PlacedByPlacementTool"),
-			PlacedByPlacementTool,
-			(LPVOID*)&PlacedByPlacementToolOG
-		);
 
 		Log("ABuildingActor Hooked!");
 	}

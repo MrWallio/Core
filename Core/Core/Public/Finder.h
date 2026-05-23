@@ -903,6 +903,8 @@ public:
 
 	static uintptr_t FindUAbilitySystemComponent_FindAbilitySpecFromHandle();
 
+	static uintptr_t FindUChannel_Close();
+
 	static uintptr_t FindUChannel_CloseVFT();
 
 	static uintptr_t FindUChannel_StartBecomingDormantVFT();

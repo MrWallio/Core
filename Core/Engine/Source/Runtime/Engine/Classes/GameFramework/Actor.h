@@ -24,6 +24,7 @@ struct FNetViewer;
 struct FNetworkObjectInfo;
 struct FComponentInstanceDataCache;
 class ULevel;
+class AOnlineBeaconClient;
 
 class AActor : public UObject {
 public:
@@ -132,9 +133,3 @@ public:
 		Log("Hooked AActor");
 	}
 };
-
-FORCEINLINE const AActor* AActor::GetNetOwner() const
-{
-	AActor* (*&GetNetOwner)(const AActor*) = decltype(GetNetOwner)(VTable[Finder::FindAActor_GetNetOwnerVFT()]);
-	return GetNetOwner(this);
-}

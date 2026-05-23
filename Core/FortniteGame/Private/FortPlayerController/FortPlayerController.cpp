@@ -564,14 +564,6 @@ void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, 
 	}
 }
 
-// This is stripped but idk what to do for it
-void AFortPlayerController::ServerSpotActor(AFortPlayerController* This, AActor* NewlySpottedActor)
-{
-	ServerSpotActorOG(This, NewlySpottedActor);
-
-	Log("ServerSpotActor Called!");
-}
-
 bool AFortPlayerController::RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval)
 {
 	if (!This) {

@@ -4,6 +4,9 @@
 #include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
 #include "Engine/Source/Runtime/Core/Public/Math/Rotator.h"
 #include "Engine/Source/Runtime/Core/Public/Math/TransformNonVectorized.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/Pawn.h"
+#include "Engine/Plugins/Online/OnlineSubsystemUtils/Source/OnlineSubsystemUtils/Public/OnlineBeaconClient.h"
 
 ENetMode AActor::InternalGetNetMode(AActor* This)
 {
@@ -184,6 +187,22 @@ void AActor::ForceNetUpdate()
 		void (*&ForceNetUpdateInternal)(AActor*) = decltype(ForceNetUpdateInternal)(VTable[VTableIdx]);
 		ForceNetUpdateInternal(this);
 	}
+}
+
+const AActor* AActor::GetNetOwner() const
+{
+	if (IsA(APawn::StaticClass())) {
+		return this;
+	}
+	if (IsA(APlayerController::StaticClass())) {
+		return this;
+	}
+	if (IsA(AOnlineBeaconClient::StaticClass())) {
+		AOnlineBeaconClient* BeaconClient = (AOnlineBeaconClient*)this;
+		return (AActor*)BeaconClient->BeaconOwner;
+	}
+
+	return Owner;
 }
 
 void AActor::K2_DestroyActor()

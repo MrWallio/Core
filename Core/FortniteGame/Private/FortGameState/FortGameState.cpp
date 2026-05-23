@@ -24,37 +24,7 @@ void AFortGameState::OnFinishedStreamingAdditionalPlaylistLevel()
 	ProcessEvent(Func, nullptr);
 }
 
-void AFortGameState::OnRep_CurrentWUID(AFortGameState* This)
-{
-	OnRep_CurrentWUIDOG(This);
-	if (Version::Fortnite_Version >= 1.8) {
-		Log("OnRep_CurrentWUID called!");
-	}
-}
-
-void AFortGameState::OnRep_WorldManager(AFortGameState* This)
-{
-	OnRep_WorldManagerOG(This);
-	if (Version::Fortnite_Version >= 1.8) {
-		Log("OnRep_WorldManager called!");
-	}
-}
-
 void AFortGameState::Hook()
 {
-	HookEveryVTable(
-		AFortGameState::StaticClass(),
-		AFortGameState::StaticClass()->GetFunction("Function /Script/FortniteGame.FortGameState.OnRep_CurrentWUID"),
-		OnRep_CurrentWUID,
-		(LPVOID*)&OnRep_CurrentWUIDOG
-	);
-
-	HookEveryVTable(
-		AFortGameState::StaticClass(),
-		AFortGameState::StaticClass()->GetFunction("Function /Script/FortniteGame.FortGameState.OnRep_WorldManager"),
-		OnRep_WorldManager,
-		(LPVOID*)&OnRep_WorldManagerOG
-	);
-
 	Log("Hooked AFortGameState");
 }

@@ -132,31 +132,6 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 	return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 }
 
-void ABuildingActor::OnRep_CurrentBuildingLevel(ABuildingActor* This) {
-	OnRep_CurrentBuildingLevelOG(This);
-
-	Log("OnRep_CurrentBuildingLevel Called!");
-}
-
-void ABuildingActor::PlacedByPlacementTool(ABuildingActor* This) {
-	if (!This)
-		return;
-	
-	if (Version::Fortnite_Version >= 1.8) {
-		Log("PlacedByPlacementTool Called. Actor: " + std::string(This ? This->GetName().ToString() : "None"));
-
-		if (This->BuildingAttributeSet) {
-			This->BuildingAttributeSet->Health.CurrentValue;
-		}
-		else {
-			This->GetMaxHealth();
-		}
-	}
-	else {
-		PlacedByPlacementToolOG(This);
-	}
-}
-
 float ABuildingActor::GetHealth() const
 {
 	static UFunction* Func = nullptr;
