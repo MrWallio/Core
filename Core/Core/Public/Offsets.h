@@ -618,6 +618,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameSessionDedicated_FinalizeCreation = 0;
 	inline uintptr_t AFortGameSessionDedicated_FinalizeCreationPatch1 = 0;
 	inline uintptr_t AFortGameSessionDedicated_FinalizeCreationVFT = 0;
+	inline uintptr_t AFortGameSessionDedicated_OnUpdateComplete = 0;
 
 	inline uintptr_t FFortBaseWeaponStats_GetDurability = 0;
 }

@@ -72,8 +72,8 @@ int32 AFortGameModeAthena::StartAircraftPhase(AFortGameModeAthena* This, bool bG
 			PC->WorldInventory->DropAllItems(false);
 		}
 
-		if (PC->MyFortPawn) {
-			AFortPlayerPawn* MyFortPawn = PC->MyFortPawn;
+		if (PC->MyFortPawn || PC->Pawn->Cast<AFortPlayerPawn>()) {
+			AFortPlayerPawn* MyFortPawn = PC->MyFortPawn ? PC->MyFortPawn : PC->Pawn->Cast<AFortPlayerPawn>();
 
 			MyFortPawn->SetHealth(MyFortPawn->GetMaxHealth());
 			MyFortPawn->SetShield(0.0f);

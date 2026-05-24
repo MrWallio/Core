@@ -1010,6 +1010,8 @@ public:
 	static uintptr_t FindUFortWeaponItemDefinition_GetMaxDurabilityVFT();
 
 	static uintptr_t FindAFortPlayerState_ApplyCharacterCustomization();
+
+	static uintptr_t FindAFortGameSessionDedicated_OnUpdateComplete();
 public:
 	static void SetupOffsets();
 

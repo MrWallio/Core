@@ -5734,6 +5734,9 @@ uintptr_t Finder::FindAFortPickup_SetPickupItems() {
 
 		if (Version::Engine_Version == 4.16 || Version::Engine_Version == 4.19) {
 			Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9").Get();
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 80 B9 ? ? ? ? ? 45 0F B6 F1").Get();
+			}
 		}
 		else if (Version::Fortnite_Version <= 3.3) {
 			Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9 49 8B F8 48 8B F1 0F 85 ? ? ? ? 48 83 7A").Get();
@@ -9267,6 +9270,32 @@ uintptr_t Finder::FindAFortPlayerState_ApplyCharacterCustomization() {
 	return ServerOffsets::AFortPlayerState_ApplyCharacterCustomization;
 }
 
+uintptr_t Finder::FindAFortGameSessionDedicated_OnUpdateComplete() {
+	if (ServerOffsets::AFortGameSessionDedicated_OnUpdateComplete)
+		return ServerOffsets::AFortGameSessionDedicated_OnUpdateComplete;
+	uintptr_t Addr = 0;
+	
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"OnUpdateComplete %d").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameSessionDedicated_OnUpdateComplete = Addr - ImageBase;
+	}
+
+	Log("AFortGameSessionDedicated_OnUpdateComplete found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSessionDedicated_OnUpdateComplete));
+	return ServerOffsets::AFortGameSessionDedicated_OnUpdateComplete;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -9445,6 +9474,8 @@ void Finder::SetupOffsets() {
 
 	FindAFortGameSessionDedicated_FinalizeCreation();
 	FindAFortGameSessionDedicated_FinalizeCreationPatch1();
+	FindAFortGameSessionDedicated_FinalizeCreationVFT();
+	FindAFortGameSessionDedicated_OnUpdateComplete();
 
 	FindUKismetSystemLibrary_ExecuteConsoleCommand();
 
