@@ -17,5 +17,8 @@ public:
 	static inline void (*OnReadyToStartMatchOG)(AFortPlayerControllerZone* This);
 	static void OnReadyToStartMatch(AFortPlayerControllerZone* This);
 
+	static inline void (*ServerReturnToMainMenuOG)(AFortPlayerControllerZone* This);
+	static void ServerReturnToMainMenu(AFortPlayerControllerZone* This);
+
 	static void Hook();
 };

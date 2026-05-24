@@ -38,3 +38,12 @@ void AFortPlayerControllerAthena::OnReadyToStartMatch(AFortPlayerControllerAthen
 		This->WorldInventory->AddItem(This->CustomizationLoadout.Pickaxe->WeaponDefinition);
 	}
 }
+
+void AFortPlayerControllerAthena::ServerReturnToMainMenu(AFortPlayerControllerAthena* This) {
+	if (Version::Fortnite_Version <= 1.72) {
+		return ServerReturnToMainMenuOG(This);
+	}
+
+	Log("ServerReturnToMainMenu: Handling return to main menu for Fortnite version " + std::to_string(Version::Fortnite_Version));
+	AFortPlayerControllerZone::ServerReturnToMainMenuOG(This);
+}

@@ -36,6 +36,9 @@ public:
 	static inline void (*OnReadyToStartMatchOG)(AFortPlayerControllerAthena* This);
 	static void OnReadyToStartMatch(AFortPlayerControllerAthena* This);
 
+	static inline void (*ServerReturnToMainMenuOG)(AFortPlayerControllerAthena* This);
+	static void ServerReturnToMainMenu(AFortPlayerControllerAthena* This);
+
 	static void Hook() {
 		UObject* AircraftComp = FUObjectArray::FindObject("Class FortniteGame.FortControllerComponent_Aircraft");
 		if (!AircraftComp) {
@@ -68,6 +71,13 @@ public:
 			)),
 			OnReadyToStartMatch,
 			(LPVOID*)&OnReadyToStartMatchOG
+		);
+
+		HookVTable(
+			AFortPlayerControllerAthena::GetDefaultObj(),
+			AFortPlayerControllerAthena::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerReturnToMainMenu"),
+			ServerReturnToMainMenu,
+			(LPVOID*)&ServerReturnToMainMenuOG
 		);
 
 		Log("Hooked AFortPlayerControllerAthena");

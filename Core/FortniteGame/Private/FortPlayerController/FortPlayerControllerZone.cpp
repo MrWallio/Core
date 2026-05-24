@@ -77,10 +77,21 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 	}
 }
 
+void AFortPlayerControllerZone::ServerReturnToMainMenu(AFortPlayerControllerZone* This) {
+	ServerReturnToMainMenuOG(This);
+}
+
 void AFortPlayerControllerZone::Hook() {
 	HookEveryVTable(AFortPlayerControllerZone::StaticClass(), AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
 	
 	MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerControllerZone_OnReadyToStartMatch()), OnReadyToStartMatch, (LPVOID*)&OnReadyToStartMatchOG);
+
+	HookVTable(
+		AFortPlayerControllerZone::GetDefaultObj(),
+		AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerReturnToMainMenu"),
+		ServerReturnToMainMenu,
+		(LPVOID*)&ServerReturnToMainMenuOG
+	);
 
 	Log("Hooked AFortPlayerControllerZone");
 }
