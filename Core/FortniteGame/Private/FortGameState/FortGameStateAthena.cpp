@@ -52,7 +52,7 @@ void AFortGameStateAthena::SetCurrentPlaylistId(int InPlaylistId) {
 
 void AFortGameStateAthena::ApplyHomebaseEffectsOnPlayerSetup(AFortGameStateAthena* This, FUniqueNetIdRepl* SourceAccountID, UFortMcpProfileCampaign* McpProfile, IAbilitySystemInterface* AbilityObject, UFortHero* Hero, bool bApplyTeamEffect, bool bApplyTeamEffectToOtherPlayers, bool bIgnoreStatClamp)
 {
-	if (Version::Fortnite_Version >= 1.82) {
+	if (Version::Fortnite_Version >= 1.9) {
 		return ApplyHomebaseEffectsOnPlayerSetupOG(This, SourceAccountID, McpProfile, AbilityObject, Hero, bApplyTeamEffect, bApplyTeamEffectToOtherPlayers, bIgnoreStatClamp);
 	}
 

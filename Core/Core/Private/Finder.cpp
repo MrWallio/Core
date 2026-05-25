@@ -5600,8 +5600,27 @@ uintptr_t Finder::FindAFortPickup_SetPickupTarget() {
 	if (ServerOffsets::AFortPickup_SetPickupTarget)
 		return ServerOffsets::AFortPickup_SetPickupTarget;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = Memcury::Scanner::FindPattern("48 8B C4 4C 89 48 ? 48 89 50 ? 55 53 57 48 8D 68").Get();
+	auto sRef = Memcury::Scanner::FindStringRef(L"%s: Attempted to spawn non-world item %s!", false, 0, Version::Fortnite_Version >= 17, false);
+
+	if (!sRef.IsValid())
+		sRef = Memcury::Scanner::FindStringRef(L"Attempted to spawn non-world item %s!", false, 0, Version::Fortnite_Version >= 17, false);
+
+	for (int i = 0; i < 0x1500; i++)
+	{
+		auto Ptr = (uint8_t*)(sRef.Get() - i);
+
+		if (*Ptr == 0x40 && (*(Ptr + 1) == 0x53 || *(Ptr + 1) == 0x55)) {
+			Addr = uint64_t(Ptr);
+			break;
+		}
+		else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
+			Addr = uint64_t(Ptr);
+			break;
+		}
+		else if (*Ptr == 0x4C && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xDC) {
+			Addr = uint64_t(Ptr);
+			break;
+		}
 	}
 	
 	if (Addr) {
@@ -9568,6 +9587,14 @@ void Finder::SetupOffsets() {
 	FindUNetDriver_IsLevelInitializedForActorVFT();
 
 	FindAFortPlayerState_ApplyCharacterCustomization();
+
+	FindAFortPickup_SetPickupItemsVFT();
+	FindAFortPickup_SetPickupTarget();
+
+	FindAFortPlayerController_CanAffordToPlaceBuildableClass();
+	FindAFortPlayerController_CanAffordToPlaceBuildableClassVFT();
+	FindAFortPlayerController_PayBuildableClassPlacementCost();
+	FindAFortPlayerController_PayBuildableClassPlacementCostVFT();
 
 	return;
 }

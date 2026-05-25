@@ -53,7 +53,7 @@ public:
 
 	void ForceFinishedTargetSpline();
 
-	void SetPickupTarget(AFortPawn* PickupTarget, float InFlyTime, FVector InStartDirection);
+	void SetPickupTarget(AFortPawn* PickupTarget, float InFlyTime, FVector InStartDirection, bool bPlayPickupSound);
 
 	void UpdateSpecialActorStat(ESpecialActorStatType InStat, double InValue, float InLogicCondition);
 

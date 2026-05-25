@@ -92,10 +92,10 @@ void AFortPickup::ForceFinishedTargetSpline()
 	ForceFinishedTargetSplineInternal(this);
 }
 
-void AFortPickup::SetPickupTarget(AFortPawn* PickupTarget, float InFlyTime, FVector InStartDirection)
+void AFortPickup::SetPickupTarget(AFortPawn* PickupTarget, float InFlyTime, FVector InStartDirection, bool bPlayPickupSound)
 {
-	void (*SetPickupTargetInternal)(AFortPickup * This, AFortPawn * PickupTarget, float InFlyTime, FVector InStartDirection) = decltype(SetPickupTargetInternal)(ImageBase + Finder::FindAFortPickup_SetPickupTarget());
-	SetPickupTargetInternal(this, PickupTarget, InFlyTime, InStartDirection);
+	void (*SetPickupTargetInternal)(AFortPickup * This, AFortPawn * PickupTarget, float InFlyTime, FVector InStartDirection, bool bPlayPickupSound) = decltype(SetPickupTargetInternal)(ImageBase + Finder::FindAFortPickup_SetPickupTarget());
+	SetPickupTargetInternal(this, PickupTarget, InFlyTime, InStartDirection, bPlayPickupSound);
 }
 
 void AFortPickup::UpdateSpecialActorStat(ESpecialActorStatType InStat, double InValue, float InLogicCondition)

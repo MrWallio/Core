@@ -26,4 +26,23 @@ public:
 
 	DefineStructProperty(AFortPawn*, PickupTarget);
 	DefineStructProperty(AFortPawn*, ItemOwner);
+	DefineStructProperty(FGuid, PickupGuid);
+	DefineStructProperty(float, FlyTime);
+	DefineStructProperty(FVector, StartDirection);
+public:
+	bool& GetPlayPickupSound() {
+		uintptr_t PlayPickupSoundAddr = StaticStruct()->GetPropertyOffset("bPlayPickupSound");
+		if (PlayPickupSoundAddr > 0) {
+			return *reinterpret_cast<bool*>(uintptr_t(this) + PlayPickupSoundAddr);
+		}
+
+		uintptr_t TossStateAddr = StaticStruct()->GetPropertyOffset("TossState");
+		if (TossStateAddr > 0) {
+			PlayPickupSoundAddr = TossStateAddr + 0x1; // bPlayPickupSound is right after TossState
+			return *reinterpret_cast<bool*>(uintptr_t(this) + PlayPickupSoundAddr);
+		}
+
+		static bool Dummy = false;
+		return Dummy; // Couldnt find!!
+	}
 };

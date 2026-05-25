@@ -1,6 +1,14 @@
 #include "pch.h"
 #include "FortniteGame/Public/FortPawn/FortPlayerPawn.h"
 
+#include "FortniteGame/Public/FortInventory/FortInventory.h"
+#include "FortniteGame/Public/FortItem/FortItemEntry.h"
+#include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortWeapon/FortWeapon.h"
+#include "FortniteGame/Public/FortPickup/FortPickup.h"
+#include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
+
 void AFortPlayerPawn::BeginSkydiving(bool bFromBus)
 {
 	static class UFunction* Func = nullptr;
@@ -63,4 +71,21 @@ void AFortPlayerPawn::ServerReviveFromDBNO(AFortPlayerPawn* This, AController* E
 	ServerReviveFromDBNOOG(This, EventInstigator);
 
 	Log("ServerReviveFromDBNO Called!");
+}
+
+void AFortPlayerPawn::ServerHandlePickup(AFortPlayerPawn* This, AFortPickup* Pickup, float InFlyTime, FVector& InStartDirection, bool bPlayPickupSound) {
+	if (Version::Fortnite_Version <= 1.81) {
+		return ServerHandlePickupOG(This, Pickup, InFlyTime, InStartDirection, bPlayPickupSound);
+	}
+
+	if (!This || !Pickup) {
+		Log("ServerHandlePickup: This or Pickup is null!");
+		return;
+	}
+	if (Pickup->bPickedUp) {
+		Log("ServerHandlePickup: Pickup is already picked up!");
+		return;
+	}
+
+	Pickup->SetPickupTarget(This, InFlyTime / This->PickupSpeedMultiplier, InStartDirection, bPlayPickupSound);
 }

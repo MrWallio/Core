@@ -26,12 +26,22 @@ public:
 	static inline void (*ServerReviveFromDBNOOG)(AFortPlayerPawn* This, AController* EventInstigator);
 	static void ServerReviveFromDBNO(AFortPlayerPawn* This, AController* EventInstigator);
 
+	static inline void (*ServerHandlePickupOG)(AFortPlayerPawn* This, AFortPickup* Pickup, float InFlyTime, FVector& InStartDirection, bool bPlayPickupSound);
+	static void ServerHandlePickup(AFortPlayerPawn* This, AFortPickup* Pickup, float InFlyTime, FVector& InStartDirection, bool bPlayPickupSound);
+
 	static void Hook() {
 		HookEveryVTable(
 			AFortPlayerPawn::StaticClass(),
 			AFortPlayerPawn::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerPawn.ServerReviveFromDBNO"),
 			ServerReviveFromDBNO,
 			(LPVOID*)&ServerReviveFromDBNOOG
+		);
+
+		HookEveryVTable(
+			AFortPlayerPawn::StaticClass(),
+			AFortPlayerPawn::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerPawn.ServerHandlePickup"),
+			ServerHandlePickup,
+			(LPVOID*)&ServerHandlePickupOG
 		);
 		
 		Log("AFortPlayerPawn Hooked!");
