@@ -81,6 +81,9 @@ void Version::SetupVersion() {
                 else if (Fortnite_CL == 3741772) {
                     Fortnite_Version = 1.82;
                 }
+                else if (Fortnite_CL == 3757339) {
+                    Fortnite_Version = 1.9;
+                }
                 else {
                     Log("Unknown version, cannot determine Fortnite version!");
                 }
