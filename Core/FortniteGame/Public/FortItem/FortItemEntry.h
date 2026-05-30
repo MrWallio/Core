@@ -49,6 +49,8 @@ public:
 public:
 	void SetStateValue(uint8 StateType, int32 InValue);
 
+	void RemoveStateValue(uint8 StateType);
+
 	void SetToDirty();
 
 	void CopyGenericValuesFrom(const FFortItemEntry* Other);

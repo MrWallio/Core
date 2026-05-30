@@ -271,6 +271,8 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
 		}
 	}
 
+	Item->ItemEntry.SetStateValue(EFortItemEntryState::GetNewItemCount(), Item->ItemEntry.Count);
+
 	InitializeExistingItem(Item);
 
 	if (PC->IsUsingOldQuickBars())

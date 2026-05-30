@@ -108,6 +108,15 @@ public:
 	DefineEnumProperty(NoneState);
 	DefineEnumProperty(NewItemCount);
 	DefineEnumProperty(ShouldShowItemToast);
+	DefineEnumProperty(DurabilityInitialized);
+	DefineEnumProperty(DoNotShowSpawnParticles);
+	DefineEnumProperty(FromRecoveredBackpack);
+	DefineEnumProperty(FromGift);
+	DefineEnumProperty(PendingUpgradeCriteriaProgress);
+	DefineEnumProperty(OwnerBuildingHandle);
+	DefineEnumProperty(FromDroppedPickup);
+	DefineEnumProperty(CraftAndSlotTarget);
+	DefineEnumProperty(EFortItemEntryState_MAX);
 };
 
 enum class ELootQuotaLevel : uint8
