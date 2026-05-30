@@ -90,7 +90,7 @@ public:
 
 	static bool PickLootDrops(
 		UObject* WorldContextObject,
-		TArray<FFortItemEntry>& OutLootToDrop,
+		TArray<FFortItemEntry>* OutLootToDrop,
 		FName TierGroupName,
 		int32 WorldLevel,
 		int32 ForcedLootTier

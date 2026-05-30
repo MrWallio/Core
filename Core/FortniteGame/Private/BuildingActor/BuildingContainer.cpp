@@ -27,7 +27,7 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 
 	TArray<FFortItemEntry> LootDrops;
 
-	bool bSuccess = UFortKismetLibrary::PickLootDrops(This, LootDrops, This->SearchLootTierGroup, 0, This->ReplicatedLootTier);
+	bool bSuccess = UFortKismetLibrary::PickLootDrops(This, &LootDrops, This->SearchLootTierGroup, 0, This->ReplicatedLootTier);
 
 	for (int i = 0; i < LootDrops.Num(); i++) {
 		FFortItemEntry& ItemEntry = LootDrops.GetWithSize(i, FFortItemEntry::GetSize());

@@ -276,6 +276,7 @@ void UFortKismetLibrary::execK2_SpawnPickupInWorld(UObject* Object, FFrame& Stac
 		else if (Name == "bPickupOnlyRelevantToOwner") {
 			Stack.StepCompiledIn(&bPickupOnlyRelevantToOwner);
 		}
+		else if (Name == "ReturnValue") {}
 		else {
 			Log("UFortKismetLibrary::execK2_SpawnPickupInWorld: Unhandled parameter: " + Name);
 		}
@@ -364,7 +365,7 @@ void UFortKismetLibrary::execGiveItemToInventoryOwner(UObject* Object, FFrame& S
 
 bool UFortKismetLibrary::PickLootDrops(
 	UObject* WorldContextObject,
-	TArray<FFortItemEntry>& OutLootToDrop,
+	TArray<FFortItemEntry>* OutLootToDrop,
 	FName TierGroupName,
 	int32 WorldLevel,
 	int32 ForcedLootTier)
@@ -480,10 +481,10 @@ bool UFortKismetLibrary::PickLootDrops(
 
 	for (int i = 0; i < LootItems.Num(); i++) {
 		FFortItemEntry& LootItem = LootItems.GetWithSize(i, FFortItemEntry::GetSize());
-		OutLootToDrop.Add(LootItem, FFortItemEntry::GetSize());
+		OutLootToDrop->Add(LootItem, FFortItemEntry::GetSize());
 	}
 
-	if (OutLootToDrop.Num() > 0) {
+	if (OutLootToDrop->Num() > 0) {
 		//Log("UFortKismetLibrary::PickLootDrops: Successfully picked " + std::to_string(OutLootToDrop.Num()) + " loot items to drop!");
 		return true;
 	}
@@ -500,7 +501,7 @@ void UFortKismetLibrary::execPickLootDrops(UObject* Object, FFrame& Stack, bool*
 		return;
 	}
 	UObject* WorldContextObject = nullptr;
-	TArray<FFortItemEntry> OutLootToDrop;
+	TArray<FFortItemEntry>& OutLootToDrop = Stack.StepCompiledInRef<TArray<FFortItemEntry>>();
 	FName TierGroupName = FName();
 	int32 WorldLevel = -1;
 	int32 ForcedLootTier = -1;
@@ -509,9 +510,6 @@ void UFortKismetLibrary::execPickLootDrops(UObject* Object, FFrame& Stack, bool*
 		std::string Name = Param.Name.ToString();
 		if (Name == "WorldContextObject") {
 			Stack.StepCompiledIn(&WorldContextObject);
-		}
-		else if (Name == "OutLootToDrop") {
-			OutLootToDrop = Stack.StepCompiledInRef<TArray<FFortItemEntry>>();
 		}
 		else if (Name == "TierGroupName") {
 			Stack.StepCompiledIn(&TierGroupName);
@@ -522,6 +520,9 @@ void UFortKismetLibrary::execPickLootDrops(UObject* Object, FFrame& Stack, bool*
 		else if (Name == "ForcedLootTier") {
 			Stack.StepCompiledIn(&ForcedLootTier);
 		}
+		else if (Name == "OutLootToDrop") {
+			// Already stepped, do nothing
+		}
 		else if (Name == "ReturnValue") {}
 		else {
 			Log("UFortKismetLibrary::execPickLootDrops: Unhandled parameter: " + Name);
@@ -529,7 +530,7 @@ void UFortKismetLibrary::execPickLootDrops(UObject* Object, FFrame& Stack, bool*
 	}
 	Stack.IncrementCode();
 
-	*Result = PickLootDrops(WorldContextObject, OutLootToDrop, TierGroupName, WorldLevel, ForcedLootTier);
+	*Result = PickLootDrops(WorldContextObject, &OutLootToDrop, TierGroupName, WorldLevel, ForcedLootTier);
 }
 
 AFortAIGoalManager* UFortKismetLibrary::GetAIGoalManager(UObject* WorldContextObject)
