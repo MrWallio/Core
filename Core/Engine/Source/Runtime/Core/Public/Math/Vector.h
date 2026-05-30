@@ -32,6 +32,14 @@ public:
 	FORCEINLINE FVector operator*(const FVector& V) const;
 public:
 	float SizeSquared() const;
+
+	std::string FormatToString() const {
+		return std::format("X={}, Y={}, Z={}", X, Y, Z);
+	}
+
+	bool IsZero() const {
+		return X == 0 && Y == 0 && Z == 0;
+	}
 };
 
 FORCEINLINE FVector::FVector()

@@ -67,7 +67,7 @@ public:
 	{
 		return TagName;
 	}
-protected:
+public:
 	FName TagName;
 };
 

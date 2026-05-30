@@ -18,8 +18,6 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 		return false;
 	}
 
-	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
-
 	FVector ContainerLocation = This->K2_GetActorLocation();
 	FVector LootSpawnLocation = This->LootSpawnLocation;
 	FVector FinalSpawnLocation = ContainerLocation + (This->GetActorForwardVector() * LootSpawnLocation.X) +
@@ -57,12 +55,9 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 			if (WeaponDef) {
 				int32 Level = Pickup->PrimaryPickupItemEntry.Level;
 				Pickup->PrimaryPickupItemEntry.LoadedAmmo = WeaponDef->GetClipSize(Level);
-				if (FortGameModeAthena) {
-					Pickup->PrimaryPickupItemEntry.Durability = FLT_MAX;
-				}
-				else {
-					Pickup->PrimaryPickupItemEntry.Durability = WeaponDef->GetDurability(Level);
-				}
+				Pickup->PrimaryPickupItemEntry.Durability = WeaponDef->GetDurability(Level);
+				Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+				Pickup->OnRep_PrimaryPickupItemEntry();
 			}
 		}
 	}
@@ -157,8 +152,8 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 			static FName Loot_Ammo = UKismetStringLibrary::Conv_StringToName("Loot_Ammo");
 			static FName Loot_AthenaTreasure = UKismetStringLibrary::Conv_StringToName("Loot_AthenaTreasure");
 			static FName Loot_AthenaAmmoLarge = UKismetStringLibrary::Conv_StringToName("Loot_AthenaAmmoLarge");
-			static auto Loot_AthenaFloorLoot = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaFloorLoot");
-			static auto Loot_AthenaFloorLoot_Warmup = UKismetStringLibrary::Conv_StringToName(L"Loot_AthenaFloorLoot_Warmup");
+			static FName Loot_AthenaFloorLoot = UKismetStringLibrary::Conv_StringToName("Loot_AthenaFloorLoot");
+			static FName Loot_AthenaFloorLoot_Warmup = UKismetStringLibrary::Conv_StringToName("Loot_AthenaFloorLoot_Warmup");
 
 			if (This->SearchLootTierGroup == Loot_Treasure) {
 				This->SearchLootTierGroup = Loot_AthenaTreasure;
@@ -171,10 +166,18 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 			else if (This->SearchLootTierGroup == Loot_AthenaFloorLoot || This->SearchLootTierGroup == Loot_AthenaFloorLoot_Warmup) {
 				This->bDestroyContainerOnSearch = true;
 			}
+			else {
+				if (Version::Fortnite_Version <= 1.8) {
+					This->SearchedMesh = nullptr;
+					This->bAllowInteract = false;
+					This->bAlreadySearched = true;
+					This->OnRep_bAlreadySearched();
+				}
+			}
 		}
 	}
 
-	if (This->bStartAlreadySearched_Athena == 1) {
+	if (This->bStartAlreadySearched_Athena) {
 		SpawnLoot(This, nullptr, EFortPickupSourceTypeFlag::GetContainer(), EFortPickupSpawnSource::GetUnset());
 	}
 }
@@ -189,4 +192,24 @@ bool ABuildingContainer::ServerOnAttemptInteract(ABuildingContainer* This, FInte
 	//Log("ABuildingContainer::ServerOnAttemptInteract: " + This->GetFullName());
 
 	return ServerOnAttemptInteractOG(This, InteractType);
+}
+
+void ABuildingContainer::BeginPlay(ABuildingContainer* This) {
+	BeginPlayOG(This);
+	
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ABuildingContainer::BeginPlay: World is null!");
+		return;
+	}
+}
+
+void ABuildingContainer::OnSetSearched()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnSetSearched");
+
+	ProcessEvent(Func, nullptr);
 }

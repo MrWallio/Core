@@ -4,6 +4,7 @@
 #include "FortniteGame/Public/FortWeapon/FortWeaponStats.h"
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 
 FFortBaseWeaponStats* UFortWeaponItemDefinition::GetWeaponStats() const {
 	FFortBaseWeaponStats WeaponStats;
@@ -31,6 +32,16 @@ int32 UFortWeaponItemDefinition::GetClipSize(int32 Level) const {
 }
 
 float UFortWeaponItemDefinition::GetDurability(int32 Level) const {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("UFortWeaponItemDefinition::GetDurability: World is null!");
+		return 1;
+	}
+	
+	if (AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>()) {
+		return FLT_MAX;
+	}
+
 	if (Finder::FindUFortWeaponItemDefinition_GetMaxDurabilityVFT()) {
 		float (*&GetMaxDurabilityInternal)(const UFortWeaponItemDefinition* This, int32 Level) = decltype(GetMaxDurabilityInternal)(VTable[Finder::FindUFortWeaponItemDefinition_GetMaxDurabilityVFT()]);
 		return GetMaxDurabilityInternal(this, Level);

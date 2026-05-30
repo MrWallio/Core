@@ -9,6 +9,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/NoExportTypes.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/Level.h"
+#include "Engine/Source/Runtime/GameplayTags/Classes/GameplayTagContainer.h"
 
 class AActor;
 class AController;
@@ -58,6 +59,10 @@ public:
 	DefineCustomProperty(float, CreationTime, ServerOffsets::AActor__CreationTime);
 
 	DefineBitfieldUProperty(bReplicates);
+
+	DefineUProperty(TArray<FName>, Tags);
+
+	DefineUProperty(FGameplayTagContainer, StaticGameplayTags);
 public:
 	static inline ENetMode(*InternalGetNetModeOG)(AActor* This);
 	static ENetMode InternalGetNetMode(AActor* This);
