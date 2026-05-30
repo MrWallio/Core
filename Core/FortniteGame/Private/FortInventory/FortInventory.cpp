@@ -345,7 +345,7 @@ int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 			while (Count > 0 && !IsInventoryFull())
 			{
 				FFortItemEntry NewEntry = ItemEntry;
-				NewEntry.Count = 1;
+				NewEntry.SetCount(1);
 
 				if (!AddItem(NewEntry))
 					break;
@@ -369,7 +369,7 @@ int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 		while (Count > 0 && !IsInventoryFull())
 		{
 			FFortItemEntry NewEntry = ItemEntry;
-			NewEntry.Count = (Count > MaxStackSize) ? MaxStackSize : Count;
+			NewEntry.SetCount((Count > MaxStackSize) ? MaxStackSize : Count);
 
 			if (!AddItem(NewEntry))
 				break;
@@ -387,7 +387,7 @@ int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 		else
 		{
 			FFortItemEntry NewEntry = ItemEntry;
-			NewEntry.Count = (Count > MaxStackSize) ? MaxStackSize : Count;
+			NewEntry.SetCount((Count > MaxStackSize) ? MaxStackSize : Count);
 
 			if (AddItem(NewEntry))
 			{
@@ -623,7 +623,7 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 		return true;
 
 	FFortItemEntry OverflowEntry = ItemEntry;
-	OverflowEntry.Count = Overflow;
+	OverflowEntry.SetCount(Overflow);
 
 	if (bAllowSwap && CanSwapForItem(OverflowEntry.ItemDefinition))
 	{
@@ -655,7 +655,7 @@ bool AFortInventory::AddItemAndHandleOverflow(UFortItemDefinition* Def, int32 Co
 
 	FFortItemEntry ItemEntry{};
 	ItemEntry.ItemDefinition = Def;
-	ItemEntry.Count = Count;
+	ItemEntry.SetCount(Count);
 	ItemEntry.Level = 0;
 
 	return AddItemAndHandleOverflow(ItemEntry, bAllowSwap, bSpawnOverflowPickup);
@@ -770,7 +770,7 @@ int32 AFortInventory::TryAddToEntry(FFortItemEntry& ItemEntry, int32 Count, int3
 		return Count;
 
 	const int32 ToAdd = (Count < Space) ? Count : Space;
-	ItemEntry.Count += ToAdd;
+	ItemEntry.SetCount(ItemEntry.Count + ToAdd);
 	ItemEntry.bIsDirty = true;
 	Inventory.MarkItemDirty(ItemEntry);
 

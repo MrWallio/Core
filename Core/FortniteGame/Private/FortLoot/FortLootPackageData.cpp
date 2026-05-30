@@ -258,7 +258,7 @@ TArray<FFortItemEntry> FFortLootPackageData::GetLootItems(
 
 		FFortItemEntry LootDropEntry{};
 		LootDropEntry.ItemDefinition = ItemDefinition;
-		LootDropEntry.Count = PickedLootPackage->Count;
+		LootDropEntry.SetCount(PickedLootPackage->Count);
 
 		LootItems.Add(LootDropEntry, FFortItemEntry::GetSize());
 	}

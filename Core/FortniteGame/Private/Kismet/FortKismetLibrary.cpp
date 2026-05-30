@@ -169,7 +169,7 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 
 	FFortItemEntry& PickupEntry = Pickup->PrimaryPickupItemEntry;
 	PickupEntry.ItemDefinition = ItemDefinition;
-	PickupEntry.Count = NumberToSpawn;
+	PickupEntry.SetCount(NumberToSpawn);
 
 	PickupEntry.ReplicationKey++;
 	Pickup->OnRep_PrimaryPickupItemEntry();

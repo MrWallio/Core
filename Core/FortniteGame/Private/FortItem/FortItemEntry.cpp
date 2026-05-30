@@ -46,3 +46,9 @@ void FFortItemEntry::CopyGenericValuesFrom(const FFortItemEntry* Other) {
 
 	SetToDirty();
 }
+
+void FFortItemEntry::SetCount(int32 NewCount) {
+	SetStateValue(EFortItemEntryState::GetNewItemCount(), NewCount);
+	Count = NewCount;
+	SetToDirty();
+}

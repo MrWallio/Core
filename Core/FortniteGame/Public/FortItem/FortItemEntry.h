@@ -54,4 +54,6 @@ public:
 	void SetToDirty();
 
 	void CopyGenericValuesFrom(const FFortItemEntry* Other);
+
+	void SetCount(int32 NewCount);
 };
