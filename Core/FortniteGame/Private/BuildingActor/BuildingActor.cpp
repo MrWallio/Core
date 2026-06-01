@@ -101,8 +101,9 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 	if (!ResourceRates) 
 		ResourceRates = StaticLoadObject<UCurveTable>("/Game/Balance/DataTables/ResourceRates.ResourceRates");
 
-	int ResourceCount = (Damage / (UKismetMathLibrary::RandomIntegerInRange(8, 16)));
-	/*if (BuildingSMActor->HasBuildingResourceAmountOverride()) {
+	//int ResourceCount = (Damage / (UKismetMathLibrary::RandomIntegerInRange(8, 16)));
+	int ResourceCount = 0;
+	if (BuildingSMActor->HasBuildingResourceAmountOverride()) {
 		FCurveTableRowHandle& BuildingResourceAmountOverride = BuildingSMActor->BuildingResourceAmountOverride;
 
 		if (BuildingResourceAmountOverride.RowName.ComparisonIndex > 0)
@@ -116,7 +117,10 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 
 			ResourceCount = (int)round(RC);
 		}
-	}*/
+	}
+
+	if (ResourceCount <= 0)
+		return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 
 	PC->ClientReportDamagedResourceBuilding(
 		BuildingSMActor,
