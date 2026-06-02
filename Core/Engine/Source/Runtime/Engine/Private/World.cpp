@@ -22,9 +22,16 @@ UWorld* UWorld::GetWorld() {
 	return nullptr;
 }
 
-ENetMode UWorld::InternalGetNetMode(UWorld* This)
+ENetMode UWorld::InternalGetNetMode()
 {
 	return NM_DedicatedServer;
+}
+
+ENetMode UWorld::InternalGetNetModeHK(UWorld* This)
+{
+	if (!This) return InternalGetNetModeOG(This);
+
+	return This->InternalGetNetMode();
 }
 
 AActor* UWorld::SpawnActor(UClass* Class, FVector Location, FRotator Rotation, AActor* Owner) {

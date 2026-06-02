@@ -140,7 +140,9 @@ public:
 public:
 	static UWorld* GetWorld();
 	
-	static ENetMode InternalGetNetMode(UWorld* This);
+	ENetMode InternalGetNetMode();
+	static inline ENetMode (*InternalGetNetModeOG)(UWorld* This);
+	static ENetMode InternalGetNetModeHK(UWorld* This);
 
 	AActor* SpawnActorUnfinished(UClass* InClass, FVector Location = FVector(), FRotator Rotation = FRotator(), AActor* Owner = nullptr);
 	AActor* FinishSpawnActor(AActor* Actor, FVector Location = FVector(), FRotator Rotation = FRotator());
@@ -171,7 +173,7 @@ public:
 	void SetNavigationSystem(UNavigationSystem* InNavigationSystem);
 public:
 	static void Hook() {
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUWorld_InternalGetNetMode()), InternalGetNetMode, nullptr);
+		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUWorld_InternalGetNetMode()), InternalGetNetModeHK, (LPVOID*)&InternalGetNetModeOG);
 
 		if (Finder::FindUWorld_ListenPatch()) {
 			PatchCallFar(ImageBase + Finder::FindUWorld_ListenPatch(), (LPVOID*)&ListenHK);
