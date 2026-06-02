@@ -65,7 +65,8 @@ public:
 	DefineUProperty(FGameplayTagContainer, StaticGameplayTags);
 public:
 	static inline ENetMode(*InternalGetNetModeOG)(AActor* This);
-	static ENetMode InternalGetNetMode(AActor* This);
+	ENetMode InternalGetNetMode();
+	static ENetMode InternalGetNetModeHK(AActor* This);
 
 	void FinishSpawning(const FTransform& Transform, bool bIsDefaultTransform = false, const FComponentInstanceDataCache* InstanceDataCache = nullptr);
 
@@ -133,7 +134,7 @@ public:
 	void SetNetDormancy(ENetDormancy NewDormancy);
 public:
 	static void Hook() {
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAActor_InternalGetNetMode()), InternalGetNetMode, (LPVOID*)&InternalGetNetModeOG);
+		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAActor_InternalGetNetMode()), InternalGetNetModeHK, (LPVOID*)&InternalGetNetModeOG);
 
 		Log("Hooked AActor");
 	}

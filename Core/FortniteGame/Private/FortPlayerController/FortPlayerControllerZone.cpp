@@ -12,12 +12,18 @@
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 #include "FortniteGame/Public/FortItemDefinition/FortItemDefinition.h"
 
-void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P) {
-	AFortPlayerController::ServerAcknowledgePossessionOG(This, P);
+void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerPawnAthena* P) {
+	AFortPlayerController::ServerAcknowledgePossessionOG(this, P);
 }
 
-void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* This) {
-	OnReadyToStartMatchOG(This);
+void AFortPlayerControllerZone::ServerAcknowledgePossessionHK(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P) {
+	if (!This || !P) return ServerAcknowledgePossessionOG(This, P);
+
+	This->ServerAcknowledgePossession(P);
+}
+
+void AFortPlayerControllerZone::OnReadyToStartMatch() {
+	OnReadyToStartMatchOG(this);
 
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
@@ -25,7 +31,7 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 		return;
 	}
 
-	AFortGameModeZone* GameMode = This->GetWorld()->AuthorityGameMode->Cast<AFortGameModeZone>();
+	AFortGameModeZone* GameMode = GetWorld()->AuthorityGameMode->Cast<AFortGameModeZone>();
 	if (!GameMode) {
 		Log("AFortPlayerControllerZone::OnReadyToStartMatch: GameMode is null or not a FortGameModeZone!");
 		return;
@@ -41,7 +47,7 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 
 				Log(std::format("StartingItem {}: Item={}, Count={}", i, StartingItem.Item ? StartingItem.Item->GetFName().ToString().ToString() : "None", StartingItem.Count));
 				if (StartingItem.Count)
-					This->WorldInventory->AddItem(StartingItem.Item, StartingItem.Count);
+					WorldInventory->AddItem(StartingItem.Item, StartingItem.Count);
 			}
 		}
 		else {
@@ -56,40 +62,52 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 			static UFortItemDefinition* EditTool = (UFortItemDefinition*)StaticLoadObject("/Game/Items/Weapons/BuildingTools/EditTool.EditTool");
 
 			if (DefaultPickaxe) {
-				This->WorldInventory->AddItem(DefaultPickaxe);
+				WorldInventory->AddItem(DefaultPickaxe);
 			}
 			if (WallBuild) {
-				This->WorldInventory->AddItem(WallBuild);
+				WorldInventory->AddItem(WallBuild);
 			}
 			if (FloorBuild) {
-				This->WorldInventory->AddItem(FloorBuild);
+				WorldInventory->AddItem(FloorBuild);
 			}
 			if (StairBuild) {
-				This->WorldInventory->AddItem(StairBuild);
+				WorldInventory->AddItem(StairBuild);
 			}
 			if (ConeBuild) {
-				This->WorldInventory->AddItem(ConeBuild);
+				WorldInventory->AddItem(ConeBuild);
 			}
 			if (EditTool) {
-				This->WorldInventory->AddItem(EditTool);
+				WorldInventory->AddItem(EditTool);
 			}
 		}
 	}
 }
 
-void AFortPlayerControllerZone::ServerReturnToMainMenu(AFortPlayerControllerZone* This) {
-	ServerReturnToMainMenuOG(This);
+void AFortPlayerControllerZone::OnReadyToStartMatchHK(AFortPlayerControllerZone* This) {
+	if (!This) return OnReadyToStartMatchOG(This);
+
+	This->OnReadyToStartMatch();
+}
+
+void AFortPlayerControllerZone::ServerReturnToMainMenu() {
+	ServerReturnToMainMenuOG(this);
+}
+
+void AFortPlayerControllerZone::ServerReturnToMainMenuHK(AFortPlayerControllerZone* This) {
+	if (!This) return ServerReturnToMainMenuOG(This);
+
+	This->ServerReturnToMainMenu();
 }
 
 void AFortPlayerControllerZone::Hook() {
-	HookEveryVTable(AFortPlayerControllerZone::StaticClass(), AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
+	HookEveryVTable(AFortPlayerControllerZone::StaticClass(), AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossessionHK, (LPVOID*)ServerAcknowledgePossessionOG);
 	
-	MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerControllerZone_OnReadyToStartMatch()), OnReadyToStartMatch, (LPVOID*)&OnReadyToStartMatchOG);
+	MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerControllerZone_OnReadyToStartMatch()), OnReadyToStartMatchHK, (LPVOID*)&OnReadyToStartMatchOG);
 
 	HookVTable(
 		AFortPlayerControllerZone::GetDefaultObj(),
 		AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerReturnToMainMenu"),
-		ServerReturnToMainMenu,
+		ServerReturnToMainMenuHK,
 		(LPVOID*)&ServerReturnToMainMenuOG
 	);
 

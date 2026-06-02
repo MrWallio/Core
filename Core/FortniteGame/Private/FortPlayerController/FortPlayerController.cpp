@@ -32,14 +32,20 @@ void AFortPlayerController::ClientForceProfileQuery()
 	}
 }
 
-void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
-	OnReadyToStartMatchOG(This);
+void AFortPlayerController::OnReadyToStartMatch() {
+	OnReadyToStartMatchOG(this);
 
-	if ((!This->QuickBars || !This->ClientQuickBars))
+	if ((!QuickBars || !ClientQuickBars))
 	{
-		This->SpawnQuickBars();
-		This->SetupQuickBars();
+		SpawnQuickBars();
+		SetupQuickBars();
 	}
+}
+
+void AFortPlayerController::OnReadyToStartMatchHK(AFortPlayerController* This) {
+	if (!This) return OnReadyToStartMatchOG(This);
+
+	This->OnReadyToStartMatch();
 }
 
 void AFortPlayerController::SpawnQuickBars()
@@ -86,36 +92,36 @@ void AFortPlayerController::SetupQuickBars()
 	}
 }
 
-void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Msg) {
+void AFortPlayerController::ServerCheat(FString* Msg) {
 	std::string Command = Msg->ToString();
-	Log("ServerCheat (" + This->GetName().ToString() + "): [" + Command + "]");
+	Log("ServerCheat (" + GetName().ToString() + "): [" + Command + "]");
 	
-	UFortCheatManager* CheatManager = This->CheatManager->Cast<UFortCheatManager>();
+	UFortCheatManager* CheatManager = CheatManager->Cast<UFortCheatManager>();
 	if (!CheatManager)
 	{
-		UFortCheatManager* NewCheatManager = (UFortCheatManager*)UGameplayStatics::SpawnObject(This->CheatClass.Get(), This);
+		UFortCheatManager* NewCheatManager = (UFortCheatManager*)UGameplayStatics::SpawnObject(CheatClass.Get(), this);
 		if (NewCheatManager) {
-			This->CheatManager = NewCheatManager;
 			CheatManager = NewCheatManager;
-			This->ClientMessage("Spawned CheatManager: " + CheatManager->GetName().ToString());
+			CheatManager = NewCheatManager;
+			ClientMessage("Spawned CheatManager: " + CheatManager->GetName().ToString());
 		}
 		else {
-			This->ClientMessage("Failed to spawn CheatManager!");
+			ClientMessage("Failed to spawn CheatManager!");
 			return;
 		}
 	}
 
-	ServerCheatOG(This, Msg);
+	ServerCheatOG(this, Msg);
 
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
-		This->ClientMessage("World is null!");
+		ClientMessage("World is null!");
 		return;
 	}
 
 	AFortGameMode* GameMode = World->AuthorityGameMode->Cast<AFortGameMode>();
 	if (!GameMode) {
-		This->ClientMessage("GameMode is null or not a FortGameMode!");
+		ClientMessage("GameMode is null or not a FortGameMode!");
 		return;
 	}
 
@@ -123,26 +129,26 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 
 	if (Parser.IsCommand("Help"))
 	{
-		This->ClientMessage("=== Available Commands ===");
-		This->ClientMessage("GiveItem <ItemDefinitionName> [Count] - Gives an item to the player's inventory.");
-		This->ClientMessage("SetLoadedAmmo <LoadedAmmo> - Sets the loaded ammo of the currently equipped weapon.");
-		This->ClientMessage("GiveAmmo [Amount] - Gives ammo for the currently equipped weapon.");
-		This->ClientMessage("DumpInventory - Dump Inventory Stats");
-		This->ClientMessage("SpawnBot [bSpawnAtPlayer] - Spawns a bot at the player's location or playerstart.");
-		This->ClientMessage("SetHealth <Health> - Sets the player's health.");
-		This->ClientMessage("SetShield <Shield> - Sets the player's shield.");
-		This->ClientMessage("SetMaxHealth <MaxHealth> - Sets the player's max health.");
-		This->ClientMessage("SetMaxShield <MaxShield> - Sets the player's max shield.");
+		ClientMessage("=== Available Commands ===");
+		ClientMessage("GiveItem <ItemDefinitionName> [Count] - Gives an item to the player's inventory.");
+		ClientMessage("SetLoadedAmmo <LoadedAmmo> - Sets the loaded ammo of the currently equipped weapon.");
+		ClientMessage("GiveAmmo [Amount] - Gives ammo for the currently equipped weapon.");
+		ClientMessage("DumpInventory - Dump Inventory Stats");
+		ClientMessage("SpawnBot [bSpawnAtPlayer] - Spawns a bot at the player's location or playerstart.");
+		ClientMessage("SetHealth <Health> - Sets the player's health.");
+		ClientMessage("SetShield <Shield> - Sets the player's shield.");
+		ClientMessage("SetMaxHealth <MaxHealth> - Sets the player's max health.");
+		ClientMessage("SetMaxShield <MaxShield> - Sets the player's max shield.");
 	}
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: GiveItem <ItemDefinitionName> [Count]");
+			ClientMessage("Usage: GiveItem <ItemDefinitionName> [Count]");
 			return;
 		}
 
-		if (!This->WorldInventory) {
-			This->ClientMessage("WorldInventory is null!");
+		if (!WorldInventory) {
+			ClientMessage("WorldInventory is null!");
 			return;
 		}
 		
@@ -182,7 +188,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 				}
 				else
 				{
-					This->ClientMessage("Invalid ItemDefinition path: " + ItemDefName);
+					ClientMessage("Invalid ItemDefinition path: " + ItemDefName);
 					return;
 				}
 			}
@@ -193,198 +199,204 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
 		}
 		if (!ItemObj) {
-			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
+			ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
 		}
 
 		UFortItemDefinition* ItemDef = ItemObj->Cast<UFortItemDefinition>();
 		if (!ItemDef) {
-			This->ClientMessage("Object is not a UFortItemDefinition: " + ItemObj->GetName().ToString());
+			ClientMessage("Object is not a UFortItemDefinition: " + ItemObj->GetName().ToString());
 			return;
 		}
 
-		This->WorldInventory->AddItemAndHandleOverflow(ItemDef, Count);
+		WorldInventory->AddItemAndHandleOverflow(ItemDef, Count);
 	}
 	else if (Parser.IsCommand("SetLoadedAmmo")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: SetLoadedAmmo <LoadedAmmo>");
+			ClientMessage("Usage: SetLoadedAmmo <LoadedAmmo>");
 			return;
 		}
 
 		int32 LoadedAmmo = Parser.GetArgInt(0, 30);
 
-		if (!This->MyFortPawn) {
-			This->ClientMessage("MyFortPawn is null!");
+		if (!MyFortPawn) {
+			ClientMessage("MyFortPawn is null!");
 			return;
 		}
-		AFortWeapon* CurrentWeapon = This->MyFortPawn->CurrentWeapon;
+		AFortWeapon* CurrentWeapon = MyFortPawn->CurrentWeapon;
 		if (!CurrentWeapon) {
-			This->ClientMessage("CurrentWeapon is null!");
+			ClientMessage("CurrentWeapon is null!");
 			return;
 		}
 
-		FFortItemEntry* WeaponEntry = This->FindItemEntry(CurrentWeapon->ItemEntryGuid);
+		FFortItemEntry* WeaponEntry = FindItemEntry(CurrentWeapon->ItemEntryGuid);
 		if (!WeaponEntry) {
-			This->ClientMessage("Weapon entry not found in inventory!");
+			ClientMessage("Weapon entry not found in inventory!");
 			return;
 		}
 
 		WeaponEntry->LoadedAmmo = LoadedAmmo;
-		This->WorldInventory->Update(WeaponEntry);
-		This->ClientMessage("Set loaded ammo of current weapon to " + std::to_string(LoadedAmmo));
+		WorldInventory->Update(WeaponEntry);
+		ClientMessage("Set loaded ammo of current weapon to " + std::to_string(LoadedAmmo));
 	}
 	else if (Parser.IsCommand("GiveAmmo")) {
 		int32 AmmoAmount = Parser.GetArgInt(0, 30);
 
-		if (!This->MyFortPawn) {
-			This->ClientMessage("MyFortPawn is null!");
+		if (!MyFortPawn) {
+			ClientMessage("MyFortPawn is null!");
 			return;
 		}
 
-		AFortWeapon* CurrentWeapon = This->MyFortPawn->CurrentWeapon;
+		AFortWeapon* CurrentWeapon = MyFortPawn->CurrentWeapon;
 		if (!CurrentWeapon) {
-			This->ClientMessage("CurrentWeapon is null!");
+			ClientMessage("CurrentWeapon is null!");
 			return;
 		}
 
 		if (!CurrentWeapon->WeaponData) {
-			This->ClientMessage("WeaponData is null!");
+			ClientMessage("WeaponData is null!");
 			return;
 		}
 
 		UFortWorldItemDefinition* ItemDef = CurrentWeapon->WeaponData->Cast<UFortWorldItemDefinition>();
 		if (!ItemDef) {
-			This->ClientMessage("WeaponData is not a UFortWorldItemDefinition!");
+			ClientMessage("WeaponData is not a UFortWorldItemDefinition!");
 			return;
 		}
 
 		UFortWorldItemDefinition* AmmoItemDef = ItemDef->GetAmmoWorldItemDefinition_BP();
 		if (!AmmoItemDef) {
-			This->ClientMessage("AmmoWorldItemDefinition is null!");
+			ClientMessage("AmmoWorldItemDefinition is null!");
 			return;
 		}
 
-		FFortItemEntry* AmmoEntry = This->FindItemEntry(AmmoItemDef);
+		FFortItemEntry* AmmoEntry = FindItemEntry(AmmoItemDef);
 		if (AmmoEntry) {
 			AmmoEntry->Count += AmmoAmount;
-			This->WorldInventory->Update(AmmoEntry);
-			This->ClientMessage("Added " + AmmoItemDef->GetName().ToString() + " " + std::to_string(AmmoAmount) + " ammo to existing stack.");
+			WorldInventory->Update(AmmoEntry);
+			ClientMessage("Added " + AmmoItemDef->GetName().ToString() + " " + std::to_string(AmmoAmount) + " ammo to existing stack.");
 		}
 		else {
-			AmmoEntry = This->WorldInventory->AddItem(AmmoItemDef, AmmoAmount);
+			AmmoEntry = WorldInventory->AddItem(AmmoItemDef, AmmoAmount);
 			if (AmmoEntry) {
-				This->ClientMessage("Added new ammo entry: " + AmmoItemDef->GetName().ToString() + " x" + std::to_string(AmmoAmount));
+				ClientMessage("Added new ammo entry: " + AmmoItemDef->GetName().ToString() + " x" + std::to_string(AmmoAmount));
 			}
 			else {
-				This->ClientMessage("Failed to add ammo item: " + AmmoItemDef->GetName().ToString());
+				ClientMessage("Failed to add ammo item: " + AmmoItemDef->GetName().ToString());
 			}
 		}
 	} else if (Parser.IsCommand("DumpInventory")) {
-		if (!This->WorldInventory) {
-			This->ClientMessage("WorldInventory is null!");
+		if (!WorldInventory) {
+			ClientMessage("WorldInventory is null!");
 			return;
 		}
-		This->ClientMessage("=== Inventory Dump ===");
+		ClientMessage("=== Inventory Dump ===");
 
-		This->ClientMessage("Stats: ");
-		This->ClientMessage("Inventory Capacity: " + std::to_string(This->WorldInventory->GetInventoryCapacity()));
-		This->ClientMessage("Inventory Used: " + std::to_string(This->WorldInventory->GetInventoryUsed()));
+		ClientMessage("Stats: ");
+		ClientMessage("Inventory Capacity: " + std::to_string(WorldInventory->GetInventoryCapacity()));
+		ClientMessage("Inventory Used: " + std::to_string(WorldInventory->GetInventoryUsed()));
 
-		This->ClientMessage("Items: ");
-		for (UFortWorldItem* ItemEntry : This->WorldInventory->Inventory.ItemInstances) {
+		ClientMessage("Items: ");
+		for (UFortWorldItem* ItemEntry : WorldInventory->Inventory.ItemInstances) {
 			std::string ItemName = ItemEntry->ItemEntry.ItemDefinition ? ItemEntry->ItemEntry.ItemDefinition->GetName().ToString() : "Unknown";
 			int32 Count = ItemEntry->ItemEntry.Count;
 			std::string FormattedGuid = ItemEntry->ItemEntry.ItemGuid.FormatGuid();
 
-			This->ClientMessage("Item: " + ItemName + ", Count: " + std::to_string(Count) + ", GUID: " + FormattedGuid);
+			ClientMessage("Item: " + ItemName + ", Count: " + std::to_string(Count) + ", GUID: " + FormattedGuid);
 		}
 
-		This->ClientMessage("=== End of Inventory Dump ===");
+		ClientMessage("=== End of Inventory Dump ===");
 	}
 	else if (Parser.IsCommand("SpawnBot")) {
 		bool bSpawnAtPlayer = Parser.GetArgBool(0, false);
 		
-		bool bSuccessfulSpawn = GameMode->SpawnPlayerBot(bSpawnAtPlayer ? This->MyFortPawn : nullptr);
+		bool bSuccessfulSpawn = GameMode->SpawnPlayerBot(bSpawnAtPlayer ? MyFortPawn : nullptr);
 		if (bSuccessfulSpawn) {
-			This->ClientMessage("Bot spawned successfully!");
+			ClientMessage("Bot spawned successfully!");
 		}
 		else {
-			This->ClientMessage("Failed to spawn bot.");
+			ClientMessage("Failed to spawn bot.");
 		}
 	} else if (Parser.IsCommand("SetHealth")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: SetHealth <Health>");
+			ClientMessage("Usage: SetHealth <Health>");
 			return;
 		}
 
 		float Health = Parser.GetArgFloat(0, 100.0f);
 
-		if (!This->MyFortPawn) {
-			This->ClientMessage("MyFortPawn is null!");
+		if (!MyFortPawn) {
+			ClientMessage("MyFortPawn is null!");
 			return;
 		}
 
-		This->MyFortPawn->SetHealth(Health);
+		MyFortPawn->SetHealth(Health);
 
-		This->ClientMessage("Set health to " + std::to_string(Health));
+		ClientMessage("Set health to " + std::to_string(Health));
 	} else if (Parser.IsCommand("SetShield")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: SetShield <Shield>");
+			ClientMessage("Usage: SetShield <Shield>");
 			return;
 		}
 
 		float Shield = Parser.GetArgFloat(0, 100.0f);
 
-		if (!This->MyFortPawn) {
-			This->ClientMessage("MyFortPawn is null!");
+		if (!MyFortPawn) {
+			ClientMessage("MyFortPawn is null!");
 			return;
 		}
 
-		This->MyFortPawn->SetShield(Shield);
+		MyFortPawn->SetShield(Shield);
 
-		This->ClientMessage("Set shield to " + std::to_string(Shield));
+		ClientMessage("Set shield to " + std::to_string(Shield));
 	} else if (Parser.IsCommand("SetMaxHealth")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: SetMaxHealth <MaxHealth>");
+			ClientMessage("Usage: SetMaxHealth <MaxHealth>");
 			return;
 		}
 
 		float MaxHealth = Parser.GetArgFloat(0, 100.0f);
 
-		if (!This->MyFortPawn) {
-			This->ClientMessage("MyFortPawn is null!");
+		if (!MyFortPawn) {
+			ClientMessage("MyFortPawn is null!");
 			return;
 		}
 
-		This->MyFortPawn->SetMaxHealth(MaxHealth);
+		MyFortPawn->SetMaxHealth(MaxHealth);
 
-		This->ClientMessage("Set max health to " + std::to_string(MaxHealth));
+		ClientMessage("Set max health to " + std::to_string(MaxHealth));
 	} else if (Parser.IsCommand("SetMaxShield")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: SetMaxShield <MaxShield>");
+			ClientMessage("Usage: SetMaxShield <MaxShield>");
 			return;
 		}
 
 		float MaxShield = Parser.GetArgFloat(0, 100.0f);
 
-		if (!This->MyFortPawn) {
-			This->ClientMessage("MyFortPawn is null!");
+		if (!MyFortPawn) {
+			ClientMessage("MyFortPawn is null!");
 			return;
 		}
 
-		This->MyFortPawn->SetMaxShield(MaxShield);
+		MyFortPawn->SetMaxShield(MaxShield);
 
-		This->ClientMessage("Set max shield to " + std::to_string(MaxShield));
+		ClientMessage("Set max shield to " + std::to_string(MaxShield));
 	}
 }
 
-void AFortPlayerController::ServerExecuteInventoryItem(AFortPlayerController* This, FGuid& ItemGuid) {
-	UFortWorldItem* ItemInstance = This->FindItemInstance(ItemGuid);
+void AFortPlayerController::ServerCheatHK(AFortPlayerController* This, FString* Msg) {
+	if (!This) return ServerCheatOG(This, Msg);
+
+	This->ServerCheat(Msg);
+}
+
+void AFortPlayerController::ServerExecuteInventoryItem(FGuid& ItemGuid) {
+	UFortWorldItem* ItemInstance = FindItemInstance(ItemGuid);
 	if (!ItemInstance) {
 		Log("AFortPlayerController::ServerExecuteInventoryItem: ItemInstance not found for GUID: " + ItemGuid.FormatGuid());
 		return;
@@ -396,7 +408,13 @@ void AFortPlayerController::ServerExecuteInventoryItem(AFortPlayerController* Th
 		return;
 	}
 
-	ItemDef->ServerExecute(ItemInstance, This);
+	ItemDef->ServerExecute(ItemInstance, this);
+}
+
+void AFortPlayerController::ServerExecuteInventoryItemHK(AFortPlayerController* This, FGuid& ItemGuid) {
+	if (!This) return ServerExecuteInventoryItemOG(This, ItemGuid);
+
+	This->ServerExecuteInventoryItem(ItemGuid);
 }
 
 FFortItemEntry* AFortPlayerController::FindItemEntry(FGuid Guid) {
@@ -474,30 +492,36 @@ void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor
 	ProcessEvent(Func, &Parms);
 }
 
-void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* This, FGuid& ItemGuid, int Count, bool bTrash) {
+void AFortPlayerController::ServerAttemptInventoryDrop(FGuid& ItemGuid, int Count, bool bTrash) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("AFortPlayerController::ServerAttemptInventoryDrop: World is null!");
 		return;
 	}
 
-	if (!This->MyFortPawn) {
+	if (!MyFortPawn) {
 		Log("AFortPlayerController::ServerAttemptInventoryDrop: MyFortPawn is null!");
 		return;
 	}
 
-	FVector PawnLocation = This->MyFortPawn->K2_GetActorLocation();
+	FVector PawnLocation = MyFortPawn->K2_GetActorLocation();
 
 	Log("AFortPlayerController::ServerAttemptInventoryDrop: Attempting to drop item with GUID: " + ItemGuid.FormatGuid() + ", Count: " + std::to_string(Count) + ", bTrash: " + std::to_string(bTrash));
-	FFortItemEntry* ItemEntry = This->FindItemEntry(ItemGuid);
+	FFortItemEntry* ItemEntry = FindItemEntry(ItemGuid);
 	if (ItemEntry) {
 		if (ItemEntry->ItemDefinition) {
 			if (!bTrash) {
-				This->WorldInventory->SpawnPickupFromEntry(*ItemEntry);
+				WorldInventory->SpawnPickupFromEntry(*ItemEntry);
 			}
-			This->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
+			WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
 		}
 	}
+}
+
+void AFortPlayerController::ServerAttemptInventoryDropHK(AFortPlayerController* This, FGuid& ItemGuid, int Count, bool bTrash) {
+	if (!This) return ServerAttemptInventoryDropOG(This, ItemGuid, Count, bTrash);
+
+	This->ServerAttemptInventoryDrop(ItemGuid, Count, bTrash);
 }
 
 void AFortPlayerController::ClientForceUpdateQuickbar(uint8 QuickbarToRefresh)
@@ -536,18 +560,18 @@ bool AFortPlayerController::IsUsingOldQuickBars() {
 	return ClientQuickBarsOffset == -1;
 }
 
-void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, bool bIsPawnLoaded)
+void AFortPlayerController::ServerClientPawnLoaded(bool bIsPawnLoaded)
 {
-	ServerClientPawnLoadedOG(This, bIsPawnLoaded);
-	AFortPlayerState* FortPlayerState = This->PlayerState ? This->PlayerState->Cast<AFortPlayerState>() : nullptr;
+	ServerClientPawnLoadedOG(this, bIsPawnLoaded);
+	AFortPlayerState* FortPlayerState = PlayerState->Cast<AFortPlayerState>();
 	if (!FortPlayerState) {
 		Log("ServerAcknowledgePossession: PlayerState is null or not AFortPlayerStateZone");
 		return;
 	}
 
-	AFortPlayerPawn* MyFortPawn = This->MyFortPawn;
+	AFortPlayerPawn* MyFortPawn = MyFortPawn;
 
-	AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>();
+	AFortPlayerControllerAthena* FortPCAthena = Cast<AFortPlayerControllerAthena>();
 
 	if (bIsPawnLoaded) {
 		if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.1 && Version::Fortnite_Version != 1.11) {
@@ -570,30 +594,42 @@ void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, 
 	}
 }
 
-bool AFortPlayerController::RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval)
+void AFortPlayerController::ServerClientPawnLoadedHK(AFortPlayerController* This, bool bIsPawnLoaded) {
+	if (!This) return ServerClientPawnLoadedOG(This, bIsPawnLoaded);
+
+	This->ServerClientPawnLoaded(bIsPawnLoaded);
+}
+
+bool AFortPlayerController::RemoveInventoryItem(FGuid& ItemGuid, int32 Count, bool bForceRemoval)
 {
 	static auto InterfaceOffset = StaticClass()->SuperStruct->PropertiesSize + (Version::Engine_Version >= 4.27 ? 16 : 8);
-	AFortPlayerController* PlayerController = (AFortPlayerController*)(__int64(This) - InterfaceOffset); // this is so wierd
+	AFortPlayerController* PlayerController = (AFortPlayerController*)(__int64(this) - InterfaceOffset); // this is so wierd
 	if (!PlayerController) {
 		Log("RemoveInventoryItem: Failed to get PlayerController from interface pointer!");
-		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
+		return RemoveInventoryItemOG(this, ItemGuid, Count, bForceRemoval);
 	}
 
 	AFortInventory* Inventory = PlayerController->WorldInventory;
 	if (!Inventory) {
 		Log("RemoveInventoryItem: WorldInventory is null!");
-		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
+		return RemoveInventoryItemOG(this, ItemGuid, Count, bForceRemoval);
 	}
 
 	if (!ItemGuid.IsValid()) {
 		Log("RemoveInventoryItem: Invalid ItemGuid!");
-		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
+		return RemoveInventoryItemOG(this, ItemGuid, Count, bForceRemoval);
 	}
 
 	return Inventory->RemoveItem(ItemGuid, Count);
 }
 
-void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored) {
+bool AFortPlayerController::RemoveInventoryItemHK(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval) {
+	if (!This) return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
+
+	return This->RemoveInventoryItem(ItemGuid, Count, bForceRemoval);
+}
+
+void AFortPlayerController::ServerCreateBuildingActorOld(FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerCreateBuildingActor: World is null!");
@@ -606,7 +642,7 @@ void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* 
 		return;
 	}
 
-	if (!This->CanAffordToPlaceBuildableClass(&BuildingClassData)) {
+	if (!CanAffordToPlaceBuildableClass(&BuildingClassData)) {
 		Log("ServerCreateBuildingActor: Cannot afford to place building!");
 		return;
 	}
@@ -625,12 +661,12 @@ void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* 
 	}
 	BuildingsToRemove.Free();
 
-	ABuildingActor* BuildingActor = World->SpawnActorUnfinished(BuildingClassData.BuildingClass.Class, BuildLoc, BuildRot, This)->Cast<ABuildingActor>();
+	ABuildingActor* BuildingActor = World->SpawnActorUnfinished(BuildingClassData.BuildingClass.Class, BuildLoc, BuildRot, this)->Cast<ABuildingActor>();
 	if (!BuildingActor) {
 		Log("ServerCreateBuildingActor: Failed to spawn building actor!");
 		return;
 	}
-	BuildingActor->InitializeKismetSpawnedBuildingActor(BuildingActor, This, true, nullptr);
+	BuildingActor->InitializeKismetSpawnedBuildingActor(BuildingActor, this, true, nullptr);
 	World->FinishSpawnActor(BuildingActor, BuildLoc, BuildRot);
 
 	BuildingActor->CurrentBuildingLevel = BuildingClassData.UpgradeLevel;
@@ -643,13 +679,19 @@ void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* 
 
 	BuildingActor->bPlayerPlaced = true;
 
-	AFortPlayerStateAthena* PlayerState = This->PlayerState->Cast<AFortPlayerStateAthena>();
+	AFortPlayerStateAthena* PlayerState = PlayerState->Cast<AFortPlayerStateAthena>();
 	if (PlayerState) {
 		BuildingActor->Team = PlayerState->TeamIndex;
 	}
 	BuildingActor->TeamIndex = BuildingActor->Team;
 
-	This->PayBuildableClassPlacementCost(&BuildingClassData);
+	PayBuildableClassPlacementCost(&BuildingClassData);
+}
+
+void AFortPlayerController::ServerCreateBuildingActorOldHK(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored) {
+	if (!This) return ServerCreateBuildingActorOldOG(This, BuildingClassData, BuildLoc, BuildRot, bMirrored);
+
+	This->ServerCreateBuildingActorOld(BuildingClassData, BuildLoc, BuildRot, bMirrored);
 }
 
 bool AFortPlayerController::CanAffordToPlaceBuildableClass(FBuildingClassData* ClassToBuildData) {
@@ -662,7 +704,7 @@ int32 AFortPlayerController::PayBuildableClassPlacementCost(FBuildingClassData* 
 	return PayBuildableClassPlacementCostInternal(this, ClassToBuildData);
 }
 
-void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit) {
+void AFortPlayerController::ServerBeginEditingBuildingActor(ABuildingSMActor* BuildingActorToEdit) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerBeginEditingBuildingActor: World is null!");
@@ -674,7 +716,7 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 		return;
 	}
 
-	AFortPlayerStateZone* PlayerState = This->PlayerState->Cast<AFortPlayerStateZone>();
+	AFortPlayerStateZone* PlayerState = PlayerState->Cast<AFortPlayerStateZone>();
 	if (!PlayerState) {
 		Log("ServerBeginEditingBuildingActor: PlayerState is null or not AFortPlayerStateZone!");
 		return;
@@ -690,16 +732,16 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 
 	BuildingActorToEdit->SetEditingPlayer(PlayerState);
 
-	AFortPawn* MyFortPawn = This->MyFortPawn;
+	AFortPawn* MyFortPawn = MyFortPawn;
 	if (!MyFortPawn) {
 		Log("ServerBeginEditingBuildingActor: MyFortPawn is null!");
 		return;
 	}
 
 	if (!MyFortPawn->CurrentWeapon->Cast<AFortWeap_EditingTool>()) {
-		FFortItemEntry* ItemEntry = This->WorldInventory->FindItemEntry(UFortEditToolItemDefinition::StaticClass());
+		FFortItemEntry* ItemEntry = WorldInventory->FindItemEntry(UFortEditToolItemDefinition::StaticClass());
 		if (ItemEntry) {
-			This->ServerExecuteInventoryItem(This, ItemEntry->ItemGuid);
+			ServerExecuteInventoryItem(ItemEntry->ItemGuid);
 		}
 		else {
 			Log("ServerBeginEditingBuildingActor: Failed to find edit tool in inventory!");
@@ -718,7 +760,13 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 	EditingTool->OnRep_EditActor();
 }
 
-void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored) {
+void AFortPlayerController::ServerBeginEditingBuildingActorHK(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit) {
+	if (!This) return ServerBeginEditingBuildingActorOG(This, BuildingActorToEdit);
+
+	This->ServerBeginEditingBuildingActor(BuildingActorToEdit);
+}
+
+void AFortPlayerController::ServerEditBuildingActor(ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerEditBuildingActor: World is null!");
@@ -735,13 +783,13 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 		return;
 	}
 
-	AFortPawn* MyFortPawn = This->MyFortPawn;
+	AFortPawn* MyFortPawn = MyFortPawn;
 	if (!MyFortPawn) {
 		Log("ServerEndEditingBuildingActor: MyFortPawn is null!");
 		return;
 	}
 
-	AFortPlayerStateZone* PlayerState = This->PlayerState->Cast<AFortPlayerStateZone>();
+	AFortPlayerStateZone* PlayerState = PlayerState->Cast<AFortPlayerStateZone>();
 	if (!PlayerState) {
 		Log("ServerEditBuildingActor: PlayerState is null or not AFortPlayerStateZone!");
 		return;
@@ -768,7 +816,7 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 		BuildingActorToEdit->CurrentBuildingLevel,
 		RotationIterations,
 		bMirrored,
-		This
+		this
 	);
 
 	if (!ReplacedBuildingActor) {
@@ -776,7 +824,7 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 		return;
 	}
 
-	ReplacedBuildingActor->InitializeKismetSpawnedBuildingActor(ReplacedBuildingActor, This, true, BuildingActorToEdit);
+	ReplacedBuildingActor->InitializeKismetSpawnedBuildingActor(ReplacedBuildingActor, this, true, BuildingActorToEdit);
 
 	ReplacedBuildingActor->bPlayerPlaced = true;
 	if (PlayerStateAthena) {
@@ -786,7 +834,7 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 
 	ReplacedBuildingActor->SetEditingPlayer(PlayerState);
 
-	FFortItemEntry* EditToolEntry = This->WorldInventory->FindItemEntry(UFortEditToolItemDefinition::StaticClass());
+	FFortItemEntry* EditToolEntry = WorldInventory->FindItemEntry(UFortEditToolItemDefinition::StaticClass());
 	if (!EditToolEntry) {
 		Log("ServerEditBuildingActor: Failed to find edit tool in inventory!");
 		return;
@@ -803,7 +851,13 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 	EditingTool->OnRep_EditActor();
 }
 
-void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
+void AFortPlayerController::ServerEditBuildingActorHK(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored) {
+	if (!This) return ServerEditBuildingActorOG(This, BuildingActorToEdit, NewBuildingClass, RotationIterations, bMirrored);
+
+	This->ServerEditBuildingActor(BuildingActorToEdit, NewBuildingClass, RotationIterations, bMirrored);
+}
+
+void AFortPlayerController::ServerEndEditingBuildingActor(ABuildingSMActor* BuildingActorToStopEditing) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerEndEditingBuildingActor: World is null!");
@@ -815,13 +869,13 @@ void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController*
 		return;
 	}
 
-	AFortPlayerStateZone* PlayerState = This->PlayerState->Cast<AFortPlayerStateZone>();
+	AFortPlayerStateZone* PlayerState = PlayerState->Cast<AFortPlayerStateZone>();
 	if (!PlayerState) {
 		Log("ServerEndEditingBuildingActor: PlayerState is null or not AFortPlayerStateZone!");
 		return;
 	}
 
-	AFortPawn* MyFortPawn = This->MyFortPawn;
+	AFortPawn* MyFortPawn = MyFortPawn;
 	if (!MyFortPawn) {
 		Log("ServerEndEditingBuildingActor: MyFortPawn is null!");
 		return;
@@ -842,7 +896,7 @@ void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController*
 
 	BuildingActorToStopEditing->SetEditingPlayer(nullptr);
 
-	FFortItemEntry* EditToolEntry = This->WorldInventory->FindItemEntry(UFortEditToolItemDefinition::StaticClass());
+	FFortItemEntry* EditToolEntry = WorldInventory->FindItemEntry(UFortEditToolItemDefinition::StaticClass());
 	if (!EditToolEntry) {
 		Log("ServerEndEditingBuildingActor: Failed to find edit tool in inventory!");
 		return;
@@ -859,8 +913,14 @@ void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController*
 	EditingTool->OnRep_EditActor();
 }
 
-void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType) {
-	ServerAttemptInteractOG(This, ReceivingActor, InteractComponent, InteractType);
+void AFortPlayerController::ServerEndEditingBuildingActorHK(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
+	if (!This) return ServerEndEditingBuildingActorOG(This, BuildingActorToStopEditing);
+
+	This->ServerEndEditingBuildingActor(BuildingActorToStopEditing);
+}
+
+void AFortPlayerController::ServerAttemptInteract(AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType) {
+	ServerAttemptInteractOG(this, ReceivingActor, InteractComponent, InteractType);
 
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
@@ -871,13 +931,19 @@ void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, A
 	//Log("ReceivingActor: " + ReceivingActor->GetFullName());
 }
 
-void AFortPlayerController::ServerRemoveInventoryStateValue(AFortPlayerController* This, FGuid& ItemGuid, uint8 StateValueType) {
-	if (!This->WorldInventory) {
+void AFortPlayerController::ServerAttemptInteractHK(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType) {
+	if (!This) return ServerAttemptInteractOG(This, ReceivingActor, InteractComponent, InteractType);
+
+	This->ServerAttemptInteract(ReceivingActor, InteractComponent, InteractType);
+}
+
+void AFortPlayerController::ServerRemoveInventoryStateValue(FGuid& ItemGuid, uint8 StateValueType) {
+	if (!WorldInventory) {
 		Log("ServerRemoveInventoryStateValue: WorldInventory is null!");
 		return;
 	}
 
-	FFortItemEntry* ItemEntry = This->FindItemEntry(ItemGuid);
+	FFortItemEntry* ItemEntry = FindItemEntry(ItemGuid);
 	if (!ItemEntry) {
 		Log("ServerRemoveInventoryStateValue: ItemEntry not found for GUID: " + ItemGuid.FormatGuid());
 		return;
@@ -891,20 +957,32 @@ void AFortPlayerController::ServerRemoveInventoryStateValue(AFortPlayerControlle
 	}
 }
 
-void AFortPlayerController::ServerSetInventoryStateValue(AFortPlayerController* This, FGuid& ItemGuid, FFortItemEntryStateValue& StateValue) {
-	Log("AFortPlayerController::ServerSetInventoryStateValue Called!");
-	Log("PlayerController: " + This->GetFullName());
+void AFortPlayerController::ServerRemoveInventoryStateValueHK(AFortPlayerController* This, FGuid& ItemGuid, uint8 StateValueType) {
+	if (!This) return ServerRemoveInventoryStateValueOG(This, ItemGuid, StateValueType);
 
-	if (!This->WorldInventory) {
-		Log("ServerRemoveInventoryStateValue: WorldInventory is null!");
+	This->ServerRemoveInventoryStateValue(ItemGuid, StateValueType);
+}
+
+void AFortPlayerController::ServerSetInventoryStateValue(FGuid& ItemGuid, FFortItemEntryStateValue& StateValue) {
+	Log("AFortPlayerController::ServerSetInventoryStateValue Called!");
+	Log("PlayerController: " + GetFullName());
+
+	if (!WorldInventory) {
+		Log("ServerSetInventoryStateValue: WorldInventory is null!");
 		return;
 	}
 
-	FFortItemEntry* ItemEntry = This->FindItemEntry(ItemGuid);
+	FFortItemEntry* ItemEntry = FindItemEntry(ItemGuid);
 	if (!ItemEntry) {
-		Log("ServerRemoveInventoryStateValue: ItemEntry not found for GUID: " + ItemGuid.FormatGuid());
+		Log("ServerSetInventoryStateValue: ItemEntry not found for GUID: " + ItemGuid.FormatGuid());
 		return;
 	}
 
 	ItemEntry->StateValues.Add(StateValue);
+}
+
+void AFortPlayerController::ServerSetInventoryStateValueHK(AFortPlayerController* This, FGuid& ItemGuid, FFortItemEntryStateValue& StateValue) {
+	if (!This) return ServerSetInventoryStateValueOG(This, ItemGuid, StateValue);
+
+	This->ServerSetInventoryStateValue(ItemGuid, StateValue);
 }

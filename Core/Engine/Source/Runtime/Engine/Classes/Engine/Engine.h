@@ -107,7 +107,8 @@ public:
 	static UEngine* GetEngine();
 
 	static inline bool (*LoadMapOG)(UEngine* This, FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error);
-	static bool LoadMap(UEngine* This, FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error);
+	bool LoadMap(FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error);
+	static bool LoadMapHK(UEngine* This, FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error);
 
 	void BroadcastNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString = FString()) {
 		void (*BroadcastNetworkFailureInternal)(UEngine*, UWorld*, UNetDriver*, ENetworkFailure::Type, const FString&) = decltype(BroadcastNetworkFailureInternal)(ImageBase + Finder::FindUEngine_BroadcastNetworkFailure());
@@ -132,7 +133,7 @@ public:
 public:
 	static void Hook() {
 		if (!Finder::FindUWorld_ListenPatch()) {
-			MH_CreateHook((LPVOID)(ImageBase + Finder::FindUEngine_LoadMap()), LoadMap, (LPVOID*)&LoadMapOG);
+			MH_CreateHook((LPVOID)(ImageBase + Finder::FindUEngine_LoadMap()), LoadMapHK, (LPVOID*)&LoadMapOG);
 		}
 
 		Log("Hooked UEngine");

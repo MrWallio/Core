@@ -31,7 +31,8 @@ public:
 
 	UWorld* GetWorld() const;
 
-	static bool NeedsLoadForClient(UObject* This);
+	bool NeedsLoadForClient();
+	static bool NeedsLoadForClientHK(UObject* This);
 
 	static void Hook();
 

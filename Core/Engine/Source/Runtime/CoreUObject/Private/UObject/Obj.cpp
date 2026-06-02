@@ -37,11 +37,18 @@ bool UObject::NeedsLoadForClient(UObject* This)
 	return true;
 }
 
+bool UObject::NeedsLoadForClientHK(UObject* This)
+{
+	if (!This) return true;
+
+	return This->NeedsLoadForClient();
+}
+
 void UObject::Hook() {
 	HookEveryVTableIdx(
 		UObject::StaticClass(),
 		Finder::FindUObject_NeedsLoadForClientVFT(),
-		NeedsLoadForClient,
+		NeedsLoadForClientHK,
 		nullptr,
 		true
 	);
