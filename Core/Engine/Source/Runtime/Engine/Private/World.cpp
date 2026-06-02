@@ -185,6 +185,10 @@ bool UWorld::Listen(FURL& InURL)
 
 bool UWorld::ListenHK(UWorld* World, FURL& InURL)
 {
+	if (!World) {
+		return false;
+	}
+
 	return World->Listen(InURL);
 }
 
