@@ -51,9 +51,9 @@ UEngine* UEngine::GetEngine() {
 	return GEngine;
 }
 
-bool UEngine::LoadMap(FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error)
+bool UEngine::LoadMap(UEngine* This, FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error)
 {
-	bool result = LoadMapOG(this, WorldContext, URL, Pending, Error);
+	bool result = LoadMapOG(This, WorldContext, URL, Pending, Error);
 	// Get last URL so we can still use the URL
 	URL = WorldContext.LastURL;
 	// Listen for clients.
@@ -65,15 +65,6 @@ bool UEngine::LoadMap(FWorldContext& WorldContext, FURL& URL, class UPendingNetG
 		}
 	}
 	return result;
-}
-
-bool UEngine::LoadMapHK(UEngine* This, FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error)
-{
-	if (!This) {
-		return LoadMapOG(This, WorldContext, URL, Pending, Error);
-	}
-
-	return This->LoadMap(WorldContext, URL, Pending, Error);
 }
 
 UNetDriver* CreateNetDriver_Local(UEngine* Engine, FWorldContext& Context, FName NetDriverDefinition)

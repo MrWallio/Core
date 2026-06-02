@@ -85,31 +85,22 @@ void UNetDriver::SetWorld(class UWorld* InWorld)
 	}
 }
 
-void UNetDriver::TickFlush(float DeltaSeconds)
+void UNetDriver::TickFlush(UNetDriver* This, float DeltaSeconds)
 {
 	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 5.0) {
-		if (ClientConnections.Num() > 0 && ClientConnections[0]->InternalAck == false) {
-			int32 Updated = ServerReplicateActors(DeltaSeconds);
+		if (This->ClientConnections.Num() > 0 && This->ClientConnections[0]->InternalAck == false) {
+			int32 Updated = This->ServerReplicateActors(DeltaSeconds);
 
 			static int32 LastUpdateCount = 0;
 			if ((LastUpdateCount && !Updated) || Updated)
 			{
-				//Log(NetDriverName.ToString().ToString() + " replicated " + std::to_string(Updated) + " actors");
+				//Log(This->NetDriverName.ToString().ToString() + " replicated " + std::to_string(Updated) + " actors");
 			}
 			LastUpdateCount = Updated;
 		}
 	}
 
-	return TickFlushOG(this, DeltaSeconds);
-}
-
-void UNetDriver::TickFlushHK(UNetDriver* This, float DeltaSeconds)
-{
-	if (!This) {
-		return TickFlushOG(This, DeltaSeconds);
-	}
-
-	return This->TickFlush(DeltaSeconds);
+	return TickFlushOG(This, DeltaSeconds);
 }
 
 void UNetDriver::SetNetDriverName(FName NewNetDriverNamed)
@@ -219,21 +210,12 @@ bool UNetDriver::IsLevelInitializedForActor(const AActor* InActor, const UNetCon
 	return IsLevelInitializedForActorInternal(this, InActor, InConnection);
 }
 
-void UNetDriver::TickDispatch(float DeltaTime)
+void UNetDriver::TickDispatch(UNetDriver* This, float DeltaTime)
 {
-	TickDispatchOG(this, DeltaTime);
+	TickDispatchOG(This, DeltaTime);
 
 	// Unless i can actually somehow make proper finders for everything in here then dont use
-	//this->UpdateStandbyCheatStatus();
-}
-
-void UNetDriver::TickDispatchHK(UNetDriver* This, float DeltaTime)
-{
-	if (!This) {
-		return TickDispatchOG(This, DeltaTime);
-	}
-
-	return This->TickDispatch(DeltaTime);
+	//This->UpdateStandbyCheatStatus();
 }
 
 void UNetDriver::UpdateStandbyCheatStatus(void)

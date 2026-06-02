@@ -8,16 +8,10 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Pawn.h"
 #include "Engine/Plugins/Online/OnlineSubsystemUtils/Source/OnlineSubsystemUtils/Public/OnlineBeaconClient.h"
 
-ENetMode AActor::InternalGetNetMode()
+ENetMode AActor::InternalGetNetMode(AActor* This)
 {
+	//return InternalGetNetModeOG(This);
 	return NM_DedicatedServer;
-}
-
-ENetMode AActor::InternalGetNetModeHK(AActor* This)
-{
-	if (!This) return InternalGetNetModeOG(This);
-
-	return This->InternalGetNetMode();
 }
 
 void AActor::FinishSpawning(const FTransform& UserTransform, bool bIsDefaultTransform, const FComponentInstanceDataCache* InstanceDataCache)

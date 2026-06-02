@@ -60,9 +60,7 @@ public:
 
 	FGameplayAbilitySpec* FindAbilitySpecFromHandle(FGameplayAbilitySpecHandle Handle);
 
-	void InternalServerTryActivateAbility(FGameplayAbilitySpecHandle AbilityToActivate, bool InputPressed, FPredictionKey& PredictionKey, FGameplayEventData* TriggerEventData);
-	static void InternalServerTryActivateAbilityHK(UAbilitySystemComponent* This, FGameplayAbilitySpecHandle AbilityToActivate, bool InputPressed, FPredictionKey& PredictionKey, FGameplayEventData* TriggerEventData);
-	static void InternalServerTryActivateAbilityOG(UAbilitySystemComponent* This, FGameplayAbilitySpecHandle AbilityToActivate, bool InputPressed, FPredictionKey& PredictionKey, FGameplayEventData* TriggerEventData);
+	static void InternalServerTryActivateAbility(UAbilitySystemComponent* This, FGameplayAbilitySpecHandle AbilityToActivate, bool InputPressed, const FPredictionKey& PredictionKey, FGameplayEventData* TriggerEventData);
 
 	void ConsumeAllReplicatedData(FGameplayAbilitySpecHandle AbilityHandle, FPredictionKey AbilityOriginalPredictionKey);
 
@@ -73,7 +71,7 @@ public:
 	FGameplayAbilitySpecHandle GiveAbilityAndActivateOnce(FGameplayAbilitySpec& AbilitySpec, FGameplayEventData* GameplayEventData = nullptr);
 public:
 	static void Hook() {
-		HookEveryVTableIdx(UAbilitySystemComponent::StaticClass(), Finder::FindInternalServerTryActivateAbilityVFT(), InternalServerTryActivateAbilityHK, (LPVOID*)&InternalServerTryActivateAbilityOG);
+		HookEveryVTableIdx(UAbilitySystemComponent::StaticClass(), Finder::FindInternalServerTryActivateAbilityVFT(), InternalServerTryActivateAbility);
 
 		Log("UAbilitySystemComponent Hooked!");
 	}

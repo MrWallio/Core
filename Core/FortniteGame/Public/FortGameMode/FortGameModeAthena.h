@@ -24,33 +24,28 @@ public:
 	DefineUProperty(TArray<AFortPlayerControllerAthena*>, AlivePlayers);
 public:
 	static inline bool (*ReadyToStartMatchOG)(AFortGameModeAthena* This);
-	bool ReadyToStartMatch();
-	static bool ReadyToStartMatchHK(AFortGameModeAthena* This);
+	static bool ReadyToStartMatch(AFortGameModeAthena* This);
 
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot);
-	APawn* SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot);
-	static APawn* SpawnDefaultPawnForHK(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot);
+	static APawn* SpawnDefaultPawnFor(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot);
 
 	static inline void (*FinishWorldInitializationOG)(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
-	void FinishWorldInitialization(AFortWorldManager* WorldManager);
-	static void FinishWorldInitializationHK(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
+	static void FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
 
 	static inline void (*BeginPlayOG)(AFortGameModeAthena* This);
-	void BeginPlay();
-	static void BeginPlayHK(AFortGameModeAthena* This);
+	static void BeginPlay(AFortGameModeAthena* This);
 
 	void AddToAlivePlayers(AFortPlayerControllerAthena* PC);
 
 	static inline int32 (*StartAircraftPhaseOG)(AFortGameModeAthena* This, bool bGoStraightToSafeZone);
-	int32 StartAircraftPhase(bool bGoStraightToSafeZone);
-	static int32 StartAircraftPhaseHK(AFortGameModeAthena* This, bool bGoStraightToSafeZone);
+	static int32 StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone);
 
 	static void Hook() {
 		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
 		HookEveryVTable(
 			AFortGameModeAthena::StaticClass(),
 			AFortGameModeAthena::StaticClass()->GetFunction("Function /Script/Engine.GameMode.ReadyToStartMatch"),
-			ReadyToStartMatchHK,
+			ReadyToStartMatch,
 			(LPVOID*)&ReadyToStartMatchOG
 		);
 
@@ -58,7 +53,7 @@ public:
 		HookEveryVTable(
 			AFortGameModeAthena::StaticClass(),
 			AFortGameModeAthena::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"),
-			SpawnDefaultPawnForHK,
+			SpawnDefaultPawnFor,
 			(LPVOID*)&SpawnDefaultPawnForOG
 		);
 
@@ -66,21 +61,21 @@ public:
 		HookEveryVTableIdx(
 			AFortGameModeAthena::StaticClass(),
 			Finder::FindAFortGameMode_FinishWorldInitializationVFT(),
-			FinishWorldInitializationHK,
+			FinishWorldInitialization,
 			(LPVOID*)&FinishWorldInitializationOG
 		);
 
 		HookVTableIdx(
 			AFortGameModeAthena::GetDefaultObj(),
 			Finder::FindAActor_BeginPlayVFT(),
-			BeginPlayHK,
+			BeginPlay,
 			(LPVOID*)&BeginPlayOG
 		);
 
 		if (Finder::FindAFortGameModeAthena_StartAircraftPhase()) {
 			MH_CreateHook(
 				(LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_StartAircraftPhase()),
-				StartAircraftPhaseHK,
+				StartAircraftPhase,
 				(LPVOID*)&StartAircraftPhaseOG
 			);
 		}

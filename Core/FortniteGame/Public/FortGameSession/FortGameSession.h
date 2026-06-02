@@ -14,12 +14,11 @@ public:
 
 	DefineUProperty(float, DisconnectedReservationTimeout);
 public:
-	static inline EFortPlayerValidationType(*ValidatePlayerOG)(AFortGameSession* This, FUniqueNetIdRepl* UniqueId, bool bIsLocalPlayer, FText* ReturnReason);
-	EFortPlayerValidationType ValidatePlayer(FUniqueNetIdRepl* UniqueId, bool bIsLocalPlayer, FText* ReturnReason);
-	static EFortPlayerValidationType ValidatePlayerHK(AFortGameSession* This, FUniqueNetIdRepl* UniqueId, bool bIsLocalPlayer, FText* ReturnReason);
+	static inline EFortPlayerValidationType(*ValidatePlayerOG)(AFortGameSession* This, const FUniqueNetIdRepl* UniqueId, bool bIsLocalPlayer, FText* ReturnReason);
+	static EFortPlayerValidationType ValidatePlayer(AFortGameSession* This, const FUniqueNetIdRepl* UniqueId, bool bIsLocalPlayer, FText* ReturnReason);
 
 	static void Hook() {
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameSession_ValidatePlayer()), (LPVOID)ValidatePlayerHK, (LPVOID*)&ValidatePlayerOG);
+		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameSession_ValidatePlayer()), (LPVOID)ValidatePlayer, (LPVOID*)&ValidatePlayerOG);
 
 		Log("Hooked AFortGameSession");
 	}

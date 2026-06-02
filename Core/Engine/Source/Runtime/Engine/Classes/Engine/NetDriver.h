@@ -183,8 +183,7 @@ public:
 	}
 
 	static inline void (*TickFlushOG)(UNetDriver* This, float DeltaSeconds);
-	void TickFlush(float DeltaSeconds);
-	static void TickFlushHK(UNetDriver* This, float DeltaSeconds);
+	static void TickFlush(UNetDriver* This, float DeltaSeconds);
 
 	void SetNetDriverName(FName NewNetDriverNamed);
 
@@ -200,8 +199,7 @@ public:
 	bool IsLevelInitializedForActor(const AActor* InActor, const UNetConnection* InConnection) const;
 
 	static inline void (*TickDispatchOG)(UNetDriver* This, float DeltaTime);
-	void TickDispatch(float DeltaTime);
-	static void TickDispatchHK(UNetDriver* This, float DeltaTime);
+	static void TickDispatch(UNetDriver* This, float DeltaTime);
 
 	void UpdateStandbyCheatStatus(void);
 
@@ -224,9 +222,9 @@ public:
 	}
 public:
 	static void Hook() {
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUNetDriver_TickFlush()), TickFlushHK, (LPVOID*)&TickFlushOG);
+		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUNetDriver_TickFlush()), TickFlush, (LPVOID*)&TickFlushOG);
 
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUNetDriver_TickDispatch()), TickDispatchHK, (LPVOID*)&TickDispatchOG);
+		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUNetDriver_TickDispatch()), TickDispatch, (LPVOID*)&TickDispatchOG);
 
 		Log("UNetDriver Hooked.");
 	}

@@ -19,16 +19,18 @@ FGameplayAbilitySpec* UAbilitySystemComponent::FindAbilitySpecFromHandle(FGamepl
 	return FindAbilitySpecFromHandleInternal(this, Handle);
 }
 
-void UAbilitySystemComponent::InternalServerTryActivateAbility(FGameplayAbilitySpecHandle Handle, bool InputPressed, FPredictionKey& PredictionKey, FGameplayEventData* TriggerEventData) {
+void UAbilitySystemComponent::InternalServerTryActivateAbility(UAbilitySystemComponent* This, FGameplayAbilitySpecHandle Handle, bool InputPressed, const FPredictionKey& PredictionKey, FGameplayEventData* TriggerEventData) {
 	if (Version::Engine_Version == 4.16) {
-		FGameplayAbilitySpec* Spec = FindAbilitySpecFromHandle(Handle);
+		FGameplayAbilitySpec* Spec = This->FindAbilitySpecFromHandle(Handle);
 		if (!Spec)
 		{
-			ClientActivateAbilityFailed(Handle, PredictionKey.Current);
+			// Can potentially happen in race conditions where client tries to activate ability that is removed server side before it is received.
+			This->ClientActivateAbilityFailed(Handle, PredictionKey.Current);
 			return;
 		}
 
-		ConsumeAllReplicatedData(Handle, PredictionKey);
+		// Consume any pending target info, to clear out cancels from old executions
+		This->ConsumeAllReplicatedData(Handle, PredictionKey);
 
 		const UGameplayAbility* AbilityToActivate = Spec->Ability;
 		if (!AbilityToActivate)
@@ -39,24 +41,19 @@ void UAbilitySystemComponent::InternalServerTryActivateAbility(FGameplayAbilityS
 		UGameplayAbility* InstancedAbility = nullptr;
 		Spec->InputPressed = true;
 
-		if (InternalTryActivateAbility(Handle, PredictionKey, &InstancedAbility, nullptr, TriggerEventData))
+		// Attempt to activate the ability (server side) and tell the client if it succeeded or failed.
+		if (This->InternalTryActivateAbility(Handle, PredictionKey, &InstancedAbility, nullptr, TriggerEventData))
 		{
 			// TryActivateAbility handles notifying the client of success
 		}
 		else
 		{
 			Log("InternalServerTryActiveAbility. Rejecting ClientActivation of " + Spec->Ability->GetName().ToString() + ". InternalTryActivateAbility failed.");
-			ClientActivateAbilityFailed(Handle, PredictionKey.Current);
+			This->ClientActivateAbilityFailed(Handle, PredictionKey.Current);
 			Spec->InputPressed = false;
 		}
-		ActivatableAbilities.MarkItemDirty(*Spec);
+		This->ActivatableAbilities.MarkItemDirty(*Spec);
 	}
-}
-
-void UAbilitySystemComponent::InternalServerTryActivateAbilityHK(UAbilitySystemComponent* This, FGameplayAbilitySpecHandle Handle, bool InputPressed, FPredictionKey& PredictionKey, FGameplayEventData* TriggerEventData) {
-	if (!This) return InternalServerTryActivateAbilityOG(This, Handle, InputPressed, PredictionKey, TriggerEventData);
-
-	return This->InternalServerTryActivateAbility(Handle, InputPressed, PredictionKey, TriggerEventData);
 }
 
 void UAbilitySystemComponent::ConsumeAllReplicatedData(FGameplayAbilitySpecHandle AbilityHandle, FPredictionKey AbilityOriginalPredictionKey)

@@ -13,86 +13,54 @@
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 
-bool AFortGameModeAthena::ReadyToStartMatch() {
-	if (bWorldIsReady
-		&& MatchState == MatchState::WaitingToStart
-		&& NumPlayers >= WarmupRequiredPlayerCount) {
+bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
+	if (This->bWorldIsReady
+		&& This->MatchState == MatchState::WaitingToStart
+		&& This->NumPlayers >= This->WarmupRequiredPlayerCount) {
 
 		Log(std::format("ReadyToStartMatch: Match ready to start! Players={}/{}, WorldReady={}",
-			NumPlayers,
-			WarmupRequiredPlayerCount,
-			bWorldIsReady));
+			This->NumPlayers,
+			This->WarmupRequiredPlayerCount,
+			This->bWorldIsReady));
 		return true;
 	}
 
 	return false;
 }
 
-bool AFortGameModeAthena::ReadyToStartMatchHK(AFortGameModeAthena* This) {
-	if (!This) {
-		return ReadyToStartMatchOG(This);
-	}
-
-	return This->ReadyToStartMatch();
-}
-
-APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot) {
-	APawn* Pawn = AFortGameModeZone::SpawnDefaultPawnFor(this, NewPlayer, StartSpot);
+APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot) {
+	APawn* Pawn = AFortGameModeZone::SpawnDefaultPawnFor(This, NewPlayer, StartSpot);
 
 	Log("AFortGameModeAthena::SpawnDefaultPawnFor: Spawned default pawn. NewPlayer=" + (NewPlayer ? NewPlayer->GetName().ToString() : "None") + " Pawn=" + (Pawn ? Pawn->GetName().ToString() : "None"));
 	return Pawn;
 }
 
-APawn* AFortGameModeAthena::SpawnDefaultPawnForHK(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot) {
-	if (!This) {
-		return SpawnDefaultPawnForOG(This, NewPlayer, StartSpot);
-	}
-
-	return This->SpawnDefaultPawnFor(NewPlayer, StartSpot);
-}
-
-void AFortGameModeAthena::FinishWorldInitialization(AFortWorldManager* WorldManager) {
-	AFortGameStateAthena* GameState = GameState->Cast<AFortGameStateAthena>();
+void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager) {
+	AFortGameStateAthena* GameState = This->GameState ? This->GameState->Cast<AFortGameStateAthena>() : nullptr;
 	if (!GameState) {
 		Log("FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
-		return FinishWorldInitializationOG(this, WorldManager);
-	}
-	
-	GameState->SetCurrentPlaylistId(CurrentPlaylistId);
-
-	CreateAIDirector();
-	CreateAIGoalManager();
-
-	FinishWorldInitializationOG(this, WorldManager);
-	bWorldIsReady = true;
-}
-
-void AFortGameModeAthena::FinishWorldInitializationHK(AFortGameModeAthena* This, AFortWorldManager* WorldManager) {
-	if (!This) {
 		return FinishWorldInitializationOG(This, WorldManager);
 	}
+	
+	GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
 
-	return This->FinishWorldInitialization(WorldManager);
+	This->CreateAIDirector();
+	This->CreateAIGoalManager();
+
+	FinishWorldInitializationOG(This, WorldManager);
+	This->bWorldIsReady = true;
 }
 
-void AFortGameModeAthena::BeginPlay() {
-	BeginPlayOG(this);
+void AFortGameModeAthena::BeginPlay(AFortGameModeAthena* This) {
+	BeginPlayOG(This);
 
 	if (Version::Fortnite_Version <= 1.72) {
-		DefaultPawnClass = (UClass*)StaticLoadObject("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
-		PlayerControllerClass = (UClass*)StaticLoadObject("/Game/Athena/Athena_PlayerController.Athena_PlayerController_C");
-		PlayerStateClass = AFortPlayerStateAthena::StaticClass();
+		This->DefaultPawnClass = (UClass*)StaticLoadObject("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
+		This->PlayerControllerClass = (UClass*)StaticLoadObject("/Game/Athena/Athena_PlayerController.Athena_PlayerController_C");
+		This->PlayerStateClass = AFortPlayerStateAthena::StaticClass();
 	}
 
-	bDisableGCOnServerDuringMatch = true;
-}
-
-void AFortGameModeAthena::BeginPlayHK(AFortGameModeAthena* This) {
-	if (!This) {
-		return BeginPlayOG(This);
-	}
-
-	return This->BeginPlay();
+	This->bDisableGCOnServerDuringMatch = true;
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
@@ -100,8 +68,8 @@ void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
 	AddToAlivePlayersInternal(this, PC);
 }
 
-int32 AFortGameModeAthena::StartAircraftPhase(bool bGoStraightToSafeZone) {
-	for (AFortPlayerControllerAthena* PC : AlivePlayers) {
+int32 AFortGameModeAthena::StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone) {
+	for (AFortPlayerControllerAthena* PC : This->AlivePlayers) {
 		if (PC->WorldInventory) {
 			PC->WorldInventory->DropAllItems(false);
 		}
@@ -114,13 +82,5 @@ int32 AFortGameModeAthena::StartAircraftPhase(bool bGoStraightToSafeZone) {
 		}
 	}
 
-	return StartAircraftPhaseOG(this, bGoStraightToSafeZone);
-}
-
-int32 AFortGameModeAthena::StartAircraftPhaseHK(AFortGameModeAthena* This, bool bGoStraightToSafeZone) {
-	if (!This) {
-		return StartAircraftPhaseOG(This, bGoStraightToSafeZone);
-	}
-
-	return This->StartAircraftPhase(bGoStraightToSafeZone);
+	return StartAircraftPhaseOG(This, bGoStraightToSafeZone);
 }

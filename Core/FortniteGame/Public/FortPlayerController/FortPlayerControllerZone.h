@@ -12,17 +12,13 @@ class AFortPlayerControllerZone : public AFortPlayerControllerGameplay {
 public:
 	DefineUnrealClass(AFortPlayerControllerZone);
 public:
-	void ServerAcknowledgePossession(AFortPlayerPawnAthena* P);
-	static inline void (*ServerAcknowledgePossessionOG)(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P);
-	static void ServerAcknowledgePossessionHK(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P);
+	static void ServerAcknowledgePossession(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P);
 
 	static inline void (*OnReadyToStartMatchOG)(AFortPlayerControllerZone* This);
-	void OnReadyToStartMatch();
-	static void OnReadyToStartMatchHK(AFortPlayerControllerZone* This);
+	static void OnReadyToStartMatch(AFortPlayerControllerZone* This);
 
 	static inline void (*ServerReturnToMainMenuOG)(AFortPlayerControllerZone* This);
-	void ServerReturnToMainMenu();
-	static void ServerReturnToMainMenuHK(AFortPlayerControllerZone* This);
+	static void ServerReturnToMainMenu(AFortPlayerControllerZone* This);
 
 	static void Hook();
 };
