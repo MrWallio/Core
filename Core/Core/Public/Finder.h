@@ -1018,6 +1018,8 @@ public:
 	static uintptr_t FindABuildingContainer_ServerOnAttemptInteract();
 
 	static uintptr_t FindABuildingActor_ServerOnAttemptInteractVFT();
+
+	static uintptr_t FindUWorld_ListenPatch();
 public:
 	static void SetupOffsets();
 

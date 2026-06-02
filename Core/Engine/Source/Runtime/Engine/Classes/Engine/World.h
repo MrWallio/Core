@@ -142,13 +142,18 @@ public:
 	
 	static ENetMode InternalGetNetMode(UWorld* This);
 
+	AActor* SpawnActorUnfinished(UClass* InClass, FVector Location = FVector(), FRotator Rotation = FRotator(), AActor* Owner = nullptr);
+	AActor* FinishSpawnActor(AActor* Actor, FVector Location = FVector(), FRotator Rotation = FRotator());
 	AActor* SpawnActor(UClass* InClass, FVector Location = FVector(), FRotator Rotation = FRotator(), AActor* Owner = nullptr);
 
 	AActor* SpawnActor(UClass* Class, FTransform Transform, AActor* Owner = nullptr);
+	AActor* SpawnActorUnfinished(UClass* Class, FTransform Transform, AActor* Owner = nullptr);
+	AActor* FinishSpawnActor(AActor* Actor, FTransform Transform);
 
 	bool ServerTravel(const FString& InURL, bool bAbsolute = false, bool bShouldSkipGameNotify = false);
 
 	bool Listen(FURL& InURL);
+	static bool ListenHK(UWorld* World, FURL& InURL);
 
 	FLevelCollection* FindCollectionByType(const ELevelCollectionType InType);
 
@@ -167,6 +172,10 @@ public:
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUWorld_InternalGetNetMode()), InternalGetNetMode, nullptr);
+
+		if (Finder::FindUWorld_ListenPatch()) {
+			PatchCallFar(ImageBase + Finder::FindUWorld_ListenPatch(), (LPVOID*)&ListenHK);
+		}
 
 		Log("Hooked UWorld");
 	}

@@ -39,6 +39,30 @@ AActor* UWorld::SpawnActor(UClass* Class, FVector Location, FRotator Rotation, A
 	return SpawnActor(Class, Transform, Owner);
 }
 
+AActor* UWorld::SpawnActorUnfinished(UClass* Class, FVector Location, FRotator Rotation, AActor* Owner) {
+	FTransform Transform;
+
+	Transform.Translation = Location;
+	Transform.Rotation = FQuat(Rotation);
+	Transform.Scale3D.X = 1.f;
+	Transform.Scale3D.Y = 1.f;
+	Transform.Scale3D.Z = 1.f;
+
+	return SpawnActorUnfinished(Class, Transform, Owner);
+}
+
+AActor* UWorld::FinishSpawnActor(AActor* Actor, FVector Location, FRotator Rotation) {
+	FTransform Transform;
+
+	Transform.Translation = Location;
+	Transform.Rotation = FQuat(Rotation);
+	Transform.Scale3D.X = 1.f;
+	Transform.Scale3D.Y = 1.f;
+	Transform.Scale3D.Z = 1.f;
+
+	return UGameplayStatics::FinishSpawningActor(Actor, Transform);
+}
+
 AActor* UWorld::SpawnActor(UClass* Class, FTransform Transform, AActor* Owner) {
 	auto Actor = UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), Class, Transform, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn, Owner);
 	if (Actor) {
@@ -48,6 +72,14 @@ AActor* UWorld::SpawnActor(UClass* Class, FTransform Transform, AActor* Owner) {
 		Log("Failed to spawn actor of class " + Class->GetName().ToString());
 		return nullptr;
 	}
+}
+
+AActor* UWorld::SpawnActorUnfinished(UClass* Class, FTransform Transform, AActor* Owner) {
+	return UGameplayStatics::BeginDeferredActorSpawnFromClass(GetWorld(), Class, Transform, ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn, Owner);
+}
+
+AActor* UWorld::FinishSpawnActor(AActor* Actor, FTransform Transform) {
+	return UGameplayStatics::FinishSpawningActor(Actor, Transform);
 }
 
 bool UWorld::ServerTravel(const FString& FURL, bool bAbsolute, bool bShouldSkipGameNotify)
@@ -149,6 +181,11 @@ bool UWorld::Listen(FURL& InURL)
 
 	SetConsoleTitleA((std::format("Core ({:.2f}) | Listening: ", Version::Fortnite_Version).c_str() + std::to_string(InURL.Port)).c_str());
 	return true;
+}
+
+bool UWorld::ListenHK(UWorld* World, FURL& InURL)
+{
+	return World->Listen(InURL);
 }
 
 FLevelCollection* UWorld::FindCollectionByType(const ELevelCollectionType InType)

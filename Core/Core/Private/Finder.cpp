@@ -9429,6 +9429,38 @@ uintptr_t Finder::FindABuildingActor_ServerOnAttemptInteractVFT() {
 	return ServerOffsets::ABuildingActor_ServerOnAttemptInteractVFT;
 }
 
+uintptr_t Finder::FindUWorld_ListenPatch() {
+	if (ServerOffsets::UWorld_ListenPatch)
+		return ServerOffsets::UWorld_ListenPatch;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: failed to Listen(%s)").Get();
+	if (StringAddr) {
+		int Skipped = 0;
+
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0xE8)
+			{
+				if (Skipped == 1) {
+					Addr = uint64_t(Ptr);
+					break;
+				}
+				
+				Skipped++;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::UWorld_ListenPatch = Addr - ImageBase;
+	}
+
+	Log("UWorld_ListenPatch found at: 0x" + std::format("{:X}", ServerOffsets::UWorld_ListenPatch));
+	return ServerOffsets::UWorld_ListenPatch;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -9721,6 +9753,8 @@ void Finder::SetupOffsets() {
 	FindABuildingActor_ServerOnAttemptInteractVFT();
 
 	FindStep();
+
+	FindUWorld_ListenPatch();
 
 	return;
 }

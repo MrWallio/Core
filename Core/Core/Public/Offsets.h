@@ -177,6 +177,7 @@ namespace ServerOffsets {
 	inline uintptr_t UWorld_UpdateStreamingLevelShouldBeConsidered = 0;
 	inline uintptr_t UWorld_FindCollectionByType = 0;
 	inline uintptr_t UWorld__NextSwitchCountdown = 0;
+	inline uintptr_t UWorld_ListenPatch = 0;
 
 	inline uintptr_t FGuid_ToString = 0;
 

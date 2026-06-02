@@ -155,3 +155,13 @@ float ABuildingActor::GetHealth() const
 
 	return Parms.ReturnValue;
 }
+
+void ABuildingActor::OnRep_CurrentBuildingLevel()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_CurrentBuildingLevel");
+
+	ProcessEvent(Func, nullptr);
+}

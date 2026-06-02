@@ -131,8 +131,9 @@ public:
 	float GetMaxTickRate(float DeltaTime, bool bAllowFrameRateSmoothing = true) const;
 public:
 	static void Hook() {
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUEngine_LoadMap()), LoadMap, (LPVOID*)&LoadMapOG);
-		//HookVTableIdx(UEngine::StaticClass(), Finder::FindUEngine_LoadMapVFT(), LoadMap, (LPVOID*)&LoadMapOG);
+		if (!Finder::FindUWorld_ListenPatch()) {
+			MH_CreateHook((LPVOID)(ImageBase + Finder::FindUEngine_LoadMap()), LoadMap, (LPVOID*)&LoadMapOG);
+		}
 
 		Log("Hooked UEngine");
 	}

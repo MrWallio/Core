@@ -625,29 +625,31 @@ void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* 
 	}
 	BuildingsToRemove.Free();
 
-	ABuildingActor* BuildingActor = World->SpawnActor(BuildingClassData.BuildingClass.Class, BuildLoc, BuildRot, This)->Cast<ABuildingActor>();
+	ABuildingActor* BuildingActor = World->SpawnActorUnfinished(BuildingClassData.BuildingClass.Class, BuildLoc, BuildRot, This)->Cast<ABuildingActor>();
 	if (!BuildingActor) {
 		Log("ServerCreateBuildingActor: Failed to spawn building actor!");
 		return;
 	}
 	BuildingActor->InitializeKismetSpawnedBuildingActor(BuildingActor, This, true, nullptr);
+	World->FinishSpawnActor(BuildingActor, BuildLoc, BuildRot);
 
-	BuildingActor->bPlayerPlaced = true;
-
-	AFortPlayerStateAthena* PlayerState = This->PlayerState->Cast<AFortPlayerStateAthena>();
-	if (PlayerState) {
-		BuildingActor->Team = PlayerState->TeamIndex;
-		BuildingActor->TeamIndex = PlayerState->TeamIndex;
-	}
+	BuildingActor->CurrentBuildingLevel = BuildingClassData.UpgradeLevel;
+	BuildingActor->OnRep_CurrentBuildingLevel();
 
 	ABuildingSMActor* BuildingSMActor = BuildingActor->Cast<ABuildingSMActor>();
 	if (BuildingSMActor) {
 		BuildingSMActor->bMirrored = bMirrored;
 	}
 
-	This->PayBuildableClassPlacementCost(&BuildingClassData);
+	BuildingActor->bPlayerPlaced = true;
 
-	BuildingActor->ForceNetUpdate();
+	AFortPlayerStateAthena* PlayerState = This->PlayerState->Cast<AFortPlayerStateAthena>();
+	if (PlayerState) {
+		BuildingActor->Team = PlayerState->TeamIndex;
+	}
+	BuildingActor->TeamIndex = BuildingActor->Team;
+
+	This->PayBuildableClassPlacementCost(&BuildingClassData);
 }
 
 bool AFortPlayerController::CanAffordToPlaceBuildableClass(FBuildingClassData* ClassToBuildData) {
@@ -712,10 +714,8 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 	}
 
 	EditingTool->EditActor = BuildingActorToEdit;
-	EditingTool->OnRep_EditActor();
-
 	EditingTool->ForceNetUpdate();
-	BuildingActorToEdit->ForceNetUpdate();
+	EditingTool->OnRep_EditActor();
 }
 
 void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToEdit, TSubclassOf<ABuildingSMActor> NewBuildingClass, int32 RotationIterations, bool bMirrored) {
@@ -799,9 +799,8 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 	}
 
 	EditingTool->EditActor = ReplacedBuildingActor;
+	EditingTool->ForceNetUpdate();
 	EditingTool->OnRep_EditActor();
-
-	ReplacedBuildingActor->ForceNetUpdate();
 }
 
 void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
@@ -856,10 +855,8 @@ void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController*
 	}
 
 	EditingTool->EditActor = nullptr;
-	EditingTool->OnRep_EditActor();
-
 	EditingTool->ForceNetUpdate();
-	BuildingActorToStopEditing->ForceNetUpdate();
+	EditingTool->OnRep_EditActor();
 }
 
 void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType) {

@@ -205,4 +205,42 @@ inline bool NopBytes(uintptr_t address, size_t count)
     return NopBytes(reinterpret_cast<void*>(address), count);
 }
 
+inline bool PatchCall(uintptr_t callSite, void* newTarget)
+{
+    if (!callSite || !newTarget)
+        return false;
+
+    int32_t relOffset = (int32_t)((uintptr_t)newTarget - (callSite + 5));
+
+    uint8_t patch[5];
+    patch[0] = 0xE8;
+    memcpy(&patch[1], &relOffset, sizeof(relOffset));
+
+    return PatchBytes(reinterpret_cast<void*>(callSite), patch, sizeof(patch));
+}
+
+inline bool PatchCallFar(uintptr_t callSite, void* newTarget)
+{
+    uintptr_t base = callSite & ~0xFFFFull;
+    void* trampoline = nullptr;
+
+    for (uintptr_t addr = base; addr > base - 0x80000000ull; addr -= 0x10000)
+    {
+        trampoline = VirtualAlloc((void*)addr, 16, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+        if (trampoline) break;
+    }
+
+    if (!trampoline)
+        return false;
+
+    uint8_t jmp[] = {
+        0xFF, 0x25, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    };
+    memcpy(&jmp[6], &newTarget, sizeof(newTarget));
+    memcpy(trampoline, jmp, sizeof(jmp));
+
+    return PatchCall(callSite, trampoline);
+}
+
 #endif //PCH_H
