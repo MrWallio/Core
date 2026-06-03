@@ -12,6 +12,9 @@
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
+#include "FortniteGame/Public/FortGameState/FortGameStateZone.h"
+#include "FortniteGame/Public/FortManager/FortMissionManager.h"
+#include "FortniteGame/Public/Kismet/FortMissionLibrary.h"
 
 void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer) {
 	HandleStartingNewPlayerOG(This, NewPlayer);
@@ -58,9 +61,33 @@ void AFortGameModeZone::CreateAIGoalManager() {
 
 void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFortWorldManager* WorldManager) {
 	AFortGameMode::FinishWorldInitialization(This, WorldManager);
+
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortGameModeZone::FinishWorldInitialization: World is null!");
+		return;
+	}
+
+	AFortGameStateZone* FortGameStateZone = This->GameState->Cast<AFortGameStateZone>();
+	if (!FortGameStateZone) {
+		Log("AFortGameModeZone::FinishWorldInitialization: GameState is null or not AFortGameStateZone");
+		return;
+	}
+
+	AFortGameModeAthena* FortGameModeAthena = This->Cast<AFortGameModeAthena>();
 	
 	This->CreateAIDirector();
 	This->CreateAIGoalManager();
+
+	if (!FortGameModeAthena && FortGameStateZone->MissionManager) {
+		UFortMissionInfo* MissionInfo = StaticLoadObject<UFortMissionInfo>("/Game/Missions/Primary/EvacuateTheSurvivors/EvacuteTheSurvivors.EvacuteTheSurvivors");
+
+		if (MissionInfo) {
+			Log("AFortGameModeZone::FinishWorldInitialization: Loading mission " + MissionInfo->GetName().ToString());
+			UFortMissionLibrary::LoadMission(World, MissionInfo);
+			Log("AFortGameModeZone::FinishWorldInitialization: Loaded mission " + MissionInfo->GetName().ToString());
+		}
+	}
 }
 
 APawn* AFortGameModeZone::SpawnDefaultPawnFor(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot) {

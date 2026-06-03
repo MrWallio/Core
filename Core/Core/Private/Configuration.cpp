@@ -14,6 +14,7 @@ void ConfigurationManager::LoadConfig() {
 
 	FCoreConfig NewConfig = FCoreConfig();
 
+	NewConfig.bIsProd = FParse::Param(CmdLine, TEXT("bIsProd"));
 	NewConfig.bEnableClientConsole = FParse::Param(CmdLine, TEXT("bEnableClientConsole"));
 	NewConfig.bIsClient = FParse::Param(CmdLine, TEXT("bIsClient"));
 	NewConfig.bSetClientLogVerbosity = FParse::Param(CmdLine, TEXT("bSetClientLogVerbosity"));
@@ -47,6 +48,7 @@ void ConfigurationManager::LoadConfig() {
 	}
 
 	Log("Configuration Loaded:");
+	Log("bIsProd: " + std::to_string(NewConfig.bIsProd));
 	Log("bEnableClientConsole: " + std::to_string(NewConfig.bEnableClientConsole));
 	Log("bIsClient: " + std::to_string(NewConfig.bIsClient));
 	Log("bSetClientLogVerbosity: " + std::to_string(NewConfig.bSetClientLogVerbosity));

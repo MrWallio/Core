@@ -90,6 +90,10 @@ void AFortPlayerController::SetupQuickBars()
 void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Msg) {
 	std::string Command = Msg->ToString();
 	Log("ServerCheat (" + This->GetName().ToString() + "): [" + Command + "]");
+
+	FCoreConfig& Config = ConfigurationManager::GetConfig();
+	if (Config.bIsProd)
+		return;
 	
 	UFortCheatManager* CheatManager = This->CheatManager->Cast<UFortCheatManager>();
 	if (!CheatManager)
@@ -777,31 +781,11 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 		return;
 	}
 
-	ReplacedBuildingActor->InitializeKismetSpawnedBuildingActor(ReplacedBuildingActor, This, true, BuildingActorToEdit);
-
 	ReplacedBuildingActor->bPlayerPlaced = true;
 	if (PlayerStateAthena) {
 		ReplacedBuildingActor->Team = PlayerStateAthena->TeamIndex;
 		ReplacedBuildingActor->TeamIndex = PlayerStateAthena->TeamIndex;
 	}
-
-	ReplacedBuildingActor->SetEditingPlayer(PlayerState);
-
-	FFortItemEntry* EditToolEntry = This->WorldInventory->FindItemEntry(UFortEditToolItemDefinition::StaticClass());
-	if (!EditToolEntry) {
-		Log("ServerEditBuildingActor: Failed to find edit tool in inventory!");
-		return;
-	}
-
-	AFortWeap_EditingTool* EditingTool = MyFortPawn->FindWeapon(EditToolEntry->ItemGuid)->Cast<AFortWeap_EditingTool>();
-	if (!EditingTool) {
-		Log("ServerEditBuildingActor: Failed to find editing tool weapon instance!");
-		return;
-	}
-
-	EditingTool->EditActor = ReplacedBuildingActor;
-	EditingTool->ForceNetUpdate();
-	EditingTool->OnRep_EditActor();
 }
 
 void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
@@ -816,29 +800,10 @@ void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController*
 		return;
 	}
 
-	AFortPlayerStateZone* PlayerState = This->PlayerState->Cast<AFortPlayerStateZone>();
-	if (!PlayerState) {
-		Log("ServerEndEditingBuildingActor: PlayerState is null or not AFortPlayerStateZone!");
-		return;
-	}
-
 	AFortPawn* MyFortPawn = This->MyFortPawn;
 	if (!MyFortPawn) {
 		Log("ServerEndEditingBuildingActor: MyFortPawn is null!");
 		return;
-	}
-
-	if (BuildingActorToStopEditing->EditingPlayer != PlayerState) {
-		Log("ServerEndEditingBuildingActor: Player is not the editing player for this building!");
-		return;
-	}
-
-	AFortPlayerStateAthena* PlayerStateAthena = PlayerState->Cast<AFortPlayerStateAthena>();
-	if (PlayerStateAthena) {
-		if (PlayerStateAthena->TeamIndex != BuildingActorToStopEditing->Team) {
-			Log("ServerEndEditingBuildingActor: Player is not on the same team as the building, cannot edit. Player hacking?");
-			return;
-		}
 	}
 
 	BuildingActorToStopEditing->SetEditingPlayer(nullptr);

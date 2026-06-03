@@ -5436,10 +5436,11 @@ uintptr_t Finder::FindABuildingSMActor_ReplaceBuildingActor() {
 
 		auto sRef = Memcury::Scanner::FindStringRef(L"STAT_Fort_BuildingSMActorReplaceBuildingActor", false);
 		if (!sRef.Get()) {
-			return Addr = Memcury::Scanner::FindPattern("4C 89 44 24 ? 55 56 57 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 45").Get();
+			Addr = Memcury::Scanner::FindPattern("4C 89 44 24 ? 55 56 57 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 45").Get();
 		}
-
-		return Addr = sRef.ScanFor(Version::Engine_Version == 4.20 || (Version::Engine_Version == 4.21 && Version::Fortnite_Version < 6.30) || Version::Engine_Version >= 4.27 ? std::vector<uint8_t> { 0x48, 0x8B, 0xC4 } : std::vector<uint8_t>{ 0x4C, 0x8B }, false, 0).Get();
+		else {
+			Addr = sRef.ScanFor(Version::Engine_Version == 4.20 || (Version::Engine_Version == 4.21 && Version::Fortnite_Version < 6.30) || Version::Engine_Version >= 4.27 ? std::vector<uint8_t> { 0x48, 0x8B, 0xC4 } : std::vector<uint8_t>{ 0x4C, 0x8B }, false, 0).Get();
+		}
 	}
 	
 	if (Addr) {
@@ -9772,6 +9773,9 @@ void Finder::SetupOffsets() {
 	FindUWorld_ListenPatch();
 
 	FindFDedicatedServerUrlContext_Constructor();
+
+	FindABuildingSMActor_SetEditingPlayer();
+	FindABuildingSMActor_ReplaceBuildingActor();
 
 	return;
 }

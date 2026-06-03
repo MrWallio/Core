@@ -26,6 +26,7 @@
 #include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
 #include "FortniteGame/Public/FortManager/FortMissionManager.h"
 #include "FortniteGame/Public/FortManager/FortFeedbackManager.h"
+#include "FortniteGame/Public/FortManager/FortBluGloManager.h"
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 
 APawn* AFortGameMode::SpawnDefaultPawnFor(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot) {
@@ -227,6 +228,7 @@ void AFortGameMode::FinishWorldInitialization(AFortGameMode* This, AFortWorldMan
 			FortGameState->OnRep_MissionManager();
 		}
 	}
+
 	Log("MissionManager: " + (FortGameState->MissionManager ? FortGameState->MissionManager->GetName().ToString() : "None"));
 
 	This->bWorldIsReady = true;

@@ -277,6 +277,7 @@
     <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameModeOutpost.h" />
     <ClInclude Include="FortniteGame\Public\FortGameSession\FortGameSessionDedicated.h" />
     <ClInclude Include="FortniteGame\Public\FortLoadout\FortAthenaLoadout.h" />
+    <ClInclude Include="FortniteGame\Public\FortManager\FortBluGloManager.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortFeedbackManager.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortMissionManager.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStart.h" />
@@ -348,6 +349,7 @@
     <ClInclude Include="FortniteGame\Public\Interaction\InteractionType.h" />
     <ClInclude Include="FortniteGame\Public\Interface\FortInventoryOwnerInterface.h" />
     <ClInclude Include="FortniteGame\Public\Kismet\FortKismetLibrary.h" />
+    <ClInclude Include="FortniteGame\Public\Kismet\FortMissionLibrary.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\FortMcpProfile.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\FortMcpProfileAccount.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfile.h" />
@@ -446,6 +448,7 @@
     <ClCompile Include="FortniteGame\Private\FortWeapon\FortWeapon.cpp" />
     <ClCompile Include="FortniteGame\Private\FortWeapon\FortWeaponStats.cpp" />
     <ClCompile Include="FortniteGame\Private\Kismet\FortKismetLibrary.cpp" />
+    <ClCompile Include="FortniteGame\Private\Kismet\FortMissionLibrary.cpp" />
     <ClCompile Include="FortniteGame\Private\Mcp\FortMcpProfileAccount.cpp" />
     <ClCompile Include="FortniteGame\Private\Mcp\McpProfileGroup.cpp" />
     <ClCompile Include="pch.cpp">

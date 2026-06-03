@@ -42,6 +42,9 @@ inline uintptr_t ImageBase = (uintptr_t)GetModuleHandleA(0);
 inline void Log(const std::string& msg)
 {
     FCoreConfig& Config = ConfigurationManager::GetConfig();
+	if (Config.bIsProd)
+		return;
+
     std::string FileName = Config.bIsClient ? "Client_log.txt" : "Server_log.txt";
     std::string LogType = Config.bIsClient ? "Client" : "Server";
 

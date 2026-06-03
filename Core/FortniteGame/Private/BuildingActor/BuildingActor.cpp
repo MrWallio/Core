@@ -90,7 +90,8 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 		return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 	}
 
-	static UCurveTable* ResourceRates = nullptr;
+	UCurveTable* ResourceRates = nullptr;
+
 	if (FortGameModeAthena && FortGameStateAthena) {
 		if (FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist) {
 			ResourceRates = FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist->ResourceRates.Get();
@@ -98,7 +99,7 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 	}
 	if (!ResourceRates)
 		ResourceRates = StaticLoadObject<UCurveTable>("/Game/Athena/Balance/DataTables/AthenaResourceRates.AthenaResourceRates");
-	if (!ResourceRates) 
+	if (!ResourceRates)
 		ResourceRates = StaticLoadObject<UCurveTable>("/Game/Balance/DataTables/ResourceRates.ResourceRates");
 
 	//int ResourceCount = (Damage / (UKismetMathLibrary::RandomIntegerInRange(8, 16)));
