@@ -36,6 +36,7 @@ void AFortGameModeZone::CreateAIDirector() {
 		AIDirector = (AFortAIDirector*)GetWorld()->SpawnActor(AFortAIDirector::StaticClass(), FVector(), FRotator(), this);
 		if (AIDirector) {
 			Log("AFortGameModeZone::CreateAIDirector: Created AIDirector: " + AIDirector->GetName().ToString());
+			AIDirector->Activate();
 		}
 		else {
 			Log("AFortGameModeZone::CreateAIDirector: Failed to create AIDirector");
@@ -78,6 +79,9 @@ void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFort
 	
 	This->CreateAIDirector();
 	This->CreateAIGoalManager();
+
+	FortGameStateZone->GameDifficulty = 10.f;
+	FortGameStateZone->OnRep_GameDifficulty();
 
 	if (!FortGameModeAthena && FortGameStateZone->MissionManager) {
 		UFortMissionInfo* MissionInfo = StaticLoadObject<UFortMissionInfo>("/Game/Missions/Primary/EvacuateTheSurvivors/EvacuteTheSurvivors.EvacuteTheSurvivors");

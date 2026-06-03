@@ -947,5 +947,8 @@
     <ClCompile Include="FortniteGame\Private\Kismet\FortMissionLibrary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FortniteGame\Private\AI\FortAIDirector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

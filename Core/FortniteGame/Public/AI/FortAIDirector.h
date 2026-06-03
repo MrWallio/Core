@@ -6,4 +6,6 @@
 class AFortAIDirector : public AActor {
 public:
 	DefineUnrealClass(AFortAIDirector);
+public:
+	void Activate();
 };

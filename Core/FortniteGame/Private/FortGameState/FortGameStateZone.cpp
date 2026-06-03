@@ -4,6 +4,16 @@
 #include "FortniteGame/Public/FortHero/FortHeroType.h"
 #include "FortniteGame/Public/FortHero/FortHero.h"
 
+void AFortGameStateZone::OnRep_GameDifficulty()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_GameDifficulty");
+
+	ProcessEvent(Func, nullptr);
+}
+
 void AFortGameStateZone::Hook() {
 	Log("Hooked AFortGameStateZone");
 }
