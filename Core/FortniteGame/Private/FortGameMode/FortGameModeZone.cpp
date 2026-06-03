@@ -57,10 +57,10 @@ void AFortGameModeZone::CreateAIGoalManager() {
 }
 
 void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFortWorldManager* WorldManager) {
+	AFortGameMode::FinishWorldInitialization(This, WorldManager);
+	
 	This->CreateAIDirector();
 	This->CreateAIGoalManager();
-	
-	AFortGameMode::FinishWorldInitialization(This, WorldManager);
 }
 
 APawn* AFortGameModeZone::SpawnDefaultPawnFor(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot) {

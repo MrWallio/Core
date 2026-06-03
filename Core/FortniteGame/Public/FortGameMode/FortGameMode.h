@@ -8,6 +8,7 @@
 
 class AFortPlayerController;
 class AFortWorldManager;
+class AFortMissionManager;
 
 class AFortGameMode : public AGameMode {
 public:
@@ -17,6 +18,7 @@ public:
 
 	DefineUProperty(int32, CurrentPlaylistId);
 	DefineUProperty(FName, CurrentPlaylistName);
+	DefineUProperty(TSubclassOf<AFortMissionManager>, MissionManagerClass);
 public:
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);
 	static APawn* SpawnDefaultPawnFor(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);

@@ -3,7 +3,7 @@
 
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
-#include "FortniteGame/Public/Cheat/FortCheatManager.h"
+#include "FortniteGame/Public/FortManager/FortCheatManager.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"

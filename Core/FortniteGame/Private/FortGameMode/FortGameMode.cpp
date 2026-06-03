@@ -24,6 +24,9 @@
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 #include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
+#include "FortniteGame/Public/FortManager/FortMissionManager.h"
+#include "FortniteGame/Public/FortManager/FortFeedbackManager.h"
+#include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 
 APawn* AFortGameMode::SpawnDefaultPawnFor(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot) {
 	return SpawnDefaultPawnForOG(This, NewPlayer, StartSpot);
@@ -197,9 +200,35 @@ void AFortGameMode::RestartPlayerHK(AFortGameMode* This, AController* NewPlayer)
 }
 
 void AFortGameMode::FinishWorldInitialization(AFortGameMode* This, AFortWorldManager* WorldManager) {
-	Log("AFortGameMode::FinishWorldInitialization called!");
-
 	FinishWorldInitializationOG(This, WorldManager);
+
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortGameMode::FinishWorldInitialization: World is null!");
+		return;
+	}
+
+	AFortGameState* FortGameState = This->GameState->Cast<AFortGameState>();
+	if (!FortGameState) {
+		Log("AFortGameMode::FinishWorldInitialization: GameState is null or not AFortGameState!");
+		return;
+	}
+
+	if (This->MissionManagerClass.Get() && !FortGameState->MissionManager) {
+		Log("MissionManagerClass: " + This->MissionManagerClass.Get()->GetName().ToString());
+		AFortMissionManager* MissionManager = World->SpawnActor(
+			This->MissionManagerClass.Class,
+			FVector(),
+			FRotator(),
+			FortGameState
+		)->Cast<AFortMissionManager>();
+		if (MissionManager) {
+			FortGameState->MissionManager = MissionManager;
+			FortGameState->OnRep_MissionManager();
+		}
+	}
+	Log("MissionManager: " + (FortGameState->MissionManager ? FortGameState->MissionManager->GetName().ToString() : "None"));
+
 	This->bWorldIsReady = true;
 }
 

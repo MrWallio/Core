@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "FortniteGame/Public/Cheat/FortCheatManager.h"
+#include "FortniteGame/Public/FortManager/FortCheatManager.h"
 
 void UFortCheatManager::AddAllScores(int32 Amount)
 {

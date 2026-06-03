@@ -277,11 +277,13 @@
     <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameModeOutpost.h" />
     <ClInclude Include="FortniteGame\Public\FortGameSession\FortGameSessionDedicated.h" />
     <ClInclude Include="FortniteGame\Public\FortLoadout\FortAthenaLoadout.h" />
+    <ClInclude Include="FortniteGame\Public\FortManager\FortFeedbackManager.h" />
+    <ClInclude Include="FortniteGame\Public\FortManager\FortMissionManager.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStart.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStartWarmup.h" />
     <ClInclude Include="FortniteGame\Public\FortSet\FortAttributeSet.h" />
     <ClInclude Include="FortniteGame\Public\FortSet\FortBuildingActorSet.h" />
-    <ClInclude Include="FortniteGame\Public\Cheat\FortCheatManager.h" />
+    <ClInclude Include="FortniteGame\Public\FortManager\FortCheatManager.h" />
     <ClInclude Include="FortniteGame\Public\Data\FortSearchBounceData.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortAbilitySet.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortGameplayAbility.h" />
@@ -408,7 +410,7 @@
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingGameplayActor.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingSMActor.cpp" />
-    <ClCompile Include="FortniteGame\Private\Cheat\FortCheatManager.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortManager\FortCheatManager.cpp" />
     <ClCompile Include="FortniteGame\Private\FortAnalytics\FortAnalytics.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameInstance\FortGameInstance.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameMode\FortGameMode.cpp" />

@@ -36,6 +36,9 @@ APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, ACont
 }
 
 void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager) {
+	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
+	FinishWorldInitializationOG(This, WorldManager);
+	
 	AFortGameStateAthena* GameState = This->GameState ? This->GameState->Cast<AFortGameStateAthena>() : nullptr;
 	if (!GameState) {
 		Log("FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
@@ -43,12 +46,6 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	}
 	
 	GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
-
-	This->CreateAIDirector();
-	This->CreateAIGoalManager();
-
-	FinishWorldInitializationOG(This, WorldManager);
-	This->bWorldIsReady = true;
 }
 
 void AFortGameModeAthena::BeginPlay(AFortGameModeAthena* This) {

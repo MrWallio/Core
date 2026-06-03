@@ -474,7 +474,7 @@
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FortniteGame\Public\Cheat\FortCheatManager.h">
+    <ClInclude Include="FortniteGame\Public\FortManager\FortCheatManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\CheatManager.h">
@@ -655,6 +655,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileSys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortManager\FortMissionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortManager\FortFeedbackManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -851,7 +857,7 @@
     <ClCompile Include="FortniteGame\Private\Mcp\McpProfileGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FortniteGame\Private\Cheat\FortCheatManager.cpp">
+    <ClCompile Include="FortniteGame\Private\FortManager\FortCheatManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\FortInventory\FortInventory.cpp">

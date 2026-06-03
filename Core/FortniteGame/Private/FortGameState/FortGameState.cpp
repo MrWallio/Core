@@ -24,6 +24,16 @@ void AFortGameState::OnFinishedStreamingAdditionalPlaylistLevel()
 	ProcessEvent(Func, nullptr);
 }
 
+void AFortGameState::OnRep_MissionManager()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_MissionManager");
+
+	ProcessEvent(Func, nullptr);
+}
+
 void AFortGameState::Hook()
 {
 	Log("Hooked AFortGameState");
