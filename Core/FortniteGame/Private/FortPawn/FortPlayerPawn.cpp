@@ -35,13 +35,13 @@ void AFortPlayerPawn::ForceFinishIncomingPickups()
 	ForceFinishIncomingPickupsInternal(this);
 }
 
-void AFortPlayerPawn::ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart, EFortCustomPartType Part)
+void AFortPlayerPawn::ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart, uint8 Part)
 {
 	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ServerChoosePart"));
 	if (Function) {
 		static uintptr_t VTableIdx = GetVTableIndex(Function);
 
-		void (*&ServerChoosePartInternal)(AFortPlayerPawn*, EFortCustomPartType, UCustomCharacterPart*) = decltype(ServerChoosePartInternal)(VTable[VTableIdx]);
+		void (*&ServerChoosePartInternal)(AFortPlayerPawn*, uint8, UCustomCharacterPart*) = decltype(ServerChoosePartInternal)(VTable[VTableIdx]);
 		return ServerChoosePartInternal(this, Part, ChosenCharacterPart);
 	}
 }

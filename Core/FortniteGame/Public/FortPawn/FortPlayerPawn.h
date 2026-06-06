@@ -19,7 +19,7 @@ public:
 
 	void ForceFinishIncomingPickups();
 
-	void ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart, EFortCustomPartType Part);
+	void ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart, uint8 Part);
 
 	void RandomizeCharacter(const FString& GenderString);
 

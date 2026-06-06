@@ -10,7 +10,11 @@
 
 ENetMode AActor::InternalGetNetMode(AActor* This)
 {
-	//return InternalGetNetModeOG(This);
+	FCoreConfig& Config = ConfigurationManager::GetConfig();
+	if (Config.bListenServer) {
+		return NM_ListenServer;
+	}
+
 	return NM_DedicatedServer;
 }
 

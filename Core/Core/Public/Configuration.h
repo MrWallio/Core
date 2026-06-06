@@ -9,6 +9,7 @@ struct FCoreConfig {
 	bool bSetClientLogVerbosity = false;
 	bool bUseGameSessions = false;
 	bool bSkipSessionValidation = false;
+	bool bListenServer = false;
 
 	std::string Playlist = "2";
 	std::string MapToLoad = "";

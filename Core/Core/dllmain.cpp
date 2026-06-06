@@ -55,14 +55,18 @@ DWORD Main(LPVOID)
 
         Utils::Hook();
 
-        *GIsClient = false;
+        if (!Config.bListenServer) {
+            *GIsClient = false;
+        }
         *GIsServer = true;
 
         Sleep(3000);
 
         Utils::SetLogVerbosity();
 
-        Utils::RemoveLocalPlayer();
+        if (!Config.bListenServer) {
+            Utils::RemoveLocalPlayer();
+        }
         Utils::LoadWorld(Config);
     }
 

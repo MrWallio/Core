@@ -8,5 +8,5 @@ class UCustomCharacterPart : public UFortWorldItemDefinition {
 public:
 	DefineUnrealClass(UCustomCharacterPart);
 
-	DefineUProperty(EFortCustomPartType, CharacterPartType);
+	DefineUProperty(uint8, CharacterPartType);
 };

@@ -24,6 +24,11 @@ UWorld* UWorld::GetWorld() {
 
 ENetMode UWorld::InternalGetNetMode()
 {
+	FCoreConfig& Config = ConfigurationManager::GetConfig();
+	if (Config.bListenServer) {
+		return NM_ListenServer;
+	}
+
 	return NM_DedicatedServer;
 }
 

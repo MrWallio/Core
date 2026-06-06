@@ -20,6 +20,7 @@ void ConfigurationManager::LoadConfig() {
 	NewConfig.bSetClientLogVerbosity = FParse::Param(CmdLine, TEXT("bSetClientLogVerbosity"));
 	NewConfig.bUseGameSessions = FParse::Param(CmdLine, TEXT("bUseGameSessions"));
 	NewConfig.bSkipSessionValidation = FParse::Param(CmdLine, TEXT("bSkipSessionValidation"));
+	NewConfig.bListenServer = FParse::Param(CmdLine, TEXT("bListenServer"));
 
 	const wchar_t* PlaylistParam = wcsstr(CmdLine, L"Playlist=");
 	if (PlaylistParam) {
@@ -54,6 +55,7 @@ void ConfigurationManager::LoadConfig() {
 	Log("bSetClientLogVerbosity: " + std::to_string(NewConfig.bSetClientLogVerbosity));
 	Log("bUseGameSessions: " + std::to_string(NewConfig.bUseGameSessions));
 	Log("bSkipSessionValidation: " + std::to_string(NewConfig.bSkipSessionValidation));
+	Log("bListenServer: " + std::to_string(NewConfig.bListenServer));
 	Log("Playlist: " + NewConfig.Playlist);
 	Log("MapToLoad: " + NewConfig.MapToLoad);
 
