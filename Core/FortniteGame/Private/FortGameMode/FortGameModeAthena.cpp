@@ -81,3 +81,8 @@ int32 AFortGameModeAthena::StartAircraftPhase(AFortGameModeAthena* This, bool bG
 
 	return StartAircraftPhaseOG(This, bGoStraightToSafeZone);
 }
+
+int32 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor) {
+	//return 0;
+	return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
+}

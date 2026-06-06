@@ -40,6 +40,9 @@ public:
 	static inline int32 (*StartAircraftPhaseOG)(AFortGameModeAthena* This, bool bGoStraightToSafeZone);
 	static int32 StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone);
 
+	static inline int32 (*PickTeamOG)(AFortGameModeAthena* This, uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor);
+	static int32 PickTeam(AFortGameModeAthena* This, uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor);
+
 	static void Hook() {
 		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
 		HookEveryVTable(
@@ -79,6 +82,13 @@ public:
 				(LPVOID*)&StartAircraftPhaseOG
 			);
 		}
+
+		HookEveryVTableIdx(
+			AFortGameModeAthena::StaticClass(),
+			Finder::FindAFortGameMode_PickTeamVFT(),
+			PickTeam,
+			(LPVOID*)&PickTeamOG
+		);
 
 		Log("Hooked AFortGameModeAthena");
 	}
