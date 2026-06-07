@@ -1,18 +1,33 @@
 # Core
-A Universal Gameserver For Fortnite that aims for accuracy first than version support!
+A Universal Gameserver For Fortnite that aims for accuracy over version support!
 
-- Full Support (1.7.2)
-- Partial Support (1.8 - 1.8.2)
+## Version Support
+| Version | Status |
+|---------|--------|
+| 1.7.2 | ✅ Full Support |
+| 1.8 – 1.8.2 | ⚠️ Partial Support |
+
+> ⚠️ Please note Save the World is very unfinished!
 
 ---
 
-> Please note Save the world is very unfinished!
+## Building
+
+Build the project using **Visual Studio** in **Release** configuration.
+
+**Tested on:**
+- Visual Studio 2022
+- Visual Studio 2026
+
+---
 
 ## Contributing:
 We would love to see contributions made to the repo! We have a few things we would like you to consider when contributing:
-- Accurate code, We dont have access to the fortnite source ofcourse but if there is any code that should be moved somewhere else or you add new code please make sure that you have took into consideration of the accuracy of your code!
-- Clean code, In your code we would like it to be as clean and readable as possible and you may create helper functions if needed for better readability
-- It must work, it must not cause a crash on the gameserver that stops it from working completely or bugs out the game too much (we will test your pr before merging)
+- **Accurate code** — We don't have access to the Fortnite source of course, but if there is any code that should be moved somewhere else or you add new code, please make sure that you have taken into consideration where it should go.
+- **Clean code** — In your code we would like it to be as clean and readable as possible. You may create helper functions if needed for better readability.
+- **It must work** — It must not cause a crash on the gameserver that stops it from working completely or bugs out the game too much. (We will test your PR before merging.)
+
+---
 
 ## Credits:
 - Crashreporter: Ploosh
