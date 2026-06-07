@@ -1028,6 +1028,8 @@ public:
 	static uintptr_t FindUFortQuestManager_QueueStatEvent();
 
 	static uintptr_t FindUFortQuestManager_SendStatEvent();
+
+	static uintptr_t FindUFortQuestManager_ProcessPendingStatEvents();
 public:
 	static void SetupOffsets();
 

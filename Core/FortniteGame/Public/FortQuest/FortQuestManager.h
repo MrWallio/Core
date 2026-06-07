@@ -54,6 +54,8 @@ public:
 		bool bForceFlush
 	);
 
+	FScriptContainerElement* ProcessPendingStatEvents();
+
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUFortQuestManager_SendCustomStatEvent()), (LPVOID)SendCustomStatEvent, (LPVOID*)&SendCustomStatEventOG);
 		

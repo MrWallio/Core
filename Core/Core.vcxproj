@@ -276,6 +276,7 @@
     <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameModeFrontEnd.h" />
     <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameModeOutpost.h" />
     <ClInclude Include="FortniteGame\Public\FortGameSession\FortGameSessionDedicated.h" />
+    <ClInclude Include="FortniteGame\Public\FortItem\FortQuestItem.h" />
     <ClInclude Include="FortniteGame\Public\FortLoadout\FortAthenaLoadout.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortBluGloManager.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortFeedbackManager.h" />

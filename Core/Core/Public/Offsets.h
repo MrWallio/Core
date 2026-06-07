@@ -632,4 +632,5 @@ namespace ServerOffsets {
 	inline uintptr_t UFortQuestManager_SendCustomStatEvent = 0;
 	inline uintptr_t UFortQuestManager_QueueStatEvent = 0;
 	inline uintptr_t UFortQuestManager_SendStatEvent = 0;
+	inline uintptr_t UFortQuestManager_ProcessPendingStatEvents = 0;
 }

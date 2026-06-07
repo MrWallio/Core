@@ -9561,6 +9561,36 @@ uintptr_t Finder::FindUFortQuestManager_SendStatEvent() {
 	return ServerOffsets::UFortQuestManager_SendStatEvent;
 }
 
+uintptr_t Finder::FindUFortQuestManager_ProcessPendingStatEvents() {
+	if (ServerOffsets::UFortQuestManager_ProcessPendingStatEvents)
+		return ServerOffsets::UFortQuestManager_ProcessPendingStatEvents;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ProcessPendingStatEvents for %s: %s").Get();
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"LogPendingChanges: ProcessPendingStatEvents for %s: Context:(%s) %d Changes:%s").Get();
+	}
+
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x4C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::UFortQuestManager_ProcessPendingStatEvents = Addr - ImageBase;
+	}
+
+	Log("UFortQuestManager_ProcessPendingStatEvents found at: 0x" + std::format("{:X}", ServerOffsets::UFortQuestManager_ProcessPendingStatEvents));
+	return ServerOffsets::UFortQuestManager_ProcessPendingStatEvents;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -9864,6 +9894,7 @@ void Finder::SetupOffsets() {
 	FindUFortQuestManager_QueueStatEvent();
 	FindUFortQuestManager_SendCustomStatEvent();
 	FindUFortQuestManager_SendStatEvent();
+	FindUFortQuestManager_ProcessPendingStatEvents();
 
 	return;
 }
