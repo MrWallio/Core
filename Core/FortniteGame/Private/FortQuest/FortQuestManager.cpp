@@ -105,7 +105,7 @@ FScriptContainerElement* UFortQuestManager::ProcessPendingStatEvents() {
 }
 
 AFortPlayerController* UFortQuestManager::GetPlayerControllerBP() {
-	if (Version::Fortnite_Version <= 1.8) {
+	if (Version::Fortnite_Version <= 1.81) {
 		UWorld* World = UWorld::GetWorld();
 		if (!World) {
 			Log("UFortQuestManager::GetPlayerControllerBP: World is null!");
@@ -191,7 +191,7 @@ void UFortQuestManager::ProgressQuest(UFortQuestItem* QuestItem, FName Objective
 		ObjectiveInfo->AchievedCount = NewCount;
 	}
 
-	Log("UFortQuestManager::ProgressQuest: Quest: " + QuestItem->GetName().ToString() + ", Objective: " + ObjectiveInfo->GetName().ToString() + ", InCount: " + std::to_string(InCount) + ", AchievedCount: " + std::to_string(ObjectiveInfo->AchievedCount));
+	Log("UFortQuestManager::ProgressQuest: Quest: " + QuestItem->GetName().ToString() + " Objective: " + ObjectiveInfo->GetName().ToString() + " InCount: " + std::to_string(InCount) + " AchievedCount: " + std::to_string(ObjectiveInfo->AchievedCount));
 
 	FFortQuestObjectiveCompletion NewCompletion{};
 	NewCompletion.StatName = QuestItem->TemplateId; // idk if this is right tbh, i dont think it is

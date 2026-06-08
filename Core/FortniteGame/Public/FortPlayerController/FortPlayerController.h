@@ -105,6 +105,9 @@ public:
 
 	UFortQuestManager* GetQuestManager(uint8 SubGame) const;
 
+	static inline void (*ServerRepairBuildingActorOG)(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair);
+	static void ServerRepairBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -215,6 +218,13 @@ public:
 			AFortPlayerController::StaticClass(),
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerSetInventoryStateValue"),
 			ServerSetInventoryStateValue
+		);
+
+		HookEveryVTable(
+			AFortPlayerController::StaticClass(),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerRepairBuildingActor"),
+			ServerRepairBuildingActor,
+			(LPVOID*)&ServerRepairBuildingActorOG
 		);
 
 		Log("Hooked AFortPlayerController");

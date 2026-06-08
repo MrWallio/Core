@@ -47,8 +47,12 @@ void AFortPlayerControllerAthena::ClientOnPawnDied(AFortPlayerControllerAthena* 
 	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
 	if (FortGameModeAthena && FortGameStateAthena) {
 		TArray<FString> Medals;
+		TArray<FFortQuestObjectiveCompletion> Advance;
 
 		UFortQuestManager* QuestManager = This->GetQuestManager(ESubGame::GetAthena());
+		if (QuestManager) {
+			Advance = QuestManager->PendingChanges;
+		}
 
 		AFortPlayerStateAthena* PlayerStateAthena = This->PlayerState->Cast<AFortPlayerStateAthena>();
 		int32 MinutesAlive = PlayerStateAthena ? (PlayerStateAthena->SecondsAlive / 60) : -1;
@@ -59,7 +63,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied(AFortPlayerControllerAthena* 
 		if (This->AthenaProfile) {
 			FDedicatedServerUrlContext Context;
 			This->AthenaProfile->EndBattleRoyaleGame(
-				QuestManager->PendingChanges,
+				Advance,
 				FortGameModeAthena->CurrentPlaylistId,
 				MinutesAlive,
 				PersonalKills,

@@ -936,3 +936,44 @@ UFortQuestManager* AFortPlayerController::GetQuestManager(uint8 SubGame) const
 
 	return Parms.ReturnValue;
 }
+
+void AFortPlayerController::ServerRepairBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair) {
+	if (Version::Fortnite_Version <= 1.8) {
+		return ServerRepairBuildingActorOG(This, BuildingActorToRepair);
+	}
+
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ServerRepairBuildingActor: World is null!");
+		return;
+	}
+
+	if (BuildingActorToRepair->EditingPlayer) {
+		return;
+	}
+
+	float BuildingHealthPercent = BuildingActorToRepair->GetHealthPercent();
+
+	float BuildingCost = 10;
+	float RepairCostMultiplier = 0.75;
+
+	float BuildingHealthPercentLost = 1.0f - BuildingHealthPercent;
+	float RepairCostUnrounded = (BuildingCost * BuildingHealthPercentLost) * RepairCostMultiplier;
+	float RepairCost = std::floor(RepairCostUnrounded > 0 ? RepairCostUnrounded < 1 ? 1 : RepairCostUnrounded : 0);
+
+	UFortResourceItemDefinition* ResourceItemDef = UFortKismetLibrary::K2_GetResourceItemDefinition(BuildingActorToRepair->ResourceType);
+	if (!ResourceItemDef) {
+		Log("ServerRepairBuildingActor: Failed to get resource item definition for building!");
+		return;
+	}
+
+	FFortItemEntry* ResourceEntry = This->WorldInventory->FindItemEntry(ResourceItemDef);
+	if (!ResourceEntry || ResourceEntry->Count < RepairCost) {
+		Log("ServerRepairBuildingActor: Not enough resources to repair building! Required: " + std::to_string(RepairCost) + ", Available: " + (ResourceEntry ? std::to_string(ResourceEntry->Count) : "0"));
+		return;
+	}
+
+	This->WorldInventory->RemoveItem(ResourceEntry->ItemGuid, RepairCost);
+
+	BuildingActorToRepair->RepairBuilding(This, RepairCost);
+}
