@@ -9,5 +9,6 @@ class UFortRegisteredPlayerInfo : public UObject {
 public:
 	DefineUnrealClass(UFortRegisteredPlayerInfo);
 
+	DefineUProperty(int32, PlayerIndex);
 	DefineUProperty(UFortMcpProfileWorld*, OutpostProfile);
 };

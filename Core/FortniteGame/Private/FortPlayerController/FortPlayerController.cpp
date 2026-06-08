@@ -892,3 +892,23 @@ void AFortPlayerController::ServerSetInventoryStateValue(AFortPlayerController* 
 
 	ItemEntry->StateValues.Add(StateValue);
 }
+
+UFortRegisteredPlayerInfo* AFortPlayerController::GetRegisteredPlayerInfo() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetRegisteredPlayerInfo");
+
+	struct FortPlayerController_GetRegisteredPlayerInfo
+	{
+	public:
+		UFortRegisteredPlayerInfo* ReturnValue;
+	};
+
+	FortPlayerController_GetRegisteredPlayerInfo Parms{};
+
+	const_cast<AFortPlayerController*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}

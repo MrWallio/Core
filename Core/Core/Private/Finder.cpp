@@ -9524,19 +9524,7 @@ uintptr_t Finder::FindUFortQuestManager_SendStatEvent() {
 		return ServerOffsets::UFortQuestManager_SendStatEvent;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"SendStatEventWithTags: Cannot be called on the client!").Get();
-	if (!StringAddr) {
-		StringAddr = StringAddr = Memcury::Scanner::FindStringRef(L"SendStatEventWithTags: Cannot be called, %s is no longer registered!").Get();
-	}
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"SendStatEventWithTags: Cannot be called with stat type %s!").Get();
-	}
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"Failed to parse quest condition %s: %s!").Get();
-	}
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"SendStatEvent for %s: %d quests listening to event %s %s TargetTags:%s SourceTags:%s ContextTags:%s").Get();
-	}
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"SendStatEvent for %s: %d quests listening to event %s %s TargetTags:%s SourceTags:%s ContextTags:%s").Get();
 	if (!StringAddr) {
 		StringAddr = Memcury::Scanner::FindStringRef(L"SendStatEvent for %s: %d quests listening to flushed event %s %s %s %s %s").Get();
 	}

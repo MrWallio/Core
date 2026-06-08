@@ -129,7 +129,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>./</AdditionalIncludeDirectories>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -284,6 +284,7 @@
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStart.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStartWarmup.h" />
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestManager.h" />
+    <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveStatTableRow.h" />
     <ClInclude Include="FortniteGame\Public\FortSet\FortAttributeSet.h" />
     <ClInclude Include="FortniteGame\Public\FortSet\FortBuildingActorSet.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortCheatManager.h" />
@@ -354,6 +355,7 @@
     <ClInclude Include="FortniteGame\Public\Kismet\FortMissionLibrary.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\FortMcpProfile.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\FortMcpProfileAccount.h" />
+    <ClInclude Include="FortniteGame\Public\Mcp\FortMcpQuestObjectiveInfo.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfile.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h" />
     <ClInclude Include="FortniteGame\Public\Data\BuildingEditModeMetadata.h" />
@@ -415,6 +417,7 @@
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingGameplayActor.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingSMActor.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortItem\FortQuestItem.cpp" />
     <ClCompile Include="FortniteGame\Private\FortManager\FortCheatManager.cpp" />
     <ClCompile Include="FortniteGame\Private\FortAnalytics\FortAnalytics.cpp" />
     <ClCompile Include="FortniteGame\Private\FortGameInstance\FortGameInstance.cpp" />

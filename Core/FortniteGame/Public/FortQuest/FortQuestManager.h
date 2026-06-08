@@ -20,6 +20,7 @@
 
 class UFortQuestItem;
 struct FScriptContainerElement;
+class AFortPlayerController;
 
 class UFortQuestManager : public UObject {
 public:
@@ -55,6 +56,10 @@ public:
 	);
 
 	FScriptContainerElement* ProcessPendingStatEvents();
+
+	AFortPlayerController* GetPlayerControllerBP();
+
+	//void ProgressQuest(UFortQuestItem* QuestItem, )
 
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUFortQuestManager_SendCustomStatEvent()), (LPVOID)SendCustomStatEvent, (LPVOID*)&SendCustomStatEventOG);

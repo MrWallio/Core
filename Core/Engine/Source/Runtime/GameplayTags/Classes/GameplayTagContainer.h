@@ -130,6 +130,59 @@ public:
 	{
 		return GameplayTags.Num() > 0 ? GameplayTags[GameplayTags.Num() - 1] : FGameplayTag();
 	}
+
+	void Reset() {
+		GameplayTags.Reset();
+		ParentTags.Reset();
+	}
+
+	bool HasAny(const FGameplayTagContainer& ContainerToCheck) const
+	{
+		if (ContainerToCheck.IsEmpty())
+		{
+			return false;
+		}
+		for (const FGameplayTag& OtherTag : ContainerToCheck.GameplayTags)
+		{
+			if (GameplayTags.Contains(OtherTag) || ParentTags.Contains(OtherTag))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool HasAll(const FGameplayTagContainer& ContainerToCheck) const
+	{
+		if (ContainerToCheck.IsEmpty())
+		{
+			return true;
+		}
+		for (const FGameplayTag& OtherTag : ContainerToCheck.GameplayTags)
+		{
+			if (!GameplayTags.Contains(OtherTag) && !ParentTags.Contains(OtherTag))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool HasAllExact(const FGameplayTagContainer& ContainerToCheck) const
+	{
+		if (ContainerToCheck.IsEmpty())
+		{
+			return true;
+		}
+		for (const FGameplayTag& OtherTag : ContainerToCheck.GameplayTags)
+		{
+			if (!GameplayTags.Contains(OtherTag))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 public:
 	TArray<FGameplayTag> GameplayTags;
 

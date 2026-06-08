@@ -20,6 +20,7 @@ class USoundBase;
 class USoundConcurrency;
 class UStaticMesh;
 class FMemoryReader;
+class APlayerController;
 
 struct FDialogueContext;
 
@@ -36,4 +37,6 @@ public:
 	static float GetTimeSeconds(const UObject* WorldContextObject);
 
 	static void GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>* OutActors);
+
+	static APlayerController* GetPlayerController(const UObject* WorldContextObject, int32 PlayerIndex);
 };

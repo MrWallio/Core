@@ -106,6 +106,8 @@ public:
 
 	static void ServerSetInventoryStateValue(AFortPlayerController* This, FGuid& ItemGuid, FFortItemEntryStateValue& StateValue);
 
+	UFortRegisteredPlayerInfo* GetRegisteredPlayerInfo() const;
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),

@@ -675,6 +675,12 @@
     <ClInclude Include="FortniteGame\Public\FortItem\FortQuestItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\Mcp\FortMcpQuestObjectiveInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveStatTableRow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">
@@ -957,6 +963,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\FortQuest\FortQuestManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortItem\FortQuestItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

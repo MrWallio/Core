@@ -127,3 +127,29 @@ void UGameplayStatics::GetAllActorsOfClass(const UObject* WorldContextObject, TS
 	if (OutActors != nullptr)
 		*OutActors = std::move(Parms.OutActors);
 }
+
+APlayerController* UGameplayStatics::GetPlayerController(const UObject* WorldContextObject, int32 PlayerIndex)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.GetPlayerController");
+
+	struct GameplayStatics_GetPlayerController
+	{
+	public:
+		const UObject* WorldContextObject;
+		int32 PlayerIndex;
+		uint8 Pad_C[0x4];
+		APlayerController* ReturnValue;
+	};
+
+	GameplayStatics_GetPlayerController Parms{};
+
+	Parms.WorldContextObject = WorldContextObject;
+	Parms.PlayerIndex = PlayerIndex;
+
+	GetDefaultObj()->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}
