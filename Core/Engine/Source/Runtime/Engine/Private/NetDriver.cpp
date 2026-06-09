@@ -19,7 +19,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/PackageMapClient.h"
 
 static int32* CVarSetNetDormancyEnabled = Finder::FindCVarDirect<int32>(L"net.DormancyEnable");
-static int32 MaxConnectionsToTickPerServerFrame = 10; // its a cvar, idk how to get it so i just hardcoded it for now
+static int32 MaxConnectionsToTickPerServerFrame = 10; // its a cvar, idk how to get it so i just hardcoded it for now (can somebody help me with this)
 
 static float ServerReplicateActorsTimeStart = 1.f;
 static float ServerReplicateActorsTimeMs = 1.f;

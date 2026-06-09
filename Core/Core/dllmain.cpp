@@ -9,6 +9,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/Core/Public/Templates/SharedPointer.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
 
 #include "CrashReporter/Public/CrashReporter.h"
 
@@ -63,6 +64,8 @@ DWORD Main(LPVOID)
         Sleep(3000);
 
         Utils::SetLogVerbosity();
+
+		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "Fort.Pickup.ServerSideWeaponAutoPickupsEnabled 1", nullptr);
 
         if (!Config.bListenServer) {
             Utils::RemoveLocalPlayer();
