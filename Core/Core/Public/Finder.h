@@ -1030,8 +1030,6 @@ public:
 	static uintptr_t FindUFortQuestManager_SendStatEvent();
 
 	static uintptr_t FindUFortQuestManager_ProcessPendingStatEvents();
-
-	static uintptr_t FindAFortPlayerController_PayBuildingRepairCost();
 public:
 	static void SetupOffsets();
 

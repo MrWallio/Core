@@ -34,22 +34,13 @@ APawn* AController::K2_GetPawn() const
 
 AActor* AController::GetViewTarget() const
 {
-	static UFunction* Func = nullptr;
+	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetViewTarget"));
+	if (Function) {
+		static uintptr_t VTableIdx = GetVTableIndex(Function);
 
-	if (Func == nullptr)
-		Func = FindFunction("GetViewTarget");
-
-	struct Controller_GetViewTarget
-	{
-	public:
-		AActor* ReturnValue;
-	};
-
-	Controller_GetViewTarget Parms{};
-
-	const_cast<AController*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+		AActor* (*&GetViewTargetInternal)(const AController*) = decltype(GetViewTargetInternal)(VTable[VTableIdx]);
+		return GetViewTargetInternal(this);
+	}
 }
 
 void AController::InitPlayerState()

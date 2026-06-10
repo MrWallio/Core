@@ -415,22 +415,16 @@ int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 
 bool AFortInventory::RemoveItem(FGuid Guid, int32 Count)
 {
-	if (!CanRemoveItem(Guid, Count)) {
-		Log("AFortInventory::RemoveItem: Cannot remove item with Guid: " + Guid.FormatGuid() + " and Count: " + std::to_string(Count));
+	if (!CanRemoveItem(Guid, Count))
 		return false;
-	}
 
 	AFortPlayerController* PC = GetOwnerPlayerController();
-	if (!PC) {
-		Log("AFortInventory::RemoveItem: Owner PlayerController is null!");
+	if (!PC)
 		return false;
-	}
 
 	FFortItemEntry* Entry = FindItemEntry(Guid);
-	if (!Entry) {
-		Log("AFortInventory::RemoveItem: ItemEntry not found for Guid: " + Guid.FormatGuid());
+	if (!Entry)
 		return false;
-	}
 
 	if (Entry->Count > Count)
 	{
@@ -755,15 +749,11 @@ bool AFortInventory::CanAddItem(const FFortItemEntry& ItemEntry) const
 
 bool AFortInventory::CanRemoveItem(FGuid Guid, int32 Count) const
 {
-	if (!Guid.IsValid()) {
-		Log("AFortInventory::CanRemoveItem: Invalid Guid: " + Guid.FormatGuid());
+	if (!Guid.IsValid())
 		return false;
-	}
 
-	if (Count <= 0) {
-		Log("AFortInventory::CanRemoveItem: Count must be greater than 0!");
+	if (Count <= 0)
 		return false;
-	}
 
 	return GetOwnerPlayerController() != nullptr;
 }

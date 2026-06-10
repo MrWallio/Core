@@ -108,8 +108,6 @@ public:
 	static inline void (*ServerRepairBuildingActorOG)(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair);
 	static void ServerRepairBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair);
 
-	int32 PayBuildingRepairCost(ABuildingSMActor* BuildingToRepair);
-
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),

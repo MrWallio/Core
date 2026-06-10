@@ -590,7 +590,6 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPlayerController_CanAffordToPlaceBuildableClassVFT = 0;
 	inline uintptr_t AFortPlayerController_PayBuildableClassPlacementCost = 0;
 	inline uintptr_t AFortPlayerController_PayBuildableClassPlacementCostVFT = 0;
-	inline uintptr_t AFortPlayerController_PayBuildingRepairCost = 0;
 
 	inline uintptr_t AFortPlayerControllerZone_OnReadyToStartMatch = 0;
 	inline uintptr_t AFortPlayerControllerZone_ClientOnPawnDied = 0;
