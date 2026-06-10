@@ -167,7 +167,7 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 				This->bDestroyContainerOnSearch = true;
 			}
 			else {
-				if (Version::Fortnite_Version <= 1.8) {
+				if (Version::Fortnite_Version <= 1.82) {
 					This->SearchedMesh = nullptr;
 					This->bAllowInteract = false;
 					This->bAlreadySearched = true;

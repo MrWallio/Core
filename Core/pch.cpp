@@ -34,7 +34,7 @@ uintptr_t GetVTableIndex(class UFunction* Func) {
 
 	int VTableIndex = 0;
 
-	if (FuncName.contains("Server"))
+	if (FuncName.contains("Server") || !FuncName.contains("ServerRepairBuildingActor"))
 	{
 		VTableIndex = (VirtualFuncIdx / 8) + 1;
 	}
