@@ -67,7 +67,7 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 	This->SearchBounceData.SearchAnimationCount++;
 	This->BounceContainer();
 
-	This->ForceNetUpdate();
+	//This->ForceNetUpdate();
 
 	if (This->bDestroyContainerOnSearch) {
 		This->K2_DestroyActor();
@@ -167,7 +167,7 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 				This->bDestroyContainerOnSearch = true;
 			}
 			else {
-				if (Version::Fortnite_Version <= 1.8) {
+				if (Version::Fortnite_Version <= 1.82) {
 					This->SearchedMesh = nullptr;
 					This->bAllowInteract = false;
 					This->bAlreadySearched = true;

@@ -9579,6 +9579,33 @@ uintptr_t Finder::FindUFortQuestManager_ProcessPendingStatEvents() {
 	return ServerOffsets::UFortQuestManager_ProcessPendingStatEvents;
 }
 
+uintptr_t Finder::FindAFortPlayerController_PayBuildingRepairCost() {
+	if (ServerOffsets::AFortPlayerController_PayBuildingRepairCost)
+		return ServerOffsets::AFortPlayerController_PayBuildingRepairCost;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Failed to remove item %s during repair, item duplicated!").Get();
+
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x57)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortPlayerController_PayBuildingRepairCost = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerController_PayBuildingRepairCost found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_PayBuildingRepairCost));
+	return ServerOffsets::AFortPlayerController_PayBuildingRepairCost;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -9883,6 +9910,8 @@ void Finder::SetupOffsets() {
 	FindUFortQuestManager_SendCustomStatEvent();
 	FindUFortQuestManager_SendStatEvent();
 	FindUFortQuestManager_ProcessPendingStatEvents();
+
+	FindAFortPlayerController_PayBuildingRepairCost();
 
 	return;
 }

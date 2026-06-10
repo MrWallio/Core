@@ -43,7 +43,7 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 
 	HandleInventoryLocalUpdate();
 
-	ForceNetUpdate();
+	//ForceNetUpdate();
 
 	return true;
 }
