@@ -245,7 +245,6 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Log("Failed to find bitfield property: " #Name); \
                 Name##_Offset = 0; \
             } \
         } \
@@ -262,7 +261,6 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Log("Failed to find bitfield property: " #Name); \
                 Name##_Offset = 0; \
             } \
         } \
@@ -279,7 +277,6 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Log("Failed to find bitfield property: " #Name); \
                 Name##_Offset = 0; \
                 return; \
             } \
@@ -308,7 +305,6 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Log("Failed to find bitfield property: " #Name); \
                 Name##_Offset = 0; \
             } \
         } \
@@ -325,7 +321,6 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Log("Failed to find bitfield property: " #Name); \
                 Name##_Offset = 0; \
             } \
         } \
@@ -342,7 +337,6 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Log("Failed to find bitfield property: " #Name); \
                 Name##_Offset = 0; \
                 return; \
             } \

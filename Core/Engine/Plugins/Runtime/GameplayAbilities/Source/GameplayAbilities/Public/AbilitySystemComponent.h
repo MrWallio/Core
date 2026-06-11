@@ -68,7 +68,7 @@ public:
 
 	FGameplayAbilitySpecHandle GiveAbility(FGameplayAbilitySpec& AbilitySpec);
 
-	FGameplayAbilitySpecHandle GiveAbilityAndActivateOnce(FGameplayAbilitySpec& AbilitySpec, FGameplayEventData* GameplayEventData = nullptr);
+	FGameplayAbilitySpecHandle GiveAbilityAndActivateOnce(FGameplayAbilitySpec* AbilitySpec, FGameplayEventData* GameplayEventData = nullptr);
 public:
 	static void Hook() {
 		HookEveryVTableIdx(UAbilitySystemComponent::StaticClass(), Finder::FindInternalServerTryActivateAbilityVFT(), InternalServerTryActivateAbility);

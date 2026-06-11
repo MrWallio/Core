@@ -10,6 +10,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetConnection.h"
+#include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h"
 
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 
@@ -475,26 +476,28 @@ uintptr_t Finder::FindInternalServerTryActivateAbilityVFT() {
 		return ServerOffsets::InternalServerTryActivateAbilityVFT;
 	uintptr_t VTableIndex = 0x0;
 
-	if (Version::Engine_Version == 4.16)
-		VTableIndex = 0xC9;
-	if (Version::Engine_Version == 4.19 || Version::Engine_Version == 4.20)
-		VTableIndex = 0xCB;
-	if (Version::Engine_Version == 4.22)
-		VTableIndex = 0xF5;
-	if (Version::Fortnite_Version >= 9.00 && Version::Fortnite_Version <= 9.41)
-		VTableIndex = 0xF5;
-	if (Version::Fortnite_Version >= 10.00 && Version::Fortnite_Version <= 10.40)
-		VTableIndex = 0xF6;
-	if (Version::Fortnite_Version >= 11.00 && Version::Fortnite_Version <= 11.31)
-		VTableIndex = 0xF7;
-	else if (Version::Fortnite_Version >= 12.00 && Version::Fortnite_Version <= 13.40)
-		VTableIndex = 0xFA;
-	else if (Version::Fortnite_Version >= 14.00 && Version::Fortnite_Version <= 14.60)
-		VTableIndex = 0xFD;
-	else if (Version::Fortnite_Version >= 15.00 && Version::Fortnite_Version <= 18.40)
-		VTableIndex = 0xFE;
-	else if (Version::Fortnite_Version >= 19.00 && Version::Fortnite_Version <= 19.40)
-		VTableIndex = 0x108;
+	UObject* DefaultObj = UAbilitySystemComponent::GetDefaultObj();
+
+	if (Version::Engine_Version > 4.20)
+	{
+		auto OnRep_ReplicatedAnimMontage = DefaultObj->FindFunction("OnRep_ReplicatedAnimMontage");
+		VTableIndex = OnRep_ReplicatedAnimMontage->GetVTableIndex() - 1;
+	}
+	else
+	{
+		auto ServerTryActivateAbilityWithEventData = DefaultObj->FindFunction("ServerTryActivateAbilityWithEventData");
+		auto ServerTryActivateAbilityWithEventDataNativeAddr = __int64(DefaultObj->VTable[ServerTryActivateAbilityWithEventData->GetVTableIndex()]);
+
+		for (int i = 0; i < 400; i++)
+		{
+			if ((*(uint8_t*)(ServerTryActivateAbilityWithEventDataNativeAddr + i) == 0xFF && *(uint8_t*)(ServerTryActivateAbilityWithEventDataNativeAddr + i + 1) == 0x90)
+				|| (*(uint8_t*)(ServerTryActivateAbilityWithEventDataNativeAddr + i) == 0xFF && *(uint8_t*)(ServerTryActivateAbilityWithEventDataNativeAddr + i + 1) == 0x93))
+			{
+				VTableIndex = *(uint32*)(ServerTryActivateAbilityWithEventDataNativeAddr + i + 2) / 8;
+				break;
+			}
+		}
+	}
 
 	ServerOffsets::InternalServerTryActivateAbilityVFT = VTableIndex;
 	Log("InternalServerTryActivateAbility VFT Index found at: 0x" + std::format("{:X}", ServerOffsets::InternalServerTryActivateAbilityVFT));
@@ -523,6 +526,9 @@ uintptr_t Finder::FindGHandle() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::GHandle)
 		return ServerOffsets::GHandle;
+	static bool bInitialized = false;
+	if (bInitialized) return ServerOffsets::GHandle;
+
 	auto match = Memcury::Scanner::FindPattern(
 		"8B 05 ? ? ? ? 89 41 0C FF C0 89 05 ? ? ? ?"
 	);
@@ -536,13 +542,7 @@ uintptr_t Finder::FindGHandle() {
 		ServerOffsets::GHandle = Addr - ImageBase;
 	}
 
-	if (!ServerOffsets::GHandle)
-	{
-		if (Version::Fortnite_CL == 3700114) {
-			ServerOffsets::GHandle = 0x50512BC;
-		}
-	}
-
+	if (!bInitialized) bInitialized = true;
 	Log("GHandle found at: 0x" + std::format("{:X}", ServerOffsets::GHandle));
 	return ServerOffsets::GHandle;
 }
@@ -598,20 +598,61 @@ uintptr_t Finder::FindAbilitySpecCDOConstructor() {
 	if (ServerOffsets::AbilitySpecCDOConstructor)
 		return ServerOffsets::AbilitySpecCDOConstructor;
 	static uintptr_t Addr = 0;
-	if (Addr == -1)
-		return 0;
 
-	// 12.41 sig
-	Addr = Memcury::Scanner::FindPattern("48 8B 44 24 ? 80 61 ? ? 80 61").Get();
+	static bool bInitialized = false;
+	if (bInitialized) return ServerOffsets::AbilitySpecCDOConstructor;
+
+	if (!bInitialized)
+	{
+		if (Version::Engine_Version >= 4.20 && Version::Engine_Version <= 4.24) {
+			Addr = Memcury::Scanner::FindPattern("80 61 29 F8 48 8B 44 24 ?").Get();
+		}
+		else if (Version::Engine_Version == 4.25)
+		{
+			Addr = Memcury::Scanner::FindPattern("48 8B 44 24 ? 80 61 29 F8 80 61 31 FE 48 89 41 20 33 C0 89 41", false).Get();
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("80 61 29 F8 48 8B 44 24 ?").Get();
+			}
+		}
+		else if (Version::Engine_Version == 4.26)
+		{
+			Addr = Memcury::Scanner::FindPattern("80 61 31 FE 0F 57 C0 80 61 29 F0 48 8B 44 24 ? 48").Get();
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B 44 24 ? 80 61").Get();
+			}
+		}
+		else if (Version::Engine_Version == 4.27) {
+			Addr = Memcury::Scanner::FindPattern("80 61 31 FE 41 83 C9 FF 80 61 29 F0 48 8B 44 24 ? 48 89 41").Get();
+		}
+		else if (Version::Engine_Version == 5.0) {
+			Addr = Memcury::Scanner::FindPattern("4C 8B C9 48 8B 44 24 ? 83 C9 FF 41 80 61 ? ? 41 80 61 ? ? 49 89 41 20 33 C0 41 88 41 30 49 89 41").Get();
+		}
+		else if (Version::Engine_Version >= 5.4)
+		{
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 56 48 83 EC ? 41 83 CE ? 33 ED 40 38 2D ? ? ? ? 41 8B F8").Get();
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 56 48 83 EC ? 41 83 CE").Get();
+			}
+		}
+		else if (Version::Engine_Version >= 5.1)
+		{
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 78 ? 41 56 48 83 EC ? 48 8B 44 24 ? 41 83 CE").Get();
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 44 89 48 ? 57 48 83 EC ? 48 8B 44 24").Get();
+			}
+		}
+	}
 
 	if (Addr)
 	{
 		ServerOffsets::AbilitySpecCDOConstructor = Addr - ImageBase;
 	}
-	else {
-		Addr = -1;
-	}
 
+	bInitialized = true;
 	Log("AbilitySpecCDOConstructor found at: 0x" + std::format("{:X}", ServerOffsets::AbilitySpecCDOConstructor));
 	return ServerOffsets::AbilitySpecCDOConstructor;
 }
@@ -5500,10 +5541,41 @@ uintptr_t Finder::FindUAbilitySystemComponent_GiveAbilityAndActivateOnce() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UAbilitySystemComponent_GiveAbilityAndActivateOnce)
 		return ServerOffsets::UAbilitySystemComponent_GiveAbilityAndActivateOnce;
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 48 8B EC 48 83 EC ? 49 8B 40").Get();
+
+	static bool bInitialized = false;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		if (Version::Engine_Version == 4.26)
+		{
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 40 49 8B 40 10 49 8B D8 48 8B FA 48 8B F1", false).Get();
+
+			if (!Addr)
+				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 40 49 8B 40 10 49").Get();
+		}
+		else {
+			auto sRef = Memcury::Scanner::FindStringRef(L"GiveAbilityAndActivateOnce called on ability %s on the client, not allowed!", true, 0, Version::Engine_Version >= 5.0).Get();
+
+			for (int i = 0; i < 1000; i++)
+			{
+				if (*(uint8_t*)(sRef - i) == 0x40 && *(uint8_t*)(sRef - i + 1) == 0x55) {
+					Addr = sRef - i;
+					break;
+				}
+				else if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x89 && *(uint8_t*)(sRef - i + 2) == 0x5C) {
+					Addr = sRef - i;
+					break;
+				}
+			}
+		}
+	}
+	
 	if (Addr) {
 		ServerOffsets::UAbilitySystemComponent_GiveAbilityAndActivateOnce = Addr - ImageBase;
 	}
+
 	Log("UAbilitySystemComponent_GiveAbilityAndActivateOnce found at: 0x" + std::format("{:X}", ServerOffsets::UAbilitySystemComponent_GiveAbilityAndActivateOnce));
 	return ServerOffsets::UAbilitySystemComponent_GiveAbilityAndActivateOnce;
 }
@@ -8142,11 +8214,13 @@ uintptr_t Finder::FindUNetDriver_IsLevelInitializedForActorVFT() {
 uintptr_t Finder::FindUObject_GetWorldVFT() {
 	if (ServerOffsets::UObject_GetWorldVFT)
 		return ServerOffsets::UObject_GetWorldVFT;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::UObject_GetWorldVFT;
 
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::UObject_GetWorldVFT = 0x26;
-	}
+	// please somebody help me make a finder for ts
 
+	if (!bInitialized) bInitialized = true;
 	Log("UObject_GetWorldVFT found at: 0x" + std::format("{:X}", ServerOffsets::UObject_GetWorldVFT));
 	return ServerOffsets::UObject_GetWorldVFT;
 }
@@ -9659,6 +9733,10 @@ void Finder::SetupOffsets() {
 	Log("UField__Name offset: 0x" + std::format("{:X}", ServerOffsets::UField__Name));
 	Log("UBoolProperty__FieldMask offset: 0x" + std::format("{:X}", ServerOffsets::UBoolProperty__FieldMask));
 
+	if (ConfigurationManager::GetConfig().bIsClient) {
+		return; // return early if this is the client
+	}
+
 	FindProcessEventVFT();
 
 	FindUStruct_FindPropertyByName();
@@ -9913,6 +9991,10 @@ void Finder::SetupOffsets() {
 	FindUFortQuestManager_ProcessPendingStatEvents();
 
 	FindAFortPlayerController_PayBuildingRepairCost();
+
+	FindUAbilitySystemComponent_GiveAbilityAndActivateOnce();
+
+	FindAbilitySpecCDOConstructor();
 
 	return;
 }

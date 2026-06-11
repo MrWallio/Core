@@ -12,4 +12,6 @@ class UGameplayTasksComponent;
 class UGameplayAbility : public UObject {
 public:
 	DefineUnrealClass(UGameplayAbility);
+
+	DefineUProperty(uint8, InstancingPolicy);
 };

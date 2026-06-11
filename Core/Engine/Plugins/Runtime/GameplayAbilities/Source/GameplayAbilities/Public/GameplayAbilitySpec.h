@@ -31,17 +31,16 @@ public:
 
 	DefineBitfieldStructProperty(PendingRemove);
 public:
+	uint8 Padding[0x6C];
+public:
 	FGameplayAbilitySpec()
 	{
-		std::memset(this, 0, GetSize());
 		static FGameplayAbilitySpec* (*ConstructorInternal)(FGameplayAbilitySpec*) = decltype(ConstructorInternal)(ImageBase + Finder::FindAbilitySpecDefaultConstructor());
 		ConstructorInternal(this);
 	}
 
-	/** Version that takes an ability class */
 	FGameplayAbilitySpec(TSubclassOf<UGameplayAbility> InAbilityClass, int32 InLevel = 1, int32 InInputID = INDEX_NONE, UObject* InSourceObject = nullptr);
 
-	/** Version that takes an ability CDO, this exists for backward compatibility */
 	FGameplayAbilitySpec(UGameplayAbility* InAbility, int32 InLevel = 1, int32 InInputID = INDEX_NONE, UObject* InSourceObject = nullptr);
 };
 

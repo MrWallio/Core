@@ -49,6 +49,16 @@ public:
 	DefineUnrealClass(UFortAccountItemDefinition);
 };
 
+class UFortMontageItemDefinitionBase : public UFortAccountItemDefinition {
+public:
+	DefineUnrealClass(UFortMontageItemDefinitionBase);
+};
+
+class UAthenaDanceItemDefinition : public UFortMontageItemDefinitionBase {
+public:
+	DefineUnrealClass(UAthenaDanceItemDefinition);
+};
+
 class UAthenaCosmeticItemDefinition : public UFortAccountItemDefinition {
 public:
 	DefineUnrealClass(UAthenaCosmeticItemDefinition);

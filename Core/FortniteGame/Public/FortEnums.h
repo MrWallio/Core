@@ -313,3 +313,59 @@ public:
 	DefineEnumProperty(Invalid);
 	DefineEnumProperty(ESubGame_MAX);
 };
+
+class EFortQuestObjectiveStatEvent {
+public:
+	DefineUnrealEnum(EFortQuestObjectiveStatEvent);
+
+	DefineEnumProperty(Kill);
+	DefineEnumProperty(TeamKill);
+	DefineEnumProperty(KillContribution);
+	DefineEnumProperty(Build);
+	DefineEnumProperty(BuildingEdit);
+	DefineEnumProperty(BuildingRepair);
+	DefineEnumProperty(BuildingUpgrade);
+	DefineEnumProperty(Complete);
+	DefineEnumProperty(Craft);
+	DefineEnumProperty(Collect);
+	DefineEnumProperty(Win);
+	DefineEnumProperty(Interact);
+	DefineEnumProperty(Destroy);
+	DefineEnumProperty(Ability);
+	DefineEnumProperty(WaveComplete);
+	DefineEnumProperty(Custom);
+	DefineEnumProperty(Client);
+	DefineEnumProperty(AthenaRank);
+	DefineEnumProperty(AthenaOutlive);
+	DefineEnumProperty(NumGameplayEvents);
+	DefineEnumProperty(Acquire);
+	DefineEnumProperty(Consume);
+	DefineEnumProperty(OpenCardPack);
+	DefineEnumProperty(PurchaseCardPack);
+	DefineEnumProperty(Convert);
+	DefineEnumProperty(Upgrade);
+	DefineEnumProperty(QuestComplete);
+	DefineEnumProperty(AssignWorker);
+	DefineEnumProperty(CollectExpedition);
+	DefineEnumProperty(CollectSuccessfulExpedition);
+	DefineEnumProperty(LevelUpCollectionBook);
+	DefineEnumProperty(HasItem);
+	DefineEnumProperty(SlotInCollection);
+	DefineEnumProperty(HasCompletedQuest);
+	DefineEnumProperty(HasAssignedWorker);
+	DefineEnumProperty(HasUpgraded);
+	DefineEnumProperty(HasConverted);
+	DefineEnumProperty(HasLeveledUpCollectionBook);
+	DefineEnumProperty(Max_None);
+	DefineEnumProperty(EFortQuestObjectiveStatEvent_MAX);
+};
+
+class EGameplayAbilityInstancingPolicy {
+public:
+	DefineUnrealEnum(EGameplayAbilityInstancingPolicy);
+
+	DefineEnumProperty(NonInstanced);
+	DefineEnumProperty(InstancedPerActor);
+	DefineEnumProperty(InstancedPerExecution);
+	DefineEnumProperty(EGameplayAbilityInstancingPolicy_MAX);
+};

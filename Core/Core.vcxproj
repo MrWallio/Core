@@ -262,6 +262,7 @@
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Public\Net\Core\Connection\NetEnums.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingGameplayActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTrap.h" />
+    <ClInclude Include="FortniteGame\Public\FortAbility\FortAbilitySystemComponent.h" />
     <ClInclude Include="FortniteGame\Public\FortAnalytics\AnalyticsProvider.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIController.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIDirector.h" />

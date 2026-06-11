@@ -110,6 +110,9 @@ public:
 
 	int32 PayBuildingRepairCost(ABuildingSMActor* BuildingToRepair);
 
+	static inline void (*ServerPlayEmoteItemOG)(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset);
+	static void ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -173,7 +176,7 @@ public:
 		);*/
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_RemoveInventoryItem()), RemoveInventoryItem, (LPVOID*)&RemoveInventoryItemOG);
 
-		if (Version::Fortnite_Version <= 1.82) {
+		if (Version::Fortnite_Version <= 1.9) {
 			HookEveryVTable(
 				AFortPlayerController::StaticClass(),
 				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerCreateBuildingActor"),
@@ -227,6 +230,13 @@ public:
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerRepairBuildingActor"),
 			ServerRepairBuildingActor,
 			(LPVOID*)&ServerRepairBuildingActorOG
+		);
+
+		HookEveryVTable(
+			AFortPlayerController::StaticClass(),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerPlayEmoteItem"),
+			ServerPlayEmoteItem,
+			(LPVOID*)&ServerPlayEmoteItemOG
 		);
 
 		Log("Hooked AFortPlayerController");

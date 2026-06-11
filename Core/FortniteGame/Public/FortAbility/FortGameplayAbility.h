@@ -9,3 +9,8 @@ class UFortGameplayAbility : public UGameplayAbility {
 public:
 	DefineUnrealClass(UFortGameplayAbility);
 };
+
+class UGAB_Emote_Generic_C : public UFortGameplayAbility {
+public:
+	DefineUnrealClass(UGAB_Emote_Generic_C);
+};

@@ -3,6 +3,7 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 
 UFunction* UObject::FindFunction(FName InName) const
 {
@@ -28,8 +29,13 @@ void UObject::ProcessEvent(UFunction* Function, void* Parms)
 
 UWorld* UObject::GetWorld() const
 {
-	UWorld* (*&GetWorldInternal)(const UObject*) = decltype(GetWorldInternal)(VTable[Finder::FindUObject_GetWorldVFT()]);
-	return GetWorldInternal(this);
+	if (Finder::FindUObject_GetWorldVFT()) {
+		UWorld* (*&GetWorldInternal)(const UObject*) = decltype(GetWorldInternal)(VTable[Finder::FindUObject_GetWorldVFT()]);
+		return GetWorldInternal(this);
+	}
+	else {
+		return UWorld::GetWorld();
+	}
 }
 
 bool UObject::NeedsLoadForClient(UObject* This)

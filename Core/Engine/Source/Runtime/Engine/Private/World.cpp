@@ -171,8 +171,6 @@ bool UWorld::Listen(FURL& InURL)
 			return false;
 		}
 
-		NetDriver->SetWorld(this); // Fixes a crash after listening, not sure why because in unreal it doesent get called again
-
 		static const bool bLanPlay = FParse::Param(GetCommandLineW(), TEXT("lanplay"));
 		const bool bLanSpeed = bLanPlay || InURL.HasOption(TEXT("LAN"));
 		if (!bLanSpeed && (NetDriver->MaxInternetClientRate < NetDriver->MaxClientRate) && (NetDriver->MaxInternetClientRate > 2500))
@@ -186,6 +184,8 @@ bool UWorld::Listen(FURL& InURL)
 		}
 
 		NextSwitchCountdown = NetDriver->ServerTravelPause;
+
+		NetDriver->SetWorld(this); // Fixes a crash after listening, not sure why because in unreal it doesent get called again
 	}
 	else {
 		return false;

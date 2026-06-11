@@ -117,6 +117,34 @@ public:
         p.Size = PropertiesSize;
         return p;
     }
+
+    uint32 GetVTableIndex() const // this one took from erbium
+    {
+        if (!this)
+            return -1;
+
+        std::string FuncName = GetFName().ToString().ToString();
+        std::string ValidateName = std::string(FuncName.c_str()) + "_Validate";
+        auto ValidateRef = Memcury::Scanner::FindStringRef(ValidateName.c_str(), false);
+
+        auto Addr = ValidateRef.Get();
+
+        if (!Addr)
+            Addr = Memcury::Scanner(Func).ScanFor({ 0x0F, 0x95 }).Get();
+
+        if (Addr)
+            for (int i = 0; i < 2000; i++)
+            {
+                if (*((uint8*)Addr + i) == 0xFF && (*((uint8*)Addr + i + 1) == 0x90 || *((uint8*)Addr + i + 1) == 0x93 || *((uint8*)Addr + i + 1) == 0xA0))
+                {
+                    auto VTIndex = *(uint32_t*)(Addr + i + 2);
+
+                    return VTIndex / 8;
+                }
+            }
+
+        return -1;
+    }
 public:
     static UClass* StaticClass() {
         return (UClass*)FUObjectArray::FindObject("Class /Script/CoreUObject.Function");

@@ -111,5 +111,7 @@ DWORD Client::ClientThread(LPVOID) {
                 }
             }
         }
+
+        Sleep(30);
     }
 }

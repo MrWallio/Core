@@ -21,6 +21,9 @@
 #include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 #include "FortniteGame/Public/Mcp/FortMcpProfileAccount.h"
+#include "FortniteGame/Public/FortAbility/FortGameplayAbility.h"
+#include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
+#include "FortniteGame/Public/FortQuest/FortQuestManager.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -1047,4 +1050,45 @@ void AFortPlayerController::ServerRepairBuildingActor(AFortPlayerController* Thi
 int32 AFortPlayerController::PayBuildingRepairCost(ABuildingSMActor* BuildingToRepair) {
 	int32(*PayBuildingRepairCostInternal)(AFortPlayerController * This, ABuildingSMActor * BuildingToRepair) = decltype(PayBuildingRepairCostInternal)(ImageBase + Finder::FindAFortPlayerController_PayBuildingRepairCost());
 	return PayBuildingRepairCostInternal(this, BuildingToRepair);
+}
+
+void AFortPlayerController::ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset) {
+	if (Version::Fortnite_Version <= 1.82) {
+		return ServerPlayEmoteItemOG(This, EmoteAsset);
+	}
+
+	if (!EmoteAsset) {
+		Log("ServerPlayEmoteItem: EmoteAsset is null!");
+		return;
+	}
+
+	if (!This->MyFortPawn) {
+		Log("ServerPlayEmoteItem: MyFortPawn is null!");
+		return;
+	}
+
+	AFortPlayerState* PlayerState = This->PlayerState->Cast<AFortPlayerState>();
+	if (!PlayerState) {
+		Log("ServerPlayEmoteItem: PlayerState is null or not AFortPlayerState!");
+		return;
+	}
+
+	UFortAbilitySystemComponent* ASC = PlayerState->AbilitySystemComponent;
+	if (!ASC) {
+		Log("ServerPlayEmoteItem: AbilitySystemComponent is null!");
+		return;
+	}
+
+	UFortGameplayAbility* EmoteAbility = nullptr;
+	if (UAthenaDanceItemDefinition* DanceItemDef = EmoteAsset->Cast<UAthenaDanceItemDefinition>()) {
+		UClass* Ability = StaticLoadObject<UClass>("/Game/Abilities/Emotes/GAB_Emote_Generic.GAB_Emote_Generic_C");
+		EmoteAbility = Ability->GetDefaultObj()->Cast<UFortGameplayAbility>();
+	}
+
+	if (EmoteAbility) {
+		FGameplayAbilitySpec* EmoteAbilitySpec = new FGameplayAbilitySpec(EmoteAbility, 1, -1, EmoteAsset);
+		ASC->GiveAbilityAndActivateOnce(EmoteAbilitySpec, nullptr);
+	}
+
+	return ServerPlayEmoteItemOG(This, EmoteAsset);
 }
