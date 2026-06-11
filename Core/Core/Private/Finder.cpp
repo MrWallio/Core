@@ -406,15 +406,58 @@ uintptr_t Finder::FindUNetDriver_SetWorld() {
 uintptr_t Finder::FindUNetDriver_InitListen() {
 	if (ServerOffsets::UNetDriver_InitListen)
 		return ServerOffsets::UNetDriver_InitListen;
+	uintptr_t Addr = 0;
 
-	auto str_addr = Memcury::Scanner::FindStringRef(L"Failed to init net driver ListenURL: %s: %s").Get();
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::UNetDriver_InitListen;
 
-	for (int i = 0; i < 300; i++)
+	if (!bInitialized)
 	{
-		if (*(uint8*)(str_addr - i + 0) == 0x48 && *(uint8*)(str_addr - i + 1) == 0x89 && *(uint8*)(str_addr - i + 2) == 0x5C)
-		{
-			ServerOffsets::UNetDriver_InitListen = (str_addr - i) - ImageBase;
+		bInitialized = true;
+
+		if (Version::Fortnite_Version == 1.91) {
+			Addr = ImageBase + 0x3A5D200;
 		}
+		else if (Version::Engine_Version >= 5.0)
+		{
+			Addr = Memcury::Scanner::FindPattern("4D 8B C8 4C 8B C2 33 D2 FF 90 ? ? ? ? 84 C0 75 ? 80 3D").ScanFor({ 0x4C, 0x8B, 0xDC }, false).Get();
+			if (!Addr)
+			{
+				Addr = Memcury::Scanner::FindPattern("4C 8B DC 49 89 5B ? 49 89 73 ? 57 48 83 EC ? 48 8B BC 24").Get();
+
+				if (!Addr)
+					Addr = Memcury::Scanner::FindPattern("4C 8B DC 49 89 5B 08 49 89 73 10 57 48 83 EC 40 48 8B 7C 24 ? 49 8B F0 48 8B 01 48 8B D9 49 89 7B E0 45").Get();
+			}
+		}
+		else if (Version::Engine_Version >= 4.27) {
+			Addr = Memcury::Scanner::FindPattern("4C 8B DC 49 89 5B 08 49 89 73 10 57 48 83 EC 50 48 8B BC 24 ? ? ? ? 49 8B F0 48 8B 01 48 8B").Get();
+		}
+		else
+		{
+			auto sRef = Memcury::Scanner::FindStringRef(L"%s IpNetDriver listening on port %i").Get();
+			int skip = 1;
+			for (int i = 0; i < 2000; i++)
+			{
+				auto Ptr = (uint8_t*)(sRef - i);
+
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5c)
+				{
+					if (skip > 0)
+					{
+						skip--;
+						continue;
+					}
+					Addr = uint64_t(Ptr);
+					break;
+				}
+			}
+		}
+	}
+
+	if (Addr)
+	{
+		ServerOffsets::UNetDriver_InitListen = Addr - ImageBase;
 	}
 
 	Log("UNetDriver::InitListen found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_InitListen));
@@ -805,7 +848,7 @@ uintptr_t Finder::FindFMemory_Free() {
 
 	int skipped = 0;
 
-	auto straddr = Memcury::Scanner::FindStringRef(L"%s IpNetDriver listening on port %i").Get();
+	auto straddr = Memcury::Scanner::FindStringRef(L"GiveAbilityAndActivateOnce called on ability %s on the client, not allowed!").Get();
 
 	for (int i = 0; i < 100; i++)
 	{
