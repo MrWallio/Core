@@ -25,6 +25,8 @@ public:
 	DefineUProperty(TSubclassOf<APawn>, DefaultPawnClass);
 	DefineUProperty(TSubclassOf<APlayerController>, PlayerControllerClass);
 	DefineUProperty(TSubclassOf<APlayerState>, PlayerStateClass);
+
+	DefineBitfieldUProperty(bUseSeamlessTravel);
 public:
 	APawn* SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot);
 
@@ -47,4 +49,16 @@ public:
 	void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage);
 
 	TSubclassOf<AGameSession>* GetGameSessionClass() const;
+
+	static void ProcessServerTravel(AGameModeBase* This, FString& URL, bool bAbsolute);
+
+	void StartToLeaveMap();
+
+	static void Hook() {
+		if (Finder::FindAFortGameMode_ProcessServerTravelPatch1()) {
+			PatchCallFar(ImageBase + Finder::FindAFortGameMode_ProcessServerTravelPatch1(), (uintptr_t)ProcessServerTravel);
+		}
+
+		Log("AGameModeBase Hooked!");
+	}
 };

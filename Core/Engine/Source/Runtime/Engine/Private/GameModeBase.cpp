@@ -2,6 +2,10 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/GameModeBase.h"
 
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/PackageMapClient.h"
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/Package.h"
 
 APawn* AGameModeBase::SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot)
 {
@@ -105,4 +109,57 @@ TSubclassOf<AGameSession>* AGameModeBase::GetGameSessionClass() const
 	TSubclassOf<AGameSession> (*&GetGameSessionClassInternal)(const AGameModeBase*, TSubclassOf<AGameSession>*) = decltype(GetGameSessionClassInternal)(VTable[Finder::FindAGameModeBase_GetGameSessionClassVFT()]);
 	GetGameSessionClassInternal(this, &GameSessionClass);
 	return &GameSessionClass;
+}
+
+void AGameModeBase::ProcessServerTravel(AGameModeBase* This, FString& URL, bool bAbsolute)
+{
+	Log("ProcessServerTravel: " + URL.ToString()));
+
+	/*This->StartToLeaveMap();
+
+	bool bSeamless = (This->bUseSeamlessTravel && This->GetWorld()->TimeSeconds < 172800.0f);
+
+	FString NextMap;
+	if (UKismetStringLibrary::Contains(UKismetStringLibrary::ToUpper(URL), "?RESTART", true, false))
+	{
+		NextMap = UWorld::RemovePIEPrefix(This->GetOutermost()->GetName());
+	}
+	else
+	{
+		int32 OptionStart = UKismetStringLibrary::FindSubstring(URL, TEXT("?"), true, false, 0);
+		if (OptionStart == INDEX_NONE)
+		{
+			NextMap = URL;
+		}
+		else
+		{
+			NextMap = UKismetStringLibrary::Left(URL, OptionStart);
+		}
+	}
+
+	FGuid NextMapGuid = UEngine::GetPackageGuid(FName(*NextMap), GetWorld()->IsPlayInEditor());
+
+	// Notify clients we're switching level and give them time to receive.
+	FString URLMod = URL;
+	APlayerController* LocalPlayer = ProcessClientTravel(URLMod, NextMapGuid, bSeamless, bAbsolute);
+
+	UWorld* World = This->GetWorld();
+	check(World);
+	World->NextURL = URL;
+	ENetMode NetMode = InternalGetNetMode(This);
+
+	if (bSeamless)
+	{
+		World->SeamlessTravel(World->NextURL, bAbsolute);
+		World->NextURL = TEXT("");
+	}
+	else if (NetMode != NM_DedicatedServer && NetMode != NM_ListenServer)
+	{
+		World->NextSwitchCountdown = 0.0f;
+	}*/
+}
+
+void AGameModeBase::StartToLeaveMap()
+{
+
 }

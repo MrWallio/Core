@@ -1034,6 +1034,16 @@ public:
 	static uintptr_t FindAFortPlayerController_PayBuildingRepairCost();
 
 	static uintptr_t FindUObject_CanCreateInCurrentContext();
+
+	static uintptr_t FindAGameModeBase_ProcessServerTravelVFT();
+
+	static uintptr_t FindAFortGameMode_ProcessServerTravelPatch1();
+
+	static uintptr_t FindUWorld_RemovePIEPrefix();
+
+	static uintptr_t FindBeginLoad();
+
+	static uintptr_t FindEndLoad();
 public:
 	static void SetupOffsets();
 

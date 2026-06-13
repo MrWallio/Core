@@ -10,6 +10,13 @@ class UKismetStringLibrary : public UBlueprintFunctionLibrary {
 public:
 	DefineUnrealClass(UKismetStringLibrary);
 public:
-	/** Converts a string to a name value */
 	static FName Conv_StringToName(const FString& InString);
+
+	static FString ToUpper(const FString& SourceString);
+
+	static bool Contains(const FString& SearchIn, const FString& Substring, bool bUseCase, bool bSearchFromEnd);
+
+	static int32 FindSubstring(const FString& SearchIn, const FString& Substring, bool bUseCase, bool bSearchFromEnd, int32 StartPosition);
+
+	static FString Left(const FString& SourceString, int32 Count);
 };

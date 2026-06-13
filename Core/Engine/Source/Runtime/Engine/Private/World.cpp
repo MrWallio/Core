@@ -243,3 +243,8 @@ void UWorld::SetNavigationSystem(UNavigationSystem* InNavigationSystem)
 	void (*SetNavigationSystemInternal)(UWorld*, UNavigationSystem*) = decltype(SetNavigationSystemInternal)(ImageBase + Finder::FindUWorld_SetNavigationSystem());
 	SetNavigationSystemInternal(this, InNavigationSystem);
 }
+
+FString UWorld::RemovePIEPrefix(const FString& Source) {
+	FString(*RemovePIEPrefixInternal)(const FString&) = decltype(RemovePIEPrefixInternal)(ImageBase + Finder::FindUWorld_RemovePIEPrefix());
+	return RemovePIEPrefixInternal(Source);
+}

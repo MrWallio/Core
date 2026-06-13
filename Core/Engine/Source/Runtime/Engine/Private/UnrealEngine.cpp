@@ -4,6 +4,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectGlobals.h"
 
 void FWorldContext::SetCurrentWorld(UWorld* World)
 {

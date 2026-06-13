@@ -179,6 +179,7 @@ namespace ServerOffsets {
 	inline uintptr_t UWorld_FindCollectionByType = 0;
 	inline uintptr_t UWorld__NextSwitchCountdown = 0;
 	inline uintptr_t UWorld_ListenPatch = 0;
+	inline uintptr_t UWorld_RemovePIEPrefix = 0;
 
 	inline uintptr_t FGuid_ToString = 0;
 
@@ -238,6 +239,7 @@ namespace ServerOffsets {
 	inline uintptr_t AGameModeBase_SpawnPlayerControllerVFT = 0;
 	inline uintptr_t AGameModeBase_GetGameSessionClass = 0;
 	inline uintptr_t AGameModeBase_GetGameSessionClassVFT = 0;
+	inline uintptr_t AGameModeBase_ProcessServerTravelVFT = 0;
 
 	inline uintptr_t UKismetStringLibrary_Conv_StringToName = 0;
 
@@ -346,6 +348,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameMode_FinishWorldInitializationVFT = 0;
 	inline uintptr_t AFortGameMode_PickTeam = 0;
 	inline uintptr_t AFortGameMode_PickTeamVFT = 0;
+	inline uintptr_t AFortGameMode_ProcessServerTravelPatch1 = 0;
 
 	inline uintptr_t AFortWorldManager_HandleWorldQueryComplete = 0;
 
@@ -635,4 +638,7 @@ namespace ServerOffsets {
 	inline uintptr_t UFortQuestManager_QueueStatEvent = 0;
 	inline uintptr_t UFortQuestManager_SendStatEvent = 0;
 	inline uintptr_t UFortQuestManager_ProcessPendingStatEvents = 0;
+
+	inline uintptr_t BeginLoad = 0;
+	inline uintptr_t EndLoad = 0;
 }

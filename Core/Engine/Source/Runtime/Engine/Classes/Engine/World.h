@@ -171,6 +171,8 @@ public:
 	bool IsInSeamlessTravel();
 
 	void SetNavigationSystem(UNavigationSystem* InNavigationSystem);
+
+	static FString RemovePIEPrefix(const FString& Source);
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUWorld_InternalGetNetMode()), InternalGetNetModeHK, (LPVOID*)&InternalGetNetModeOG);

@@ -13,6 +13,7 @@
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h"
 
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 
 uintptr_t Finder::FindGUObjectArray() {
 	static uintptr_t Addr = 0;
@@ -9792,6 +9793,142 @@ uintptr_t Finder::FindUObject_CanCreateInCurrentContext() {
 	return ServerOffsets::UObject_CanCreateInCurrentContext;
 }
 
+uintptr_t Finder::FindAGameModeBase_ProcessServerTravelVFT() {
+	if (ServerOffsets::AGameModeBase_ProcessServerTravelVFT)
+		return ServerOffsets::AGameModeBase_ProcessServerTravelVFT;
+	uintptr_t Addr = 0;
+	
+	uintptr_t ServerTravelAddr = FindUWorld_ServerTravel() + ImageBase;
+	if (ServerTravelAddr) {
+		uintptr_t XrefAddr = Memcury::Scanner::FindPointerRef((LPVOID)ServerTravelAddr, 4).Get();
+		if (XrefAddr) {
+			int Skipped = 0;
+			for (int i = 0; i < 1024; i++)
+			{
+				auto Ptr = (uint8_t*)(XrefAddr + i);
+				if (*Ptr == 0xFF && *(Ptr + 1) == 0x90)
+				{
+					if (Skipped == 1) {
+						int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+						Addr = static_cast<uintptr_t>(Offset);
+					}
+					Skipped++;
+				}
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AGameModeBase_ProcessServerTravelVFT = Addr / 8;
+	}
+
+	Log("AGameModeBase_ProcessServerTravelVFT found at: 0x" + std::format("{:X}", ServerOffsets::AGameModeBase_ProcessServerTravelVFT));
+	return ServerOffsets::AGameModeBase_ProcessServerTravelVFT;
+}
+
+uintptr_t Finder::FindAFortGameMode_ProcessServerTravelPatch1() {
+	if (ServerOffsets::AFortGameMode_ProcessServerTravelPatch1)
+		return ServerOffsets::AFortGameMode_ProcessServerTravelPatch1;
+	uintptr_t Addr = 0;
+	
+	uintptr_t ProcessServerTravelVFT = FindAGameModeBase_ProcessServerTravelVFT();
+	if (ProcessServerTravelVFT) {
+		uintptr_t AFortGameMode_ProcessServerTravelAddr = GetOffsetFromVTable(AFortGameMode::GetDefaultObj(), ProcessServerTravelVFT);
+		if (AFortGameMode_ProcessServerTravelAddr) {
+			for (int i = 0; i < 1024; i++)
+			{
+				auto Ptr = (uint8_t*)(AFortGameMode_ProcessServerTravelAddr + i);
+				if (*Ptr == 0xE9)
+				{
+					Addr = uint64_t(Ptr);
+					break;
+				}
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameMode_ProcessServerTravelPatch1 = Addr - ImageBase;
+	}
+
+	Log("AFortGameMode_ProcessServerTravelPatch1 found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_ProcessServerTravelPatch1));
+	return ServerOffsets::AFortGameMode_ProcessServerTravelPatch1;
+}
+
+uintptr_t Finder::FindUWorld_RemovePIEPrefix() {
+	if (ServerOffsets::UWorld_RemovePIEPrefix)
+		return ServerOffsets::UWorld_RemovePIEPrefix;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Looks like World path invalid PIE prefix (expected '_' characeter after PIE prefix): %s").Get();
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"Looks like World have invalid PIE prefix (PIE instance not number): %s").Get();
+	}
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"Looks like World path invalid PIE prefix (can't find end of PIE prefix): %s").Get();
+	}
+	
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::UWorld_RemovePIEPrefix = Addr - ImageBase;
+	}
+
+	Log("UWorld_RemovePIEPrefix found at: 0x" + std::format("{:X}", ServerOffsets::UWorld_RemovePIEPrefix));
+	return ServerOffsets::UWorld_RemovePIEPrefix;
+}
+
+uintptr_t Finder::FindBeginLoad() {
+	if (ServerOffsets::BeginLoad)
+		return ServerOffsets::BeginLoad;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"BeginLoad(%s) is flushing async loading").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::BeginLoad = Addr - ImageBase;
+	}
+
+	Log("BeginLoad found at: 0x" + std::format("{:X}", ServerOffsets::BeginLoad));
+	return ServerOffsets::BeginLoad;
+}
+
+uintptr_t Finder::FindEndLoad() {
+	if (ServerOffsets::EndLoad)
+		return ServerOffsets::EndLoad;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindPattern("40 55 41 54 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05").Get();
+
+	if (Addr) {
+		ServerOffsets::EndLoad = Addr - ImageBase;
+	}
+
+	Log("EndLoad found at: 0x" + std::format("{:X}", ServerOffsets::EndLoad));
+	return ServerOffsets::EndLoad;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10109,6 +10246,15 @@ void Finder::SetupOffsets() {
 	FindAbilitySpecCDOConstructor();
 
 	FindUObject_CanCreateInCurrentContext();
+
+	FindAGameModeBase_ProcessServerTravelVFT();
+
+	FindAFortGameMode_ProcessServerTravelPatch1();
+
+	FindUWorld_RemovePIEPrefix();
+
+	FindBeginLoad();
+	FindEndLoad();
 
 	return;
 }
