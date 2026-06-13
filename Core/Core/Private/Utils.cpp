@@ -200,6 +200,7 @@ void Utils::Hook() {
 	UAbilitySystemComponent::Hook();
 	APlayerController::Hook();
 	AGameMode::Hook();
+	AGameModeBase::Hook();
 
 	// FortniteGame
 	AFortGameSession::Hook();

@@ -113,7 +113,7 @@ TSubclassOf<AGameSession>* AGameModeBase::GetGameSessionClass() const
 
 void AGameModeBase::ProcessServerTravel(AGameModeBase* This, FString& URL, bool bAbsolute)
 {
-	Log("ProcessServerTravel: " + URL.ToString()));
+	Log("ProcessServerTravel: " + URL.ToString());
 
 	/*This->StartToLeaveMap();
 

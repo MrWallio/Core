@@ -9800,20 +9800,18 @@ uintptr_t Finder::FindAGameModeBase_ProcessServerTravelVFT() {
 	
 	uintptr_t ServerTravelAddr = FindUWorld_ServerTravel() + ImageBase;
 	if (ServerTravelAddr) {
-		uintptr_t XrefAddr = Memcury::Scanner::FindPointerRef((LPVOID)ServerTravelAddr, 4).Get();
-		if (XrefAddr) {
-			int Skipped = 0;
-			for (int i = 0; i < 1024; i++)
+		int Skipped = 0;
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(ServerTravelAddr + i);
+			if (*Ptr == 0xFF && *(Ptr + 1) == 0x90)
 			{
-				auto Ptr = (uint8_t*)(XrefAddr + i);
-				if (*Ptr == 0xFF && *(Ptr + 1) == 0x90)
-				{
-					if (Skipped == 1) {
-						int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
-						Addr = static_cast<uintptr_t>(Offset);
-					}
-					Skipped++;
+				if (Skipped == 1) {
+					int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 2);
+					Addr = static_cast<uintptr_t>(Offset);
+					break;
 				}
+				Skipped++;
 			}
 		}
 	}
@@ -9869,7 +9867,7 @@ uintptr_t Finder::FindUWorld_RemovePIEPrefix() {
 	}
 	
 	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
+		for (int i = 0; i < 2048; i++)
 		{
 			auto Ptr = (uint8_t*)(StringAddr - i);
 			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)

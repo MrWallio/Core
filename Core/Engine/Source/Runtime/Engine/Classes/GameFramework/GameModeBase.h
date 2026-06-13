@@ -55,9 +55,9 @@ public:
 	void StartToLeaveMap();
 
 	static void Hook() {
-		if (Finder::FindAFortGameMode_ProcessServerTravelPatch1()) {
-			PatchCallFar(ImageBase + Finder::FindAFortGameMode_ProcessServerTravelPatch1(), (uintptr_t)ProcessServerTravel);
-		}
+		/*if (Finder::FindAFortGameMode_ProcessServerTravelPatch1()) {
+			PatchCallFar((uintptr_t)(ImageBase + Finder::FindAFortGameMode_ProcessServerTravelPatch1()), (LPVOID*)&ProcessServerTravel);
+		}*/
 
 		Log("AGameModeBase Hooked!");
 	}

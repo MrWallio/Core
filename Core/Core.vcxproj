@@ -164,7 +164,9 @@
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\AssetPtr.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Class.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\CoreNet.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Package.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\PersistentObjectPtr.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UObjectGlobals.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\AI\Navigation\NavigationSystem.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\NavigationObjectBase.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\MovementComponent.h" />
@@ -384,6 +386,7 @@
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectArray.cpp" />
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectBase.cpp" />
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectBaseUtility.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectGlobals.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Private\HAL\UnrealMemory.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Private\Math\UnrealMath.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Private\Misc\AssertionMacros.cpp" />
