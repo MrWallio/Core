@@ -1,5 +1,6 @@
 # Core
 A Universal Gameserver For Fortnite that aims for accuracy over version support!
+### -> [Discord Server](https://discord.gg/FXA9ySgtuW)
 
 ## Version Support
 | Version | Status |
@@ -28,7 +29,7 @@ We would love to see contributions made to the repo! We have a few things we wou
 - **It must work** — It must not cause a crash on the gameserver that stops it from working completely or bugs out the game too much. (We will test your PR before merging.)
 - **detailed issues** - When creating an issue please provide as much detail as possible.
 
-> If you find any issues or missing features please create an issue!
+> **If you find any issues or missing features please create an issue!**
 
 ---
 
