@@ -43,13 +43,24 @@ bool UObject::NeedsLoadForClient(UObject* This)
 	return true;
 }
 
+bool UObject::CanCreateInCurrentContext(UObject* Template)
+{
+	return true;
+}
+
 void UObject::Hook() {
-	HookEveryVTableIdx(
+	/*HookEveryVTableIdx(
 		UObject::StaticClass(),
 		Finder::FindUObject_NeedsLoadForClientVFT(),
 		NeedsLoadForClient,
 		nullptr,
 		true
+	);*/
+
+	MH_CreateHook(
+		(LPVOID*)(ImageBase + Finder::FindUObject_CanCreateInCurrentContext()),
+		CanCreateInCurrentContext,
+		nullptr
 	);
 	
 	Log("Hooked UObject");

@@ -33,6 +33,8 @@ public:
 
 	static bool NeedsLoadForClient(UObject* This);
 
+	static bool CanCreateInCurrentContext(UObject* Template);
+
 	static void Hook();
 
 	static UClass* StaticClass() {

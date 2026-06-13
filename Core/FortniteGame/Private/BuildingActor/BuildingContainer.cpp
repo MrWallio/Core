@@ -8,6 +8,11 @@
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 
 bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* PlayerPawn, uint8 InSourceTypeFlag, uint8 InSpawnSource) {
+	if (!This) {
+		Log("ABuildingContainer::SpawnLoot: This is null!");
+		return false;
+	}
+	
 	if (This->bAlreadySearched) {
 		return false;
 	}
@@ -167,7 +172,7 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 				This->bDestroyContainerOnSearch = true;
 			}
 			else {
-				if (Version::Fortnite_Version <= 1.9) {
+				if (Version::Fortnite_Version <= 1.91) {
 					This->SearchedMesh = nullptr;
 					This->bAllowInteract = false;
 					This->bAlreadySearched = true;

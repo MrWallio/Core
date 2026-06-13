@@ -109,6 +109,10 @@ FVector AActor::GetActorUpVector() const
 
 FVector AActor::K2_GetActorLocation() const
 {
+	if (!this) {
+		return FVector();
+	}
+
 	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)

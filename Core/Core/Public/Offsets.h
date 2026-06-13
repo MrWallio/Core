@@ -87,6 +87,7 @@ namespace ServerOffsets {
 	inline uintptr_t UObject_FindFunctionChecked = 0;
 	inline uintptr_t UObject_GetWorldVFT = 0;
 	inline uintptr_t UObject_NeedsLoadForClientVFT = 0;
+	inline uintptr_t UObject_CanCreateInCurrentContext = 0;
 
 	inline uintptr_t UField_GetOwnerClass = 0;
 	inline uintptr_t UField_GetOwnerStruct = 0;

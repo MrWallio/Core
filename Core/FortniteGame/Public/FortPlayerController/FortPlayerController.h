@@ -176,7 +176,7 @@ public:
 		);*/
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_RemoveInventoryItem()), RemoveInventoryItem, (LPVOID*)&RemoveInventoryItemOG);
 
-		if (Version::Fortnite_Version <= 1.9) {
+		if (Version::Fortnite_Version <= 1.91) {
 			HookEveryVTable(
 				AFortPlayerController::StaticClass(),
 				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerCreateBuildingActor"),
@@ -225,9 +225,9 @@ public:
 			ServerSetInventoryStateValue
 		);
 
-		HookEveryVTable(
+		HookEveryVTableIdx(
 			AFortPlayerController::StaticClass(),
-			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerRepairBuildingActor"),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerRepairBuildingActor")->GetVTableIndex(),
 			ServerRepairBuildingActor,
 			(LPVOID*)&ServerRepairBuildingActorOG
 		);

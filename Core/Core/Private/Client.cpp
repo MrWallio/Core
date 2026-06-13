@@ -82,7 +82,7 @@ void Client::InitConsole(FCoreConfig& Config)
         freopen_s(&fptr, "CONOUT$", "w+", stdout);
     }
     SetConsoleTitleA("CoreClient (Finding Build) | Starting...");
-    Log("Welcome to CoreClient, Made with love by Pongo_x86!");
+    Log("Welcome to CoreClient, Made with love by Pongo_x86 and The Community!");
 }
 
 DWORD Client::ClientThread(LPVOID) {

@@ -105,28 +105,41 @@ uintptr_t Finder::FindProcessEventVFT() {
 	if (ServerOffsets::ProcessEventVFT)
 		return ServerOffsets::ProcessEventVFT;
 
-	auto addr1 = Memcury::Scanner::FindStringRef(L"FLatentActionManager::ProcessLatentActions: Could not find latent action resume point named '%s' on '%s' called by '%s'").Get();
+	uintptr_t Addr = 0;
 
-	uintptr_t addr2 = 0x0;
-
-	for (int i = 0; i < 1000; i++)
+	if (Version::Fortnite_Version < 14.00)
+		Addr = Memcury::Scanner::FindStringRef(L"AccessNoneNoContext").ScanFor({ 0x40, 0x55 }, true, 0).Get();
+	else if (floor(Version::Fortnite_Version) == 27)
+		Addr = Memcury::Scanner::FindPattern(
+			"40 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8D 6C 24 ? 48 89 9D ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C5 48 89 85 ? ? ? ? 45 33 E4 4C 89 45 ? 4D 8B F8")
+		.Get();
+	else if (Version::Engine_Version == 5.2 || (std::floor(Version::Fortnite_Version) == 24 && Version::Fortnite_Version >= 24.30))
+		Addr = Memcury::Scanner::FindPattern(
+			"40 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 48 8D 6C 24 ? 48 89 9D ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C5 48 89 85 ? ? ? ? 45 33 F6")
+		.Get();
+	else if (Version::Fortnite_Version >= 23.00)
 	{
-		auto Address = addr1 - i;
+		Addr = Memcury::Scanner::FindPattern("48 85 C9 0F 85 ? ? ? ? F7 87 ? ? ? ? ? ? ? ? ? 8B ?").ScanFor({ 0x40, 0x55 }, false).Get();
+		if (!Addr)
+			Addr = Memcury::Scanner::FindPattern("41 FF 92 ? ? ? ? E9 ? ? ? ? 49 8B C8").ScanFor({ 0x40, 0x55 }, false).Get();
+	}
+	else
+		Addr = Memcury::Scanner::FindStringRef(L"UMeshNetworkComponent::ProcessEvent: Invalid mesh network node type: %s", true, 0, Version::Fortnite_Version >= 19.00)
+		.ScanFor({ 0xE8 }, true, Version::Fortnite_Version < 19.00 ? 1 : 3)
+		.RelativeOffset(1)
+		.Get();
 
-		if (*(uint8*)(Address) == 0x48 && *(uint8*)(Address + 1) == 0x8B && *(uint8*)(Address + 2) == 0xD6)
-		{
-			addr2 = Address;
-			break;
+	auto DefaultObj = UObject::StaticClass()->GetDefaultObj();
+
+	if (DefaultObj) {
+		for (int i = 0; i < 0x100; i++) {
+			if (__int64(DefaultObj->VTable[i]) == Addr)
+			{
+				ServerOffsets::ProcessEventVFT = i;
+				break;
+			}
 		}
 	}
-
-	auto CallInstructionAddr = addr2 + 6;
-
-	uint32 FoundValue = 0x0;
-
-	FoundValue = *(Memcury::Scanner(CallInstructionAddr).ScanFor({ 0xFF, 0x90 }, true).AbsoluteOffset(2).GetAs<uint32_t*>());
-
-	ServerOffsets::ProcessEventVFT = FoundValue / 8;
 
 	Log("ProcessEvent VFT found at: 0x" + std::format("{:X}", ServerOffsets::ProcessEventVFT));
 	return ServerOffsets::ProcessEventVFT;
@@ -4009,19 +4022,24 @@ uintptr_t Finder::FindUEngine_LoadMap() {
 	if (ServerOffsets::UEngine_LoadMap)
 		return ServerOffsets::UEngine_LoadMap;
 	
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: %s").Get();
-	if (StringAddr) {
-		int Skipped = 0;
+	if (Version::Fortnite_Version == 1.91) {
+		Addr = ImageBase + 0x25143C0;
+	}
+	else {
+		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: %s").Get();
+		if (StringAddr) {
+			int Skipped = 0;
 
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
-				if (Skipped == 1) {
-					Addr = reinterpret_cast<uintptr_t>(Ptr);
-					break;
+			for (int i = 0; i < 1024; i++)
+			{
+				auto Ptr = (uint8_t*)(StringAddr - i);
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
+					if (Skipped == 1) {
+						Addr = reinterpret_cast<uintptr_t>(Ptr);
+						break;
+					}
+					Skipped++;
 				}
-				Skipped++;
 			}
 		}
 	}
@@ -8359,10 +8377,6 @@ uintptr_t Finder::FindUObject_NeedsLoadForClientVFT() {
 	if (ServerOffsets::UObject_NeedsLoadForClientVFT)
 		return ServerOffsets::UObject_NeedsLoadForClientVFT;
 
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::UObject_NeedsLoadForClientVFT = 0x1A;
-	}
-
 	Log("UObject_NeedsLoadForClientVFT found at: 0x" + std::format("{:X}", ServerOffsets::UObject_NeedsLoadForClientVFT));
 	return ServerOffsets::UObject_NeedsLoadForClientVFT;
 }
@@ -8907,15 +8921,20 @@ uintptr_t Finder::FindUFortAnalytics_SetGameSessionID() {
 		return ServerOffsets::UFortAnalytics_SetGameSessionID;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameSessionIDChanged").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+	if (Version::Fortnite_Version == 1.91) {
+		Addr = ImageBase + 0x3C7C80;
+	}
+	else {
+		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameSessionIDChanged").Get();
+		if (StringAddr) {
+			for (int i = 0; i < 1024; i++)
 			{
-				Addr = uint64_t(Ptr);
-				break;
+				auto Ptr = (uint8_t*)(StringAddr - i);
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+				{
+					Addr = uint64_t(Ptr);
+					break;
+				}
 			}
 		}
 	}
@@ -8933,15 +8952,20 @@ uintptr_t Finder::FindUFortAnalytics_SetGameStateClassName() {
 		return ServerOffsets::UFortAnalytics_SetGameStateClassName;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameStateClassNameChanged").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+	if (Version::Fortnite_Version == 1.91) {
+		Addr = ImageBase + 0x3C8040;
+	}
+	else {
+		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameStateClassNameChanged").Get();
+		if (StringAddr) {
+			for (int i = 0; i < 1024; i++)
 			{
-				Addr = uint64_t(Ptr);
-				break;
+				auto Ptr = (uint8_t*)(StringAddr - i);
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+				{
+					Addr = uint64_t(Ptr);
+					break;
+				}
 			}
 		}
 	}
@@ -9528,6 +9552,10 @@ uintptr_t Finder::FindABuildingActor_ServerOnAttemptInteractVFT() {
 uintptr_t Finder::FindUWorld_ListenPatch() {
 	if (ServerOffsets::UWorld_ListenPatch)
 		return ServerOffsets::UWorld_ListenPatch;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::UWorld_ListenPatch;
+
 	uintptr_t Addr = 0;
 
 	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: failed to Listen(%s)").Get();
@@ -9543,7 +9571,7 @@ uintptr_t Finder::FindUWorld_ListenPatch() {
 					Addr = uint64_t(Ptr);
 					break;
 				}
-				
+
 				Skipped++;
 			}
 		}
@@ -9553,6 +9581,7 @@ uintptr_t Finder::FindUWorld_ListenPatch() {
 		ServerOffsets::UWorld_ListenPatch = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("UWorld_ListenPatch found at: 0x" + std::format("{:X}", ServerOffsets::UWorld_ListenPatch));
 	return ServerOffsets::UWorld_ListenPatch;
 }
@@ -9721,6 +9750,36 @@ uintptr_t Finder::FindAFortPlayerController_PayBuildingRepairCost() {
 
 	Log("AFortPlayerController_PayBuildingRepairCost found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_PayBuildingRepairCost));
 	return ServerOffsets::AFortPlayerController_PayBuildingRepairCost;
+}
+
+uintptr_t Finder::FindUObject_CanCreateInCurrentContext() {
+	if (ServerOffsets::UObject_CanCreateInCurrentContext)
+		return ServerOffsets::UObject_CanCreateInCurrentContext;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Unable to spawn class '%s' due to client/server context.").Get();
+	if (StringAddr) {
+		int Skipped = 0;
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0xE8)
+			{
+				if (Skipped == 1) {
+					Addr = Utils::GetCallDestination((uintptr_t)Ptr);
+					break;
+				}
+				Skipped++;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::UObject_CanCreateInCurrentContext = Addr - ImageBase;
+	}
+
+	Log("UObject_CanCreateInCurrentContext found at: 0x" + std::format("{:X}", ServerOffsets::UObject_CanCreateInCurrentContext));
+	return ServerOffsets::UObject_CanCreateInCurrentContext;
 }
 
 void Finder::SetupOffsets() {
@@ -10038,6 +10097,8 @@ void Finder::SetupOffsets() {
 	FindUAbilitySystemComponent_GiveAbilityAndActivateOnce();
 
 	FindAbilitySpecCDOConstructor();
+
+	FindUObject_CanCreateInCurrentContext();
 
 	return;
 }

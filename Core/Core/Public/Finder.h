@@ -1032,6 +1032,8 @@ public:
 	static uintptr_t FindUFortQuestManager_ProcessPendingStatEvents();
 
 	static uintptr_t FindAFortPlayerController_PayBuildingRepairCost();
+
+	static uintptr_t FindUObject_CanCreateInCurrentContext();
 public:
 	static void SetupOffsets();
 
