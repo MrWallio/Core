@@ -292,7 +292,7 @@ uintptr_t Finder::FindStaticFindObject() {
 	}
 
 	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("4C 8B DC 57 48 81 EC ? ? ? ? 80 3D").Get();
+		Addr = Memcury::Scanner::FindPattern("4C 8B DC 49 89 5B ? 49 89 6B ? 49 89 73 ? 57 41 56 41 57 48 83 EC ? 80 3D ? ? ? ? 00").Get();
 	}
 	if (!Addr) {
 		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 45 33 ED 4D 8B F9").Get();

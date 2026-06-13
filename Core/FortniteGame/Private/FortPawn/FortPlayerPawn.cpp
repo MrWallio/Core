@@ -74,7 +74,7 @@ void AFortPlayerPawn::ServerReviveFromDBNO(AFortPlayerPawn* This, AController* E
 }
 
 void AFortPlayerPawn::ServerHandlePickup(AFortPlayerPawn* This, AFortPickup* Pickup, float InFlyTime, FVector& InStartDirection, bool bPlayPickupSound) {
-	if (Version::Fortnite_Version <= 1.81) {
+	if (Version::Fortnite_Version <= 1.81 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
 		return ServerHandlePickupOG(This, Pickup, InFlyTime, InStartDirection, bPlayPickupSound);
 	}
 

@@ -91,7 +91,7 @@ void AFortPlayerControllerAthena::OnReadyToStartMatch(AFortPlayerControllerAthen
 }
 
 void AFortPlayerControllerAthena::ServerReturnToMainMenu(AFortPlayerControllerAthena* This) {
-	if (Version::Fortnite_Version <= 1.72) {
+	if (Version::Fortnite_Version <= 1.72 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
 		return ServerReturnToMainMenuOG(This);
 	}
 

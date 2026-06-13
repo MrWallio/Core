@@ -20,16 +20,14 @@ FGameplayAbilitySpec* UAbilitySystemComponent::FindAbilitySpecFromHandle(FGamepl
 }
 
 void UAbilitySystemComponent::InternalServerTryActivateAbility(UAbilitySystemComponent* This, FGameplayAbilitySpecHandle Handle, bool InputPressed, const FPredictionKey& PredictionKey, FGameplayEventData* TriggerEventData) {
-	if (Version::Engine_Version == 4.16) {
+	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.19) {
 		FGameplayAbilitySpec* Spec = This->FindAbilitySpecFromHandle(Handle);
 		if (!Spec)
 		{
-			// Can potentially happen in race conditions where client tries to activate ability that is removed server side before it is received.
 			This->ClientActivateAbilityFailed(Handle, PredictionKey.Current);
 			return;
 		}
 
-		// Consume any pending target info, to clear out cancels from old executions
 		This->ConsumeAllReplicatedData(Handle, PredictionKey);
 
 		const UGameplayAbility* AbilityToActivate = Spec->Ability;
@@ -41,10 +39,9 @@ void UAbilitySystemComponent::InternalServerTryActivateAbility(UAbilitySystemCom
 		UGameplayAbility* InstancedAbility = nullptr;
 		Spec->InputPressed = true;
 
-		// Attempt to activate the ability (server side) and tell the client if it succeeded or failed.
 		if (This->InternalTryActivateAbility(Handle, PredictionKey, &InstancedAbility, nullptr, TriggerEventData))
 		{
-			// TryActivateAbility handles notifying the client of success
+			
 		}
 		else
 		{

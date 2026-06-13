@@ -28,7 +28,7 @@ void UActorChannel::SetChannelActorForDestroy(FActorDestructionInfo* DestructInf
 		SetChannelActorForDestroyInternal(this, DestructInfo);
 	}
 	else {
-		if (Version::Engine_Version == 4.16) {
+		if (Version::Engine_Version >= 4.0 && Version::Engine_Version < 4.19) {
 			UActorChannelUE416* ActorChannel = (UActorChannelUE416*)this;
 
 			if (ActorChannel->Closing && (Connection->State == USOCK_Open || Connection->State == USOCK_Pending))
@@ -57,16 +57,12 @@ void UActorChannel::SetChannelActor(AActor* InActor)
 
 int32 UChannel::IsNetReady(bool Saturate)
 {
-	if (Version::Engine_Version == 4.16) {
-		// If saturation allowed, ignore queued byte count.
-		if (NumOutRec >= RELIABLE_BUFFER - 1)
-		{
-			return 0;
-		}
-		return Connection->IsNetReady(Saturate);
+	// If saturation allowed, ignore queued byte count.
+	if (NumOutRec >= RELIABLE_BUFFER - 1)
+	{
+		return 0;
 	}
-
-	return 0;
+	return Connection->IsNetReady(Saturate);
 }
 
 bool UActorChannel::ReplicateActor()

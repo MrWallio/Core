@@ -501,7 +501,7 @@ int32 AFortInventory::GetInventoryCapacity()
 		return 0;
 	}
 
-	if (Version::Fortnite_Version >= 1.9)
+	if (Version::Fortnite_Version >= 1.9 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11)
 	{
 		IFortInventoryOwnerInterface* InventoryOwner = (IFortInventoryOwnerInterface*)Owner->GetInterfaceAddress(IFortInventoryOwnerInterface::StaticClass());
 		if (!InventoryOwner)
@@ -529,7 +529,7 @@ int32 AFortInventory::GetInventoryUsed()
 		return 0;
 	}
 
-	if (Version::Fortnite_Version >= 1.9)
+	if (Version::Fortnite_Version >= 1.9 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11)
 	{
 		IFortInventoryOwnerInterface* InventoryOwner = (IFortInventoryOwnerInterface*)Owner->GetInterfaceAddress(IFortInventoryOwnerInterface::StaticClass());
 		if (!InventoryOwner)
