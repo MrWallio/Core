@@ -5,7 +5,7 @@ A Universal Gameserver For Fortnite that aims for accuracy over version support!
 | Version | Status |
 |---------|--------|
 | 1.7.2 - 1.9.1 | ✅ Full Support |
-| 1.9.1+ | ⚠️ Partial Support |
+| 1.10+ | ⚠️ Partial Support |
 
 > ⚠️ Please note Save the World is very unfinished!
 
