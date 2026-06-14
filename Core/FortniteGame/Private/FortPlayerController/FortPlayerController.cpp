@@ -554,6 +554,17 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			return;
 		}
 
+		UObject* ActorCDO = ActorClass->GetDefaultObj();
+		if (!ActorCDO) {
+			This->ClientMessage("Failed to get CDO for class: " + ActorClass->GetName().ToString());
+			return;
+		}
+
+		if (!ActorCDO->IsA(AActor::StaticClass())) {
+			This->ClientMessage("Class is not an AActor: " + ActorClass->GetName().ToString());
+			return;
+		}
+
 		AActor* NewActor = World->SpawnActor(ActorClass, Location, Rotation, bSetOwnerAsThis ? This : nullptr);
 		if (NewActor) {
 			This->ClientMessage("Spawned actor: " + NewActor->GetName().ToString());
