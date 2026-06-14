@@ -246,4 +246,14 @@ inline bool PatchCallFar(uintptr_t callSite, void* newTarget)
     return PatchCall(callSite, trampoline);
 }
 
+struct _Pad_0x10
+{
+    uint8_t Padding[0x10];
+};
+
+struct _Pad_0x18
+{
+    uint8_t Padding[0x18];
+};
+
 #endif //PCH_H

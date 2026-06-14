@@ -149,9 +149,11 @@
     <ClInclude Include="Core\Public\Version.h" />
     <ClInclude Include="CrashReporter\Public\CrashReporter.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\Abilities\GameplayAbility.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\Abilities\GameplayAbilityTargetTypes.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\Abilities\GameplayAbilityTypes.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\AbilitySystemComponent.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\AbilitySystemInterface.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\ActiveGameplayEffectHandle.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\AttributeSet.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayAbilitySpec.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayAbilitySpecHandle.h" />
@@ -265,6 +267,7 @@
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingGameplayActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTrap.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortAbilitySystemComponent.h" />
+    <ClInclude Include="FortniteGame\Public\FortAbility\GameplayEffectApplicationInfo.h" />
     <ClInclude Include="FortniteGame\Public\FortAnalytics\AnalyticsProvider.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIController.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIDirector.h" />
@@ -379,6 +382,7 @@
     <ClCompile Include="Core\Private\Version.cpp" />
     <ClCompile Include="CrashReporter\Private\CrashReporter.cpp" />
     <ClCompile Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Private\AbilitySystemComponent.cpp" />
+    <ClCompile Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Private\GameplayAbility.cpp" />
     <ClCompile Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Private\GameplayAbilitySpecHandle.cpp" />
     <ClCompile Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Private\GameplayAbilityTypes.cpp" />
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\Class.cpp" />
@@ -425,6 +429,7 @@
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingGameplayActor.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingSMActor.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortAbility\FortAbilitySystemComponent.cpp" />
     <ClCompile Include="FortniteGame\Private\FortItem\FortQuestItem.cpp" />
     <ClCompile Include="FortniteGame\Private\FortManager\FortCheatManager.cpp" />
     <ClCompile Include="FortniteGame\Private\FortAnalytics\FortAnalytics.cpp" />

@@ -339,6 +339,35 @@ public:
         return Size; \
     }
 
+#define DefineUnrealStructPath(FullName) \
+    static UStruct* StaticStruct() \
+    { \
+        static UStruct* CachedStaticStruct = nullptr; \
+        static bool bInitialized = false; \
+        \
+        if (!bInitialized) \
+        { \
+            bInitialized = true; \
+            CachedStaticStruct = (UStruct*)FUObjectArray::FindObject(FullName, true); \
+        } \
+        return CachedStaticStruct; \
+    } \
+    \
+    static int32 GetSize() \
+    { \
+        static int32 Size = -1; \
+        if (Size == -1) \
+        { \
+            Size = StaticStruct()->PropertiesSize; \
+            if (Size <= 0) \
+            { \
+                Log("Failed to find size for " #FullName "!"); \
+                return 0; \
+            } \
+        } \
+        return Size; \
+    }
+
 #define DefineUnrealEnum(__Class) \
     static UEnum* StaticEnum() \
     { \

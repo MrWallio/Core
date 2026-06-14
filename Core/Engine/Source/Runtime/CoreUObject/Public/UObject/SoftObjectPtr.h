@@ -88,3 +88,21 @@ public:
         return Get();
     }
 };
+
+template<typename UEType>
+class TSoftClassPtr : public FSoftObjectPtr
+{
+public:
+    UEType* Get()
+    {
+        return (UEType*)InternalGet(UEType::StaticClass());
+    }
+    const UEType* operator->()
+    {
+        return Get();
+    }
+    operator const UEType* ()
+    {
+        return Get();
+    }
+};

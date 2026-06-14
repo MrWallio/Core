@@ -23,18 +23,30 @@ void UAbilitySystemComponent::InternalServerTryActivateAbility(UAbilitySystemCom
 	FGameplayAbilitySpec* Spec = This->FindAbilitySpecFromHandle(Handle);
 	if (!Spec)
 	{
+		Log("InternalServerTryActiveAbility. Rejecting ClientActivation of ability with invalid SpecHandle!");
 		This->ClientActivateAbilityFailed(Handle, PredictionKey.Current);
 		return;
 	}
-
-	This->ConsumeAllReplicatedData(Handle, PredictionKey);
 
 	const UGameplayAbility* AbilityToActivate = Spec->Ability;
 	if (!AbilityToActivate)
 	{
+		Log("InternalServerTryActiveAbility. Rejecting ClientActivation of unconfigured spec ability!");
 		This->ClientActivateAbilityFailed(Handle, PredictionKey.Current);
 		return;
 	}
+
+	if (AbilityToActivate->_HasInstancingPolicy()) {
+		if (AbilityToActivate->NetSecurityPolicy == EGameplayAbilityNetSecurityPolicy::GetServerOnlyExecution() ||
+			AbilityToActivate->NetSecurityPolicy == EGameplayAbilityNetSecurityPolicy::GetServerOnly())
+		{
+			Log("InternalServerTryActiveAbility. Rejecting ClientActivation of " + AbilityToActivate->GetName().ToString() + " due to security policy violation.");
+			This->ClientActivateAbilityFailed(Handle, PredictionKey.Current);
+			return;
+		}
+	}
+
+	This->ConsumeAllReplicatedData(Handle, PredictionKey);
 
 	UGameplayAbility* InstancedAbility = nullptr;
 	Spec->InputPressed = true;
@@ -87,8 +99,17 @@ void UAbilitySystemComponent::ConsumeAllReplicatedData(FGameplayAbilitySpecHandl
 
 bool UAbilitySystemComponent::InternalTryActivateAbility(FGameplayAbilitySpecHandle AbilityToActivate, FPredictionKey InPredictionKey, UGameplayAbility** OutInstancedAbility, void* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData)
 {
-	bool (*InternalTryActivateAbilityInternal)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle, FPredictionKey, UGameplayAbility**, void*, const FGameplayEventData*) = decltype(InternalTryActivateAbilityInternal)(ImageBase + Finder::FindUAbilitySystemComponent_InternalTryActivateAbility());
-	return InternalTryActivateAbilityInternal(this, AbilityToActivate, InPredictionKey, OutInstancedAbility, OnGameplayAbilityEndedDelegate, TriggerEventData);
+	const uintptr_t Addr = ImageBase + Finder::FindUAbilitySystemComponent_InternalTryActivateAbility();
+	if (FPredictionKey::GetSize() == 0x18)
+	{
+		using Fn = bool(*)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle, _Pad_0x18, UGameplayAbility**, void*, const FGameplayEventData*);
+		return ((Fn)Addr)(this, AbilityToActivate, *(_Pad_0x18*)&InPredictionKey, OutInstancedAbility, OnGameplayAbilityEndedDelegate, TriggerEventData);
+	}
+	else
+	{
+		using Fn = bool(*)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle, _Pad_0x10, UGameplayAbility**, void*, const FGameplayEventData*);
+		return ((Fn)Addr)(this, AbilityToActivate, *(_Pad_0x10*)&InPredictionKey, OutInstancedAbility, OnGameplayAbilityEndedDelegate, TriggerEventData);
+	}
 }
 
 FGameplayAbilitySpecHandle UAbilitySystemComponent::GiveAbility(FGameplayAbilitySpec& AbilitySpec) {
@@ -104,4 +125,52 @@ FGameplayAbilitySpecHandle UAbilitySystemComponent::GiveAbilityAndActivateOnce(F
 	FGameplayAbilitySpecHandle OutHandle;
 	GiveAbilityAndActivateOnceInternal(this, &OutHandle, Spec, GameplayEventData);
 	return OutHandle;
+}
+
+FActiveGameplayEffectHandle UAbilitySystemComponent::BP_ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level, const FGameplayEffectContextHandle& EffectContext)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("BP_ApplyGameplayEffectToSelf");
+
+	struct AbilitySystemComponent_BP_ApplyGameplayEffectToSelf
+	{
+	public:
+		TSubclassOf<UGameplayEffect> GameplayEffectClass;
+		float Level;
+		uint8 Pad_C[0x4];
+		FGameplayEffectContextHandle EffectContext;
+		FActiveGameplayEffectHandle ReturnValue;
+	};
+
+	AbilitySystemComponent_BP_ApplyGameplayEffectToSelf Parms{};
+
+	Parms.GameplayEffectClass = GameplayEffectClass;
+	Parms.Level = Level;
+	Parms.EffectContext = std::move(EffectContext);
+
+	ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}
+
+FGameplayEffectContextHandle UAbilitySystemComponent::MakeEffectContext() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("MakeEffectContext");
+
+	struct AbilitySystemComponent_MakeEffectContext
+	{
+	public:
+		FGameplayEffectContextHandle ReturnValue;
+	};
+
+	AbilitySystemComponent_MakeEffectContext Parms{};
+
+	const_cast<UAbilitySystemComponent*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
 }

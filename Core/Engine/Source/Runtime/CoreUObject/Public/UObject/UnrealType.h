@@ -158,6 +158,12 @@ public:
 private: \
     static inline int32 Name##_Offset = -2; \
 public: \
+    bool _Has##Name() const { \
+        if (Name##_Offset == -2) { \
+            Name##_Offset = StaticClass()->GetPropertyOffset(#Name); \
+        } \
+        return Name##_Offset != -1; \
+    } \
     Type& _Get##Name() { \
         if (Name##_Offset == -2) { \
             Name##_Offset = StaticClass()->GetPropertyOffset(#Name); \

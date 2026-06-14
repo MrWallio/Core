@@ -7,6 +7,8 @@
 #include "Abilities/GameplayAbilityTypes.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayAbilitySpec.h"
+#include "ActiveGameplayEffectHandle.h"
+#include "GameplayEffectTypes.h"
 
 class AGameplayAbilityTargetActor;
 class AHUD;
@@ -14,6 +16,7 @@ class FDebugDisplayInfo;
 class UAnimMontage;
 class UCanvas;
 class UInputComponent;
+class UGameplayEffect;
 
 enum class EReplicationMode : uint8
 {
@@ -69,6 +72,10 @@ public:
 	FGameplayAbilitySpecHandle GiveAbility(FGameplayAbilitySpec& AbilitySpec);
 
 	FGameplayAbilitySpecHandle GiveAbilityAndActivateOnce(FGameplayAbilitySpec* AbilitySpec, FGameplayEventData* GameplayEventData = nullptr);
+
+	FActiveGameplayEffectHandle BP_ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level, const FGameplayEffectContextHandle& EffectContext);
+
+	FGameplayEffectContextHandle MakeEffectContext() const;
 public:
 	static void Hook() {
 		HookEveryVTableIdx(UAbilitySystemComponent::StaticClass(), Finder::FindInternalServerTryActivateAbilityVFT(), InternalServerTryActivateAbility);

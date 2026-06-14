@@ -11,6 +11,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetConnection.h"
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h"
+#include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/GameplayAbility.h"
 
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
@@ -9927,6 +9928,55 @@ uintptr_t Finder::FindEndLoad() {
 	return ServerOffsets::EndLoad;
 }
 
+uintptr_t Finder::FindUGameplayAbility_CanActivateAbility() {
+	if (ServerOffsets::UGameplayAbility_CanActivateAbility)
+		return ServerOffsets::UGameplayAbility_CanActivateAbility;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"CanActivateAbility called with invalid Handle").Get();
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"CanActivateAbility %s failed, blueprint refused").Get();
+	}
+
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x89 && *(Ptr + 1) == 0x54)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::UGameplayAbility_CanActivateAbility = Addr - ImageBase;
+	}
+
+	Log("UGameplayAbility_CanActivateAbility found at: 0x" + std::format("{:X}", ServerOffsets::UGameplayAbility_CanActivateAbility));
+	return ServerOffsets::UGameplayAbility_CanActivateAbility;
+}
+
+uintptr_t Finder::FindUGameplayAbility_CanActivateAbilityVFT() {
+	if (ServerOffsets::UGameplayAbility_CanActivateAbilityVFT)
+		return ServerOffsets::UGameplayAbility_CanActivateAbilityVFT;
+
+	void** VFT = UGameplayAbility::StaticClass()->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindUGameplayAbility_CanActivateAbility() + ImageBase))
+		{
+			ServerOffsets::UGameplayAbility_CanActivateAbilityVFT = i;
+			break;
+		}
+	}
+
+	Log("UGameplayAbility_CanActivateAbilityVFT found at: 0x" + std::format("{:X}", ServerOffsets::UGameplayAbility_CanActivateAbilityVFT));
+	return ServerOffsets::UGameplayAbility_CanActivateAbilityVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10253,6 +10303,9 @@ void Finder::SetupOffsets() {
 
 	FindBeginLoad();
 	FindEndLoad();
+
+	FindUGameplayAbility_CanActivateAbility();
+	FindUGameplayAbility_CanActivateAbilityVFT();
 
 	return;
 }

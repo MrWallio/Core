@@ -21,9 +21,22 @@ struct FAbilityTargetDataSetDelegate;
 struct FSimpleMulticastDelegate;
 struct FAbilityReplicatedData;
 
+class EGameplayAbilityNetSecurityPolicy {
+public:
+	DefineUnrealEnum(EGameplayAbilityNetSecurityPolicy);
+
+	DefineEnumProperty(ClientOrServer);
+	DefineEnumProperty(ServerOnlyExecution);
+	DefineEnumProperty(ServerOnlyTermination);
+	DefineEnumProperty(ServerOnly);
+	DefineEnumProperty(EGameplayAbilityNetSecurityPolicy_MAX);
+};
+
 struct FGameplayEventData {
 public:
 	DefineUnrealStruct(FGameplayEventData);
+public:
+	uint8 Padding[0xA8];
 };
 
 struct FGameplayAbilitySpecHandleAndPredictionKey {

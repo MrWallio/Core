@@ -201,6 +201,7 @@ void Utils::Hook() {
 	APlayerController::Hook();
 	AGameMode::Hook();
 	AGameModeBase::Hook();
+	UGameplayAbility::Hook();
 
 	// FortniteGame
 	AFortGameSession::Hook();
@@ -284,6 +285,8 @@ FString Utils::BuildTravelURL(FString MapName, std::vector<std::pair<std::string
 
 void Utils::SetLogVerbosity() {
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogGarbage VeryVerbose", nullptr);
+    UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAbilitySystem VeryVerbose", nullptr);
+    UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAbilitySystemPrediction VeryVerbose", nullptr);
 
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortAIDebug VeryVerbose", nullptr);
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortBotMission VeryVerbose", nullptr);

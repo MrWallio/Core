@@ -5,11 +5,18 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/DataAsset.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/Templates/SubclassOf.h"
 
+#include "GameplayEffectApplicationInfo.h"
+
 class UFortGameplayAbility;
+struct FGameplayEffectApplicationInfoHard;
+struct FGameplayEffectApplicationInfo;
+class UAbilitySystemComponent;
 
 struct FFortAbilitySetHandle {
 public:
 	DefineUnrealStruct(FFortAbilitySetHandle);
+
+	DefineStructProperty(TWeakObjectPtr<UAbilitySystemComponent>, TargetAbilitySystemComponent);
 
 	uint8 Padding[0x28];
 };
@@ -19,4 +26,6 @@ public:
 	DefineUnrealClass(UFortAbilitySet);
 public:
 	DefineUProperty(TArray<TSubclassOf<UFortGameplayAbility>>, GameplayAbilities);
+	DefineUProperty(TArray<FGameplayEffectApplicationInfoHard>, GrantedGameplayEffects);
+	DefineUProperty(TArray<FGameplayEffectApplicationInfo>, PassiveGameplayEffects);
 };

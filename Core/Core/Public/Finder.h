@@ -1044,6 +1044,10 @@ public:
 	static uintptr_t FindBeginLoad();
 
 	static uintptr_t FindEndLoad();
+
+	static uintptr_t FindUGameplayAbility_CanActivateAbility();
+
+	static uintptr_t FindUGameplayAbility_CanActivateAbilityVFT();
 public:
 	static void SetupOffsets();
 

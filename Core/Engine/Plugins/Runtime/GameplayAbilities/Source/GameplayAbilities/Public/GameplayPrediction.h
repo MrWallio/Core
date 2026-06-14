@@ -8,13 +8,14 @@ class UPackageMap;
 
 struct FPredictionKey {
 public:
-	DefineUnrealStruct(FPredictionKey);
+	DefineUnrealStructPath("ScriptStruct /Script/GameplayAbilities.PredictionKey");
 
-	int16 Current;
-	int16 Base;
-	uint8 Pad_4[0x4];
-	UPackageMap* PredictiveConnection;
-	bool bIsStale;
-	bool bIsServerInitiated;
-	uint8 Pad_12[0x6];
+	DefineStructProperty(int16, Current);
+	DefineStructProperty(int16, Base);
+	DefineStructProperty(UPackageMap*, PredictiveConnection);
+	DefineStructProperty(bool, bIsStale);
+	DefineStructProperty(bool, bIsServerInitiated);
+
+public:
+	uint8 Padding[0x18];
 };

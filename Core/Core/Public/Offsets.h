@@ -641,4 +641,7 @@ namespace ServerOffsets {
 
 	inline uintptr_t BeginLoad = 0;
 	inline uintptr_t EndLoad = 0;
+
+	inline uintptr_t UGameplayAbility_CanActivateAbility = 0;
+	inline uintptr_t UGameplayAbility_CanActivateAbilityVFT = 0;
 }

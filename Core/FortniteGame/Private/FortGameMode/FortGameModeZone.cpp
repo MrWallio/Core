@@ -15,6 +15,7 @@
 #include "FortniteGame/Public/FortGameState/FortGameStateZone.h"
 #include "FortniteGame/Public/FortManager/FortMissionManager.h"
 #include "FortniteGame/Public/Kismet/FortMissionLibrary.h"
+#include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 
 void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer) {
 	HandleStartingNewPlayerOG(This, NewPlayer);
@@ -109,11 +110,7 @@ APawn* AFortGameModeZone::SpawnDefaultPawnFor(AFortGameModeZone* This, AControll
 				FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer");
 			}
 
-			TScriptInterface<IAbilitySystemInterface> AbilitySystemInterface = TScriptInterface<IAbilitySystemInterface>();
-			AbilitySystemInterface.ObjectPointer = PlayerState;
-			AbilitySystemInterface.InterfacePointer = PlayerState->GetInterfaceAddress(IAbilitySystemInterface::StaticClass());
-
-			UFortKismetLibrary::EquipFortAbilitySet(AbilitySystemInterface, FortAbilitySet, PlayerState);
+			PlayerState->AbilitySystemComponent->GiveAbilitySet(FortAbilitySet);
 		}
 	}
 

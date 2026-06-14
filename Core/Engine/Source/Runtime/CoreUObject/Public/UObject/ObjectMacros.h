@@ -9,6 +9,9 @@ enum EClassCastFlags : uint64
 
 	CASTCLASS_UClass = 0x0000000000000020,
 	CASTCLASS_UFunction = 0x0000000000080000,
+    CASTCLASS_UStruct = 0x0000000000000008,
+    CASTCLASS_UScriptStruct = 0x0000000000000010,
+    CASTCLASS_UStructProperty = 0x0000000000100000,
 };
 
 enum EPropertyFlags : uint64
