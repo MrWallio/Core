@@ -98,22 +98,6 @@ void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFort
 APawn* AFortGameModeZone::SpawnDefaultPawnFor(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot) {
 	APawn* Pawn = AFortGameMode::SpawnDefaultPawnFor(This, NewPlayer, StartSpot);
 
-	auto PlayerState = (AFortPlayerStateZone*)NewPlayer->PlayerState;
-	if (PlayerState) {
-		if (PlayerState->AbilitySystemComponent) {
-			UFortAbilitySet* FortAbilitySet = nullptr;
-
-			if (Version::Fortnite_Version >= 2) {
-				FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer");
-			}
-			else {
-				FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer");
-			}
-
-			PlayerState->AbilitySystemComponent->GiveAbilitySet(FortAbilitySet);
-		}
-	}
-
 	Log("AFortGameModeZone::SpawnDefaultPawnFor: Spawned default pawn. NewPlayer=" + (NewPlayer ? NewPlayer->GetName().ToString() : "None") + " Pawn=" + (Pawn ? Pawn->GetName().ToString() : "None"));
 	return Pawn;
 }

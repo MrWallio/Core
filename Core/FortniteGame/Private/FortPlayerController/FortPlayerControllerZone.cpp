@@ -16,8 +16,26 @@
 #include "FortniteGame/Public/Mcp/McpProfileSys.h"
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
+#include "FortniteGame/Public/FortAbility/FortAbilitySet.h"
+#include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 
 void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P) {
+	auto PlayerState = (AFortPlayerStateZone*)This->PlayerState;
+	if (PlayerState) {
+		if (PlayerState->AbilitySystemComponent) {
+			UFortAbilitySet* FortAbilitySet = nullptr;
+
+			if (Version::Fortnite_Version >= 2) {
+				FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer");
+			}
+			else {
+				FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer");
+			}
+
+			PlayerState->AbilitySystemComponent->GiveAbilitySet(FortAbilitySet);
+		}
+	}
+
 	AFortPlayerController::ServerAcknowledgePossessionOG(This, P);
 }
 

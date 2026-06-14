@@ -142,6 +142,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("SetShield <Shield> - Sets the player's shield.");
 		This->ClientMessage("SetMaxHealth <MaxHealth> - Sets the player's max health.");
 		This->ClientMessage("SetMaxShield <MaxShield> - Sets the player's max shield.");
+		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] [Location] [Rotation] - Spawns an actor at the specified location and rotation.");
 	}
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
@@ -475,6 +476,91 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->MyFortPawn->SetMaxShield(MaxShield);
 
 		This->ClientMessage("Set max shield to " + std::to_string(MaxShield));
+	}
+	else if (Parser.IsCommand("SpawnActor")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SpawnActor <ActorClassName> [Location] [Rotation]");
+			return;
+		}
+
+		std::string ActorClassName = Parser.GetArg(0);
+		bool bSetOwnerAsThis = Parser.GetArgBool(1, false);
+		FVector Location = This->Pawn ? This->Pawn->K2_GetActorLocation() : FVector();
+		FRotator Rotation = FRotator();
+
+		if (Parser.GetArgCount() >= 5) {
+			Location.X = Parser.GetArgFloat(1, Location.X);
+			Location.Y = Parser.GetArgFloat(2, Location.Y);
+			Location.Z = Parser.GetArgFloat(3, Location.Z);
+		}
+		if (Parser.GetArgCount() >= 8) {
+			Rotation.Pitch = Parser.GetArgFloat(4, Rotation.Pitch);
+			Rotation.Yaw = Parser.GetArgFloat(5, Rotation.Yaw);
+			Rotation.Roll = Parser.GetArgFloat(6, Rotation.Roll);
+		}
+
+		UObject* ActorClassObj;
+		if (ActorClassName.contains("/")) {
+			if (ActorClassName.starts_with("FortniteGame/"))
+			{
+				ActorClassName = "/Game/" + ActorClassName.substr(strlen("FortniteGame/"));
+			}
+
+			size_t contentPos = ActorClassName.find("/Content/");
+			if (contentPos != std::string::npos)
+			{
+				if (ActorClassName.contains("/Game/Content/"))
+				{
+					ActorClassName.replace(ActorClassName.find("/Game/Content/"), strlen("/Game/Content/"), "/Game/");
+				}
+				else
+				{
+					size_t contentPos = ActorClassName.find("/Content/");
+					ActorClassName = ActorClassName.substr(0, contentPos)
+						+ "/Game/"
+						+ ActorClassName.substr(contentPos + strlen("/Content/"));
+				}
+			}
+
+			if (!ActorClassName.contains("."))
+			{
+				size_t lastSlash = ActorClassName.find_last_of('/');
+				if (lastSlash != std::string::npos)
+				{
+					std::string className = ActorClassName.substr(lastSlash + 1);
+					ActorClassName += "." + className;
+				}
+				else
+				{
+					This->ClientMessage("Invalid ActorClass path: " + ActorClassName);
+					return;
+				}
+			}
+
+			ActorClassObj = StaticLoadObject(ActorClassName);
+		}
+		else {
+			ActorClassObj = FUObjectArray::FindObjectFast(ActorClassName);
+		}
+		if (!ActorClassObj) {
+			This->ClientMessage("Actor class not found: " + ActorClassName);
+			return;
+		}
+
+		UClass* ActorClass = ActorClassObj->Cast<UClass>();
+		if (!ActorClass) {
+			This->ClientMessage("Object is not a UClass: " + ActorClassObj->GetName().ToString());
+			return;
+		}
+
+		AActor* NewActor = World->SpawnActor(ActorClass, Location, Rotation, bSetOwnerAsThis ? This : nullptr);
+		if (NewActor) {
+			This->ClientMessage("Spawned actor: " + NewActor->GetName().ToString());
+		}
+		else {
+			This->ClientMessage("Failed to spawn actor of class: " + ActorClass->GetName().ToString());
+		}
 	}
 }
 
