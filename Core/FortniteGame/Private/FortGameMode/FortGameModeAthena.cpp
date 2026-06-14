@@ -52,6 +52,10 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	This->bDisableGCOnServerDuringMatch = true;
 	
 	GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
+
+	This->GameSession->MaxPlayers = 100;
+
+	This->MaxPlayerCount = 100;
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {

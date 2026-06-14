@@ -16,6 +16,7 @@ public:
 	DefineUnrealClass(AFortGameModeAthena);
 
 	DefineUProperty(int32, WarmupRequiredPlayerCount);
+	DefineUProperty(int32, MaxPlayerCount);
 
 	DefineUProperty(float, PlaylistHotfixOriginalGCFrequency);
 	DefineUProperty(bool, bDisableGCOnServerDuringMatch);
