@@ -9,7 +9,9 @@
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/GameplayPrediction.h"
 #include "Engine/Source/Runtime/Core/Public/Templates/SharedPointer.h"
 #include "Engine/Source/Runtime/Core/Public/Containers/Map.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/WeakObjectPtr.h"
 
+class AActor;
 class APlayerController;
 class UAbilitySystemComponent;
 class UAnimMontage;
@@ -20,6 +22,8 @@ class UGameplayTask;
 struct FAbilityTargetDataSetDelegate;
 struct FSimpleMulticastDelegate;
 struct FAbilityReplicatedData;
+class USkeletalMeshComponent;
+class UAnimInstance;
 
 class EGameplayAbilityNetSecurityPolicy {
 public:
@@ -159,4 +163,17 @@ private:
 
 	TArray<FKeyDataPair> InUseData;
 	TArray<TSharedRef<FAbilityReplicatedDataCache>> FreeData;
+};
+
+struct FGameplayAbilityActorInfo {
+public:
+	DefineUnrealStruct(FGameplayAbilityActorInfo);
+
+	DefineStructProperty(TWeakObjectPtr<AActor>, OwnerActor);
+	DefineStructProperty(TWeakObjectPtr<AActor>, AvatarActor);
+	DefineStructProperty(TWeakObjectPtr<APlayerController>, PlayerController);
+	DefineStructProperty(TWeakObjectPtr<UAbilitySystemComponent>, AbilitySystemComponent);
+	DefineStructProperty(TWeakObjectPtr<USkeletalMeshComponent>, SkeletalMeshComponent);
+	DefineStructProperty(TWeakObjectPtr<UAnimInstance>, AnimInstance);
+	DefineStructProperty(TWeakObjectPtr<UMovementComponent>, MovementComponent);
 };

@@ -63,6 +63,7 @@ public:
 	DefineUProperty(TArray<FName>, Tags);
 
 	DefineUProperty(FGameplayTagContainer, StaticGameplayTags);
+	DefineUProperty(uint8, Role);
 public:
 	static inline ENetMode(*InternalGetNetModeOG)(AActor* This);
 	static ENetMode InternalGetNetMode(AActor* This);

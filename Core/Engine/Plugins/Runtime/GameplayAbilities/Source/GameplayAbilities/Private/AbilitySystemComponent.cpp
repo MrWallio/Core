@@ -2,15 +2,27 @@
 #include "../Public/AbilitySystemComponent.h"
 
 #include "../Public/Abilities/GameplayAbility.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 
 void UAbilitySystemComponent::ClientActivateAbilityFailed(FGameplayAbilitySpecHandle AbilityToActivate, int16 PredictionKey) {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ClientActivateAbilityFailed"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		void (*&ClientActivateAbilityFailedInternal)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle, int16) = decltype(ClientActivateAbilityFailedInternal)(VTable[VTableIdx]);
-		ClientActivateAbilityFailedInternal(this, AbilityToActivate, PredictionKey);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("ClientActivateAbilityFailed");
+
+	struct AbilitySystemComponent_ClientActivateAbilityFailed
+	{
+	public:
+		FGameplayAbilitySpecHandle AbilityToActivate;
+		int16 PredictionKey;
+	};
+
+	AbilitySystemComponent_ClientActivateAbilityFailed Parms{};
+
+	Parms.AbilityToActivate = std::move(AbilityToActivate);
+	Parms.PredictionKey = PredictionKey;
+
+	ProcessEvent(Func, &Parms);
 }
 
 FGameplayAbilitySpec* UAbilitySystemComponent::FindAbilitySpecFromHandle(FGameplayAbilitySpecHandle Handle)
@@ -97,17 +109,17 @@ void UAbilitySystemComponent::ConsumeAllReplicatedData(FGameplayAbilitySpecHandl
 	}
 }
 
-bool UAbilitySystemComponent::InternalTryActivateAbility(FGameplayAbilitySpecHandle AbilityToActivate, FPredictionKey InPredictionKey, UGameplayAbility** OutInstancedAbility, void* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData)
+bool UAbilitySystemComponent::InternalTryActivateAbility(FGameplayAbilitySpecHandle AbilityToActivate, FPredictionKey InPredictionKey, UGameplayAbility** OutInstancedAbility, void* OnGameplayAbilityEndedDelegate, FGameplayEventData* TriggerEventData)
 {
 	const uintptr_t Addr = ImageBase + Finder::FindUAbilitySystemComponent_InternalTryActivateAbility();
 	if (FPredictionKey::GetSize() == 0x18)
 	{
-		using Fn = bool(*)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle, _Pad_0x18, UGameplayAbility**, void*, const FGameplayEventData*);
+		using Fn = bool(*)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle, _Pad_0x18, UGameplayAbility**, void*, void*);
 		return ((Fn)Addr)(this, AbilityToActivate, *(_Pad_0x18*)&InPredictionKey, OutInstancedAbility, OnGameplayAbilityEndedDelegate, TriggerEventData);
 	}
 	else
 	{
-		using Fn = bool(*)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle, _Pad_0x10, UGameplayAbility**, void*, const FGameplayEventData*);
+		using Fn = bool(*)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle, _Pad_0x10, UGameplayAbility**, void*, void*);
 		return ((Fn)Addr)(this, AbilityToActivate, *(_Pad_0x10*)&InPredictionKey, OutInstancedAbility, OnGameplayAbilityEndedDelegate, TriggerEventData);
 	}
 }

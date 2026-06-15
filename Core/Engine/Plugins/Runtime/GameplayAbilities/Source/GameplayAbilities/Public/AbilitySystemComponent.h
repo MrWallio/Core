@@ -58,6 +58,7 @@ public:
 	DefineUnrealClass(UAbilitySystemComponent);
 
 	DefineUProperty(FGameplayAbilitySpecContainer, ActivatableAbilities);
+	DefineUProperty(AActor*, AvatarActor);
 public:
 	void ClientActivateAbilityFailed(FGameplayAbilitySpecHandle AbilityToActivate, int16 PredictionKey);
 
@@ -67,7 +68,7 @@ public:
 
 	void ConsumeAllReplicatedData(FGameplayAbilitySpecHandle AbilityHandle, FPredictionKey AbilityOriginalPredictionKey);
 
-	bool InternalTryActivateAbility(FGameplayAbilitySpecHandle AbilityToActivate, FPredictionKey InPredictionKey = FPredictionKey(), UGameplayAbility** OutInstancedAbility = nullptr, void* OnGameplayAbilityEndedDelegate = nullptr, const FGameplayEventData* TriggerEventData = nullptr);
+	bool InternalTryActivateAbility(FGameplayAbilitySpecHandle AbilityToActivate, FPredictionKey InPredictionKey, UGameplayAbility** OutInstancedAbility, void* OnGameplayAbilityEndedDelegate, FGameplayEventData* TriggerEventData);
 
 	FGameplayAbilitySpecHandle GiveAbility(FGameplayAbilitySpec& AbilitySpec);
 
@@ -76,6 +77,11 @@ public:
 	FActiveGameplayEffectHandle BP_ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level, const FGameplayEffectContextHandle& EffectContext);
 
 	FGameplayEffectContextHandle MakeEffectContext() const;
+
+	TSharedPtr<FGameplayAbilityActorInfo>& GetAbilityActorInfo() {
+		uintptr_t AvatarActorOffset = StaticClass()->GetPropertyOffset("AvatarActor");
+		return *(TSharedPtr<FGameplayAbilityActorInfo>*)(__int64(this) + AvatarActorOffset + 8);
+	}
 public:
 	static void Hook() {
 		HookEveryVTableIdx(UAbilitySystemComponent::StaticClass(), Finder::FindInternalServerTryActivateAbilityVFT(), InternalServerTryActivateAbility);

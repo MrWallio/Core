@@ -10307,5 +10307,8 @@ void Finder::SetupOffsets() {
 	FindUGameplayAbility_CanActivateAbility();
 	FindUGameplayAbility_CanActivateAbilityVFT();
 
+	FindUAbilitySystemComponent_GiveAbility();
+	FindUAbilitySystemComponent_GiveAbilityAndActivateOnce();
+
 	return;
 }
