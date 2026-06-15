@@ -924,7 +924,6 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 	}
 
 	EditingTool->EditActor = BuildingActorToEdit;
-	//EditingTool->ForceNetUpdate();
 	EditingTool->OnRep_EditActor();
 }
 
@@ -991,6 +990,10 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 		ReplacedBuildingActor->Team = PlayerStateAthena->TeamIndex;
 		ReplacedBuildingActor->TeamIndex = PlayerStateAthena->TeamIndex;
 	}
+
+	if (Version::Fortnite_Version <= 1.72) {
+		ServerEndEditingBuildingActor(This, ReplacedBuildingActor);
+	}
 }
 
 void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToStopEditing) {
@@ -1026,7 +1029,6 @@ void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController*
 	}
 
 	EditingTool->EditActor = nullptr;
-	//EditingTool->ForceNetUpdate();
 	EditingTool->OnRep_EditActor();
 }
 
