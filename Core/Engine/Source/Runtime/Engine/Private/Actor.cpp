@@ -262,3 +262,28 @@ void AActor::SetNetDormancy(ENetDormancy NewDormancy)
 
 	ProcessEvent(Func, &Parms);
 }
+
+void AActor::GetActorEyesViewPoint(struct FVector* OutLocation, struct FRotator* OutRotation) const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetActorEyesViewPoint");
+
+	struct Actor_GetActorEyesViewPoint
+	{
+	public:
+		FVector OutLocation;
+		FRotator OutRotation;
+	};
+
+	Actor_GetActorEyesViewPoint Parms{};
+
+	const_cast<AActor*>(this)->ProcessEvent(Func, &Parms);
+
+	if (OutLocation != nullptr)
+		*OutLocation = std::move(Parms.OutLocation);
+
+	if (OutRotation != nullptr)
+		*OutRotation = std::move(Parms.OutRotation);
+}

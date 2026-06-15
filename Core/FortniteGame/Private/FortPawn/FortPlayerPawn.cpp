@@ -8,6 +8,7 @@
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 
 void AFortPlayerPawn::BeginSkydiving(bool bFromBus)
 {
@@ -74,6 +75,17 @@ void AFortPlayerPawn::ServerReviveFromDBNO(AFortPlayerPawn* This, AController* E
 }
 
 void AFortPlayerPawn::ServerHandlePickup(AFortPlayerPawn* This, AFortPickup* Pickup, float InFlyTime, FVector& InStartDirection, bool bPlayPickupSound) {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ServerHandlePickup: World is null!");
+		return;
+	}
+
+	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	
+	float PickupSpeedMultiplier = This->_HasPickupSpeedMultiplier() ? This->PickupSpeedMultiplier : (FortGameModeAthena ? 3 : 1);
+	InFlyTime = InFlyTime / PickupSpeedMultiplier;
+	
 	if (Version::Fortnite_Version <= 1.81 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
 		return ServerHandlePickupOG(This, Pickup, InFlyTime, InStartDirection, bPlayPickupSound);
 	}
@@ -87,7 +99,7 @@ void AFortPlayerPawn::ServerHandlePickup(AFortPlayerPawn* This, AFortPickup* Pic
 		return;
 	}
 
-	Pickup->SetPickupTarget(This, InFlyTime / This->PickupSpeedMultiplier, InStartDirection, bPlayPickupSound);
+	Pickup->SetPickupTarget(This, InFlyTime, InStartDirection, bPlayPickupSound);
 }
 
 void AFortPlayerPawn::execOnCapsuleBeginOverlap(AFortPlayerPawn* Context, FFrame& Stack) {

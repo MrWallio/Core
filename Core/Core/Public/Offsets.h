@@ -595,6 +595,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPlayerController_PayBuildableClassPlacementCost = 0;
 	inline uintptr_t AFortPlayerController_PayBuildableClassPlacementCostVFT = 0;
 	inline uintptr_t AFortPlayerController_PayBuildingRepairCost = 0;
+	inline uintptr_t AFortPlayerController_GetPlayerViewPoint = 0;
 
 	inline uintptr_t AFortPlayerControllerZone_OnReadyToStartMatch = 0;
 	inline uintptr_t AFortPlayerControllerZone_ClientOnPawnDied = 0;
@@ -619,6 +620,7 @@ namespace ServerOffsets {
 
 	inline uintptr_t AController_InitPlayerState = 0;
 	inline uintptr_t AController_InitPlayerStateVFT = 0;
+	inline uintptr_t AController_GetPlayerViewPointVFT = 0;
 
 	inline uintptr_t UFortAnalytics_SetGameSessionID = 0;
 	inline uintptr_t UFortAnalytics_SetGameStateClassName = 0;

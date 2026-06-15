@@ -113,6 +113,9 @@ public:
 	static inline void (*ServerPlayEmoteItemOG)(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset);
 	static void ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset);
 
+	static inline void (*GetPlayerViewPointOG)(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation);
+	static void GetPlayerViewPoint(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -238,6 +241,8 @@ public:
 			ServerPlayEmoteItem,
 			(LPVOID*)&ServerPlayEmoteItemOG
 		);
+
+		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_GetPlayerViewPoint()), GetPlayerViewPoint, (LPVOID*)&GetPlayerViewPointOG);
 
 		Log("Hooked AFortPlayerController");
 	}

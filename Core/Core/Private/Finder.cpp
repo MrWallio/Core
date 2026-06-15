@@ -15,6 +15,7 @@
 
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
+#include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 
 uintptr_t Finder::FindGUObjectArray() {
 	static uintptr_t Addr = 0;
@@ -9977,6 +9978,54 @@ uintptr_t Finder::FindUGameplayAbility_CanActivateAbilityVFT() {
 	return ServerOffsets::UGameplayAbility_CanActivateAbilityVFT;
 }
 
+uintptr_t Finder::FindAFortPlayerController_GetPlayerViewPoint() {
+	if (ServerOffsets::AFortPlayerController_GetPlayerViewPoint)
+		return ServerOffsets::AFortPlayerController_GetPlayerViewPoint;
+	uintptr_t Addr = 0;
+	
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"APlayerController::GetPlayerViewPoint: out_Location, ViewTarget=%s").Get();
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"APlayerController::GetPlayerViewPoint: out_Rotation, ViewTarget=%s").Get();
+	}
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::AFortPlayerController_GetPlayerViewPoint = Addr - ImageBase;
+	}
+
+	Log("AFortPlayerController_GetPlayerViewPoint found at: 0x" + std::format("{:X}", ServerOffsets::AFortPlayerController_GetPlayerViewPoint));
+	return ServerOffsets::AFortPlayerController_GetPlayerViewPoint;
+}
+
+uintptr_t Finder::FindAController_GetPlayerViewPointVFT() {
+	if (ServerOffsets::AController_GetPlayerViewPointVFT)
+		return ServerOffsets::AController_GetPlayerViewPointVFT;
+	
+	void** VFT = AFortPlayerController::StaticClass()->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortPlayerController_GetPlayerViewPoint() + ImageBase))
+		{
+			ServerOffsets::AController_GetPlayerViewPointVFT = i;
+			break;
+		}
+	}
+
+	Log("AController_GetPlayerViewPointVFT found at: 0x" + std::format("{:X}", ServerOffsets::AController_GetPlayerViewPointVFT));
+	return ServerOffsets::AController_GetPlayerViewPointVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10309,6 +10358,10 @@ void Finder::SetupOffsets() {
 
 	FindUAbilitySystemComponent_GiveAbility();
 	FindUAbilitySystemComponent_GiveAbilityAndActivateOnce();
+
+	FindAFortPlayerController_GetPlayerViewPoint();
+
+	FindAController_GetPlayerViewPointVFT();
 
 	return;
 }

@@ -1048,6 +1048,10 @@ public:
 	static uintptr_t FindUGameplayAbility_CanActivateAbility();
 
 	static uintptr_t FindUGameplayAbility_CanActivateAbilityVFT();
+
+	static uintptr_t FindAFortPlayerController_GetPlayerViewPoint();
+
+	static uintptr_t FindAController_GetPlayerViewPointVFT();
 public:
 	static void SetupOffsets();
 
