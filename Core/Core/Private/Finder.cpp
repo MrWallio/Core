@@ -6654,11 +6654,13 @@ uintptr_t Finder::FindAActor_IsRelevancyOwnerFor() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AActor_IsRelevancyOwnerFor)
 		return ServerOffsets::AActor_IsRelevancyOwnerFor;
+
 	Addr = Memcury::Scanner::FindPattern("4C 3B C1 0F 94 C0").Get();
 
 	if (Addr) {
 		ServerOffsets::AActor_IsRelevancyOwnerFor = Addr - ImageBase;
 	}
+
 	Log("AActor_IsRelevancyOwnerFor found at: 0x" + std::format("{:X}", ServerOffsets::AActor_IsRelevancyOwnerFor));
 	return ServerOffsets::AActor_IsRelevancyOwnerFor;
 }
@@ -6666,14 +6668,15 @@ uintptr_t Finder::FindAActor_IsRelevancyOwnerFor() {
 uintptr_t Finder::FindAActor_IsRelevancyOwnerForVFT() {
 	if (ServerOffsets::AActor_IsRelevancyOwnerForVFT)
 		return ServerOffsets::AActor_IsRelevancyOwnerForVFT;
-	uintptr_t Addr = 0;
+	void** VFT = AActor::StaticClass()->GetDefaultObject()->VTable;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x86;
-	}
-
-	if (Addr) {
-		ServerOffsets::AActor_IsRelevancyOwnerForVFT = Addr;
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAActor_IsRelevancyOwnerFor() + ImageBase))
+		{
+			ServerOffsets::AActor_IsRelevancyOwnerForVFT = i;
+			break;
+		}
 	}
 
 	Log("AActor_IsRelevancyOwnerForVFT found at: 0x" + std::format("{:X}", ServerOffsets::AActor_IsRelevancyOwnerForVFT));
@@ -10362,6 +10365,9 @@ void Finder::SetupOffsets() {
 	FindAFortPlayerController_GetPlayerViewPoint();
 
 	FindAController_GetPlayerViewPointVFT();
+
+	FindAActor_IsRelevancyOwnerFor();
+	FindAActor_IsRelevancyOwnerForVFT();
 
 	return;
 }
