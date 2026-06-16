@@ -68,3 +68,23 @@ void AController::OnRep_PlayerState()
 	
 	ProcessEvent(Func, nullptr);
 }
+
+FRotator AController::GetControlRotation() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetControlRotation");
+
+	struct Controller_GetControlRotation
+	{
+	public:
+		FRotator ReturnValue;
+	};
+
+	Controller_GetControlRotation Parms{};
+
+	const_cast<AController*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}

@@ -1223,15 +1223,8 @@ void AFortPlayerController::ServerPlayEmoteItem(AFortPlayerController* This, UFo
 }
 
 void AFortPlayerController::GetPlayerViewPoint(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation) {
+	GetPlayerViewPointOG(This, out_Location, out_Rotation);
 	if (Version::Fortnite_Version <= 1.72) {
-		return GetPlayerViewPointOG(This, out_Location, out_Rotation);
-	}
-	AActor* ViewTarget = This->GetViewTarget();
-
-	if (ViewTarget) {
-		ViewTarget->GetActorEyesViewPoint(&out_Location, &out_Rotation);
 		return;
-	} 
-
-	return GetPlayerViewPointOG(This, out_Location, out_Rotation);
+	}
 }

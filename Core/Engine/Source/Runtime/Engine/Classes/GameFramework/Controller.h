@@ -4,6 +4,9 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerState.h"
 
+#include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
+#include "Engine/Source/Runtime/Core/Public/Math/Rotator.h"
+
 class ACharacter;
 class APawn;
 class APlayerState;
@@ -31,6 +34,8 @@ public:
 	void OnRep_PlayerState();
 
 	static inline void (*GetPlayerViewPointOG)(AController* This, FVector& out_Location, FRotator& out_Rotation);
+
+	FRotator GetControlRotation() const;
 
 	static void Hook() {
 		CreateVTableOriginal(AController::GetDefaultObj(), Finder::FindAController_GetPlayerViewPointVFT(), (LPVOID*)&GetPlayerViewPointOG);
