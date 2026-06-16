@@ -433,7 +433,7 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 			while (NumConnectionsToMove > 0)
 			{
 				UNetConnection* Connection = ClientConnections[0];
-				ClientConnections.RemoveAt(0, 1);
+				ClientConnections.RemoveAt(0, 1, true);
 				ClientConnections.Add(Connection);
 				NumConnectionsToMove--;
 			}

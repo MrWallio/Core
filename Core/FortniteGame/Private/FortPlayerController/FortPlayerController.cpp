@@ -1080,7 +1080,7 @@ void AFortPlayerController::ServerRemoveInventoryStateValue(AFortPlayerControlle
 	for (int32 i = 0; i < ItemEntry->StateValues.Num(); i++) {
 		FFortItemEntryStateValue& StateValue = ItemEntry->StateValues.GetWithSize(i, FFortItemEntryStateValue::GetSize());
 		if (StateValue.StateType == StateValueType) {
-			ItemEntry->StateValues.RemoveAt(i);
+			ItemEntry->StateValues.RemoveAt(i, FFortItemEntryStateValue::GetSize());
 			bModified = true;
 		}
 	}
