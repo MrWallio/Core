@@ -33,8 +33,11 @@ public:
 
 	void BounceContainer();
 
-	static inline void (*PostUpdateOG)(ABuildingContainer* This);
-	static void PostUpdate(ABuildingContainer* This);
+	static inline void (*PostUpdateOG)(ABuildingContainer* This, uint8 PersistantState, void* ReservedRandomValues);
+	static void PostUpdate(ABuildingContainer* This, uint8 PersistantState, void* ReservedRandomValues);
+
+	static inline void (*PostLoadOG)(ABuildingContainer* This);
+	static void PostLoad(ABuildingContainer* This);
 
 	static inline bool (*ServerOnAttemptInteractOG)(ABuildingContainer* This, FInteractionType& InteractType);
 	static bool ServerOnAttemptInteract(ABuildingContainer* This, FInteractionType& InteractType);
@@ -56,6 +59,13 @@ public:
 			Finder::FindABuildingActor_PostUpdateVFT(),
 			PostUpdate,
 			(LPVOID*)&PostUpdateOG
+		);
+
+		HookEveryVTableIdx(
+			ABuildingContainer::StaticClass(),
+			Finder::FindUObject_PostLoadVFT(),
+			PostLoad,
+			(LPVOID*)&PostLoadOG
 		);
 
 		HookEveryVTableIdx(

@@ -16,6 +16,7 @@
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
+#include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
 
 uintptr_t Finder::FindGUObjectArray() {
 	static uintptr_t Addr = 0;
@@ -1478,19 +1479,22 @@ uintptr_t Finder::FindUObject_PostInitProperties() {
 	return ServerOffsets::UObject_PostInitProperties;
 }
 
-uintptr_t Finder::FindUObject_PostLoad() {
-	if (ServerOffsets::UObject_PostLoad)
-		return ServerOffsets::UObject_PostLoad;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 48 8B 41 ? 33 FF 48 8B D9 8B 90").Get();
-
-	if (Addr) {
-		ServerOffsets::UObject_PostLoad = Addr - ImageBase;
+uintptr_t Finder::FindUObject_PostLoadVFT() {
+	if (ServerOffsets::UObject_PostLoadVFT)
+		return ServerOffsets::UObject_PostLoadVFT;
+	void** VFT = ABuildingSMActor::StaticClass()->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindABuildingSMActor_PostLoad() + ImageBase))
+		{
+			ServerOffsets::UObject_PostLoadVFT = i;
+			break;
+		}
 	}
 
-	Log("UObject::PostLoad found at: 0x" + std::format("{:X}", ServerOffsets::UObject_PostLoad));
-	return ServerOffsets::UObject_PostLoad;
+	Log("UObject::PostLoad found at: 0x" + std::format("{:X}", ServerOffsets::UObject_PostLoadVFT));
+	return ServerOffsets::UObject_PostLoadVFT;
 }
 
 uintptr_t Finder::FindUObject_FindFunctionChecked() {
@@ -10029,6 +10033,32 @@ uintptr_t Finder::FindAController_GetPlayerViewPointVFT() {
 	return ServerOffsets::AController_GetPlayerViewPointVFT;
 }
 
+uintptr_t Finder::FindABuildingSMActor_PostLoad() {
+	if (ServerOffsets::ABuildingSMActor_PostLoad)
+		return ServerOffsets::ABuildingSMActor_PostLoad;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Building actor %s has no StaticMeshComponent!").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::ABuildingSMActor_PostLoad = Addr - ImageBase;
+	}
+
+	Log("ABuildingSMActor_PostLoad found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingSMActor_PostLoad));
+	return ServerOffsets::ABuildingSMActor_PostLoad;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10368,6 +10398,9 @@ void Finder::SetupOffsets() {
 
 	FindAActor_IsRelevancyOwnerFor();
 	FindAActor_IsRelevancyOwnerForVFT();
+
+	FindABuildingSMActor_PostLoad();
+	FindUObject_PostLoadVFT();
 
 	return;
 }

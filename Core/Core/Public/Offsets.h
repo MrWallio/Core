@@ -83,7 +83,7 @@ namespace ServerOffsets {
 	inline uintptr_t UObject_GetDefaultSubobjects = 0;
 	inline uintptr_t UObject_GetDefaultSubobjectByName = 0;
 	inline uintptr_t UObject_PostInitProperties = 0;
-	inline uintptr_t UObject_PostLoad = 0;
+	inline uintptr_t UObject_PostLoadVFT = 0;
 	inline uintptr_t UObject_FindFunctionChecked = 0;
 	inline uintptr_t UObject_GetWorldVFT = 0;
 	inline uintptr_t UObject_NeedsLoadForClientVFT = 0;
@@ -435,6 +435,7 @@ namespace ServerOffsets {
 	inline uintptr_t ABuildingSMActor_PostUpdate = 0;
 	inline uintptr_t ABuildingSMActor_SetEditingPlayer = 0;
 	inline uintptr_t ABuildingSMActor_SetEditingPlayerVFT = 0;
+	inline uintptr_t ABuildingSMActor_PostLoad = 0;
 
 	inline uintptr_t AFortPickup_FinishedTargetSpline = 0;
 	inline uintptr_t AFortPickup_ForceFinishedTargetSpline = 0;

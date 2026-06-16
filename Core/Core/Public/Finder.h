@@ -129,7 +129,7 @@ public:
 
 	static uintptr_t FindUObject_PostInitProperties();
 
-	static uintptr_t FindUObject_PostLoad();
+	static uintptr_t FindUObject_PostLoadVFT();
 
 	static uintptr_t FindUObject_FindFunctionChecked();
 
@@ -1052,6 +1052,8 @@ public:
 	static uintptr_t FindAFortPlayerController_GetPlayerViewPoint();
 
 	static uintptr_t FindAController_GetPlayerViewPointVFT();
+
+	static uintptr_t FindABuildingSMActor_PostLoad();
 public:
 	static void SetupOffsets();
 

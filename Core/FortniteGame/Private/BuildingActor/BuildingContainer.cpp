@@ -72,11 +72,11 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 	This->SearchBounceData.SearchAnimationCount++;
 	This->BounceContainer();
 
-	//This->ForceNetUpdate();
-
 	if (This->bDestroyContainerOnSearch) {
 		This->K2_DestroyActor();
 	}
+
+	This->ForceNetUpdate();
 
 	return bSuccess;
 }
@@ -101,9 +101,9 @@ void ABuildingContainer::BounceContainer()
 	ProcessEvent(Func, nullptr);
 }
 
-void ABuildingContainer::PostUpdate(ABuildingContainer* This)
+void ABuildingContainer::PostUpdate(ABuildingContainer* This, uint8 PersistantState, void* ReservedRandomValues)
 {
-	PostUpdateOG(This);
+	PostUpdateOG(This, PersistantState, ReservedRandomValues);
 
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
@@ -169,7 +169,7 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 				This->bDestroyContainerOnSearch = false;
 			}
 			else if (This->SearchLootTierGroup == Loot_AthenaFloorLoot || This->SearchLootTierGroup == Loot_AthenaFloorLoot_Warmup) {
-				This->bDestroyContainerOnSearch = true;
+				This->bDestroyContainerOnSearch = false;
 			}
 			else {
 				if (Version::Fortnite_Version <= 1.91) {
@@ -187,6 +187,10 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This)
 	}
 }
 
+void ABuildingContainer::PostLoad(ABuildingContainer* This) {
+	PostLoadOG(This);
+}
+
 bool ABuildingContainer::ServerOnAttemptInteract(ABuildingContainer* This, FInteractionType& InteractType) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
@@ -201,12 +205,6 @@ bool ABuildingContainer::ServerOnAttemptInteract(ABuildingContainer* This, FInte
 
 void ABuildingContainer::BeginPlay(ABuildingContainer* This) {
 	BeginPlayOG(This);
-	
-	UWorld* World = UWorld::GetWorld();
-	if (!World) {
-		Log("ABuildingContainer::BeginPlay: World is null!");
-		return;
-	}
 }
 
 void ABuildingContainer::OnSetSearched()

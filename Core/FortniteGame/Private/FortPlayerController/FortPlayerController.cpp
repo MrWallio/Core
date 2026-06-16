@@ -1061,7 +1061,10 @@ void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, A
 		return;
 	}
 
-	//Log("ReceivingActor: " + ReceivingActor->GetFullName());
+	if (ReceivingActor) {
+		//Log("ReceivingActor: " + ReceivingActor->GetFullName());
+		ReceivingActor->ForceNetUpdate();
+	}
 }
 
 void AFortPlayerController::ServerRemoveInventoryStateValue(AFortPlayerController* This, FGuid& ItemGuid, uint8 StateValueType) {

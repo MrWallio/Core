@@ -12,6 +12,7 @@
 #include "FortniteGame/Public/AI/FortAIDirector.h"
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
+#include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 
 bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
 	if (This->bWorldIsReady
