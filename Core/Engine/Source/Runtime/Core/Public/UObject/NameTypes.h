@@ -85,9 +85,9 @@ public:
 	uint32 Number;
 public:
 	// Custom
-	FName(std::string& Name);
+	FName(const std::string& Name);
 
-	FName(FString& Name);
+	FName(const FString& Name);
 
 	operator std::string() const;
 };

@@ -52,11 +52,11 @@ int32 FName::Compare(const FName& Other) const
 	return CompareInternal(this, &Other);
 }
 
-FName::FName(std::string& Name) {
+FName::FName(const std::string& Name) {
 	*this = UKismetStringLibrary::Conv_StringToName(Name);
 }
 
-FName::FName(FString& Name) {
+FName::FName(const FString& Name) {
 	*this = UKismetStringLibrary::Conv_StringToName(Name);
 }
 

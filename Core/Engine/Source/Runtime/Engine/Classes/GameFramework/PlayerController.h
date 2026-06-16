@@ -4,6 +4,9 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Controller.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/Templates/SubclassOf.h"
 
+#include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
+#include "Engine/Source/Runtime/Core/Public/Math/Rotator.h"
+
 class ACameraActor;
 class AHUD;
 class APawn;
@@ -26,8 +29,9 @@ public:
 	DefineUnrealClass(APlayerController);
 
 	DefineUProperty(UCheatManager*, CheatManager);
-
 	DefineUProperty(TSubclassOf<UCheatManager>, CheatClass);
+	DefineUProperty(FVector, LastSpectatorSyncLocation);
+	DefineUProperty(FRotator, LastSpectatorSyncRotation);
 public:
 	static inline void (*ServerAcknowledgePossessionOG)(APlayerController* This, APawn* P);
 	void ServerAcknowledgePossession(APawn* P);
@@ -39,8 +43,11 @@ public:
 
 	void ClientTeamMessage(APlayerState* SenderPlayerState, const FString& S, FName Type, float MsgLifeTime);
 
+	static inline void (*GetPlayerViewPointOG)(APlayerController* This, FVector& out_Location, FRotator& out_Rotation);
+
 	static void Hook() {
 		CreateVTableOriginal(APlayerController::GetDefaultObj(), APlayerController::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), (LPVOID*)&ServerAcknowledgePossessionOG);
+		CreateVTableOriginal(APlayerController::GetDefaultObj(), Finder::FindAController_GetPlayerViewPointVFT(), (LPVOID*)&GetPlayerViewPointOG);
 
 		Log("Hooked APlayerController");
 	}

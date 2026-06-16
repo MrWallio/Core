@@ -15,8 +15,8 @@ public:
 	DefineUnrealClass(AController);
 public:
 	DefineUProperty(APlayerState*, PlayerState);
-
 	DefineUProperty(APawn*, Pawn);
+	DefineUProperty(FName, StateName);
 public:
 	void Possess(APawn* InPawn);
 
@@ -29,4 +29,12 @@ public:
 	void OnRep_Pawn();
 
 	void OnRep_PlayerState();
+
+	static inline void (*GetPlayerViewPointOG)(AController* This, FVector& out_Location, FRotator& out_Rotation);
+
+	static void Hook() {
+		CreateVTableOriginal(AController::GetDefaultObj(), Finder::FindAController_GetPlayerViewPointVFT(), (LPVOID*)&GetPlayerViewPointOG);
+
+		Log("Hooked AController");
+	}
 };
