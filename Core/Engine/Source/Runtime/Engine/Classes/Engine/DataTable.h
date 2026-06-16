@@ -128,9 +128,7 @@ public:
 struct FTableRowBase
 {
 public:
-	DefineUnrealStruct(FTaleRowBase);
-
-	FTableRowBase() {}
+	DefineUnrealStruct(FTableRowBase);
 
 public:
 	void** VTable;

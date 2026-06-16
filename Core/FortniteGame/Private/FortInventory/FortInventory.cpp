@@ -275,6 +275,7 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
 		return nullptr;
 
 	Item->SetOwningControllerForTemporaryItem(PC);
+	SetStateValues(&Item->ItemEntry);
 
 	InitializeExistingItem(Item);
 

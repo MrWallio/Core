@@ -143,6 +143,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("SetMaxHealth <MaxHealth> - Sets the player's max health.");
 		This->ClientMessage("SetMaxShield <MaxShield> - Sets the player's max shield.");
 		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] [Location] [Rotation] - Spawns an actor at the specified location and rotation.");
+		This->ClientMessage("ClearEquippedItem - Clears the currently equipped item.");
 	}
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
@@ -572,6 +573,25 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		else {
 			This->ClientMessage("Failed to spawn actor of class: " + ActorClass->GetName().ToString());
 		}
+	}
+	else if (Parser.IsCommand("ClearEquippedItem")) {
+		if (!This->WorldInventory) {
+			This->ClientMessage("WorldInventory is null!");
+			return;
+		}
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		if (!This->MyFortPawn->CurrentWeapon) {
+			This->ClientMessage("No currently equipped item to clear.");
+			return;
+		}
+
+		This->WorldInventory->RemoveItem(This->MyFortPawn->CurrentWeapon->ItemEntryGuid);
+		This->ClientMessage("Cleared currently equipped item.");
 	}
 }
 
@@ -1056,11 +1076,17 @@ void AFortPlayerController::ServerRemoveInventoryStateValue(AFortPlayerControlle
 		return;
 	}
 
+	bool bModified = false;
 	for (int32 i = 0; i < ItemEntry->StateValues.Num(); i++) {
 		FFortItemEntryStateValue& StateValue = ItemEntry->StateValues.GetWithSize(i, FFortItemEntryStateValue::GetSize());
 		if (StateValue.StateType == StateValueType) {
 			ItemEntry->StateValues.RemoveAt(i);
+			bModified = true;
 		}
+	}
+
+	if (bModified) {
+		This->WorldInventory->Update(ItemEntry);
 	}
 }
 
@@ -1080,6 +1106,7 @@ void AFortPlayerController::ServerSetInventoryStateValue(AFortPlayerController* 
 	}
 
 	ItemEntry->StateValues.Add(StateValue);
+	This->WorldInventory->Update(ItemEntry);
 }
 
 UFortRegisteredPlayerInfo* AFortPlayerController::GetRegisteredPlayerInfo() const

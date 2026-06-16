@@ -7,6 +7,7 @@
 
 struct FMemory
 {
+	static void* Malloc(SIZE_T Count, uint32 Alignment = DEFAULT_ALIGNMENT);
 	static void* Realloc(void* Original, SIZE_T Count, uint32 Alignment = DEFAULT_ALIGNMENT);
 	static void Free(void* Original);
 };

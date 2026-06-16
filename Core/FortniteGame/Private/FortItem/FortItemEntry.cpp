@@ -59,15 +59,21 @@ void FFortItemEntry::CopyGenericValuesFrom(const FFortItemEntry* Other) {
 }
 
 void FFortItemEntry::SetCount(int32 NewCount) {
+	AFortInventory* Inventory = ParentInventory.Get();
+
 	if (NewCount > Count) {
 		int32 CountDifference = NewCount - Count;
 
-		AFortInventory* Inventory = ParentInventory.Get();
 		if (Inventory) {
 			Inventory->SetNewItemCountStateValue(this, CountDifference);
 		}
 	}
 
 	Count = NewCount;
-	SetToDirty();
+	if (Inventory) {
+		Inventory->Update(this);
+	}
+	else {
+		SetToDirty();
+	}
 }

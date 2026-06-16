@@ -9,7 +9,7 @@
 struct FScalableFloat
 {
 public:
-    DefineUnrealStruct("ScriptStruct /Script/GameplayAbilities.ScalableFloat");
+    DefineUnrealStructPath("ScriptStruct /Script/GameplayAbilities.ScalableFloat");
 
     float Value;
     uint8 Padding[0x4];

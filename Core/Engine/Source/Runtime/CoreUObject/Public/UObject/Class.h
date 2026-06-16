@@ -337,7 +337,11 @@ public:
             } \
         } \
         return Size; \
-    }
+    } \
+    static __Class* Allocate() \
+    { \
+        return (__Class*)FMemory::Malloc(GetSize()); \
+    } \
 
 #define DefineUnrealStructPath(FullName) \
     static UStruct* StaticStruct() \
