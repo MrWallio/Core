@@ -256,7 +256,7 @@ TArray<FFortItemEntry> FFortLootPackageData::GetLootItems(
 			continue;
 		}
 
-		FFortItemEntry LootDropEntry{};
+		FFortItemEntry LootDropEntry = *FFortItemEntry::Allocate();
 		LootDropEntry.ItemDefinition = ItemDefinition;
 		LootDropEntry.SetCount(PickedLootPackage->Count);
 

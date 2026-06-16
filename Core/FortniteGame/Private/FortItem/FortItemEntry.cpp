@@ -14,7 +14,7 @@ void FFortItemEntry::SetStateValue(uint8 StateType, int32 InValue) {
 		}
 	}
 
-	FFortItemEntryStateValue StateValue{};
+	FFortItemEntryStateValue StateValue = *FFortItemEntryStateValue::Allocate();
 
 	StateValue.IntValue = InValue;
 	StateValue.StateType = StateType;

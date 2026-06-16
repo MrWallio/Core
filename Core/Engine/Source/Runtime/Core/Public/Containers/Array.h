@@ -107,7 +107,7 @@ public:
 	}
 
 	int32 Add(const ArrayElementType& Item, int32 Size = ElementSize) {
-		Reserve(ArrayNum + 1, ElementSize);
+		Reserve(ArrayNum + 1, Size);
 		std::memcpy(PBYTE(Data) + (ArrayNum * Size), (const PBYTE)&Item, Size);
 		return ArrayNum++;
 	}
@@ -120,10 +120,12 @@ public:
 		if (Count)
 		{
 			ArrayNum--;
-
 			for (int i = Index; i < ArrayNum; i++)
 			{
-				Data[i] = Data[i + 1];
+				std::memcpy(
+					(uint8*)Data + ((size_t)i * Size),
+					(uint8*)Data + ((size_t)(i + 1) * Size),
+					Size);
 			}
 		}
 	}

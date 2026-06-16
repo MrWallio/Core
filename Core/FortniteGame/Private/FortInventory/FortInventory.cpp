@@ -476,7 +476,7 @@ void AFortInventory::RemoveEntryAndInstance(FGuid Guid)
 		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
 		if (Entry.ItemGuid == Guid)
 		{
-			Inventory.ReplicatedEntries.RemoveAt(i);
+			Inventory.ReplicatedEntries.RemoveAt(i, FFortItemEntry::GetSize());
 			break;
 		}
 	}
@@ -665,7 +665,7 @@ bool AFortInventory::AddItemAndHandleOverflow(UFortItemDefinition* Def, int32 Co
 	if (!CanAddItem(Def, Count))
 		return false;
 
-	FFortItemEntry ItemEntry{};
+	FFortItemEntry ItemEntry = *FFortItemEntry::Allocate();
 	ItemEntry.ItemDefinition = Def;
 	ItemEntry.SetCount(Count);
 	ItemEntry.Level = 0;
@@ -726,11 +726,12 @@ bool AFortInventory::DropAllItems(bool bSpawnPickups)
 			continue;
 		}
 
-		EntriesToRemove.Add(Entry);
+		EntriesToRemove.Add(Entry, FFortItemEntry::GetSize());
 	}
 
-	for (const FFortItemEntry& Entry : EntriesToRemove)
+	for (int32 i = 0; i < EntriesToRemove.Num(); i++)
 	{
+		auto& Entry = EntriesToRemove.GetWithSize(i, FFortItemEntry::GetSize());
 		if (bSpawnPickups)
 		{
 			SpawnPickupFromEntry(Entry);

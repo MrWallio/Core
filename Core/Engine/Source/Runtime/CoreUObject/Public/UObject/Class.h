@@ -340,7 +340,9 @@ public:
     } \
     static __Class* Allocate() \
     { \
-        return (__Class*)FMemory::Malloc(GetSize()); \
+        void* Mem = FMemory::Malloc(GetSize()); \
+        if (Mem) memset(Mem, 0, GetSize()); \
+        return (__Class*)Mem; \
     } \
 
 #define DefineUnrealStructPath(FullName) \
