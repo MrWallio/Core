@@ -188,13 +188,12 @@ void AActor::CallPreReplication(UNetDriver* NetDriver)
 
 void AActor::ForceNetUpdate()
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ForceNetUpdate"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		void (*&ForceNetUpdateInternal)(AActor*) = decltype(ForceNetUpdateInternal)(VTable[VTableIdx]);
-		ForceNetUpdateInternal(this);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("ForceNetUpdate");
+
+	ProcessEvent(Func, nullptr);
 }
 
 const AActor* AActor::GetNetOwner() const

@@ -51,7 +51,7 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 
 	HandleInventoryLocalUpdate();
 
-	//ForceNetUpdate();
+	ForceNetUpdate();
 
 	return true;
 }
@@ -275,13 +275,6 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
 		return nullptr;
 
 	Item->SetOwningControllerForTemporaryItem(PC);
-
-	for (int i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
-	{
-		FFortItemEntry& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
-		Entry.SetStateValue(EFortItemEntryState::GetNewItemCount(), 0);
-		Update(&Entry);
-	}
 
 	InitializeExistingItem(Item);
 
