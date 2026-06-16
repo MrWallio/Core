@@ -1227,4 +1227,11 @@ void AFortPlayerController::GetPlayerViewPoint(AFortPlayerController* This, FVec
 	if (Version::Fortnite_Version <= 1.72) {
 		return;
 	}
+
+	AActor* ViewTarget = This->GetViewTarget();
+	AFortPlayerPawn* ViewTargetFortPawn = ViewTarget->Cast<AFortPlayerPawn>();
+
+	if (ViewTarget) {
+		This->GetActorEyesViewPoint(&out_Location, &out_Rotation);
+	}
 }
