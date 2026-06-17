@@ -20,6 +20,7 @@
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
 #include "FortniteGame/Public/FortQuest/FortQuestObjectiveCompletion.h"
 #include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
+#include "FortniteGame/Public/Info/FortTeamInfo.h"
 
 void AFortPlayerControllerAthena::EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft) {
 	EnterAircraftOG(This, InAircraft);
@@ -30,7 +31,6 @@ void AFortPlayerControllerAthena::ServerAttemptAircraftJump(AFortPlayerControlle
 }
 
 void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport) {
-	Log("AFortPlayerControllerAthena::ClientOnPawnDied Called!");
 	//ClientOnPawnDied_ImplementationOG(This, DeathReport);
 	
 	UWorld* World = UWorld::GetWorld();
@@ -41,14 +41,39 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
 	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
+	if (!FortGameModeAthena || !FortGameStateAthena) {
+		Log("ClientOnPawnDied: GameMode or GameState is null or not a FortGameModeAthena/FortGameStateAthena!");
+		return;
+	}
 
-	if (FortGameModeAthena) {
-		if (This->WorldInventory) {
-			This->WorldInventory->DropAllItems();
-		}
+	AFortPlayerStateAthena* PlayerStateAthena = This->PlayerState->Cast<AFortPlayerStateAthena>();
+	if (!PlayerStateAthena) {
+		Log("ClientOnPawnDied: PlayerState is null or not a FortPlayerStateAthena!");
+		return;
+	}
+
+	AFortPlayerStateAthena* KillerPlayerStateAthena = DeathReport.KillerPlayerState->Cast<AFortPlayerStateAthena>();
+
+	if (This->WorldInventory) {
+		This->WorldInventory->DropAllItems();
 	}
 
 	if (Version::Fortnite_Version >= 1.8) {
+		if (KillerPlayerStateAthena && KillerPlayerStateAthena != PlayerStateAthena) {
+			KillerPlayerStateAthena->KillScore++;
+			KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
+			KillerPlayerStateAthena->OnRep_Kills();
+
+			for (int32 i = 0; i < KillerPlayerStateAthena->PlayerTeam->TeamMembers.Num(); i++) {
+				AFortPlayerStateAthena* TeamMember = KillerPlayerStateAthena->PlayerTeam->TeamMembers[i]->Cast<AFortPlayerStateAthena>();
+				if (TeamMember) {
+					TeamMember->TeamKillScore++;
+					TeamMember->ClientReportTeamKill(TeamMember->TeamKillScore);
+					TeamMember->OnRep_TeamKillScore();
+				}
+			}
+		}
+
 		if (Version::Fortnite_Version < 2.1) {
 			if (FortGameModeAthena->bAllowSpectateAfterDeath) {
 				APawn* PawnToSpectate = DeathReport.KillerPawn;
@@ -67,11 +92,11 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 					FTimerHandle TimerHandle = UKismetSystemLibrary::K2_SetTimer(This, "SpectateOnDeath", 5.f, false);
 					if (!TimerHandle.IsValid()) {
-						Log("ClientOnPawnDied: Failed to set timer for SpectateOnDeath!");
+						Log("AFortPlayerControllerAthena::ClientOnPawnDied: Failed to set timer for SpectateOnDeath!");
 					}
 				}
 				else {
-					Log("ClientOnPawnDied: Unable to find a pawn to spectate after death!");
+					Log("AFortPlayerControllerAthena::ClientOnPawnDied: Unable to find a pawn to spectate after death!");
 				}
 			}
 		}
@@ -85,7 +110,6 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		Advance = QuestManager->PendingChanges;
 	}
 
-	AFortPlayerStateAthena* PlayerStateAthena = This->PlayerState->Cast<AFortPlayerStateAthena>();
 	int32 MinutesAlive = PlayerStateAthena ? (PlayerStateAthena->SecondsAlive / 60) : -1;
 	int32 PersonalKills = PlayerStateAthena ? PlayerStateAthena->KillScore : -1;
 	int32 TeamKills = PlayerStateAthena ? PlayerStateAthena->TeamKillScore : -1;

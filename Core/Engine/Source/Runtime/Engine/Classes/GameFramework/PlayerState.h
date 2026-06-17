@@ -9,8 +9,7 @@ public:
 	DefineUnrealClass(APlayerState);
 
 	DefineBitfieldUProperty(bOnlySpectator);
-
 	DefineUProperty(uint8, Ping);
-
+	DefineUProperty(FString, PlayerName);
 	DefineBitfieldUProperty(bIsABot);
 };

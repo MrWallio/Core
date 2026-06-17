@@ -359,6 +359,7 @@
     <ClInclude Include="FortniteGame\Public\FortWorld\FortAthenaMapInfo.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldManager.h" />
     <ClInclude Include="FortniteGame\Public\Info\FortRegisteredPlayerInfo.h" />
+    <ClInclude Include="FortniteGame\Public\Info\FortTeamInfo.h" />
     <ClInclude Include="FortniteGame\Public\Interaction\InteractionType.h" />
     <ClInclude Include="FortniteGame\Public\Interface\FortInventoryOwnerInterface.h" />
     <ClInclude Include="FortniteGame\Public\Kismet\FortKismetLibrary.h" />
