@@ -69,3 +69,33 @@ void UKismetSystemLibrary::ExecuteConsoleCommand(UObject* WorldContextObject, co
 		GetDefaultObj()->ProcessEvent(Func, &Parms);
 	}
 }
+
+FTimerHandle UKismetSystemLibrary::K2_SetTimer(UObject* Object, const FString& FunctionName, float Time, bool bLooping)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.KismetSystemLibrary.K2_SetTimer");
+
+	struct KismetSystemLibrary_K2_SetTimer
+	{
+	public:
+		UObject* Object;
+		FString FunctionName;
+		float Time;
+		bool bLooping;
+		uint8 Pad_1D[0x3];
+		FTimerHandle ReturnValue;
+	};
+
+	KismetSystemLibrary_K2_SetTimer Parms{};
+
+	Parms.Object = Object;
+	Parms.FunctionName = std::move(FunctionName);
+	Parms.Time = Time;
+	Parms.bLooping = bLooping;
+
+	GetDefaultObj()->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}

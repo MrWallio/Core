@@ -23,6 +23,7 @@ public:
 	DefineUProperty(bool, bPlaylistHotfixChangedGCDisabling);
 
 	DefineUProperty(TArray<AFortPlayerControllerAthena*>, AlivePlayers);
+	DefineUProperty(bool, bAllowSpectateAfterDeath);
 public:
 	static inline bool (*ReadyToStartMatchOG)(AFortGameModeAthena* This);
 	static bool ReadyToStartMatch(AFortGameModeAthena* This);

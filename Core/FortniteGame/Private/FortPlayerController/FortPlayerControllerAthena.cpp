@@ -19,6 +19,7 @@
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
 #include "FortniteGame/Public/FortQuest/FortQuestObjectiveCompletion.h"
+#include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
 
 void AFortPlayerControllerAthena::EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft) {
 	EnterAircraftOG(This, InAircraft);
@@ -29,22 +30,52 @@ void AFortPlayerControllerAthena::ServerAttemptAircraftJump(AFortPlayerControlle
 }
 
 void AFortPlayerControllerAthena::ClientOnPawnDied(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport) {
-	if (This->IsA(AFortPlayerControllerAthena::StaticClass())) {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ClientOnPawnDied: World is null!");
+		return ClientOnPawnDiedOG(This, DeathReport);
+	}
+
+	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
+
+	if (FortGameModeAthena) {
 		if (This->WorldInventory) {
 			This->WorldInventory->DropAllItems();
 		}
 	}
 
-	ClientOnPawnDiedOG(This, DeathReport);
+	if (Version::Fortnite_Version >= 1.8) {
+		if (Version::Fortnite_Version < 2.1) {
+			if (FortGameModeAthena && FortGameModeAthena->bAllowSpectateAfterDeath) {
+				APawn* PawnToSpectate = DeathReport.KillerPawn;
+				if (!PawnToSpectate) {
+					// Find next spectatable player
+					for (AFortPlayerControllerAthena* PC : FortGameModeAthena->AlivePlayers) {
+						if (PC && PC->Pawn) {
+							PawnToSpectate = PC->Pawn;
+							break;
+						}
+					}
+				}
 
-	UWorld* World = UWorld::GetWorld();
-	if (!World) {
-		Log("ClientOnPawnDied: World is null!");
-		return;
+				if (PawnToSpectate) {
+					This->PlayerToSpectateOnDeath = PawnToSpectate;
+
+					FTimerHandle TimerHandle = UKismetSystemLibrary::K2_SetTimer(This, "SpectateOnDeath", 5.f, false);
+					if (!TimerHandle.IsValid()) {
+						Log("ClientOnPawnDied: Failed to set timer for SpectateOnDeath!");
+					}
+				}
+				else {
+					Log("ClientOnPawnDied: Unable to find a pawn to spectate after death!");
+				}
+			}
+		}
 	}
 
-	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
-	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
+	ClientOnPawnDiedOG(This, DeathReport);
+
 	if (FortGameModeAthena && FortGameStateAthena) {
 		TArray<FString> Medals;
 		TArray<FFortQuestObjectiveCompletion> Advance;

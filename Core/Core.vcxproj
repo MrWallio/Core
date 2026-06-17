@@ -171,6 +171,7 @@
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UObjectGlobals.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\AI\Navigation\NavigationSystem.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\NavigationObjectBase.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\TimerHandle.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\MovementComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\PlayerStart.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\ProjectileMovementComponent.h" />
@@ -289,6 +290,7 @@
     <ClInclude Include="FortniteGame\Public\FortManager\FortMissionManager.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStart.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStartWarmup.h" />
+    <ClInclude Include="FortniteGame\Public\FortPlayer\FortPlayerDeathReport.h" />
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestManager.h" />
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveCompletion.h" />
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveInfo.h" />
