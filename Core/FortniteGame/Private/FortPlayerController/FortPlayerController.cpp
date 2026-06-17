@@ -762,41 +762,7 @@ void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, 
 	AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>();
 
 	if (bIsPawnLoaded) {
-		if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.1 && Version::Fortnite_Version != 1.11) {
-			if (FortPCAthena && MyFortPawn) {
-				if (FortPCAthena->StrongMyHero && FortPCAthena->StrongMyHero->CharacterParts.Num() > 0) {
-					for (UCustomCharacterPart* CharacterPart : FortPCAthena->StrongMyHero->CharacterParts) {
-						MyFortPawn->ServerChoosePart(CharacterPart, CharacterPart->CharacterPartType);
-						Log("ServerClientPawnLoaded: Applied CharacterPart " + CharacterPart->GetName().ToString() + " for PlayerState " + FortPlayerState->GetName().ToString());
-					}
-				}
-				else {
-					UCustomCharacterPart* HeadPart = (UCustomCharacterPart*)StaticLoadObject("/Game/Characters/CharacterParts/Female/Medium/Heads/F_Med_Head1.F_Med_Head1");
-					UCustomCharacterPart* BodyPart = (UCustomCharacterPart*)StaticLoadObject("/Game/Characters/CharacterParts/Female/Medium/Bodies/F_Med_Soldier_01.F_Med_Soldier_01");
-					UCustomCharacterPart* BackpackPart = (UCustomCharacterPart*)StaticLoadObject("/Game/Characters/CharacterParts/Backpacks/NoBackpack.NoBackpack");
-
-					if (HeadPart) {
-						MyFortPawn->ServerChoosePart(HeadPart, HeadPart->CharacterPartType);
-					}
-					if (BodyPart) {
-						MyFortPawn->ServerChoosePart(BodyPart, BodyPart->CharacterPartType);
-					}
-					if (BackpackPart) {
-						MyFortPawn->ServerChoosePart(BackpackPart, BackpackPart->CharacterPartType);
-					}
-
-					Log("ServerClientPawnLoaded: StrongMyHero or CharacterParts is null or empty for PlayerState " + FortPlayerState->GetName().ToString());
-				}
-			}
-
-			FortPlayerState->OnRep_CharacterParts();
-			
-			Log("ServerClientPawnLoaded: Applied CharacterParts for PlayerState " + FortPlayerState->GetName().ToString());
-		}
-		else {
-			FortPlayerState->ApplyCharacterCustomization(MyFortPawn);
-			Log("ServerClientPawnLoaded: Applied character customization for PlayerState " + FortPlayerState->GetName().ToString());
-		}
+		FortPlayerState->ApplyCharacterCustomization(MyFortPawn);
 	}
 }
 

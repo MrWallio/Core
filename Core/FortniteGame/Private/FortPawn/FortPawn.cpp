@@ -130,6 +130,7 @@ void AFortPawn::SetShield(float NewShieldValue)
 			HealthSet->CurrentShield.BaseValue = NewShieldValue;
 			HealthSet->CurrentShield.CurrentValue = NewShieldValue;
 			HealthSet->OnRep_CurrentShield();
+			ForceNetUpdate();
 		}
 		else {
 			Log("SetShield: HealthSet is null!");
@@ -163,6 +164,7 @@ void AFortPawn::SetMaxShield(float NewValue)
 			HealthSet->Shield.CurrentValue = NewValue;
 			HealthSet->Shield.Maximum = NewValue;
 			HealthSet->OnRep_Shield();
+			ForceNetUpdate();
 		}
 		else {
 			Log("SetMaxShield: HealthSet is null!");
