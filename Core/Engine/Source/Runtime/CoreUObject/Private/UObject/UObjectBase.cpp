@@ -5,14 +5,18 @@
 
 bool UObjectBase::IsValidLowLevel() const
 {
-	bool (*IsValidLowLevelInternal)(const UObjectBase*) = decltype(IsValidLowLevelInternal)(ImageBase + Finder::FindUObjectBase_IsValidLowLevel());
-	return IsValidLowLevelInternal(this);
+	if (Finder::FindUObjectBase_IsValidLowLevel()) {
+		bool (*IsValidLowLevelInternal)(const UObjectBase*) = decltype(IsValidLowLevelInternal)(ImageBase + Finder::FindUObjectBase_IsValidLowLevel());
+		return IsValidLowLevelInternal(this);
+	}
 }
 
 bool UObjectBase::IsValidLowLevelFast(bool bRecursive) const
 {
-	bool (*IsValidLowLevelFastInternal)(const UObjectBase*, bool) = decltype(IsValidLowLevelFastInternal)(ImageBase + Finder::FindUObjectBase_IsValidLowLevelFast());
-	return IsValidLowLevelFastInternal(this, bRecursive);
+	if (Finder::FindUObjectBase_IsValidLowLevelFast()) {
+		bool (*IsValidLowLevelFastInternal)(const UObjectBase*, bool) = decltype(IsValidLowLevelFastInternal)(ImageBase + Finder::FindUObjectBase_IsValidLowLevelFast());
+		return IsValidLowLevelFastInternal(this, bRecursive);
+	}
 }
 
 std::string UObjectBase::GetFullName() const

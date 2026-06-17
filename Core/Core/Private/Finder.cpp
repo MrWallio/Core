@@ -10059,6 +10059,40 @@ uintptr_t Finder::FindABuildingSMActor_PostLoad() {
 	return ServerOffsets::ABuildingSMActor_PostLoad;
 }
 
+uintptr_t Finder::FindAController_Reset() {
+	if (ServerOffsets::AController_Reset)
+		return ServerOffsets::AController_Reset;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ?? 48 8B D9 E8 ?? ?? ?? ?? 33 D2 48 8D 4C 24").Get();
+
+	if (Addr) {
+		ServerOffsets::AController_Reset = Addr - ImageBase;
+	}
+
+	Log("AController_Reset found at: 0x" + std::format("{:X}", ServerOffsets::AController_Reset));
+	return ServerOffsets::AController_Reset;
+}
+
+uintptr_t Finder::FindAActor_ResetVFT() {
+	if (ServerOffsets::AActor_ResetVFT)
+		return ServerOffsets::AActor_ResetVFT;
+	
+	void** VFT = AController::StaticClass()->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAController_Reset() + ImageBase))
+		{
+			ServerOffsets::AActor_ResetVFT = i;
+			break;
+		}
+	}
+
+	Log("AActor_ResetVFT found at: 0x" + std::format("{:X}", ServerOffsets::AActor_ResetVFT));
+	return ServerOffsets::AActor_ResetVFT;
+}
+
 void Finder::SetupOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10401,6 +10435,10 @@ void Finder::SetupOffsets() {
 
 	FindABuildingSMActor_PostLoad();
 	FindUObject_PostLoadVFT();
+
+	FindAController_Reset();
+
+	FindAActor_ResetVFT();
 
 	return;
 }

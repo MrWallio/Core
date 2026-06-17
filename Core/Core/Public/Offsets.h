@@ -207,6 +207,7 @@ namespace ServerOffsets {
 	inline uintptr_t AActor_SetNetDormancy = 0;
 	inline uintptr_t AActor_BeginPlay = 0;
 	inline uintptr_t AActor_BeginPlayVFT = 0;
+	inline uintptr_t AActor_ResetVFT = 0;
 
 	inline uintptr_t AGameSession_ApproveLogin = 0;
 	inline uintptr_t AGameSession_AtCapacity = 0;
@@ -622,6 +623,7 @@ namespace ServerOffsets {
 	inline uintptr_t AController_InitPlayerState = 0;
 	inline uintptr_t AController_InitPlayerStateVFT = 0;
 	inline uintptr_t AController_GetPlayerViewPointVFT = 0;
+	inline uintptr_t AController_Reset = 0;
 
 	inline uintptr_t UFortAnalytics_SetGameSessionID = 0;
 	inline uintptr_t UFortAnalytics_SetGameStateClassName = 0;

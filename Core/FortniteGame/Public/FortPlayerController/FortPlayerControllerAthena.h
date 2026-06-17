@@ -31,8 +31,8 @@ public:
 	static inline void (*ServerAttemptAircraftJumpOG)(AFortPlayerControllerAthena* This, FRotator& ClientRotation);
 	static void ServerAttemptAircraftJump(AFortPlayerControllerAthena* This, FRotator& ClientRotation);
 
-	static inline void (*ClientOnPawnDiedOG)(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport);
-	static void ClientOnPawnDied(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport);
+	static inline void (*ClientOnPawnDied_ImplementationOG)(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport);
+	static void ClientOnPawnDied_Implementation(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport);
 
 	static inline void (*OnReadyToStartMatchOG)(AFortPlayerControllerAthena* This);
 	static void OnReadyToStartMatch(AFortPlayerControllerAthena* This);
@@ -63,7 +63,11 @@ public:
 			ClientOnPawnDied,
 			(LPVOID*)&ClientOnPawnDiedOG
 		);*/
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerControllerZone_ClientOnPawnDied()), ClientOnPawnDied, (LPVOID*)&ClientOnPawnDiedOG);
+		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerControllerZone_ClientOnPawnDied()), ClientOnPawnDied, (LPVOID*)&ClientOnPawnDiedOG);
+		MH_CreateHook((LPVOID)(GetOffsetFromVTable(
+			AFortPlayerControllerAthena::GetDefaultObj(),
+			AFortPlayerControllerAthena::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerControllerZone.ClientOnPawnDied")
+		)), ClientOnPawnDied_Implementation, (LPVOID*)&ClientOnPawnDied_ImplementationOG);
 
 		MH_CreateHook(
 			(LPVOID)(GetOffsetFromVTable(

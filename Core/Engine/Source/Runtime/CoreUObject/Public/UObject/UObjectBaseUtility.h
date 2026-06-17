@@ -17,6 +17,10 @@ public:
 
 	FORCEINLINE FString GetName() const
 	{
+		if (!IsValidLowLevelFast()) {
+			return "None";
+		}
+
 		return GetFName().ToString();
 	}
 

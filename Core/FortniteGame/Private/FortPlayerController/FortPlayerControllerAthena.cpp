@@ -29,11 +29,14 @@ void AFortPlayerControllerAthena::ServerAttemptAircraftJump(AFortPlayerControlle
 	ServerAttemptAircraftJumpOG(This, ClientRotation);
 }
 
-void AFortPlayerControllerAthena::ClientOnPawnDied(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport) {
+void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport) {
+	Log("AFortPlayerControllerAthena::ClientOnPawnDied Called!");
+	//ClientOnPawnDied_ImplementationOG(This, DeathReport);
+	
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ClientOnPawnDied: World is null!");
-		return ClientOnPawnDiedOG(This, DeathReport);
+		return;
 	}
 
 	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
@@ -47,7 +50,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied(AFortPlayerControllerAthena* 
 
 	if (Version::Fortnite_Version >= 1.8) {
 		if (Version::Fortnite_Version < 2.1) {
-			if (FortGameModeAthena && FortGameModeAthena->bAllowSpectateAfterDeath) {
+			if (FortGameModeAthena->bAllowSpectateAfterDeath) {
 				APawn* PawnToSpectate = DeathReport.KillerPawn;
 				if (!PawnToSpectate) {
 					// Find next spectatable player
@@ -74,37 +77,36 @@ void AFortPlayerControllerAthena::ClientOnPawnDied(AFortPlayerControllerAthena* 
 		}
 	}
 
-	ClientOnPawnDiedOG(This, DeathReport);
+	TArray<FString> Medals;
+	TArray<FFortQuestObjectiveCompletion> Advance;
 
-	if (FortGameModeAthena && FortGameStateAthena) {
-		TArray<FString> Medals;
-		TArray<FFortQuestObjectiveCompletion> Advance;
-
-		UFortQuestManager* QuestManager = This->GetQuestManager(ESubGame::GetAthena());
-		if (QuestManager) {
-			Advance = QuestManager->PendingChanges;
-		}
-
-		AFortPlayerStateAthena* PlayerStateAthena = This->PlayerState->Cast<AFortPlayerStateAthena>();
-		int32 MinutesAlive = PlayerStateAthena ? (PlayerStateAthena->SecondsAlive / 60) : -1;
-		int32 PersonalKills = PlayerStateAthena ? PlayerStateAthena->KillScore : -1;
-		int32 TeamKills = PlayerStateAthena ? PlayerStateAthena->TeamKillScore : -1;
-		int32 Placement = PlayerStateAthena ? PlayerStateAthena->Place : -1;
-
-		if (This->AthenaProfile) {
-			FDedicatedServerUrlContext Context;
-			This->AthenaProfile->EndBattleRoyaleGame(
-				Advance,
-				FortGameModeAthena->CurrentPlaylistId,
-				MinutesAlive,
-				PersonalKills,
-				TeamKills,
-				Placement,
-				Medals,
-				&Context
-			);
-		}
+	UFortQuestManager* QuestManager = This->GetQuestManager(ESubGame::GetAthena());
+	if (QuestManager) {
+		Advance = QuestManager->PendingChanges;
 	}
+
+	AFortPlayerStateAthena* PlayerStateAthena = This->PlayerState->Cast<AFortPlayerStateAthena>();
+	int32 MinutesAlive = PlayerStateAthena ? (PlayerStateAthena->SecondsAlive / 60) : -1;
+	int32 PersonalKills = PlayerStateAthena ? PlayerStateAthena->KillScore : -1;
+	int32 TeamKills = PlayerStateAthena ? PlayerStateAthena->TeamKillScore : -1;
+	int32 Placement = PlayerStateAthena ? PlayerStateAthena->Place : -1;
+
+	if (This->AthenaProfile) {
+		FDedicatedServerUrlContext Context;
+		This->AthenaProfile->EndBattleRoyaleGame(
+			Advance,
+			FortGameModeAthena->CurrentPlaylistId,
+			MinutesAlive,
+			PersonalKills,
+			TeamKills,
+			Placement,
+			Medals,
+			&Context
+		);
+	}
+
+	Medals.Free();
+	Advance.Free();
 }
 
 void AFortPlayerControllerAthena::OnReadyToStartMatch(AFortPlayerControllerAthena* This) {

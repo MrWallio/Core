@@ -21,4 +21,6 @@ public:
 	DefineBitfieldStructProperty(bDroppedBackpack);
 	DefineBitfieldStructProperty(bNotifyUI);
 	DefineStructProperty(FGameplayTagContainer, Tags);
+public:
+	uint8 Padding[0x50];
 };

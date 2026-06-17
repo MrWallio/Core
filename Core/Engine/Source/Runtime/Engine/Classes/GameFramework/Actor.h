@@ -134,6 +134,8 @@ public:
 	void SetNetDormancy(ENetDormancy NewDormancy);
 
 	void GetActorEyesViewPoint(FVector* OutLocation, FRotator* OutRotation) const;
+
+	void Reset();
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAActor_InternalGetNetMode()), InternalGetNetMode, (LPVOID*)&InternalGetNetModeOG);

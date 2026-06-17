@@ -1054,6 +1054,10 @@ public:
 	static uintptr_t FindAController_GetPlayerViewPointVFT();
 
 	static uintptr_t FindABuildingSMActor_PostLoad();
+
+	static uintptr_t FindAController_Reset();
+
+	static uintptr_t FindAActor_ResetVFT();
 public:
 	static void SetupOffsets();
 

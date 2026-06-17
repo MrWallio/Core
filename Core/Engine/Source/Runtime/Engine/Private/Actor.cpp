@@ -286,3 +286,9 @@ void AActor::GetActorEyesViewPoint(struct FVector* OutLocation, struct FRotator*
 	if (OutRotation != nullptr)
 		*OutRotation = std::move(Parms.OutRotation);
 }
+
+void AActor::Reset()
+{
+	void (*&ResetInternal)(AActor*) = decltype(ResetInternal)(VTable[Finder::FindAActor_ResetVFT()]);
+	ResetInternal(this);
+}
