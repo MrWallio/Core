@@ -33,7 +33,7 @@ void AFortPlayerStateAthena::OnRep_TeamScore()
 
 void AFortPlayerStateAthena::ClientReportKill(const AFortPlayerStateAthena* Player)
 {
-	if (Version::Fortnite_Version > 1.91 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+	if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
 		ClientReportKill(Player->PlayerName);
 	}
 	else {

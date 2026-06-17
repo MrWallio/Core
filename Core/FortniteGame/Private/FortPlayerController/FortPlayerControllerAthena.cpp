@@ -61,7 +61,9 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	if (Version::Fortnite_Version >= 1.8) {
 		if (KillerPlayerStateAthena && KillerPlayerStateAthena != PlayerStateAthena) {
 			KillerPlayerStateAthena->KillScore++;
-			KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
+			if (Version::Fortnite_Version > 1.8) {
+				KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
+			}
 			KillerPlayerStateAthena->OnRep_Kills();
 
 			for (int32 i = 0; i < KillerPlayerStateAthena->PlayerTeam->TeamMembers.Num(); i++) {
