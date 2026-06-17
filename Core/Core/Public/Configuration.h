@@ -10,6 +10,7 @@ struct FCoreConfig {
 	bool bUseGameSessions = false;
 	bool bSkipSessionValidation = false;
 	bool bListenServer = false;
+	bool bDevSameTeam = false;
 
 	std::string Playlist = "2";
 	std::string MapToLoad = "";

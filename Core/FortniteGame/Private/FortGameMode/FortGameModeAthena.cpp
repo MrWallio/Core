@@ -82,6 +82,10 @@ int32 AFortGameModeAthena::StartAircraftPhase(AFortGameModeAthena* This, bool bG
 }
 
 int32 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor) {
-	//return 0;
+	FCoreConfig& Config = ConfigurationManager::GetConfig();
+	if (Config.bDevSameTeam) {
+		return 0;
+	}
+
 	return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
 }

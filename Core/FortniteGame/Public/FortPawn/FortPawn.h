@@ -40,6 +40,7 @@ public:
 	DefineUProperty(TArray<AFortPickup*>, IncomingPickups);
 
 	DefineUProperty(UFortHealthSet*, HealthSet);
+	DefineUProperty(bool, bIsDBNO);
 public:
 	AFortWeapon* EquipWeaponDefinition(const UFortWeaponItemDefinition* WeaponData, const FGuid& ItemEntryGuid);
 
@@ -59,4 +60,6 @@ public:
 
 	AFortWeapon* FindWeapon(UFortItemDefinition* ItemDef);
 	AFortWeapon* FindWeapon(FGuid ItemDef);
+
+	void OnRep_IsDBNO();
 };

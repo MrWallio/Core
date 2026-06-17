@@ -253,3 +253,13 @@ AFortWeapon* AFortPawn::FindWeapon(FGuid Guid)
 
 	return nullptr;
 }
+
+void AFortPawn::OnRep_IsDBNO()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_IsDBNO");
+
+	ProcessEvent(Func, nullptr);
+}

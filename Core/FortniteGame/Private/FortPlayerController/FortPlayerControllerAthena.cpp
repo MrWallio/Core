@@ -28,6 +28,10 @@ void AFortPlayerControllerAthena::EnterAircraft(AFortPlayerControllerAthena* Thi
 
 void AFortPlayerControllerAthena::ServerAttemptAircraftJump(AFortPlayerControllerAthena* This, FRotator& ClientRotation) {
 	ServerAttemptAircraftJumpOG(This, ClientRotation);
+
+	if (This->MyFortPawn) {
+		This->MyFortPawn->ForceNetUpdate();
+	}
 }
 
 void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport) {
@@ -52,7 +56,14 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		return;
 	}
 
+	AFortPlayerPawnAthena* PlayerPawnAthena = This->MyFortPawn->Cast<AFortPlayerPawnAthena>();
+	if (!PlayerPawnAthena) {
+		Log("ClientOnPawnDied: MyFortPawn is null or not a FortPlayerPawnAthena!");
+		return;
+	}
+
 	AFortPlayerStateAthena* KillerPlayerStateAthena = DeathReport.KillerPlayerState->Cast<AFortPlayerStateAthena>();
+	AFortPlayerPawnAthena* KillerPlayerPawnAthena = DeathReport.KillerPawn->Cast<AFortPlayerPawnAthena>();
 
 	if (This->WorldInventory) {
 		This->WorldInventory->DropAllItems();
