@@ -88,11 +88,11 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 	DeathInfo.bDBNO = bIsDBNO;
 	DeathInfo.FinisherOrDowner = KillerPlayerStateAthena ? KillerPlayerStateAthena : PlayerStateAthena;
-	Log("==================== DeathInfo Dump ====================");
+	Log("==================== DeathInfo Dump Start ====================");
 	Log("==================== bDBNO=" + std::to_string(DeathInfo.bDBNO));
 	Log("==================== FinisherOrDowner=" + (DeathInfo.FinisherOrDowner ? DeathInfo.FinisherOrDowner->GetName().ToString() : "None"));
 	Log("==================== DeathCause=" + std::to_string(DeathInfo.DeathCause));
-	Log("==================== DeathInfo Dump ====================");
+	Log("==================== DeathInfo Dump End ====================");
 	PlayerStateAthena->OnRep_DeathInfo();
 
 	if (Version::Fortnite_Version >= 1.8) {
