@@ -11,27 +11,45 @@
 #include "Engine/Source/Runtime/Core/Public/Templates/TypeCompatibleBytes.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/ScriptInterface.h"
 
+#include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
+#include "FortniteGame/Public/Info/DeathInfo.h"
+
 class AFortTeamInfo;
 
 class AFortPlayerStateAthena final : public AFortPlayerStateZone {
 public:
 	DefineUnrealClass(AFortPlayerStateAthena);
 
+	DefineUProperty(FDeathInfo, DeathInfo);
 	DefineUProperty(uint8, TeamIndex);
 	DefineUProperty(int32, SecondsAlive);
 	DefineUProperty(int32, KillScore);
 	DefineUProperty(int32, TeamKillScore);
+	DefineUProperty(int32, DownScore);
 	DefineUProperty(int32, Place);
 	DefineUProperty(AFortTeamInfo*, PlayerTeam);
 public:
 	void OnRep_TeamKillScore();
+
 	void OnRep_TeamScore();
+
+	void ClientReportDBNO(const AFortPlayerStateAthena* Player);
+	void ClientReportDBNO(const FString& DBNOPlayersName);
 
 	void ClientReportKill(const AFortPlayerStateAthena* Player);
 	void ClientReportKill(const FString& KilledPlayersName);
+
 	void ClientReportTeamKill(int32 TeamKills);
 
 	void OnRep_Kills();
+
+	void OnRep_DeathInfo();
+
+	void OnRep_Downs();
+
+	void OnRep_Place();
+
+	void OnRep_TeamIndex();
 
 	static void Hook() {
 		Log("AFortPlayerStateAthena Hooked!");

@@ -7,6 +7,7 @@
 
 class AFortPlayerState;
 class AFortPawn;
+class AFortPlayerStateAthena;
 
 struct FFortPlayerDeathReport {
 public:

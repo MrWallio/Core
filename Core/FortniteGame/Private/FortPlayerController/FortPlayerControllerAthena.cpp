@@ -56,6 +56,8 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		return;
 	}
 
+	FDeathInfo& DeathInfo = PlayerStateAthena->DeathInfo;
+
 	AFortPlayerPawnAthena* PlayerPawnAthena = This->MyFortPawn->Cast<AFortPlayerPawnAthena>();
 	if (!PlayerPawnAthena) {
 		Log("ClientOnPawnDied: MyFortPawn is null or not a FortPlayerPawnAthena!");
@@ -69,20 +71,55 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		This->WorldInventory->DropAllItems();
 	}
 
+	bool bIsDBNO = false;
+	if (KillerPlayerStateAthena->PlayerTeam) {
+		for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
+			AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
+			if (TeamMemberController && TeamMemberController != This
+				&& TeamMemberController->bMarkedAlive) {
+				AFortPlayerPawnAthena* TeamMemberPlayerPawn = TeamMemberController->MyFortPawn->Cast<AFortPlayerPawnAthena>();
+				if (TeamMemberPlayerPawn && !TeamMemberPlayerPawn->bIsDBNO) {
+					bIsDBNO = true;
+					break;
+				}
+			}
+		}
+	}
+
+	DeathInfo.bDBNO = bIsDBNO;
+	DeathInfo.FinisherOrDowner = KillerPlayerStateAthena ? KillerPlayerStateAthena : PlayerStateAthena;
+	Log("==================== DeathInfo Dump ====================");
+	Log("==================== bDBNO=" + std::to_string(DeathInfo.bDBNO));
+	Log("==================== FinisherOrDowner=" + (DeathInfo.FinisherOrDowner ? DeathInfo.FinisherOrDowner->GetName().ToString() : "None"));
+	Log("==================== DeathCause=" + std::to_string(DeathInfo.DeathCause));
+	Log("==================== DeathInfo Dump ====================");
+	PlayerStateAthena->OnRep_DeathInfo();
+
 	if (Version::Fortnite_Version >= 1.8) {
 		if (KillerPlayerStateAthena && KillerPlayerStateAthena != PlayerStateAthena) {
-			KillerPlayerStateAthena->KillScore++;
-			if (Version::Fortnite_Version > 1.8) {
-				KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
+			if (bIsDBNO) {
+				KillerPlayerStateAthena->DownScore++;
+				KillerPlayerStateAthena->OnRep_Downs();
 			}
-			KillerPlayerStateAthena->OnRep_Kills();
+			else {
+				KillerPlayerStateAthena->KillScore++;
+				if (Version::Fortnite_Version > 1.8) {
+					KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
+				}
+				KillerPlayerStateAthena->OnRep_Kills();
 
-			for (int32 i = 0; i < KillerPlayerStateAthena->PlayerTeam->TeamMembers.Num(); i++) {
-				AFortPlayerStateAthena* TeamMember = KillerPlayerStateAthena->PlayerTeam->TeamMembers[i]->Cast<AFortPlayerStateAthena>();
-				if (TeamMember) {
-					TeamMember->TeamKillScore++;
-					TeamMember->ClientReportTeamKill(TeamMember->TeamKillScore);
-					TeamMember->OnRep_TeamKillScore();
+				if (KillerPlayerStateAthena->PlayerTeam) {
+					for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
+						AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
+						if (TeamMemberController) {
+							AFortPlayerStateAthena* TeamMemberPlayerState = TeamMemberController->PlayerState->Cast<AFortPlayerStateAthena>();
+							if (TeamMemberPlayerState) {
+								TeamMemberPlayerState->TeamKillScore++;
+								TeamMemberPlayerState->ClientReportTeamKill(TeamMemberPlayerState->TeamKillScore);
+								TeamMemberPlayerState->OnRep_TeamKillScore();
+							}
+						}
+					}
 				}
 			}
 		}

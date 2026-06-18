@@ -358,6 +358,7 @@
     <ClInclude Include="FortniteGame\Public\FortWorld\AdditionalLevelStreamed.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortAthenaMapInfo.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldManager.h" />
+    <ClInclude Include="FortniteGame\Public\Info\DeathInfo.h" />
     <ClInclude Include="FortniteGame\Public\Info\FortRegisteredPlayerInfo.h" />
     <ClInclude Include="FortniteGame\Public\Info\FortTeamInfo.h" />
     <ClInclude Include="FortniteGame\Public\Interaction\InteractionType.h" />

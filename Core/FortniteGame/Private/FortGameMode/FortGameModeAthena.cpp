@@ -47,7 +47,7 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	}
 
 	This->DefaultPawnClass = (UClass*)StaticLoadObject("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
-	This->PlayerControllerClass = (UClass*)StaticLoadObject("/Game/Athena/Athena_PlayerController.Athena_PlayerController_C");
+	//This->PlayerControllerClass = (UClass*)StaticLoadObject("/Game/Athena/Athena_PlayerController.Athena_PlayerController_C");
 
 	This->bDisableGCOnServerDuringMatch = true;
 	

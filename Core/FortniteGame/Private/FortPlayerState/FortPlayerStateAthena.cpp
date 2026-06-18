@@ -9,7 +9,6 @@ void AFortPlayerStateAthena::OnRep_TeamKillScore()
 		Func = FindFunction("OnRep_TeamKillScore");
 
 	if (!Func) {
-		Log("OnRep_TeamKillScore: Function not found!");
 		return;
 	}
 
@@ -24,11 +23,63 @@ void AFortPlayerStateAthena::OnRep_TeamScore()
 		Func = FindFunction("OnRep_TeamScore");
 
 	if (!Func) {
-		Log("OnRep_TeamScore: Function not found!");
 		return;
 	}
 
 	ProcessEvent(Func, nullptr);
+}
+
+void AFortPlayerStateAthena::ClientReportDBNO(const AFortPlayerStateAthena* Player)
+{
+	if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
+		ClientReportDBNO(Player->PlayerName);
+	}
+	else {
+		static UFunction* Func = nullptr;
+
+		if (Func == nullptr)
+			Func = FindFunction("ClientReportDBNO");
+
+		if (!Func) {
+			return;
+		}
+
+		struct FortPlayerStateAthena_ClientReportDBNO
+		{
+		public:
+			const AFortPlayerStateAthena* Player;
+		};
+
+		FortPlayerStateAthena_ClientReportDBNO Parms{};
+
+		Parms.Player = Player;
+
+		ProcessEvent(Func, &Parms);
+	}
+}
+
+void AFortPlayerStateAthena::ClientReportDBNO(const FString& DBNOPlayersName)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientReportDBNO");
+
+	if (!Func) {
+		return;
+	}
+
+	struct FortPlayerStateAthena_ClientReportDBNO
+	{
+	public:
+		FString DBNOPlayersName;
+	};
+
+	FortPlayerStateAthena_ClientReportDBNO Parms{};
+
+	Parms.DBNOPlayersName = std::move(DBNOPlayersName);
+
+	ProcessEvent(Func, &Parms);
 }
 
 void AFortPlayerStateAthena::ClientReportKill(const AFortPlayerStateAthena* Player)
@@ -43,7 +94,6 @@ void AFortPlayerStateAthena::ClientReportKill(const AFortPlayerStateAthena* Play
 			Func = FindFunction("ClientReportKill");
 
 		if (!Func) {
-			Log("ClientReportKill: Function not found!");
 			return;
 		}
 
@@ -69,7 +119,6 @@ void AFortPlayerStateAthena::ClientReportKill(const FString& KilledPlayersName)
 		Func = FindFunction("ClientReportKill");
 
 	if (!Func) {
-		Log("ClientReportKill: Function not found!");
 		return;
 	}
 
@@ -94,7 +143,6 @@ void AFortPlayerStateAthena::ClientReportTeamKill(int32 TeamKills)
 		Func = FindFunction("ClientReportTeamKill");
 
 	if (!Func) {
-		Log("ClientReportTeamKill: Function not found!");
 		return;
 	}
 
@@ -119,7 +167,62 @@ void AFortPlayerStateAthena::OnRep_Kills()
 		Func = FindFunction("OnRep_Kills");
 
 	if (!Func) {
-		Log("OnRep_Kills: Function not found!");
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortPlayerStateAthena::OnRep_DeathInfo()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_DeathInfo");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortPlayerStateAthena::OnRep_Downs()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_Downs");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortPlayerStateAthena::OnRep_Place()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_Place");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortPlayerStateAthena::OnRep_TeamIndex()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_TeamIndex");
+
+	if (!Func) {
 		return;
 	}
 

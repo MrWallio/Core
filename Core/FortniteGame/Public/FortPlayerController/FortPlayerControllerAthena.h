@@ -24,6 +24,7 @@ public:
 	DefineUProperty(TArray<UFortHeroType*>, DefaultHeroes);
 	DefineUProperty(FFortAthenaLoadout, CustomizationLoadout);
 	DefineUProperty(APawn*, PlayerToSpectateOnDeath);
+	DefineUProperty(bool, bMarkedAlive);
 public:
 	static inline void (*EnterAircraftOG)(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft);
 	static void EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft);
