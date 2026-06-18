@@ -5,6 +5,8 @@
 
 #include "Engine/Source/Runtime/Core/Public/Containers/UnrealString.h"
 
+class UObject;
+
 class Utils {
 public:
 	static void InitConsole(FCoreConfig& Config);
@@ -30,6 +32,8 @@ public:
     static uintptr_t GetCallDestination(uintptr_t callAddr);
 
     static double NowSeconds();
+
+	static UObject* GetObjectFromString(const std::string& InString);
 };
 
 class FCommandParser

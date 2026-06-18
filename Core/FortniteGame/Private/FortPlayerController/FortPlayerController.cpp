@@ -24,6 +24,7 @@
 #include "FortniteGame/Public/FortAbility/FortGameplayAbility.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
+#include "FortniteGame/Public/FortPickup/FortPickup.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -133,6 +134,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 	{
 		This->ClientMessage("=== Available Commands ===");
 		This->ClientMessage("GiveItem <ItemDefinitionName> [Count] - Gives an item to the player's inventory.");
+		This->ClientMessage("ForceGiveItem <ItemDefinitionName> [Count] - Forces an item to the player's inventory. Use this if GiveItem fails!");
 		This->ClientMessage("SpawnPickup <ItemDefinitionName> [Count] - Spawns a pickup at the player's location.");
 		This->ClientMessage("SetLoadedAmmo <LoadedAmmo> - Sets the loaded ammo of the currently equipped weapon.");
 		This->ClientMessage("GiveAmmo [Amount] - Gives ammo for the currently equipped weapon.");
@@ -160,49 +162,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj;
-		if (ItemDefName.contains("/")) {
-			if (ItemDefName.starts_with("FortniteGame/"))
-			{
-				ItemDefName = "/Game/" + ItemDefName.substr(strlen("FortniteGame/"));
-			}
-
-			size_t contentPos = ItemDefName.find("/Content/");
-			if (contentPos != std::string::npos)
-			{
-				if (ItemDefName.contains("/Game/Content/"))
-				{
-					ItemDefName.replace(ItemDefName.find("/Game/Content/"), strlen("/Game/Content/"), "/Game/");
-				}
-				else
-				{
-					size_t contentPos = ItemDefName.find("/Content/");
-					ItemDefName = ItemDefName.substr(0, contentPos)
-						+ "/Game/"
-						+ ItemDefName.substr(contentPos + strlen("/Content/"));
-				}
-			}
-
-			if (!ItemDefName.contains("."))
-			{
-				size_t lastSlash = ItemDefName.find_last_of('/');
-				if (lastSlash != std::string::npos)
-				{
-					std::string className = ItemDefName.substr(lastSlash + 1);
-					ItemDefName += "." + className;
-				}
-				else
-				{
-					This->ClientMessage("Invalid ItemDefinition path: " + ItemDefName);
-					return;
-				}
-			}
-
-			ItemObj = StaticLoadObject(ItemDefName);
-		}
-		else {
-			ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
-		}
+		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -214,7 +174,84 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			return;
 		}
 
-		This->WorldInventory->AddItemAndHandleOverflow(ItemDef, Count);
+		AFortPlayerPawn* Pawn = This->Pawn->Cast<AFortPlayerPawn>();
+		if (!Pawn) {
+			This->ClientMessage("Pawn is null!");
+			return;
+		}
+
+		FVector FinalLoc = Pawn->K2_GetActorLocation();
+		FVector ForwardVector = Pawn->GetActorForwardVector();
+
+		ForwardVector.Z = 0.0f;
+
+		float SizeSq = ForwardVector.SizeSquared();
+		if (SizeSq > 0.0001f) {
+			float Size = sqrtf(SizeSq);
+			ForwardVector.X /= Size;
+			ForwardVector.Y /= Size;
+		}
+
+		FinalLoc = FinalLoc + ForwardVector * 450.f;
+		FinalLoc.Z += 50.f;
+
+		const float RandomAngleVariation = ((float)rand() * 0.00109866634f) - 18.f;
+		const float FinalAngle = RandomAngleVariation * 0.017453292519943295f;
+
+		FinalLoc.X += cos(FinalAngle) * 100.f;
+		FinalLoc.Y += sin(FinalAngle) * 100.f;
+
+		AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+			World,
+			ItemDef,
+			Count,
+			FinalLoc,
+			FVector(),
+			-1,
+			true,
+			true,
+			false,
+			-1,
+			EFortPickupSourceTypeFlag::GetOther(),
+			EFortPickupSpawnSource::GetUnset(),
+			This,
+			false
+		);
+
+		if (Pickup) {
+			FVector ZeroVector = { 0, 0, 0 };
+			AFortPlayerPawn::ServerHandlePickup(Pawn, Pickup, Pickup->PickupLocationData.FlyTime, ZeroVector, true);
+			This->ClientMessage("Given Item: (Item=" + ItemDef->GetName().ToString() + " Count=" + std::to_string(Count) + ")");
+		}
+	}
+	else if (Parser.IsCommand("ForceGiveItem")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: GiveItem <ItemDefinitionName> [Count]");
+			return;
+		}
+
+		if (!This->WorldInventory) {
+			This->ClientMessage("WorldInventory is null!");
+			return;
+		}
+
+		std::string ItemDefName = Parser.GetArg(0);
+		int32 Count = Parser.GetArgInt(1, 1);
+
+		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
+		if (!ItemObj) {
+			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
+			return;
+		}
+
+		UFortItemDefinition* ItemDef = ItemObj->Cast<UFortItemDefinition>();
+		if (!ItemDef) {
+			This->ClientMessage("Object is not a UFortItemDefinition: " + ItemObj->GetName().ToString());
+			return;
+		}
+
+		This->WorldInventory->AddItem(ItemDef, Count);
 	}
 	else if (Parser.IsCommand("SpawnPickup")) {
 		if (Parser.GetArgCount() < 1)
@@ -501,49 +538,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			Rotation.Roll = Parser.GetArgFloat(6, Rotation.Roll);
 		}
 
-		UObject* ActorClassObj;
-		if (ActorClassName.contains("/")) {
-			if (ActorClassName.starts_with("FortniteGame/"))
-			{
-				ActorClassName = "/Game/" + ActorClassName.substr(strlen("FortniteGame/"));
-			}
-
-			size_t contentPos = ActorClassName.find("/Content/");
-			if (contentPos != std::string::npos)
-			{
-				if (ActorClassName.contains("/Game/Content/"))
-				{
-					ActorClassName.replace(ActorClassName.find("/Game/Content/"), strlen("/Game/Content/"), "/Game/");
-				}
-				else
-				{
-					size_t contentPos = ActorClassName.find("/Content/");
-					ActorClassName = ActorClassName.substr(0, contentPos)
-						+ "/Game/"
-						+ ActorClassName.substr(contentPos + strlen("/Content/"));
-				}
-			}
-
-			if (!ActorClassName.contains("."))
-			{
-				size_t lastSlash = ActorClassName.find_last_of('/');
-				if (lastSlash != std::string::npos)
-				{
-					std::string className = ActorClassName.substr(lastSlash + 1);
-					ActorClassName += "." + className;
-				}
-				else
-				{
-					This->ClientMessage("Invalid ActorClass path: " + ActorClassName);
-					return;
-				}
-			}
-
-			ActorClassObj = StaticLoadObject(ActorClassName);
-		}
-		else {
-			ActorClassObj = FUObjectArray::FindObjectFast(ActorClassName);
-		}
+		UObject* ActorClassObj = Utils::GetObjectFromString(ActorClassName);
 		if (!ActorClassObj) {
 			This->ClientMessage("Actor class not found: " + ActorClassName);
 			return;

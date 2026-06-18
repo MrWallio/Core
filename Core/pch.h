@@ -23,6 +23,8 @@
 #include <TlHelp32.h>
 #include <sstream>
 #include <winternl.h>
+#include <cstdlib>
+#include <cmath>
 
 #include "../includes/memcury.h"
 #include "../includes/MinHook/MinHook.h"
