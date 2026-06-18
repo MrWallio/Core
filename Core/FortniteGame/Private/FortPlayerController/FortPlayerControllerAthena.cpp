@@ -73,16 +73,19 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 	bool bIsDBNO = false;
 	if (KillerPlayerStateAthena->PlayerTeam) {
-		for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
+		for (AController* TeamMember : PlayerStateAthena->PlayerTeam->TeamMembers) {
 			AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
-			if (TeamMemberController && TeamMemberController != This
-				&& TeamMemberController->bMarkedAlive) {
-				AFortPlayerPawnAthena* TeamMemberPlayerPawn = TeamMemberController->MyFortPawn->Cast<AFortPlayerPawnAthena>();
-				if (TeamMemberPlayerPawn && !TeamMemberPlayerPawn->bIsDBNO) {
-					bIsDBNO = true;
-					break;
-				}
+			if (!TeamMemberController || TeamMemberController == This || !TeamMemberController->bMarkedAlive) {
+				continue;
 			}
+
+			AFortPlayerPawnAthena* TeamMemberPlayerPawn = TeamMemberController->MyFortPawn->Cast<AFortPlayerPawnAthena>();
+			if (!TeamMemberPlayerPawn || TeamMemberPlayerPawn->bIsDBNO) {
+				continue;
+			}
+
+			bIsDBNO = true;
+			break;
 		}
 	}
 
