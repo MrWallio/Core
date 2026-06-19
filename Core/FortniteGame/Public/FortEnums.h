@@ -369,3 +369,23 @@ public:
 	DefineEnumProperty(InstancedPerExecution);
 	DefineEnumProperty(EGameplayAbilityInstancingPolicy_MAX);
 };
+
+class EDeathCause {
+public:
+	DefineUnrealEnum(EDeathCause);
+
+	DefineEnumProperty(OutsideSafeZone);
+	DefineEnumProperty(FallDamage);
+	DefineEnumProperty(Pistol);
+	DefineEnumProperty(Shotgun);
+	DefineEnumProperty(Rifle);
+	DefineEnumProperty(SMG);
+	DefineEnumProperty(Sniper);
+	DefineEnumProperty(Melee);
+	DefineEnumProperty(Heavy);
+	DefineEnumProperty(DBNOTimeout);
+	DefineEnumProperty(Banhammer);
+	DefineEnumProperty(RemovedFromGame);
+	DefineEnumProperty(Unspecified);
+	DefineEnumProperty(EDeathCause_MAX);
+};

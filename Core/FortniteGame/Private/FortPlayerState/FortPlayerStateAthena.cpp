@@ -232,7 +232,7 @@ void AFortPlayerStateAthena::OnRep_TeamIndex()
 uint8 AFortPlayerStateAthena::ToDeathCause(const FGameplayTagContainer& InTags, bool bWasDBNO)
 {
 	if (Version::Fortnite_Version <= 2.1 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
-		
+		return EDeathCause::GetUnspecified();
 	}
 	else {
 		static UFunction* Func = nullptr;

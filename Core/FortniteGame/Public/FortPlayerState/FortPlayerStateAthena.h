@@ -14,6 +14,7 @@
 
 #include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
 #include "FortniteGame/Public/Info/DeathInfo.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 class AFortTeamInfo;
 

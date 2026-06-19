@@ -69,7 +69,8 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 
 	This->MaxPlayerCount = 100;
 
-	//This->bAlwaysDBNO = true;
+	bool bDBNOEnabled = GameState->TeamSize > 1;
+	//This->bAlwaysDBNO = bDBNOEnabled;
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {

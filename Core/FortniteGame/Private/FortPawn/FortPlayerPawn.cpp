@@ -207,3 +207,17 @@ void AFortPlayerPawn::TryToAutoPickupWeapon(AFortPickup* Pickup) {
 	FVector ZeroVector(0, 0, 0);
 	ServerHandlePickup(this, Pickup, 1.0f, ZeroVector, true);
 }
+
+void AFortPlayerPawn::OnRep_IsDBNO()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_IsDBNO");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}

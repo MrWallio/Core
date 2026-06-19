@@ -52,6 +52,8 @@ public:
 
 	void TryToAutoPickupWeapon(AFortPickup* Pickup);
 
+	void OnRep_IsDBNO();
+
 	static void Hook() {
 		HookEveryVTable(
 			AFortPlayerPawn::StaticClass(),
