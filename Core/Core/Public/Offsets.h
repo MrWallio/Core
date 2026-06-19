@@ -561,6 +561,7 @@ namespace ServerOffsets {
 	inline uintptr_t UChannel_StartBecomingDormantVFT = 0;
 
 	inline uintptr_t AFortGameSession_ValidatePlayer = 0;
+	inline uintptr_t AFortGameSession_CreateServerGame = 0;
 
 	inline uintptr_t UPackageMap_WriteObject = 0;
 
@@ -632,6 +633,9 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameSessionDedicated_FinalizeCreationPatch1 = 0;
 	inline uintptr_t AFortGameSessionDedicated_FinalizeCreationVFT = 0;
 	inline uintptr_t AFortGameSessionDedicated_OnUpdateComplete = 0;
+	inline uintptr_t AFortGameSessionDedicated_OnAllPlayersUnregistered = 0;
+	inline uintptr_t AFortGameSessionDedicated_OnServerConfigurationRequest = 0;
+	inline uintptr_t AFortGameSessionDedicated_OnServerConfigurationRequestVFT = 0;
 
 	inline uintptr_t FFortBaseWeaponStats_GetDurability = 0;
 
@@ -649,4 +653,6 @@ namespace ServerOffsets {
 
 	inline uintptr_t UGameplayAbility_CanActivateAbility = 0;
 	inline uintptr_t UGameplayAbility_CanActivateAbilityVFT = 0;
+
+	inline uintptr_t UFortGameInstance_ServerTravel = 0;
 }

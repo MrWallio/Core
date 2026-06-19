@@ -47,10 +47,6 @@ DWORD Main(LPVOID)
         }
         *GIsServer = true;
 
-        if (!Utils::SetupDedicatedServer(Config)) {
-            Log("Failed to setup dedicated server!");
-        }
-
         Version::SetupVersion();
         Log(std::format("ImageBase: 0x{:X}", ImageBase).c_str());
         Log("FullVersion: " + Version::VersionString);
@@ -69,12 +65,15 @@ DWORD Main(LPVOID)
 
         Utils::Hook();
 
+        if (!Utils::SetupDedicatedServer(Config)) {
+            Log("Failed to setup dedicated server!");
+        }
+
         Sleep(3000);
 
-        if (!Config.bListenServer) {
-            Utils::RemoveLocalPlayer();
-        }
-        Utils::LoadWorld(Config);
+		if (!Utils::LoadWorld(Config)) {
+			Log("Failed to load world!");
+		}
     }
 
     return 0;

@@ -9,6 +9,7 @@
 class AFortPlayerController;
 class AFortWorldManager;
 class AFortMissionManager;
+class AFortGameSession;
 
 class AFortGameMode : public AGameMode {
 public:
@@ -21,6 +22,7 @@ public:
 	DefineUProperty(TSubclassOf<AFortMissionManager>, MissionManagerClass);
 	DefineBitfieldUProperty(bTeamGame);
 	DefineUProperty(bool, bDBNOEnabled);
+	DefineUProperty(AFortGameSession*, FortGameSession);
 public:
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);
 	static APawn* SpawnDefaultPawnFor(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);

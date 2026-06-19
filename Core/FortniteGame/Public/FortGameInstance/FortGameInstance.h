@@ -11,6 +11,8 @@ class UFortGameInstance : public UGameInstance {
 public:
 	DefineUnrealClass(UFortGameInstance);
 public:
+	bool ServerTravel(const FString& URL, bool bAbsolute = false, bool bShouldSkipGameNotify = false);
+
 	static void Hook() {
 		Log("UFortGameInstance Hooked!");
 	}

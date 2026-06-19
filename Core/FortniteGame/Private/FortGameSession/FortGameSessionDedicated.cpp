@@ -10,3 +10,13 @@ void AFortGameSessionDedicated::OnUpdateComplete(AFortGameSessionDedicated* This
 	Log("AFortGameSessionDedicated::OnUpdateComplete Called!");
 	return OnUpdateCompleteOG(This, EUpdateCompletionStatus::GetUpdateSuccess(), Callback);
 }
+
+void AFortGameSessionDedicated::OnAllPlayersUnregistered() {
+	void (*OnAllPlayersUnregisteredInternal)(AFortGameSessionDedicated * This) = decltype(OnAllPlayersUnregisteredInternal)(ImageBase + Finder::FindAFortGameSessionDedicated_OnAllPlayersUnregistered());
+	OnAllPlayersUnregisteredInternal(this);
+}
+
+void AFortGameSessionDedicated::OnServerConfigurationRequest(const FUniqueNetIdRepl& GameSessionOwner, FEmptyServerReservation& ReservationData) {
+	void (*&OnServerConfigurationRequestInternal)(AFortGameSessionDedicated * This, const FUniqueNetIdRepl&, FEmptyServerReservation&) = decltype(OnServerConfigurationRequestInternal)(VTable[Finder::FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT()]);
+	OnServerConfigurationRequestInternal(this, GameSessionOwner, ReservationData);
+}

@@ -17,6 +17,8 @@ public:
 	static inline EFortPlayerValidationType(*ValidatePlayerOG)(AFortGameSession* This, const FUniqueNetIdRepl* UniqueId, bool bIsLocalPlayer, FText* ReturnReason);
 	static EFortPlayerValidationType ValidatePlayer(AFortGameSession* This, const FUniqueNetIdRepl* UniqueId, bool bIsLocalPlayer, FText* ReturnReason);
 
+	void CreateServerGame();
+
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameSession_ValidatePlayer()), (LPVOID)ValidatePlayer, (LPVOID*)&ValidatePlayerOG);
 

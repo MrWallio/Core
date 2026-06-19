@@ -161,6 +161,7 @@
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayPrediction.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\ScalableFloat.h" />
     <ClInclude Include="Engine\Source\Runtime\AIModule\Classes\AIController.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreOnline\Public\Online\CoreOnline.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\Misc\StringAssetReference.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\Templates\SubclassOf.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\AssetPtr.h" />
@@ -173,6 +174,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\NavigationObjectBase.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\TimerHandle.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\MovementComponent.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\OnlineReplStructs.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\PlayerStart.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\ProjectileMovementComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\GameplayTags\Classes\GameplayTagContainer.h" />
@@ -375,6 +377,7 @@
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h" />
     <ClInclude Include="FortniteGame\Public\Data\BuildingEditModeMetadata.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileSys.h" />
+    <ClInclude Include="FortniteGame\Public\Server\EmptyServerReservation.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

@@ -384,8 +384,8 @@ void Utils::RemoveLocalPlayer() {
 }
 
 bool Utils::SetupDedicatedServer(FCoreConfig& Config) {
-	if (!Config.bListenServer) {
-		return; // we dont wanna do this if we are a listen server (not a dedicated server)
+	if (Config.bListenServer) {
+		return false; // we dont wanna do this if we are a listen server (not a dedicated server)
 	}
 
 	UWorld* World = UWorld::GetWorld();
@@ -396,8 +396,14 @@ bool Utils::SetupDedicatedServer(FCoreConfig& Config) {
 
 	RemoveLocalPlayer();
 
-	FString TravelURL = "/Game/Maps/FortniteEmptyDedicated";
-	if (!World->ServerTravel(TravelURL)) {
+	FString TravelURL = "/Game/Maps/FortniteEmptyDedicated?listen";
+
+	UFortGameInstance* FortGameInstance = World->OwningGameInstance->Cast<UFortGameInstance>();
+	bool bTravelOk = FortGameInstance
+		? FortGameInstance->ServerTravel(TravelURL)
+		: World->ServerTravel(TravelURL);
+
+	if (!bTravelOk) {
 		Log("Utils::SetupDedicatedServer: ServerTravel failed!");
 		return false;
 	}
@@ -405,11 +411,11 @@ bool Utils::SetupDedicatedServer(FCoreConfig& Config) {
 	return true;
 }
 
-void Utils::LoadWorld(FCoreConfig& Config) {
+bool Utils::LoadWorld(FCoreConfig& Config) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("Utils::LoadWorld: World is nullptr!");
-		return;
+		return false;
 	}
 
 	FString MapName = Utils::GetDefaultMapName(Config);
@@ -423,7 +429,20 @@ void Utils::LoadWorld(FCoreConfig& Config) {
 	});
 
 	Log("Travel URL: " + TravelURL.ToString());
-	World->ServerTravel(TravelURL);
+
+	UFortGameInstance* FortGameInstance = World->OwningGameInstance->Cast<UFortGameInstance>();
+	AFortGameMode* FortGameMode = World->AuthorityGameMode->Cast<AFortGameMode>();
+
+	bool bTravelOk = FortGameInstance
+		? FortGameInstance->ServerTravel(TravelURL)
+		: World->ServerTravel(TravelURL);
+
+	if (!bTravelOk) {
+		Log("Utils::LoadWorld: ServerTravel failed!");
+		return false;
+	}
+
+	return true;
 }
 
 uintptr_t Utils::GetCallDestination(uintptr_t callAddr)

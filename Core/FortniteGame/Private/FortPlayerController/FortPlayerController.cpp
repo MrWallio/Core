@@ -1196,3 +1196,23 @@ void AFortPlayerController::GetPlayerViewPoint(AFortPlayerController* This, FVec
 		This->GetActorEyesViewPoint(&out_Location, &out_Rotation);
 	}
 }
+
+FUniqueNetIdRepl AFortPlayerController::GetGameAccountId() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetGameAccountId");
+
+	struct FortPlayerController_GetGameAccountId
+	{
+	public:
+		FUniqueNetIdRepl ReturnValue;
+	};
+
+	FortPlayerController_GetGameAccountId Parms{};
+
+	const_cast<AFortPlayerController*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}

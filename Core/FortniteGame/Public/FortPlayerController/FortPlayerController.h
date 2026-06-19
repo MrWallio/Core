@@ -7,6 +7,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/GameInstance.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/LocalPlayer.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/OnlineReplStructs.h"
 
 class AFortPlayerPawn;
 class ABuildingSMActor;
@@ -115,6 +116,8 @@ public:
 
 	static inline void (*GetPlayerViewPointOG)(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation);
 	static void GetPlayerViewPoint(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation);
+
+	FUniqueNetIdRepl GetGameAccountId() const;
 
 	static void Hook() {
 		/*HookVTableIdx(

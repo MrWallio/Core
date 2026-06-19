@@ -1058,6 +1058,16 @@ public:
 	static uintptr_t FindAController_Reset();
 
 	static uintptr_t FindAActor_ResetVFT();
+
+	static uintptr_t FindAFortGameSessionDedicated_OnAllPlayersUnregistered();
+
+	static uintptr_t FindUFortGameInstance_ServerTravel();
+
+	static uintptr_t FindAFortGameSession_CreateServerGame();
+
+	static uintptr_t FindAFortGameSessionDedicated_OnServerConfigurationRequest();
+
+	static uintptr_t FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT();
 public:
 	static void SetupCoreOffsets();
 

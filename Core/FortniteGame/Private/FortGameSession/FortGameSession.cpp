@@ -11,3 +11,8 @@ EFortPlayerValidationType AFortGameSession::ValidatePlayer(AFortGameSession* Thi
 		return EFortPlayerValidationType::ValidatedPlayer;
 	}
 }
+
+void AFortGameSession::CreateServerGame() {
+	void (*CreateServerGameInternal)(AFortGameSession * This) = decltype(CreateServerGameInternal)(ImageBase + Finder::FindAFortGameSession_CreateServerGame());
+	CreateServerGame();
+}

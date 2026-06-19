@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "FortGameSession.h"
+#include "FortniteGame/Public/Server/EmptyServerReservation.h"
 
 class AFortGameSessionDedicated : public AFortGameSession {
 public:
@@ -13,6 +14,10 @@ public:
 
 	static inline void (*OnUpdateCompleteOG)(AFortGameSessionDedicated* This, uint8 Result, void* Callback);
 	static void OnUpdateComplete(AFortGameSessionDedicated* This, uint8 Result, void* Callback);
+
+	void OnAllPlayersUnregistered();
+
+	void OnServerConfigurationRequest(const FUniqueNetIdRepl& GameSessionOwner, FEmptyServerReservation& ReservationData);
 
 	static void Hook() {
 		PatchByte(ImageBase + Finder::FindAFortGameSessionDedicated_FinalizeCreationPatch1(), 0x85);

@@ -17,6 +17,7 @@
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
+#include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
 
 uintptr_t Finder::FindGUObjectArray() {
 	static uintptr_t Addr = 0;
@@ -10093,6 +10094,111 @@ uintptr_t Finder::FindAActor_ResetVFT() {
 	return ServerOffsets::AActor_ResetVFT;
 }
 
+uintptr_t Finder::FindAFortGameSessionDedicated_OnAllPlayersUnregistered() {
+	if (ServerOffsets::AFortGameSessionDedicated_OnAllPlayersUnregistered)
+		return ServerOffsets::AFortGameSessionDedicated_OnAllPlayersUnregistered;
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameSessionDedicated::OnAllPlayersUnregistered: Completing restart of dedicated server").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x53)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameSessionDedicated_OnAllPlayersUnregistered = Addr - ImageBase;
+	}
+
+	Log("AFortGameSessionDedicated_OnAllPlayersUnregistered found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSessionDedicated_OnAllPlayersUnregistered));
+	return ServerOffsets::AFortGameSessionDedicated_OnAllPlayersUnregistered;
+}
+
+uintptr_t Finder::FindUFortGameInstance_ServerTravel() {
+	if (ServerOffsets::UFortGameInstance_ServerTravel)
+		return ServerOffsets::UFortGameInstance_ServerTravel;
+	uintptr_t Addr = 0;
+	
+	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? ? ? ? 41 0F B6 D9").Get();
+	
+	if (Addr) {
+		ServerOffsets::UFortGameInstance_ServerTravel = Addr - ImageBase;
+	}
+
+	Log("UFortGameInstance_ServerTravel found at: 0x" + std::format("{:X}", ServerOffsets::UFortGameInstance_ServerTravel));
+	return ServerOffsets::UFortGameInstance_ServerTravel;
+}
+
+uintptr_t Finder::FindAFortGameSession_CreateServerGame() {
+	if (ServerOffsets::AFortGameSession_CreateServerGame)
+		return ServerOffsets::AFortGameSession_CreateServerGame;
+	uintptr_t Addr = 0;
+
+	if (!FindUFortGameInstance_ServerTravel()) {
+		return Addr;
+	}
+	uintptr_t FortGameInstanceServerTravelAddr = FindUFortGameInstance_ServerTravel() + ImageBase;
+
+	uintptr_t XrefAddr = Memcury::Scanner::FindPointerRef((LPVOID)FortGameInstanceServerTravelAddr, 0, true).Get();
+	if (XrefAddr) {
+		for (int i = 0; i < 2048; i++)
+		{
+			auto Ptr = (uint8_t*)(XrefAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::AFortGameSession_CreateServerGame = Addr - ImageBase;
+	}
+
+	Log("AFortGameSession_CreateServerGame found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSession_CreateServerGame));
+	return ServerOffsets::AFortGameSession_CreateServerGame;
+}
+
+uintptr_t Finder::FindAFortGameSessionDedicated_OnServerConfigurationRequest() {
+	if (ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequest)
+		return ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequest;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindPattern("40 55 53 56 41 54 41 56 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? ? ? ? 4D 8B F0").Get();
+
+	if (Addr) {
+		ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequest = Addr - ImageBase;
+	}
+
+	Log("AFortGameSessionDedicated_OnServerConfigurationRequest found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequest));
+	return ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequest;
+}
+
+uintptr_t Finder::FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT() {
+	if (ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT)
+		return ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT;
+	void** VFT = AFortGameSessionDedicated::StaticClass()->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortGameSessionDedicated_OnServerConfigurationRequest() + ImageBase))
+		{
+			ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortGameSessionDedicated_OnServerConfigurationRequestVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT));
+	return ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10441,6 +10547,15 @@ void Finder::SetupOffsets() {
 	FindAController_Reset();
 
 	FindAActor_ResetVFT();
+
+	FindAFortGameSessionDedicated_OnAllPlayersUnregistered();
+
+	FindUFortGameInstance_ServerTravel();
+
+	FindAFortGameSession_CreateServerGame();
+
+	FindAFortGameSessionDedicated_OnServerConfigurationRequest();
+	FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT();
 
 	return;
 }
