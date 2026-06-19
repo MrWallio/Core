@@ -1059,6 +1059,8 @@ public:
 
 	static uintptr_t FindAActor_ResetVFT();
 public:
+	static void SetupCoreOffsets();
+
 	static void SetupOffsets();
 
 	template <typename CVarT>

@@ -20,23 +20,36 @@ DWORD Main(LPVOID)
     ConfigurationManager::LoadConfig();
     FCoreConfig& Config = ConfigurationManager::GetConfig();
 
+    Utils::InitConsole(Config);
+
+    Finder::FindGUObjectArray();
+    Finder::FindGIsClient();
+    Finder::FindGIsServer();
+    Finder::FindGEngine();
+    Finder::FindGWorld();
+
+    GEngine = reinterpret_cast<UEngine**>(ImageBase + ServerOffsets::GEngine);
+    GWorld = reinterpret_cast<UWorld**>(ImageBase + ServerOffsets::GWorld);
+    CoreGlobals::Init();
+
+    Finder::SetupCoreOffsets();
+
     if (Config.bIsClient) {
         Client::Init(Config);
     }
     else {
-		Utils::InitConsole(Config);
+        Utils::SetLogVerbosity();
 
-        Finder::FindGUObjectArray();
-        Finder::FindGIsClient();
-        Finder::FindGIsServer();
-        Finder::FindGEngine();
-        Finder::FindGWorld();
+        UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "Fort.Pickup.ServerSideWeaponAutoPickupsEnabled 1", nullptr);
 
-        Sleep(1000);
+        if (!Config.bListenServer) {
+            *GIsClient = false;
+        }
+        *GIsServer = true;
 
-        GEngine = reinterpret_cast<UEngine**>(ImageBase + ServerOffsets::GEngine);
-        GWorld = reinterpret_cast<UWorld**>(ImageBase + ServerOffsets::GWorld);
-        CoreGlobals::Init();
+        if (!Utils::SetupDedicatedServer(Config)) {
+            Log("Failed to setup dedicated server!");
+        }
 
         Version::SetupVersion();
         Log(std::format("ImageBase: 0x{:X}", ImageBase).c_str());
@@ -56,16 +69,7 @@ DWORD Main(LPVOID)
 
         Utils::Hook();
 
-        if (!Config.bListenServer) {
-            *GIsClient = false;
-        }
-        *GIsServer = true;
-
         Sleep(3000);
-
-        Utils::SetLogVerbosity();
-
-		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "Fort.Pickup.ServerSideWeaponAutoPickupsEnabled 1", nullptr);
 
         if (!Config.bListenServer) {
             Utils::RemoveLocalPlayer();

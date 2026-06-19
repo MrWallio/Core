@@ -21,20 +21,6 @@
 #include "FortniteGame/Public/FortManager/FortCheatManager.h"
 
 void Client::Init(FCoreConfig& Config) {
-    InitConsole(Config);
-
-    Finder::FindGUObjectArray();
-    Finder::FindGIsClient();
-    Finder::FindGIsServer();
-    Finder::FindGEngine();
-    Finder::FindGWorld();
-
-    Sleep(1000);
-
-    GEngine = reinterpret_cast<UEngine**>(ImageBase + ServerOffsets::GEngine);
-    GWorld = reinterpret_cast<UWorld**>(ImageBase + ServerOffsets::GWorld);
-    CoreGlobals::Init();
-
     Version::SetupVersion();
     Log(std::format("ImageBase: 0x{:X}", ImageBase).c_str());
     Log("FullVersion: " + Version::VersionString);
@@ -72,17 +58,6 @@ void Client::Init(FCoreConfig& Config) {
     }
 
     SetConsoleTitleA(std::format("CoreClient ({:.2f})", Version::Fortnite_Version).c_str());
-}
-
-void Client::InitConsole(FCoreConfig& Config)
-{
-    if (Config.bEnableClientConsole) {
-        AllocConsole();
-        FILE* fptr;
-        freopen_s(&fptr, "CONOUT$", "w+", stdout);
-    }
-    SetConsoleTitleA("CoreClient (Finding Build) | Starting...");
-    Log("Welcome to CoreClient, Made with love by Pongo_x86 and The Community!");
 }
 
 DWORD Client::ClientThread(LPVOID) {

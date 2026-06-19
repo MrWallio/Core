@@ -10093,7 +10093,7 @@ uintptr_t Finder::FindAActor_ResetVFT() {
 	return ServerOffsets::AActor_ResetVFT;
 }
 
-void Finder::SetupOffsets() {
+void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
 	ServerOffsets::FFrame__Next = Version::Fortnite_Version >= 24.30 ? 0x18 : (Version::Fortnite_Version >= 12.10 ? 0x20 : 0x28);
@@ -10145,9 +10145,11 @@ void Finder::SetupOffsets() {
 	Log("UField__Next offset: 0x" + std::format("{:X}", ServerOffsets::UField__Next));
 	Log("UField__Name offset: 0x" + std::format("{:X}", ServerOffsets::UField__Name));
 	Log("UBoolProperty__FieldMask offset: 0x" + std::format("{:X}", ServerOffsets::UBoolProperty__FieldMask));
+}
 
+void Finder::SetupOffsets() {
 	if (ConfigurationManager::GetConfig().bIsClient) {
-		return; // return early if this is the client
+		return;
 	}
 
 	FindProcessEventVFT();

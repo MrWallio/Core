@@ -42,8 +42,14 @@ void Utils::InitConsole(FCoreConfig& Config)
         FILE* fptr;
         freopen_s(&fptr, "CONOUT$", "w+", stdout);
     }
-    SetConsoleTitleA("Core (Finding Build) | Starting...");
-    Log("Welcome to Core, Made with love by Pongo_x86 and The Community!");
+	if (Config.bIsClient) {
+		SetConsoleTitleA("CoreClient (Finding Build) | Starting...");
+		Log("Welcome to CoreClient, Made with love by Pongo_x86 and The Community!");
+	} 
+	else {
+		SetConsoleTitleA("Core (Finding Build) | Starting...");
+		Log("Welcome to Core, Made with love by Pongo_x86 and The Community!");
+	}
 }
 
 uintptr_t Utils::ResolveRipRelative(uintptr_t instr, int dispOffset, int instrLen)
@@ -363,8 +369,12 @@ void Utils::SetLogVerbosity() {
 
 void Utils::RemoveLocalPlayer() {
 	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("Utils::RemoveLocalPlayer: World is nullptr!");
+		return;
+	}
 
-	if (World->OwningGameInstance->LocalPlayers.Num() > 0) {
+	if (World->OwningGameInstance && World->OwningGameInstance->LocalPlayers.Num() > 0) {
 		World->OwningGameInstance->LocalPlayers.RemoveAt(0);
 		Log("Utils::RemoveLocalPlayer: Local Player Removed!");
 	}
@@ -373,8 +383,33 @@ void Utils::RemoveLocalPlayer() {
 	}
 }
 
+bool Utils::SetupDedicatedServer(FCoreConfig& Config) {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("Utils::SetupDedicatedServer: World is nullptr!");
+		return false;
+	}
+
+	if (!Config.bListenServer) {
+		RemoveLocalPlayer();
+	}
+
+	FString TravelURL = "/Game/Maps/FortniteEmptyDedicated";
+
+	if (!World->ServerTravel(TravelURL)) {
+		Log("Utils::SetupDedicatedServer: ServerTravel failed!");
+		return false;
+	}
+
+	return true;
+}
+
 void Utils::LoadWorld(FCoreConfig& Config) {
 	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("Utils::LoadWorld: World is nullptr!");
+		return;
+	}
 
 	FString MapName = Utils::GetDefaultMapName(Config);
 	Log("Loading World: " + MapName.ToString());
@@ -384,7 +419,7 @@ void Utils::LoadWorld(FCoreConfig& Config) {
 		{"playlistId", Config.Playlist},
 		{"Playlist", Config.Playlist},
 		{"RequiredPlayers", "1"}
-		});
+	});
 
 	Log("Travel URL: " + TravelURL.ToString());
 	World->ServerTravel(TravelURL);

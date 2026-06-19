@@ -191,7 +191,7 @@ bool UWorld::Listen(FURL& InURL)
 		return false;
 	}
 
-	SetConsoleTitleA((std::format("Core ({:.2f}) | Listening: ", Version::Fortnite_Version).c_str() + std::to_string(InURL.Port)).c_str());
+	SetConsoleTitleA((std::format("Core ({:.2f}) | Listening: ", Version::Fortnite_Version).c_str() + GetName().ToString() + " | " + std::to_string(InURL.Port)).c_str());
 	return true;
 }
 
