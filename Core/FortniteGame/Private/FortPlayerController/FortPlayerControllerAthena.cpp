@@ -56,8 +56,6 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		return;
 	}
 
-	FDeathInfo& DeathInfo = PlayerStateAthena->DeathInfo;
-
 	AFortPlayerPawnAthena* PlayerPawnAthena = This->MyFortPawn->Cast<AFortPlayerPawnAthena>();
 	if (!PlayerPawnAthena) {
 		Log("ClientOnPawnDied: MyFortPawn is null or not a FortPlayerPawnAthena!");
@@ -73,7 +71,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 	bool bIsDBNO = false;
 	if (KillerPlayerStateAthena->PlayerTeam) {
-		for (AController* TeamMember : PlayerStateAthena->PlayerTeam->TeamMembers) {
+		for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
 			AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
 			if (!TeamMemberController || TeamMemberController == This || !TeamMemberController->bMarkedAlive) {
 				continue;
@@ -89,13 +87,13 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		}
 	}
 
-	DeathInfo.bDBNO = bIsDBNO;
-	DeathInfo.FinisherOrDowner = KillerPlayerStateAthena ? KillerPlayerStateAthena : PlayerStateAthena;
-	DeathInfo.DeathCause = AFortPlayerStateAthena::ToDeathCause(DeathReport.Tags, bIsDBNO);
+	PlayerStateAthena->DeathInfo.bDBNO = bIsDBNO;
+	PlayerStateAthena->DeathInfo.FinisherOrDowner = KillerPlayerStateAthena ? KillerPlayerStateAthena : PlayerStateAthena;
+	PlayerStateAthena->DeathInfo.DeathCause = AFortPlayerStateAthena::ToDeathCause(DeathReport.Tags, bIsDBNO);
 	Log("==================== DeathInfo Dump Start ====================");
-	Log("==================== bDBNO=" + std::to_string(DeathInfo.bDBNO));
-	Log("==================== FinisherOrDowner=" + (DeathInfo.FinisherOrDowner ? DeathInfo.FinisherOrDowner->GetName().ToString() : "None"));
-	Log("==================== DeathCause=" + std::to_string(DeathInfo.DeathCause));
+	Log("==================== bDBNO=" + std::to_string(PlayerStateAthena->DeathInfo.bDBNO));
+	Log("==================== FinisherOrDowner=" + (PlayerStateAthena->DeathInfo.FinisherOrDowner ? PlayerStateAthena->DeathInfo.FinisherOrDowner->GetName().ToString() : "None"));
+	Log("==================== DeathCause=" + std::to_string(PlayerStateAthena->DeathInfo.DeathCause));
 	Log("==================== DeathInfo Dump End ====================");
 	PlayerStateAthena->OnRep_DeathInfo();
 
