@@ -99,9 +99,6 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	Log("==================== DeathInfo Dump End ====================");
 	PlayerStateAthena->OnRep_DeathInfo();
 
-	//PlayerPawnAthena->bIsDBNO = bIsDBNO;
-	//PlayerPawnAthena->OnRep_IsDBNO();
-
 	if (Version::Fortnite_Version >= 1.8) {
 		if (KillerPlayerStateAthena && KillerPlayerStateAthena != PlayerStateAthena) {
 			if (bIsDBNO) {
