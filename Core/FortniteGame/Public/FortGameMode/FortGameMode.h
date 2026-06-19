@@ -20,6 +20,7 @@ public:
 	DefineUProperty(FName, CurrentPlaylistName);
 	DefineUProperty(TSubclassOf<AFortMissionManager>, MissionManagerClass);
 	DefineBitfieldUProperty(bTeamGame);
+	DefineUProperty(bool, bDBNOEnabled);
 public:
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);
 	static APawn* SpawnDefaultPawnFor(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);

@@ -251,10 +251,10 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Name##_Offset = 0; \
+                Name##_Offset = -1; \
             } \
         } \
-        if (Name##_Offset <= 0) { \
+        if (Name##_Offset < 0) { \
             return false; \
         } \
         uint8_t value = *reinterpret_cast<uint8_t*>((uintptr_t)this + Name##_Offset); \
@@ -267,10 +267,10 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Name##_Offset = 0; \
+                Name##_Offset = -1; \
             } \
         } \
-        if (Name##_Offset <= 0) { \
+        if (Name##_Offset < 0) { \
             return false; \
         } \
         uint8_t value = *reinterpret_cast<uint8_t*>((uintptr_t)this + Name##_Offset); \
@@ -283,11 +283,11 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Name##_Offset = 0; \
+                Name##_Offset = -1; \
                 return; \
             } \
         } \
-        if (Name##_Offset <= 0) { \
+        if (Name##_Offset < 0) { \
             return; \
         } \
         uint8_t* ptr = reinterpret_cast<uint8_t*>((uintptr_t)this + Name##_Offset); \
@@ -311,10 +311,10 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Name##_Offset = 0; \
+                Name##_Offset = -1; \
             } \
         } \
-        if (Name##_Offset <= 0) { \
+        if (Name##_Offset < 0) { \
             return false; \
         } \
         uint8_t value = *reinterpret_cast<uint8_t*>((uintptr_t)this + Name##_Offset); \
@@ -327,10 +327,10 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Name##_Offset = 0; \
+                Name##_Offset = -1; \
             } \
         } \
-        if (Name##_Offset <= 0) { \
+        if (Name##_Offset < 0) { \
             return false; \
         } \
         uint8_t value = *reinterpret_cast<uint8_t*>((uintptr_t)this + Name##_Offset); \
@@ -343,11 +343,11 @@ public: \
                 Name##_Offset = Prop->Offset_Internal; \
                 Name##_FieldMask = Prop->FieldMask; \
             } else { \
-                Name##_Offset = 0; \
+                Name##_Offset = -1; \
                 return; \
             } \
         } \
-        if (Name##_Offset <= 0) { \
+        if (Name##_Offset < 0) { \
             return; \
         } \
         uint8_t* ptr = reinterpret_cast<uint8_t*>((uintptr_t)this + Name##_Offset); \

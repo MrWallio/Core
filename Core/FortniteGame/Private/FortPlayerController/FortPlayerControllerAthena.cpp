@@ -69,7 +69,9 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		This->WorldInventory->DropAllItems();
 	}
 
-	bool bIsDBNO = false;
+	bool bHasAliveTeamMember = false;
+	bool bIsDBNO = PlayerPawnAthena->bIsDBNO || PlayerPawnAthena->bWasDBNOOnDeath;
+
 	if (KillerPlayerStateAthena->PlayerTeam) {
 		for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
 			AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
@@ -82,7 +84,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 				continue;
 			}
 
-			bIsDBNO = true;
+			bHasAliveTeamMember = true;
 			break;
 		}
 	}

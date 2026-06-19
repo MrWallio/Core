@@ -25,6 +25,7 @@ public:
 	DefineUProperty(int32, TeamCount);
 	DefineUProperty(int32, TeamSize);
 	DefineUProperty(TArray<AFortTeamInfo*>, Teams);
+	DefineBitfieldUProperty(bDBNOEnabledForGameMode);
 public:
 	void OnRep_AdditionalPlaylistLevelsStreamed();
 	void OnFinishedStreamingAdditionalPlaylistLevel();

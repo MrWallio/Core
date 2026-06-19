@@ -40,7 +40,8 @@ public:
 	DefineUProperty(TArray<AFortPickup*>, IncomingPickups);
 
 	DefineUProperty(UFortHealthSet*, HealthSet);
-	DefineUProperty(bool, bIsDBNO);
+	DefineBitfieldUProperty(bIsDBNO);
+	DefineBitfieldUProperty(bWasDBNOOnDeath);
 public:
 	AFortWeapon* EquipWeaponDefinition(const UFortWeaponItemDefinition* WeaponData, const FGuid& ItemEntryGuid);
 

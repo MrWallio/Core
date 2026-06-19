@@ -8,6 +8,7 @@ public:
 	DefineUnrealClass(AFortGameStateZone);
 
 	DefineUProperty(float, GameDifficulty);
+	DefineUProperty(bool, bDBNODeathEnabled);
 public:
 	void OnRep_GameDifficulty();
 
