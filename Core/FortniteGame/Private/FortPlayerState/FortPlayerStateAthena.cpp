@@ -228,3 +228,33 @@ void AFortPlayerStateAthena::OnRep_TeamIndex()
 
 	ProcessEvent(Func, nullptr);
 }
+
+uint8 AFortPlayerStateAthena::ToDeathCause(const FGameplayTagContainer& InTags, bool bWasDBNO)
+{
+	if (Version::Fortnite_Version <= 2.1 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+		
+	}
+	else {
+		static UFunction* Func = nullptr;
+
+		if (Func == nullptr)
+			Func = StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerStateAthena:ToDeathCause");
+
+		struct FortPlayerStateAthena_ToDeathCause
+		{
+		public:
+			FGameplayTagContainer InTags;
+			bool bWasDBNO;
+			uint8 ReturnValue;
+		};
+
+		FortPlayerStateAthena_ToDeathCause Parms{};
+
+		Parms.InTags = std::move(InTags);
+		Parms.bWasDBNO = bWasDBNO;
+
+		GetDefaultObj()->ProcessEvent(Func, &Parms);
+
+		return Parms.ReturnValue;
+	}
+}

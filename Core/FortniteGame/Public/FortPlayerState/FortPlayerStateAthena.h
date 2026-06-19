@@ -10,6 +10,7 @@
 #include "Engine/Source/Runtime/Core/Public/Misc/OutputDevice.h"
 #include "Engine/Source/Runtime/Core/Public/Templates/TypeCompatibleBytes.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/ScriptInterface.h"
+#include "Engine/Source/Runtime/GameplayTags/Classes/GameplayTagContainer.h"
 
 #include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
 #include "FortniteGame/Public/Info/DeathInfo.h"
@@ -50,6 +51,8 @@ public:
 	void OnRep_Place();
 
 	void OnRep_TeamIndex();
+
+	static uint8 ToDeathCause(const FGameplayTagContainer& InTags, bool bWasDBNO);
 
 	static void Hook() {
 		Log("AFortPlayerStateAthena Hooked!");

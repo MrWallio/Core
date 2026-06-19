@@ -91,6 +91,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 	DeathInfo.bDBNO = bIsDBNO;
 	DeathInfo.FinisherOrDowner = KillerPlayerStateAthena ? KillerPlayerStateAthena : PlayerStateAthena;
+	DeathInfo.DeathCause = AFortPlayerStateAthena::ToDeathCause(DeathReport.Tags, bIsDBNO);
 	Log("==================== DeathInfo Dump Start ====================");
 	Log("==================== bDBNO=" + std::to_string(DeathInfo.bDBNO));
 	Log("==================== FinisherOrDowner=" + (DeathInfo.FinisherOrDowner ? DeathInfo.FinisherOrDowner->GetName().ToString() : "None"));
