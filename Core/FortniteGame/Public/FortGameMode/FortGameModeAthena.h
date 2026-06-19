@@ -24,6 +24,7 @@ public:
 
 	DefineUProperty(TArray<AFortPlayerControllerAthena*>, AlivePlayers);
 	DefineUProperty(bool, bAllowSpectateAfterDeath);
+	DefineUProperty(bool, bAlwaysDBNO);
 public:
 	static inline bool (*ReadyToStartMatchOG)(AFortGameModeAthena* This);
 	static bool ReadyToStartMatch(AFortGameModeAthena* This);

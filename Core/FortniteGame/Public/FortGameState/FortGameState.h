@@ -12,6 +12,7 @@ class UFortHero;
 class IAbilitySystemInterface;
 class AFortMissionManager;
 class AFortFeedbackManager;
+class AFortTeamInfo;
 
 class AFortGameState : public AGameState {
 public:
@@ -21,6 +22,9 @@ public:
 	DefineUProperty(AFortFeedbackManager*, FeedbackManager);
 	DefineUProperty(AFortMissionManager*, MissionManager);
 	DefineUProperty(FString, GameSessionID);
+	DefineUProperty(int32, TeamCount);
+	DefineUProperty(int32, TeamSize);
+	DefineUProperty(TArray<AFortTeamInfo*>, Teams);
 public:
 	void OnRep_AdditionalPlaylistLevelsStreamed();
 	void OnFinishedStreamingAdditionalPlaylistLevel();

@@ -13,6 +13,18 @@
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
+#include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWorldItemDefinition.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortHero/FortHeroSpecialization.h"
+#include "FortniteGame/Public/FortItemDefinition/FortItemDefinition.h"
+#include "FortniteGame/Public/Mcp/FortMcpProfileAccount.h"
+#include "FortniteGame/Public/Mcp/FortMcpProfileAthena.h"
+#include "FortniteGame/Public/Mcp/McpProfileSys.h"
+#include "FortniteGame/Public/FortQuest/FortQuestManager.h"
+#include "FortniteGame/Public/FortQuest/FortQuestObjectiveCompletion.h"
+#include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
+#include "FortniteGame/Public/Info/FortTeamInfo.h"
 
 bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
 	if (This->bWorldIsReady
@@ -56,6 +68,8 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	This->GameSession->MaxPlayers = 100;
 
 	This->MaxPlayerCount = 100;
+
+	//This->bAlwaysDBNO = true;
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
@@ -84,6 +98,27 @@ int32 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 	FCoreConfig& Config = ConfigurationManager::GetConfig();
 	if (Config.bDevSameTeam) {
 		return 0;
+	}
+	if (Config.bUseGameSessions) {
+		return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
+	}
+
+	AFortGameStateAthena* GameState = This->GameState ? This->GameState->Cast<AFortGameStateAthena>() : nullptr;
+	if (!GameState) {
+		Log("AFortGameModeAthena::PickTeam: GameState is null or not AFortGameStateAthena");
+		return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
+	}
+
+	for (AFortTeamInfo* TeamInfo : GameState->Teams) {
+		if (!TeamInfo) {
+			continue;
+		}
+
+		int32 TeamMemberCount = TeamInfo->TeamMembers.Num();
+		if (TeamMemberCount < GameState->TeamSize) {
+			Log("AFortGameModeAthena::PickTeam: Assigning player to team " + std::to_string(TeamInfo->Team) + " with " + std::to_string(TeamMemberCount) + " members.");
+			return TeamInfo->Team;
+		}
 	}
 
 	return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
