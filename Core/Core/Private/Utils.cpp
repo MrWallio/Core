@@ -384,18 +384,19 @@ void Utils::RemoveLocalPlayer() {
 }
 
 bool Utils::SetupDedicatedServer(FCoreConfig& Config) {
+	if (!Config.bListenServer) {
+		return; // we dont wanna do this if we are a listen server (not a dedicated server)
+	}
+
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("Utils::SetupDedicatedServer: World is nullptr!");
 		return false;
 	}
 
-	if (!Config.bListenServer) {
-		RemoveLocalPlayer();
-	}
+	RemoveLocalPlayer();
 
 	FString TravelURL = "/Game/Maps/FortniteEmptyDedicated";
-
 	if (!World->ServerTravel(TravelURL)) {
 		Log("Utils::SetupDedicatedServer: ServerTravel failed!");
 		return false;
