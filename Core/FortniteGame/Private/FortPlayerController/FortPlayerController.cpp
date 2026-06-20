@@ -144,7 +144,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("SetShield <Shield> - Sets the player's shield.");
 		This->ClientMessage("SetMaxHealth <MaxHealth> - Sets the player's max health.");
 		This->ClientMessage("SetMaxShield <MaxShield> - Sets the player's max shield.");
-		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] [Location] [Rotation] - Spawns an actor at the specified location and rotation.");
+		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] - Spawns an actor");
 		This->ClientMessage("ClearEquippedItem - Clears the currently equipped item.");
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -518,25 +518,14 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 	else if (Parser.IsCommand("SpawnActor")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: SpawnActor <ActorClassName> [Location] [Rotation]");
+			This->ClientMessage("Usage: SpawnActor <ActorClassName>");
 			return;
 		}
 
 		std::string ActorClassName = Parser.GetArg(0);
 		bool bSetOwnerAsThis = Parser.GetArgBool(1, false);
 		FVector Location = This->Pawn ? This->Pawn->K2_GetActorLocation() : FVector();
-		FRotator Rotation = FRotator();
-
-		if (Parser.GetArgCount() >= 5) {
-			Location.X = Parser.GetArgFloat(1, Location.X);
-			Location.Y = Parser.GetArgFloat(2, Location.Y);
-			Location.Z = Parser.GetArgFloat(3, Location.Z);
-		}
-		if (Parser.GetArgCount() >= 8) {
-			Rotation.Pitch = Parser.GetArgFloat(4, Rotation.Pitch);
-			Rotation.Yaw = Parser.GetArgFloat(5, Rotation.Yaw);
-			Rotation.Roll = Parser.GetArgFloat(6, Rotation.Roll);
-		}
+		FRotator Rotation = This->Pawn ? This->Pawn->K2_GetActorRotation() : FRotator();
 
 		UObject* ActorClassObj = Utils::GetObjectFromString(ActorClassName);
 		if (!ActorClassObj) {
