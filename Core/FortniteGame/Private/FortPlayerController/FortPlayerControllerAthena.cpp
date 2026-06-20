@@ -72,7 +72,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	bool bHasAliveTeamMember = false;
 	bool bIsDBNO = PlayerPawnAthena->bIsDBNO || PlayerPawnAthena->bWasDBNOOnDeath;
 
-	if (KillerPlayerStateAthena->PlayerTeam) {
+	if (KillerPlayerStateAthena && KillerPlayerStateAthena->PlayerTeam) {
 		for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
 			AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
 			if (!TeamMemberController || TeamMemberController == This || !TeamMemberController->bMarkedAlive) {
