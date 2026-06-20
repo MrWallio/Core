@@ -110,7 +110,7 @@ uint8 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 		return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
 	}
 
-	AFortGameStateAthena* GameState = This->GameState ? This->GameState->Cast<AFortGameStateAthena>() : nullptr;
+	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
 	if (!GameState) {
 		Log("AFortGameModeAthena::PickTeam: GameState is null or not AFortGameStateAthena");
 		return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
