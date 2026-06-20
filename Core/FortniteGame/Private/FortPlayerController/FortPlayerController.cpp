@@ -689,7 +689,22 @@ void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* Th
 	if (ItemEntry) {
 		if (ItemEntry->ItemDefinition) {
 			if (!bTrash) {
-				This->WorldInventory->SpawnPickupFromEntry(*ItemEntry);
+				AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+					World,
+					ItemEntry->ItemDefinition,
+					Count,
+					PawnLocation,
+					FVector(),
+					-1,
+					true,
+					true,
+					true,
+					-1,
+					EFortPickupSourceTypeFlag::GetPlayer(),
+					EFortPickupSpawnSource::GetTossedByPlayer(),
+					This,
+					false
+				);
 			}
 			This->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
 		}
