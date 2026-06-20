@@ -101,28 +101,21 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 	if (Version::Fortnite_Version >= 1.8) {
 		if (KillerPlayerStateAthena && KillerPlayerStateAthena != PlayerStateAthena) {
-			if (bIsDBNO) {
-				KillerPlayerStateAthena->DownScore++;
-				KillerPlayerStateAthena->ClientReportDBNO(PlayerStateAthena);
-				KillerPlayerStateAthena->OnRep_Downs();
+			KillerPlayerStateAthena->KillScore++;
+			if (Version::Fortnite_Version > 1.8) {
+				KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
 			}
-			else {
-				KillerPlayerStateAthena->KillScore++;
-				if (Version::Fortnite_Version > 1.8) {
-					KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
-				}
-				KillerPlayerStateAthena->OnRep_Kills();
+			KillerPlayerStateAthena->OnRep_Kills();
 
-				if (KillerPlayerStateAthena->PlayerTeam) {
-					for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
-						AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
-						if (TeamMemberController) {
-							AFortPlayerStateAthena* TeamMemberPlayerState = TeamMemberController->PlayerState->Cast<AFortPlayerStateAthena>();
-							if (TeamMemberPlayerState) {
-								TeamMemberPlayerState->TeamKillScore++;
-								TeamMemberPlayerState->ClientReportTeamKill(TeamMemberPlayerState->TeamKillScore);
-								TeamMemberPlayerState->OnRep_TeamKillScore();
-							}
+			if (KillerPlayerStateAthena->PlayerTeam) {
+				for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
+					AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
+					if (TeamMemberController) {
+						AFortPlayerStateAthena* TeamMemberPlayerState = TeamMemberController->PlayerState->Cast<AFortPlayerStateAthena>();
+						if (TeamMemberPlayerState) {
+							TeamMemberPlayerState->TeamKillScore++;
+							TeamMemberPlayerState->ClientReportTeamKill(TeamMemberPlayerState->TeamKillScore);
+							TeamMemberPlayerState->OnRep_TeamKillScore();
 						}
 					}
 				}
