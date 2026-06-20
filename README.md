@@ -3,7 +3,8 @@
   &nbsp;Core
 </h1>
 A Universal Gameserver For Fortnite that aims for accuracy over version support!
-- **Everyone may use this for personal use or a project but please credit me, many thanks!**
+
+> **Everyone may use this for personal use or a project but please credit me, many thanks!**
 
 ---
 
