@@ -8274,8 +8274,16 @@ uintptr_t Finder::FindUObject_GetWorldVFT() {
 	static bool bInitialized = false;
 	if (bInitialized)
 		return ServerOffsets::UObject_GetWorldVFT;
+	void** VFT = AActor::StaticClass()->GetDefaultObject()->VTable;
 
-	// please somebody help me make a finder for ts
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAActor_GetWorld() + ImageBase))
+		{
+			ServerOffsets::UObject_GetWorldVFT = i;
+			break;
+		}
+	}
 
 	if (!bInitialized) bInitialized = true;
 	Log("UObject_GetWorldVFT found at: 0x" + std::format("{:X}", ServerOffsets::UObject_GetWorldVFT));
