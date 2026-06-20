@@ -1,9 +1,11 @@
-# Core
-<img width="512" height="512" alt="New Project (48)" src="https://github.com/user-attachments/assets/28d73a41-1c02-4343-8365-3a19d0771d48" />
-
+<h1>
+  <img src="https://github.com/user-attachments/assets/28d73a41-1c02-4343-8365-3a19d0771d48" width="50" height="50" align="absmiddle" />
+  &nbsp;| Core
+</h1>
 A Universal Gameserver For Fortnite that aims for accuracy over version support!
+- **Everyone may use this for personal use or a project but please credit me, many thanks!**
 
-
+---
 
 Stuck or need help? Join our community information / help server!
 ### -> [Discord Server](https://discord.gg/FXA9ySgtuW)
