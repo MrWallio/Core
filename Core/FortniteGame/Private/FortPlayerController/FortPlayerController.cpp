@@ -1080,7 +1080,7 @@ UFortQuestManager* AFortPlayerController::GetQuestManager(uint8 SubGame) const
 }
 
 void AFortPlayerController::ServerRepairBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair) {
-	if (Version::Fortnite_Version <= 1.8) {
+	if (Version::Fortnite_Version <= 1.8 || Version::Fortnite_Version != 1.10 || Version::Fortnite_Version != 1.11) {
 		return ServerRepairBuildingActorOG(This, BuildingActorToRepair);
 	}
 
