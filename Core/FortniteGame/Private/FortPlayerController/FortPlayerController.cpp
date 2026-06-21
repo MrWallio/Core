@@ -162,7 +162,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
+		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -239,7 +239,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
+		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -268,49 +268,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj;
-		if (ItemDefName.contains("/")) {
-			if (ItemDefName.starts_with("FortniteGame/"))
-			{
-				ItemDefName = "/Game/" + ItemDefName.substr(strlen("FortniteGame/"));
-			}
-
-			size_t contentPos = ItemDefName.find("/Content/");
-			if (contentPos != std::string::npos)
-			{
-				if (ItemDefName.contains("/Game/Content/"))
-				{
-					ItemDefName.replace(ItemDefName.find("/Game/Content/"), strlen("/Game/Content/"), "/Game/");
-				}
-				else
-				{
-					size_t contentPos = ItemDefName.find("/Content/");
-					ItemDefName = ItemDefName.substr(0, contentPos)
-						+ "/Game/"
-						+ ItemDefName.substr(contentPos + strlen("/Content/"));
-				}
-			}
-
-			if (!ItemDefName.contains("."))
-			{
-				size_t lastSlash = ItemDefName.find_last_of('/');
-				if (lastSlash != std::string::npos)
-				{
-					std::string className = ItemDefName.substr(lastSlash + 1);
-					ItemDefName += "." + className;
-				}
-				else
-				{
-					This->ClientMessage("Invalid ItemDefinition path: " + ItemDefName);
-					return;
-				}
-			}
-
-			ItemObj = StaticLoadObject(ItemDefName);
-		}
-		else {
-			ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
-		}
+		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -527,7 +485,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		FVector Location = This->Pawn ? This->Pawn->K2_GetActorLocation() : FVector();
 		FRotator Rotation = This->Pawn ? This->Pawn->K2_GetActorRotation() : FRotator();
 
-		UObject* ActorClassObj = Utils::GetObjectFromString(ActorClassName);
+		UObject* ActorClassObj = FUObjectArray::FindObject(ActorClassName, false);
 		if (!ActorClassObj) {
 			This->ClientMessage("Actor class not found: " + ActorClassName);
 			return;
