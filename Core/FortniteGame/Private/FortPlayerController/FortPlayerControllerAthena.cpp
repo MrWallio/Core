@@ -130,7 +130,6 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	if (Version::Fortnite_Version >= 1.91 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 		PlayerStateAthena->Place = FortGameStateAthena->TeamsLeft; // we wanna do this before removing the player from alive players, so that the place is correct
 		PlayerStateAthena->OnRep_Place();
-		Log("TeamsLeft: " + std::to_string(FortGameStateAthena->TeamsLeft) + ", Player Place: " + std::to_string(PlayerStateAthena->Place));
 
 		FortGameModeAthena->RemoveFromAlivePlayers(
 			This,
@@ -141,10 +140,8 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 			false
 		);
 
-		Log("TeamsLeft: " + std::to_string(FortGameStateAthena->TeamsLeft) + ", Player Place: " + std::to_string(PlayerStateAthena->Place));
-
 		// Now we need to calculate if the player or team won
-		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1;
+		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1 && FortGameStateAthena->WinningTeam != KillerPlayerStateAthena->TeamIndex;
 		if (bTeamWon) {
 			KillerPCAthena->ClientNotifyWon(KillerPlayerPawnAthena, FinishingWeapon, KillerPlayerStateAthena->DeathInfo.DeathCause);
 			if (KillerPlayerStateAthena->PlayerTeam) {

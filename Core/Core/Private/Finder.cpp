@@ -10180,6 +10180,9 @@ uintptr_t Finder::FindAFortGameSessionDedicated_OnServerConfigurationRequest() {
 	uintptr_t Addr = 0;
 
 	Addr = Memcury::Scanner::FindPattern("40 55 53 56 41 54 41 56 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? ? ? ? 4D 8B F0").Get();
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("40 55 53 56 41 54 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? ? ? ? 4D 8B F0").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequest = Addr - ImageBase;
