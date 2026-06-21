@@ -663,6 +663,7 @@ void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* Th
 					This,
 					false
 				);
+				Pickup->PrimaryPickupItemEntry.LoadedAmmo = ItemEntry->LoadedAmmo;
 			}
 			This->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
 		}
