@@ -52,6 +52,14 @@ int32 FName::Compare(const FName& Other) const
 	return CompareInternal(this, &Other);
 }
 
+FName::FName(const std::string& Name) {
+	*this = UKismetStringLibrary::Conv_StringToName(Name);
+}
+
+FName::FName(const FString& Name) {
+	*this = UKismetStringLibrary::Conv_StringToName(Name);
+}
+
 FName::FName(const char* Str)
 {
 	((void(*)(FName*, const char*, unsigned int))(ImageBase + Finder::FindFName_Constructor1()))(this, Str, 1);

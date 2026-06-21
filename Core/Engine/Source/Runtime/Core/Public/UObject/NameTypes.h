@@ -84,5 +84,10 @@ public:
 
 	uint32 Number;
 public:
+	// Custom
+	FName(const std::string& Name);
+
+	FName(const FString& Name);
+
 	FName(const char* Str);
 };
