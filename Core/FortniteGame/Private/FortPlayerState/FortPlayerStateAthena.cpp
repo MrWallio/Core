@@ -31,8 +31,8 @@ void AFortPlayerStateAthena::OnRep_TeamScore()
 
 void AFortPlayerStateAthena::ClientReportDBNO(const AFortPlayerStateAthena* Player)
 {
-	if (Version::Fortnite_Version <= 1.9 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
-		ClientReportDBNO(Player->PlayerName);
+	if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
+		ClientReportDBNO(Player->GetPlayerName());
 	}
 	else {
 		static UFunction* Func = nullptr;
@@ -84,8 +84,8 @@ void AFortPlayerStateAthena::ClientReportDBNO(const FString& DBNOPlayersName)
 
 void AFortPlayerStateAthena::ClientReportKill(const AFortPlayerStateAthena* Player)
 {
-	if (Version::Fortnite_Version <= 1.9 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
-		ClientReportKill(Player->PlayerName);
+	if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
+		ClientReportKill(Player->GetPlayerName());
 	}
 	else {
 		static UFunction* Func = nullptr;

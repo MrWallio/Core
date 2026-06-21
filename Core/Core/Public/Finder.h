@@ -1072,6 +1072,8 @@ public:
 	static uintptr_t FindFMsg_Logf();
 
 	static uintptr_t FindFName_Constructor1();
+
+	static uintptr_t FindAFortGameModeAthena_RemoveFromAlivePlayers();
 public:
 	static void SetupCoreOffsets();
 

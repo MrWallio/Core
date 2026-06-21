@@ -73,6 +73,62 @@ void AFortGameStateAthena::ApplyHomebaseEffectsOnPlayerSetup(AFortGameStateAthen
 	ApplyHomebaseEffectsOnPlayerSetupOG(This, SourceAccountID, McpProfile, AbilityObject, Hero, bApplyTeamEffect, bApplyTeamEffectToOtherPlayers, bIgnoreStatClamp);
 }
 
+void AFortGameStateAthena::OnRep_WinningPlayerName()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_WinningPlayerName");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortGameStateAthena::OnRep_WinningTeam()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_WinningTeam");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortGameStateAthena::OnRep_WinningPlayerList()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_WinningPlayerList");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortGameStateAthena::OnRep_WinningPlayerState()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_WinningPlayerState");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}
+
 void AFortGameStateAthena::Hook() {
 	HookEveryVTableIdx(
 		AFortGameStateAthena::StaticClass(),

@@ -75,6 +75,11 @@ void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
 	AddToAlivePlayersInternal(this, PC);
 }
 
+void AFortGameModeAthena::RemoveFromAlivePlayers(AFortPlayerControllerAthena* PC, APlayerState* RemovalInstigator, APawn* FinisherPawn, UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause, bool bIsTeamSwitching) {
+	void (*RemoveFromAlivePlayersInternal)(AFortGameModeAthena * This, AFortPlayerControllerAthena * PC, APlayerState * RemovalInstigator, APawn * FinisherPawn, UFortWeaponItemDefinition * FinishingWeapon, uint8 DeathCause, bool bIsTeamSwitching) = decltype(RemoveFromAlivePlayersInternal)(ImageBase + Finder::FindAFortGameModeAthena_RemoveFromAlivePlayers());
+	RemoveFromAlivePlayersInternal(this, PC, RemovalInstigator, FinisherPawn, FinishingWeapon, DeathCause, bIsTeamSwitching);
+}
+
 int32 AFortGameModeAthena::StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone) {
 	for (AFortPlayerControllerAthena* PC : This->AlivePlayers) {
 		if (PC->WorldInventory) {

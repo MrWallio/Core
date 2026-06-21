@@ -10,6 +10,7 @@ struct FVector;
 class AFortAIDirector;
 class UFortPlaylistAthena;
 class AFortWorldManager;
+class UFortWeaponItemDefinition;
 
 class AFortGameModeAthena : public AFortGamePvPBase {
 public:
@@ -36,6 +37,8 @@ public:
 	static void FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
 
 	void AddToAlivePlayers(AFortPlayerControllerAthena* PC);
+
+	void RemoveFromAlivePlayers(AFortPlayerControllerAthena* PC, APlayerState* RemovalInstigator, APawn* FinisherPawn, UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause, bool bIsTeamSwitching);
 
 	static inline int32 (*StartAircraftPhaseOG)(AFortGameModeAthena* This, bool bGoStraightToSafeZone);
 	static int32 StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone);

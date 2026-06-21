@@ -10236,6 +10236,60 @@ uintptr_t Finder::FindFName_Constructor1() {
 	return ServerOffsets::FName_Constructor1;
 }
 
+uintptr_t Finder::FindAFortGameModeAthena_RemoveFromAlivePlayers() {
+	if (ServerOffsets::AFortGameModeAthena_RemoveFromAlivePlayers)
+		return ServerOffsets::AFortGameModeAthena_RemoveFromAlivePlayers;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortGameModeAthena_RemoveFromAlivePlayers;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		auto sRef = Memcury::Scanner::FindStringRef(L"FortGameModeAthena: Player [%s] removed from alive players list (Team [%d]).  Player count is now [%d].  Team count is now [%d].", false).Get();
+		if (!sRef) {
+			sRef = Memcury::Scanner::FindStringRef(L"FortGameModeAthena: Player [%s] removed from alive players list (Team [%d]).  Player count is now [%d]. PlayerBots count is now [%d]. Team count is now [%d].", false).Get();
+		}
+		if (!sRef) {
+			sRef = Memcury::Scanner::FindStringRef(L"FortGameModeAthena::RemoveFromAlivePlayers: Player [%s] PC [%s] removed from alive players list (Team [%d]).  Player count is now [%d]. PlayerBots count is now [%d]. Team count is now [%d].", true, 0, Version::Fortnite_Version >= 16).Get();
+		}
+
+		for (int i = 0; i < 0x1200; i++)
+		{
+			if (*(uint8_t*)(sRef - i) == 0x4C && *(uint8_t*)(sRef - i + 1) == 0x89 && *(uint8_t*)(sRef - i + 2) == 0x4C) {
+				Addr = sRef - i;
+				break;
+			}
+			else if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x89 && *(uint8_t*)(sRef - i + 2) == 0x54)
+			{
+				for (int z = 3; z < 50; z++)
+					if (*(uint8_t*)(sRef - i - z) == 0x4C && *(uint8_t*)(sRef - i - z + 1) == 0x89 && *(uint8_t*)(sRef - i - z + 2) == 0x4C)
+						return Addr = sRef - i - z;
+
+				Addr = sRef - i;
+				break;
+			}
+			else if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x8B && *(uint8_t*)(sRef - i + 2) == 0xC4) {
+				Addr = sRef - i;
+				break;
+			}
+			else if (Version::Engine_Version >= 5.3 && *(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x89 && *(uint8_t*)(sRef - i + 2) == 0x5C) {
+				Addr = sRef - i;
+				break;
+			}
+		}
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameModeAthena_RemoveFromAlivePlayers = Addr - ImageBase;
+	}
+
+	Log("AFortGameModeAthena_RemoveFromAlivePlayers found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeAthena_RemoveFromAlivePlayers));
+	return ServerOffsets::AFortGameModeAthena_RemoveFromAlivePlayers;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10597,6 +10651,8 @@ void Finder::SetupOffsets() {
 	FindFMsg_Logf();
 
 	FindFName_Constructor1();
+
+	FindAFortGameModeAthena_RemoveFromAlivePlayers();
 
 	return;
 }

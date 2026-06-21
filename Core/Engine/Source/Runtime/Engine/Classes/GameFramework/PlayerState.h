@@ -12,4 +12,6 @@ public:
 	DefineUProperty(uint8, Ping);
 	DefineUProperty(FString, PlayerName);
 	DefineBitfieldUProperty(bIsABot);
+public:
+	FString GetPlayerName() const;
 };

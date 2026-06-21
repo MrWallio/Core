@@ -21,6 +21,7 @@
 #include "FortniteGame/Public/FortQuest/FortQuestObjectiveCompletion.h"
 #include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
 #include "FortniteGame/Public/Info/FortTeamInfo.h"
+#include "FortniteGame/Public/FortWeapon/FortWeapon.h"
 
 void AFortPlayerControllerAthena::EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft) {
 	EnterAircraftOG(This, InAircraft);
@@ -64,6 +65,9 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 	AFortPlayerStateAthena* KillerPlayerStateAthena = DeathReport.KillerPlayerState->Cast<AFortPlayerStateAthena>();
 	AFortPlayerPawnAthena* KillerPlayerPawnAthena = DeathReport.KillerPawn->Cast<AFortPlayerPawnAthena>();
+	AFortPlayerControllerAthena* KillerPCAthena = KillerPlayerPawnAthena->Controller->Cast<AFortPlayerControllerAthena>();
+	UFortWeaponItemDefinition* FinishingWeapon = DeathReport.DamageCauser->IsA(AFortWeapon::StaticClass())
+		? DeathReport.DamageCauser->Cast<AFortWeapon>()->WeaponData : nullptr;
 
 	if (This->WorldInventory) {
 		This->WorldInventory->DropAllItems();
@@ -89,20 +93,10 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		}
 	}
 
-	PlayerStateAthena->DeathInfo.bDBNO = bIsDBNO;
-	PlayerStateAthena->DeathInfo.FinisherOrDowner = KillerPlayerStateAthena ? KillerPlayerStateAthena : PlayerStateAthena;
-	PlayerStateAthena->DeathInfo.DeathCause = AFortPlayerStateAthena::ToDeathCause(DeathReport.Tags, bIsDBNO);
-	Log("==================== DeathInfo Dump Start ====================");
-	Log("==================== bDBNO=" + std::to_string(PlayerStateAthena->DeathInfo.bDBNO));
-	Log("==================== FinisherOrDowner=" + (PlayerStateAthena->DeathInfo.FinisherOrDowner ? PlayerStateAthena->DeathInfo.FinisherOrDowner->GetName().ToString() : "None"));
-	Log("==================== DeathCause=" + std::to_string(PlayerStateAthena->DeathInfo.DeathCause));
-	Log("==================== DeathInfo Dump End ====================");
-	PlayerStateAthena->OnRep_DeathInfo();
-
 	if (Version::Fortnite_Version >= 1.8) {
 		if (KillerPlayerStateAthena && KillerPlayerStateAthena != PlayerStateAthena) {
 			KillerPlayerStateAthena->KillScore++;
-			if (Version::Fortnite_Version > 1.8) {
+			if (Version::Fortnite_Version >= 1.8 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 				KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
 			}
 			KillerPlayerStateAthena->OnRep_Kills();
@@ -121,31 +115,81 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 				}
 			}
 		}
+	}
 
-		if ((Version::Fortnite_Version < 2.1 && Version::Fortnite_Version > 1.91) || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
-			if (FortGameModeAthena->bAllowSpectateAfterDeath) {
-				APawn* PawnToSpectate = DeathReport.KillerPawn;
-				if (!PawnToSpectate) {
-					// Find next spectatable player
-					for (AFortPlayerControllerAthena* PC : FortGameModeAthena->AlivePlayers) {
-						if (PC && PC->Pawn) {
-							PawnToSpectate = PC->Pawn;
-							break;
-						}
+	PlayerStateAthena->DeathInfo.bDBNO = bIsDBNO;
+	PlayerStateAthena->DeathInfo.FinisherOrDowner = KillerPlayerStateAthena ? KillerPlayerStateAthena : PlayerStateAthena;
+	PlayerStateAthena->DeathInfo.DeathCause = AFortPlayerStateAthena::ToDeathCause(DeathReport.Tags, bIsDBNO);
+	Log("==================== DeathInfo Dump Start ====================");
+	Log("==================== bDBNO=" + std::to_string(PlayerStateAthena->DeathInfo.bDBNO));
+	Log("==================== FinisherOrDowner=" + (PlayerStateAthena->DeathInfo.FinisherOrDowner ? PlayerStateAthena->DeathInfo.FinisherOrDowner->GetName().ToString() : "None"));
+	Log("==================== DeathCause=" + std::to_string(PlayerStateAthena->DeathInfo.DeathCause));
+	Log("==================== DeathInfo Dump End ====================");
+	PlayerStateAthena->OnRep_DeathInfo();
+
+	if (Version::Fortnite_Version >= 1.91 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+		PlayerStateAthena->Place = FortGameStateAthena->TeamsLeft; // we wanna do this before removing the player from alive players, so that the place is correct
+		PlayerStateAthena->OnRep_Place();
+		Log("TeamsLeft: " + std::to_string(FortGameStateAthena->TeamsLeft) + ", Player Place: " + std::to_string(PlayerStateAthena->Place));
+
+		FortGameModeAthena->RemoveFromAlivePlayers(
+			This,
+			KillerPlayerStateAthena == PlayerStateAthena ? nullptr : KillerPlayerStateAthena,
+			KillerPlayerPawnAthena,
+			FinishingWeapon,
+			PlayerStateAthena->DeathInfo.DeathCause,
+			false
+		);
+
+		Log("TeamsLeft: " + std::to_string(FortGameStateAthena->TeamsLeft) + ", Player Place: " + std::to_string(PlayerStateAthena->Place));
+
+		// Now we need to calculate if the player or team won
+		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1;
+		if (bTeamWon) {
+			KillerPCAthena->ClientNotifyWon(KillerPlayerPawnAthena, FinishingWeapon, KillerPlayerStateAthena->DeathInfo.DeathCause);
+			if (KillerPlayerStateAthena->PlayerTeam) {
+				for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
+					AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
+					if (TeamMemberController) {
+						TeamMemberController->ClientNotifyTeamWon(KillerPlayerPawnAthena, FinishingWeapon, KillerPlayerStateAthena->DeathInfo.DeathCause);
 					}
 				}
+			}
 
-				if (PawnToSpectate) {
-					This->PlayerToSpectateOnDeath = PawnToSpectate;
+			FortGameStateAthena->WinningTeam = KillerPlayerStateAthena->TeamIndex;
+			FortGameStateAthena->OnRep_WinningTeam();
 
-					FTimerHandle TimerHandle = UKismetSystemLibrary::K2_SetTimer(This, "SpectateOnDeath", 5.f, false);
-					if (!TimerHandle.IsValid()) {
-						Log("AFortPlayerControllerAthena::ClientOnPawnDied: Failed to set timer for SpectateOnDeath!");
+			FortGameStateAthena->WinningPlayerName = KillerPlayerStateAthena->GetPlayerName();
+			FortGameStateAthena->OnRep_WinningPlayerName();
+
+			FortGameStateAthena->WinningPlayerState = KillerPlayerStateAthena;
+			FortGameStateAthena->OnRep_WinningPlayerState();
+		}
+	}
+
+	if ((Version::Fortnite_Version < 2.1 && Version::Fortnite_Version >= 1.91) || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+		if (FortGameModeAthena->bAllowSpectateAfterDeath) {
+			APawn* PawnToSpectate = DeathReport.KillerPawn;
+			if (!PawnToSpectate) {
+				// Find next spectatable player
+				for (AFortPlayerControllerAthena* PC : FortGameModeAthena->AlivePlayers) {
+					if (PC && PC->Pawn) {
+						PawnToSpectate = PC->Pawn;
+						break;
 					}
 				}
-				else {
-					Log("AFortPlayerControllerAthena::ClientOnPawnDied: Unable to find a pawn to spectate after death!");
+			}
+
+			if (PawnToSpectate) {
+				This->PlayerToSpectateOnDeath = PawnToSpectate;
+
+				FTimerHandle TimerHandle = UKismetSystemLibrary::K2_SetTimer(This, "SpectateOnDeath", 5.f, false);
+				if (!TimerHandle.IsValid()) {
+					Log("AFortPlayerControllerAthena::ClientOnPawnDied: Failed to set timer for SpectateOnDeath!");
 				}
+			}
+			else {
+				Log("AFortPlayerControllerAthena::ClientOnPawnDied: Unable to find a pawn to spectate after death!");
 			}
 		}
 	}
@@ -201,4 +245,52 @@ void AFortPlayerControllerAthena::ServerReturnToMainMenu(AFortPlayerControllerAt
 	}
 
 	AFortPlayerControllerZone::ServerReturnToMainMenuOG(This);
+}
+
+void AFortPlayerControllerAthena::ClientNotifyTeamWon(APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientNotifyTeamWon");
+
+	struct FortPlayerControllerAthena_ClientNotifyTeamWon
+	{
+	public:
+		APawn* FinisherPawn;
+		const UFortWeaponItemDefinition* FinishingWeapon;
+		uint8 DeathCause;
+	};
+
+	FortPlayerControllerAthena_ClientNotifyTeamWon Parms{};
+
+	Parms.FinisherPawn = FinisherPawn;
+	Parms.FinishingWeapon = FinishingWeapon;
+	Parms.DeathCause = DeathCause;
+
+	ProcessEvent(Func, &Parms);
+}
+
+void AFortPlayerControllerAthena::ClientNotifyWon(APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientNotifyWon");
+
+	struct FortPlayerControllerAthena_ClientNotifyWon
+	{
+	public:
+		APawn* FinisherPawn;
+		const UFortWeaponItemDefinition* FinishingWeapon;
+		uint8 DeathCause;
+	};
+
+	FortPlayerControllerAthena_ClientNotifyWon Parms{};
+
+	Parms.FinisherPawn = FinisherPawn;
+	Parms.FinishingWeapon = FinishingWeapon;
+	Parms.DeathCause = DeathCause;
+
+	ProcessEvent(Func, &Parms);
 }

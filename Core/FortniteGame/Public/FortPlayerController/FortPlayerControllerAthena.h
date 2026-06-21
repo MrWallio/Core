@@ -13,6 +13,7 @@ class UFortHero;
 class UFortHeroType;
 class AFortAircraft;
 struct FFortAthenaLoadout;
+class UFortWeaponItemDefinition;
 
 class AFortPlayerControllerAthena : public AFortPlayerControllerZone {
 public:
@@ -40,6 +41,10 @@ public:
 
 	static inline void (*ServerReturnToMainMenuOG)(AFortPlayerControllerAthena* This);
 	static void ServerReturnToMainMenu(AFortPlayerControllerAthena* This);
+
+	void ClientNotifyTeamWon(APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause);
+
+	void ClientNotifyWon(APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause);
 
 	static void Hook() {
 		UObject* AircraftComp = FUObjectArray::FindObject("Class FortniteGame.FortControllerComponent_Aircraft");
