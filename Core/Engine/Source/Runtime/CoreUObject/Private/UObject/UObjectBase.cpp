@@ -80,7 +80,7 @@ bool UObjectBase::IsA(UClass* TypeClass) const
 	return GetClass()->IsSubclassOf(TypeClass);
 }
 
-UProperty* UObjectBase::FindPropertyByName(std::string InName) const
+UProperty* UObjectBase::FindPropertyByName(FName InName) const
 {
 	return GetClass() ? GetClass()->FindPropertyByName(InName) : nullptr;
 }

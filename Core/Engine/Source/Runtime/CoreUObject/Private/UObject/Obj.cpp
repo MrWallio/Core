@@ -10,11 +10,6 @@ UFunction* UObject::FindFunction(FName InName) const
 	return GetClass()->FindFunctionByName(InName, EIncludeSuperFlag::IncludeSuper);
 }
 
-UFunction* UObject::FindFunction(std::string InName) const
-{
-	return FindFunction(UKismetStringLibrary::Conv_StringToName(InName));
-}
-
 UObject* UObject::GetArchetypeFromRequiredInfo(UClass* Class, UObject* Outer, FName Name, EObjectFlags ObjectFlags)
 {
 	UObject* (*GetArchetypeFromRequiredInfoInternal)(UClass*, UObject*, FName, EObjectFlags) = decltype(GetArchetypeFromRequiredInfoInternal)(ImageBase + Finder::FindUObject_GetArchetypeFromRequiredInfo());

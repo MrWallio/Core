@@ -18,7 +18,6 @@ class UClass;
 class UObject : public UObjectBaseUtility {
 public:
 	UFunction* FindFunction(FName InName) const;
-	UFunction* FindFunction(std::string InName) const;
 
 	static UObject* GetArchetypeFromRequiredInfo(UClass* Class, UObject* Outer, FName Name, EObjectFlags ObjectFlags);
 

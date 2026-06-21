@@ -19,20 +19,15 @@ UStruct* UField::GetOwnerStruct() const
 
 UProperty* UStruct::FindPropertyByName(FName InName) const
 {
-	UProperty* (*FindPropertyByNameInternal)(const UStruct*, FName) = decltype(FindPropertyByNameInternal)(ImageBase + Finder::FindUStruct_FindPropertyByName());
-	return FindPropertyByNameInternal(this, InName);
-}
-
-UProperty* UStruct::FindPropertyByName(std::string InName) const
-{
 	if (Finder::FindUStruct_FindPropertyByName()) {
-		FString PropertyNameString = FString(std::wstring(InName.begin(), InName.end()).c_str());
-		FName PropertyName = UKismetStringLibrary::Conv_StringToName(PropertyNameString);
-		UProperty* Prop = FindPropertyByName(PropertyName);
+		UProperty* (*FindPropertyByNameInternal)(const UStruct*, FName) = decltype(FindPropertyByNameInternal)(ImageBase + Finder::FindUStruct_FindPropertyByName());
+		UProperty* Prop = FindPropertyByNameInternal(this, InName);
+
 		if (!Prop) {
 			//Log("Failed to find property for object: " + GetFName().ToString().ToString() + " with name: " + InName);
 			return nullptr;
 		}
+
 		return Prop;
 	}
 	else {
@@ -41,7 +36,7 @@ UProperty* UStruct::FindPropertyByName(std::string InName) const
 			if (!Field) continue;
 			UProperty* Prop = (UProperty*)Field;
 
-			if (Prop && Prop->GetName().ToString() == InName) {
+			if (Prop && Prop->GetFName() == InName) {
 				return Prop;
 			}
 		}

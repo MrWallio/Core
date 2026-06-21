@@ -54,7 +54,6 @@ public:
     DefineCustomProperty(UField*, ChildProperties, 0x50);
 public:
     UProperty* FindPropertyByName(FName InName) const;
-    UProperty* FindPropertyByName(std::string InName) const;
     uintptr_t GetPropertyOffset(std::string InName) const;
 public:
     UField* GetChildrenOrChildProperties() const

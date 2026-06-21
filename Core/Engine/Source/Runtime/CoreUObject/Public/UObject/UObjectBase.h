@@ -75,5 +75,5 @@ public:
 		return (ObjectFlags & EObjectFlags::RF_ClassDefaultObject);
 	}
 
-	UProperty* FindPropertyByName(std::string InName) const;
+	UProperty* FindPropertyByName(FName InName) const;
 };
