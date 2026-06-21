@@ -73,6 +73,8 @@ public:
 
 	bool CheckForRePickup(AFortPlayerPawn* FortPlayerPawn);
 
+	static UClass* GetDefaultPickupClass(const UFortItemDefinition* ItemDefinition);
+
 	static void Hook() {
 		HookEveryVTableIdx(
 			AFortPickup::StaticClass(),

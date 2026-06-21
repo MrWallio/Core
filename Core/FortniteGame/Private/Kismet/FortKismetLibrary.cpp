@@ -160,7 +160,7 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 		" In World: " + World->GetName().ToString()
 	);*/
 
-	AFortPickup* Pickup = World->SpawnActor(AFortPickup::StaticClass(), Position)->Cast<AFortPickup>();
+	AFortPickup* Pickup = World->SpawnActor(AFortPickup::GetDefaultPickupClass(ItemDefinition), Position)->Cast<AFortPickup>();
 	if (!Pickup) {
 		Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Failed to spawn pickup!");
 		return nullptr;

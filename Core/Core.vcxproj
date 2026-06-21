@@ -293,6 +293,7 @@
     <ClInclude Include="FortniteGame\Public\FortManager\FortBluGloManager.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortFeedbackManager.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortMissionManager.h" />
+    <ClInclude Include="FortniteGame\Public\FortPickup\FortPickupAthena.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStart.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayerStart\FortPlayerStartWarmup.h" />
     <ClInclude Include="FortniteGame\Public\FortPlayer\FortPlayerDeathReport.h" />

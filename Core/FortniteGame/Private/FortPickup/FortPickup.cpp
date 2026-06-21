@@ -8,6 +8,8 @@
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 #include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
+#include "FortniteGame/Public/FortPickup/FortPickupAthena.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 
 void AFortPickup::OnRep_PrimaryPickupItemEntry()
 {
@@ -171,4 +173,18 @@ bool AFortPickup::CheckForRePickup(AFortPlayerPawn* FortPlayerPawn) {
 		return false;
 
 	return true;
+}
+
+UClass* AFortPickup::GetDefaultPickupClass(const UFortItemDefinition* ItemDefinition)
+{
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortPickup::GetDefaultPickupClass: World is null!");
+		return AFortPickup::StaticClass();
+	}
+
+	if (World->AuthorityGameMode->IsA(AFortGameModeAthena::StaticClass()))
+		return AFortPickupAthena::StaticClass();
+	else
+		return AFortPickup::StaticClass();
 }
