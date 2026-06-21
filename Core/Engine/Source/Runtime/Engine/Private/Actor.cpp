@@ -292,3 +292,26 @@ void AActor::Reset()
 	void (*&ResetInternal)(AActor*) = decltype(ResetInternal)(VTable[Finder::FindAActor_ResetVFT()]);
 	ResetInternal(this);
 }
+
+float AActor::GetDistanceTo(const AActor* OtherActor) const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetDistanceTo");
+
+	struct Actor_GetDistanceTo
+	{
+	public:
+		const AActor* OtherActor;
+		float ReturnValue;
+	};
+
+	Actor_GetDistanceTo Parms{};
+
+	Parms.OtherActor = OtherActor;
+
+	const_cast<AActor*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}
