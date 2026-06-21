@@ -6,6 +6,10 @@
 
 #include "FortPlayerControllerZone.h"
 #include "FortniteGame/Public/FortLoadout/FortAthenaLoadout.h"
+#include "FortniteGame/Public/Athena/AthenaRewardResult.h"
+#include "FortniteGame/Public/Athena/AthenaMatchStats.h"
+#include "FortniteGame/Public/Athena/AthenaMatchTeamStats.h"
+#include "FortniteGame/Public/Athena/AthenaPlayerMatchReport.h"
 
 class AFortPlayerPawnAthena;
 class AFortBroadcastRemoteClientInfo;
@@ -14,6 +18,8 @@ class UFortHeroType;
 class AFortAircraft;
 struct FFortAthenaLoadout;
 class UFortWeaponItemDefinition;
+struct FAthenaRewardResult;
+class UAthenaPlayerMatchReport;
 
 class AFortPlayerControllerAthena : public AFortPlayerControllerZone {
 public:
@@ -26,6 +32,7 @@ public:
 	DefineUProperty(FFortAthenaLoadout, CustomizationLoadout);
 	DefineUProperty(APawn*, PlayerToSpectateOnDeath);
 	DefineUProperty(bool, bMarkedAlive);
+	DefineUProperty(UAthenaPlayerMatchReport*, MatchReport);
 public:
 	static inline void (*EnterAircraftOG)(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft);
 	static void EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft);
@@ -45,6 +52,12 @@ public:
 	void ClientNotifyTeamWon(APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause);
 
 	void ClientNotifyWon(APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause);
+
+	void ClientSendEndBattleRoyaleMatchForPlayer(bool bSuccess, const FAthenaRewardResult& Result);
+
+	void ClientSendMatchStatsForPlayer(const FAthenaMatchStats& Stats);
+
+	void ClientSendTeamStatsForPlayer(const FAthenaMatchTeamStats& TeamStats);
 
 	static void Hook() {
 		UObject* AircraftComp = FUObjectArray::FindObject("Class FortniteGame.FortControllerComponent_Aircraft");

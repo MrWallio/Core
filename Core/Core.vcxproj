@@ -269,6 +269,11 @@
     <ClInclude Include="Engine\Source\Runtime\GameplayTasks\Classes\GameplayTasksComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Classes\Net\Serialization\FastArraySerializer.h" />
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Public\Net\Core\Connection\NetEnums.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\AthenaLevelInfo.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchStats.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchTeamStats.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\AthenaPlayerMatchReport.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\AthenaRewardResult.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingGameplayActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTrap.h" />
     <ClInclude Include="FortniteGame\Public\FortAbility\FortAbilitySystemComponent.h" />

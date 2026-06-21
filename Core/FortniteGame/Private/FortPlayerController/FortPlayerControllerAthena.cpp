@@ -22,6 +22,10 @@
 #include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
 #include "FortniteGame/Public/Info/FortTeamInfo.h"
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
+#include "FortniteGame/Public/Athena/AthenaRewardResult.h"
+#include "FortniteGame/Public/Athena/AthenaMatchStats.h"
+#include "FortniteGame/Public/Athena/AthenaMatchTeamStats.h"
+#include "FortniteGame/Public/Athena/AthenaPlayerMatchReport.h"
 
 void AFortPlayerControllerAthena::EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft) {
 	EnterAircraftOG(This, InAircraft);
@@ -140,6 +144,14 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 			false
 		);
 
+		This->ClientSendEndBattleRoyaleMatchForPlayer(
+			true,
+			This->MatchReport ? (This->MatchReport->_HasRewards() ? This->MatchReport->Rewards : This->MatchReport->EndOfMatchResults) : *FAthenaRewardResult::Allocate()
+		);
+
+		This->ClientSendMatchStatsForPlayer(This->MatchReport ? This->MatchReport->MatchStats : *FAthenaMatchStats::Allocate());
+		This->ClientSendTeamStatsForPlayer(This->MatchReport ? This->MatchReport->TeamStats : *FAthenaMatchTeamStats::Allocate());
+
 		// Now we need to calculate if the player or team won
 		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1 && FortGameStateAthena->WinningTeam != KillerPlayerStateAthena->TeamIndex;
 		if (bTeamWon) {
@@ -149,6 +161,16 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 					AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
 					if (TeamMemberController) {
 						TeamMemberController->ClientNotifyTeamWon(KillerPlayerPawnAthena, FinishingWeapon, KillerPlayerStateAthena->DeathInfo.DeathCause);
+
+						if (TeamMemberController != This) {
+							TeamMemberController->ClientSendEndBattleRoyaleMatchForPlayer(
+								true,
+								TeamMemberController->MatchReport ? (TeamMemberController->MatchReport->_HasRewards() ? TeamMemberController->MatchReport->Rewards : TeamMemberController->MatchReport->EndOfMatchResults) : *FAthenaRewardResult::Allocate()
+							);
+
+							TeamMemberController->ClientSendMatchStatsForPlayer(TeamMemberController->MatchReport ? TeamMemberController->MatchReport->MatchStats : *FAthenaMatchStats::Allocate());
+							TeamMemberController->ClientSendTeamStatsForPlayer(TeamMemberController->MatchReport ? TeamMemberController->MatchReport->TeamStats : *FAthenaMatchTeamStats::Allocate());
+						}
 					}
 				}
 			}
@@ -288,6 +310,81 @@ void AFortPlayerControllerAthena::ClientNotifyWon(APawn* FinisherPawn, const UFo
 	Parms.FinisherPawn = FinisherPawn;
 	Parms.FinishingWeapon = FinishingWeapon;
 	Parms.DeathCause = DeathCause;
+
+	ProcessEvent(Func, &Parms);
+}
+
+void AFortPlayerControllerAthena::ClientSendEndBattleRoyaleMatchForPlayer(bool bSuccess, const FAthenaRewardResult& Result)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientSendEndBattleRoyaleMatchForPlayer");
+
+	if (!Func) {
+		return;
+	}
+
+	struct FortPlayerControllerAthena_ClientSendEndBattleRoyaleMatchForPlayer
+	{
+	public:
+		bool bSuccess;
+		uint8 Pad_1[0x7];
+		FAthenaRewardResult Result;
+	};
+
+	FortPlayerControllerAthena_ClientSendEndBattleRoyaleMatchForPlayer Parms{};
+
+	Parms.bSuccess = bSuccess;
+	Parms.Result = std::move(Result);
+
+	ProcessEvent(Func, &Parms);
+}
+
+void AFortPlayerControllerAthena::ClientSendMatchStatsForPlayer(const FAthenaMatchStats& Stats)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientSendMatchStatsForPlayer");
+
+	if (!Func) {
+		return;
+	}
+
+	struct FortPlayerControllerAthena_ClientSendMatchStatsForPlayer
+	{
+	public:
+		FAthenaMatchStats Stats;
+	};
+
+	FortPlayerControllerAthena_ClientSendMatchStatsForPlayer Parms{};
+
+	Parms.Stats = std::move(Stats);
+
+	ProcessEvent(Func, &Parms);
+}
+
+void AFortPlayerControllerAthena::ClientSendTeamStatsForPlayer(const FAthenaMatchTeamStats& TeamStats)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientSendTeamStatsForPlayer");
+
+	if (!Func) {
+		return;
+	}
+
+	struct FortPlayerControllerAthena_ClientSendTeamStatsForPlayer
+	{
+	public:
+		FAthenaMatchTeamStats TeamStats;
+	};
+
+	FortPlayerControllerAthena_ClientSendTeamStatsForPlayer Parms{};
+
+	Parms.TeamStats = std::move(TeamStats);
 
 	ProcessEvent(Func, &Parms);
 }
