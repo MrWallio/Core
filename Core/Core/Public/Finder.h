@@ -1068,6 +1068,8 @@ public:
 	static uintptr_t FindAFortGameSessionDedicated_OnServerConfigurationRequest();
 
 	static uintptr_t FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT();
+
+	static uintptr_t FindFMsg_Logf();
 public:
 	static void SetupCoreOffsets();
 

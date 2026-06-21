@@ -170,6 +170,8 @@
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Package.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\PersistentObjectPtr.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UObjectGlobals.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Logging\LogMacros.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Logging\LogVerbosity.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\AI\Navigation\NavigationSystem.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\NavigationObjectBase.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\TimerHandle.h" />
@@ -400,6 +402,7 @@
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectBaseUtility.cpp" />
     <ClCompile Include="Engine\Source\Runtime\CoreUObject\Private\UObject\UObjectGlobals.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Private\HAL\UnrealMemory.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Core\Private\Logging\LogMacros.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Private\Math\UnrealMath.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Private\Misc\AssertionMacros.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Core\Private\Misc\Guid.cpp" />

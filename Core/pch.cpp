@@ -3,6 +3,44 @@
 #include "pch.h"
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
+#include "Engine/Source/Runtime/Core/Public/Logging/LogMacros.h"
+#include "Core/Public/Utils.h"
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
+
+void Log(const std::string& msg)
+{
+	FCoreConfig& Config = ConfigurationManager::GetConfig();
+	if (Config.bIsProd)
+		return;
+
+	std::string FileName = Config.bIsClient ? "Client_log.txt" : "Server_log.txt";
+	std::string LogType = Config.bIsClient ? "Client" : "Server";
+
+	static bool firstCallClient = true;
+	static bool firstCallServer = true;
+
+	bool& firstCall = Config.bIsClient ? firstCallClient : firstCallServer;
+
+	if (firstCall)
+	{
+		std::ofstream logFile(FileName, std::ios::trunc);
+		if (logFile.is_open())
+		{
+			logFile << "Log" + LogType + ": Log file initialized!\n";
+			logFile.close();
+		}
+		firstCall = false;
+	}
+
+	std::ofstream logFile(FileName, std::ios::app);
+	if (logFile.is_open())
+	{
+		logFile << "Log" + LogType + ": " << msg << std::endl;
+		logFile.close();
+	}
+
+	std::cout << "Log" + LogType + ": " << msg << std::endl;
+}
 
 uintptr_t GetVTableIndex(class UFunction* Func) {
 	if (!Func)

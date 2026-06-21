@@ -20,6 +20,8 @@ DWORD Main(LPVOID)
     ConfigurationManager::LoadConfig();
     FCoreConfig& Config = ConfigurationManager::GetConfig();
 
+    Finder::FindFMsg_Logf();
+
     Utils::InitConsole(Config);
 
     Finder::FindGUObjectArray();
@@ -27,6 +29,8 @@ DWORD Main(LPVOID)
     Finder::FindGIsServer();
     Finder::FindGEngine();
     Finder::FindGWorld();
+
+    GCanUseEngineLog = true;
 
     GEngine = reinterpret_cast<UEngine**>(ImageBase + ServerOffsets::GEngine);
     GWorld = reinterpret_cast<UWorld**>(ImageBase + ServerOffsets::GWorld);

@@ -507,3 +507,44 @@ UObject* Utils::GetObjectFromString(const std::string& InString) {
 
 	return OutObject;
 }
+
+wchar_t* Utils::StringToWChar(const std::string& input) {
+	if (input.empty()) {
+		wchar_t* empty = (wchar_t*)malloc(sizeof(wchar_t));
+		if (!empty) return nullptr;
+		empty[0] = L'\0';
+		return empty;
+	}
+
+	int sizeNeeded = MultiByteToWideChar(
+		CP_UTF8,
+		MB_ERR_INVALID_CHARS,
+		input.c_str(),
+		-1,
+		nullptr,
+		0
+	);
+
+	if (sizeNeeded == 0) {
+		return nullptr;
+	}
+
+	wchar_t* buffer = (wchar_t*)malloc(sizeof(wchar_t) * sizeNeeded);
+	if (!buffer) return nullptr;
+
+	int result = MultiByteToWideChar(
+		CP_UTF8,
+		MB_ERR_INVALID_CHARS,
+		input.c_str(),
+		-1,
+		buffer,
+		sizeNeeded
+	);
+
+	if (result == 0) {
+		free(buffer);
+		return nullptr;
+	}
+
+	return buffer;
+}

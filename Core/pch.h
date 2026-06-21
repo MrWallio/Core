@@ -41,40 +41,8 @@ inline uintptr_t ImageBase = (uintptr_t)GetModuleHandleA(0);
 #define INDEX_NONE -1
 #endif
 
-inline void Log(const std::string& msg)
-{
-    FCoreConfig& Config = ConfigurationManager::GetConfig();
-	if (Config.bIsProd)
-		return;
-
-    std::string FileName = Config.bIsClient ? "Client_log.txt" : "Server_log.txt";
-    std::string LogType = Config.bIsClient ? "Client" : "Server";
-
-    static bool firstCallClient = true;
-    static bool firstCallServer = true;
-
-    bool& firstCall = Config.bIsClient ? firstCallClient : firstCallServer;
-
-    if (firstCall)
-    {
-        std::ofstream logFile(FileName, std::ios::trunc);
-        if (logFile.is_open())
-        {
-            logFile << "Log" + LogType + ": Log file initialized!\n";
-            logFile.close();
-        }
-        firstCall = false;
-    }
-
-    std::ofstream logFile(FileName, std::ios::app);
-    if (logFile.is_open())
-    {
-        logFile << "Log" + LogType + ": " << msg << std::endl;
-        logFile.close();
-    }
-
-    std::cout << "Log" + LogType + ": " << msg << std::endl;
-}
+inline bool GCanUseEngineLog = false;
+void Log(const std::string& msg);
 
 template<typename T>
 static inline T& GetFromOffset(const void* base, size_t offset)

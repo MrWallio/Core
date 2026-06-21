@@ -37,6 +37,8 @@ public:
     static double NowSeconds();
 
 	static UObject* GetObjectFromString(const std::string& InString);
+
+    static wchar_t* StringToWChar(const std::string& input);
 };
 
 class FCommandParser

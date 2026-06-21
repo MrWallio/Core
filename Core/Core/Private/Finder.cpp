@@ -10207,6 +10207,20 @@ uintptr_t Finder::FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT(
 	return ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT;
 }
 
+uintptr_t Finder::FindFMsg_Logf() {
+	if (ServerOffsets::FMsg_Logf)
+		return ServerOffsets::FMsg_Logf;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindStringRef(L"AFortGameModeAthena::HandleMatchHasStarted: NumPlayers: %i").ScanFor({ 0xE8 }).RelativeOffset(1).Get();
+
+	if (Addr) {
+		ServerOffsets::FMsg_Logf = Addr - ImageBase;
+	}
+
+	return ServerOffsets::FMsg_Logf;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10564,6 +10578,8 @@ void Finder::SetupOffsets() {
 
 	FindAFortGameSessionDedicated_OnServerConfigurationRequest();
 	FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT();
+
+	FindFMsg_Logf();
 
 	return;
 }
