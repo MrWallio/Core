@@ -60,6 +60,7 @@ FName::FName(const FString& Name) {
 	*this = UKismetStringLibrary::Conv_StringToName(Name);
 }
 
-FName::operator std::string() const {
-	return ToString().ToString();
+FName::FName(const char* Str)
+{
+	((void(*)(FName*, const char*, unsigned int))(ImageBase + Finder::FindFName_Constructor1()))(this, Str, 1);
 }

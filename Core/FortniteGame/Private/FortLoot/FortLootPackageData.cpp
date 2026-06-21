@@ -5,6 +5,7 @@
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 #include "FortniteGame/Public/FortItemDefinition/FortItemDefinition.h"
 #include "FortniteGame/Public/FortLoot/FortLootTierData.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 
 bool FFortLootPackageData::DoesLootPackageMatchWorldLevel(int32 WorldLevel)
 {

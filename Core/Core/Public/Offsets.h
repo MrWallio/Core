@@ -49,6 +49,7 @@ namespace ServerOffsets {
 	inline uintptr_t FName_ToStringOut = 0;
 	inline uintptr_t FName_Compare = 0;
 	inline uintptr_t FName_GetComparisonNameEntry = 0;
+	inline uintptr_t FName_Constructor1 = 0; // const char* Str
 
 	inline uintptr_t UObjectBase_AddObject = 0;
 	inline uintptr_t UObjectBase_AtomicallyClearFlags = 0;

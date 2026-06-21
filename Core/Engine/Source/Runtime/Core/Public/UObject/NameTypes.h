@@ -89,5 +89,5 @@ public:
 
 	FName(const FString& Name);
 
-	operator std::string() const;
+	FName(const char* Str);
 };

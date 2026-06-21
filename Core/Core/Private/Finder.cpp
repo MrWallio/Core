@@ -10221,6 +10221,21 @@ uintptr_t Finder::FindFMsg_Logf() {
 	return ServerOffsets::FMsg_Logf;
 }
 
+uintptr_t Finder::FindFName_Constructor1() {
+	if (ServerOffsets::FName_Constructor1)
+		return ServerOffsets::FName_Constructor1;
+	uintptr_t Addr = 0;
+
+	Addr = Memcury::Scanner::FindStringRef("GamepadNextBuildingOrBuildingPicker").ScanFor({ 0xE8 }).RelativeOffset(1).Get();
+
+	if (Addr) {
+		ServerOffsets::FName_Constructor1 = Addr - ImageBase;
+	}
+
+	Log("FName_Constructor1 found at: 0x" + std::format("{:X}", ServerOffsets::FName_Constructor1));
+	return ServerOffsets::FName_Constructor1;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10580,6 +10595,8 @@ void Finder::SetupOffsets() {
 	FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT();
 
 	FindFMsg_Logf();
+
+	FindFName_Constructor1();
 
 	return;
 }
