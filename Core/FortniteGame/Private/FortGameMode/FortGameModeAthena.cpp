@@ -43,6 +43,10 @@ bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
 
 APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot) {
 	APawn* Pawn = AFortGameModeZone::SpawnDefaultPawnFor(This, NewPlayer, StartSpot);
+	if (!Pawn) {
+		// sometimes it doesent work when you get kicked from the bus because the startspot is obstructed by another pawn
+		Pawn = This->SpawnDefaultPawnAtTransform(NewPlayer, StartSpot->GetTransform());
+	}
 
 	Log("AFortGameModeAthena::SpawnDefaultPawnFor: Spawned default pawn. NewPlayer=" + (NewPlayer ? NewPlayer->GetName().ToString() : "None") + " Pawn=" + (Pawn ? Pawn->GetName().ToString() : "None"));
 	return Pawn;
