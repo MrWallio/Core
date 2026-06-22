@@ -8,4 +8,6 @@ public:
 	DefineUnrealStruct(FAthenaRewardResult);
 
 	DefineStructProperty(int32, LevelsGained);
+public:
+	uint8 Padding[0x50];
 };

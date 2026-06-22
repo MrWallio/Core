@@ -10,4 +10,6 @@ public:
 
 	DefineStructProperty(int32, Place);
 	DefineStructProperty(int32, TotalPlayers);
+public:
+	uint8 Padding[0x10];
 };
