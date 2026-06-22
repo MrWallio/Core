@@ -97,9 +97,10 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		}
 	}
 
-	if (Version::Fortnite_Version >= 1.8) {
+	if (Version::Fortnite_Version >= 1.8 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 		if (KillerPlayerStateAthena && KillerPlayerStateAthena != PlayerStateAthena) {
 			KillerPlayerStateAthena->KillScore++;
+
 			if (Version::Fortnite_Version >= 1.8 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 				KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
 			}
@@ -124,16 +125,44 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	PlayerStateAthena->DeathInfo.bDBNO = bIsDBNO;
 	PlayerStateAthena->DeathInfo.FinisherOrDowner = KillerPlayerStateAthena ? KillerPlayerStateAthena : PlayerStateAthena;
 	PlayerStateAthena->DeathInfo.DeathCause = AFortPlayerStateAthena::ToDeathCause(DeathReport.Tags, bIsDBNO);
-	Log("==================== DeathInfo Dump Start ====================");
+	/*Log("==================== DeathInfo Dump Start ====================");
 	Log("==================== bDBNO=" + std::to_string(PlayerStateAthena->DeathInfo.bDBNO));
 	Log("==================== FinisherOrDowner=" + (PlayerStateAthena->DeathInfo.FinisherOrDowner ? PlayerStateAthena->DeathInfo.FinisherOrDowner->GetName().ToString() : "None"));
 	Log("==================== DeathCause=" + std::to_string(PlayerStateAthena->DeathInfo.DeathCause));
-	Log("==================== DeathInfo Dump End ====================");
+	Log("==================== DeathInfo Dump End ====================");*/
 	PlayerStateAthena->OnRep_DeathInfo();
 
 	if (Version::Fortnite_Version >= 1.91 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
-		PlayerStateAthena->Place = FortGameStateAthena->TeamsLeft; // we wanna do this before removing the player from alive players, so that the place is correct
-		PlayerStateAthena->OnRep_Place();
+		if (!bHasAliveTeamMember) {
+			if (PlayerStateAthena && PlayerStateAthena->PlayerTeam) {
+				for (AController* TeamMember : PlayerStateAthena->PlayerTeam->TeamMembers) {
+					AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
+					if (!TeamMemberController) {
+						continue;
+					}
+
+					AFortPlayerStateAthena* TeamMemberPlayerState = TeamMemberController->PlayerState->Cast<AFortPlayerStateAthena>();
+					if (!TeamMemberPlayerState) {
+						continue;
+					}
+
+					TeamMemberPlayerState->Place = FortGameStateAthena->TeamsLeft; // we wanna do this before removing the player from alive players, so that the place is correct
+					TeamMemberPlayerState->OnRep_Place();
+
+					if (FAthenaRewardResult::StaticStruct()) {
+						TeamMemberController->ClientSendEndBattleRoyaleMatchForPlayer(true, TeamMemberController->ConstructAthenaRewardResult());
+					}
+
+					if (FAthenaMatchStats::StaticStruct()) {
+						TeamMemberController->ClientSendMatchStatsForPlayer(TeamMemberController->ConstructAthenaMatchStats());
+					}
+					
+					if (FAthenaMatchTeamStats::StaticStruct()) {
+						TeamMemberController->ClientSendTeamStatsForPlayer(TeamMemberController->ConstructAthenaMatchTeamStats());
+					}
+				}
+			}
+		}
 
 		FortGameModeAthena->RemoveFromAlivePlayers(
 			This,
@@ -144,32 +173,33 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 			false
 		);
 
-		This->ClientSendEndBattleRoyaleMatchForPlayer(
-			true,
-			This->MatchReport ? (This->MatchReport->_HasRewards() ? This->MatchReport->Rewards : This->MatchReport->EndOfMatchResults) : *FAthenaRewardResult::Allocate()
-		);
-
-		This->ClientSendMatchStatsForPlayer(This->MatchReport ? This->MatchReport->MatchStats : *FAthenaMatchStats::Allocate());
-		This->ClientSendTeamStatsForPlayer(This->MatchReport ? This->MatchReport->TeamStats : *FAthenaMatchTeamStats::Allocate());
-
 		// Now we need to calculate if the player or team won
 		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1 && FortGameStateAthena->WinningTeam != KillerPlayerStateAthena->TeamIndex;
 		if (bTeamWon) {
-			KillerPCAthena->ClientNotifyWon(KillerPlayerPawnAthena, FinishingWeapon, KillerPlayerStateAthena->DeathInfo.DeathCause);
+			KillerPCAthena->ClientNotifyWon(KillerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
+
 			if (KillerPlayerStateAthena->PlayerTeam) {
 				for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
 					AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
 					if (TeamMemberController) {
-						TeamMemberController->ClientNotifyTeamWon(KillerPlayerPawnAthena, FinishingWeapon, KillerPlayerStateAthena->DeathInfo.DeathCause);
+						AFortPlayerStateAthena* TeamMemberPlayerState = TeamMemberController->PlayerState->Cast<AFortPlayerStateAthena>();
+						if (TeamMemberPlayerState) {
+							TeamMemberPlayerState->Place = FortGameStateAthena->TeamsLeft; // we wanna do this before removing the player from alive players, so that the place is correct
+							TeamMemberPlayerState->OnRep_Place();
+						}
 
-						if (TeamMemberController != This) {
-							TeamMemberController->ClientSendEndBattleRoyaleMatchForPlayer(
-								true,
-								TeamMemberController->MatchReport ? (TeamMemberController->MatchReport->_HasRewards() ? TeamMemberController->MatchReport->Rewards : TeamMemberController->MatchReport->EndOfMatchResults) : *FAthenaRewardResult::Allocate()
-							);
+						TeamMemberController->ClientNotifyTeamWon(KillerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
 
-							TeamMemberController->ClientSendMatchStatsForPlayer(TeamMemberController->MatchReport ? TeamMemberController->MatchReport->MatchStats : *FAthenaMatchStats::Allocate());
-							TeamMemberController->ClientSendTeamStatsForPlayer(TeamMemberController->MatchReport ? TeamMemberController->MatchReport->TeamStats : *FAthenaMatchTeamStats::Allocate());
+						if (FAthenaRewardResult::StaticStruct()) {
+							TeamMemberController->ClientSendEndBattleRoyaleMatchForPlayer(true, TeamMemberController->ConstructAthenaRewardResult());
+						}
+
+						if (FAthenaMatchStats::StaticStruct()) {
+							TeamMemberController->ClientSendMatchStatsForPlayer(TeamMemberController->ConstructAthenaMatchStats());
+						}
+
+						if (FAthenaMatchTeamStats::StaticStruct()) {
+							TeamMemberController->ClientSendTeamStatsForPlayer(TeamMemberController->ConstructAthenaMatchTeamStats());
 						}
 					}
 				}
@@ -387,4 +417,93 @@ void AFortPlayerControllerAthena::ClientSendTeamStatsForPlayer(const FAthenaMatc
 	Parms.TeamStats = std::move(TeamStats);
 
 	ProcessEvent(Func, &Parms);
+}
+
+FAthenaRewardResult& AFortPlayerControllerAthena::ConstructAthenaRewardResult() {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ConstructAthenaRewardResult: World is null!");
+		return *FAthenaRewardResult::Allocate();
+	}
+
+	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
+	if (!FortGameModeAthena || !FortGameStateAthena) {
+		Log("ConstructAthenaRewardResult: GameMode or GameState is null or not a FortGameModeAthena/FortGameStateAthena!");
+		return *FAthenaRewardResult::Allocate();
+	}
+	
+	FAthenaRewardResult* AthenaRewardResult = FAthenaRewardResult::Allocate();
+
+	return *AthenaRewardResult;
+}
+
+FAthenaMatchStats& AFortPlayerControllerAthena::ConstructAthenaMatchStats() {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ConstructAthenaMatchStats: World is null!");
+		return *FAthenaMatchStats::Allocate();
+	}
+
+	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
+	if (!FortGameModeAthena || !FortGameStateAthena) {
+		Log("ConstructAthenaMatchStats: GameMode or GameState is null or not a FortGameModeAthena/FortGameStateAthena!");
+		return *FAthenaMatchStats::Allocate();
+	}
+
+	AFortPlayerStateAthena* PlayerStateAthena = PlayerState->Cast<AFortPlayerStateAthena>();
+	if (!PlayerStateAthena) {
+		Log("ConstructAthenaMatchStats: PlayerState is null or not a FortPlayerStateAthena!");
+		return *FAthenaMatchStats::Allocate();
+	}
+	
+	FAthenaMatchStats* AthenaMatchStats = FAthenaMatchStats::Allocate();
+	AthenaMatchStats->Place = PlayerStateAthena->Place;
+	AthenaMatchStats->TotalPlayers = FortGameStateAthena->TotalPlayers;
+	AthenaMatchStats->SecondsAlive = PlayerStateAthena->SecondsAlive;
+	AthenaMatchStats->Kills = PlayerStateAthena->KillScore;
+	AthenaMatchStats->Downs = PlayerStateAthena->DownScore;
+	//AthenaMatchStats->Assists = (what do we even put here???) 
+	//AthenaMatchStats->Revives = (what do we even put here???) 
+	//AthenaMatchStats->DamageDealtToHostiles = (what do we even put here???) 
+	//AthenaMatchStats->DamageDealtToFriends = (what do we even put here???) 
+	//AthenaMatchStats->DamageDealtToStructures = (what do we even put here???) 
+	//AthenaMatchStats->DamageTaken = (what do we even put here???) 
+	//AthenaMatchStats->RangedHit = (what do we even put here???) 
+	//AthenaMatchStats->RangedMiss = (what do we even put here???) 
+	//AthenaMatchStats->Accuracy = (what do we even put here???) 
+	//AthenaMatchStats->TravelDistanceGround = (what do we even put here???) 
+	//AthenaMatchStats->MaterialsGathered = (what do we even put here???) 
+	//AthenaMatchStats->MaterialsUsed = (what do we even put here???) 
+	//AthenaMatchStats->CriticalShots = (what do we even put here???) 
+
+	return *AthenaMatchStats;
+}
+
+FAthenaMatchTeamStats& AFortPlayerControllerAthena::ConstructAthenaMatchTeamStats() {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("ConstructAthenaMatchTeamStats: World is null!");
+		return *FAthenaMatchTeamStats::Allocate();
+	}
+
+	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	AFortGameStateAthena* FortGameStateAthena = World->GameState->Cast<AFortGameStateAthena>();
+	if (!FortGameModeAthena || !FortGameStateAthena) {
+		Log("ConstructAthenaMatchTeamStats: GameMode or GameState is null or not a FortGameModeAthena/FortGameStateAthena!");
+		return *FAthenaMatchTeamStats::Allocate();
+	}
+
+	AFortPlayerStateAthena* PlayerStateAthena = PlayerState->Cast<AFortPlayerStateAthena>();
+	if (!PlayerStateAthena) {
+		Log("ConstructAthenaMatchTeamStats: PlayerState is null or not a FortPlayerStateAthena!");
+		return *FAthenaMatchTeamStats::Allocate();
+	}
+
+	FAthenaMatchTeamStats* AthenaMatchTeamStats = FAthenaMatchTeamStats::Allocate();
+	AthenaMatchTeamStats->Place = PlayerStateAthena->Place;
+	AthenaMatchTeamStats->TotalPlayers = FortGameStateAthena->TotalPlayers;
+
+	return *AthenaMatchTeamStats;
 }

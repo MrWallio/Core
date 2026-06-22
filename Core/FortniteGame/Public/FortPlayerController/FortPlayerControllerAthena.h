@@ -59,6 +59,12 @@ public:
 
 	void ClientSendTeamStatsForPlayer(const FAthenaMatchTeamStats& TeamStats);
 
+	FAthenaRewardResult& ConstructAthenaRewardResult();
+
+	FAthenaMatchStats& ConstructAthenaMatchStats();
+
+	FAthenaMatchTeamStats& ConstructAthenaMatchTeamStats();
+
 	static void Hook() {
 		UObject* AircraftComp = FUObjectArray::FindObject("Class FortniteGame.FortControllerComponent_Aircraft");
 		if (!AircraftComp) {

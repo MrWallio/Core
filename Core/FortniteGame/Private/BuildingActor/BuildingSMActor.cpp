@@ -8,13 +8,24 @@ ABuildingSMActor* ABuildingSMActor::ReplaceBuildingActor(uint8 ReplacementType, 
 
 void ABuildingSMActor::RepairBuilding(AFortPlayerController* RepairingController, int32 ResourcesSpent)
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName("RepairBuilding"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		void (*&RepairBuildingInternal)(ABuildingSMActor*, AFortPlayerController*, int32) = decltype(RepairBuildingInternal)(VTable[VTableIdx]);
-		return RepairBuildingInternal(this, RepairingController, ResourcesSpent);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("RepairBuilding");
+
+	struct BuildingSMActor_RepairBuilding
+	{
+	public:
+		AFortPlayerController* RepairingController;
+		int32 ResourcesSpent;
+	};
+
+	BuildingSMActor_RepairBuilding Parms{};
+
+	Parms.RepairingController = RepairingController;
+	Parms.ResourcesSpent = ResourcesSpent;
+
+	ProcessEvent(Func, &Parms);
 }
 
 void ABuildingSMActor::SetEditingPlayer(AFortPlayerStateZone* NewEditingPlayer) {

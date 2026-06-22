@@ -8,29 +8,30 @@ FGameplayAbilitySpec::FGameplayAbilitySpec(TSubclassOf<UGameplayAbility> InAbili
 	ConstructorInternal(this, InAbilityClass, InLevel, InInputID, InSourceObject);
 }
 
-FGameplayAbilitySpec::FGameplayAbilitySpec(UGameplayAbility* InAbility, int32 InLevel, int32 InInputID, UObject* InSourceObject)
+FGameplayAbilitySpec* FGameplayAbilitySpec::ConstructAbilitySpec(UGameplayAbility* InAbility, int32 InLevel, int32 InInputID, UObject* InSourceObject)
 {
+	FGameplayAbilitySpec* This = FGameplayAbilitySpec::Allocate();
 	if (Finder::FindAbilitySpecCDOConstructor() > 0) {
 		FGameplayAbilitySpec* (*ConstructorInternal)(FGameplayAbilitySpec*, UGameplayAbility*, int32, int32, UObject*) = decltype(ConstructorInternal)(ImageBase + Finder::FindAbilitySpecCDOConstructor());
-		ConstructorInternal(this, InAbility, InLevel, InInputID, InSourceObject);
+		ConstructorInternal(This, InAbility, InLevel, InInputID, InSourceObject);
 	}
 	else {
-		memset(this, 0, FGameplayAbilitySpec::GetSize());
+		This->Ability = InAbility;
+		This->Level = InLevel;
+		This->InputID = InInputID;
+		This->SourceObject = InSourceObject;
+		This->ActiveCount = 0;
+		This->InputPressed = false;
+		This->RemoveAfterActivation = false;
+		This->PendingRemove = false;
+		This->MostRecentArrayReplicationKey = -1;
+		This->ReplicationID = -1;
+		This->ReplicationKey = -1;
 
-		Ability = InAbility;
-		Level = InLevel;
-		InputID = InInputID;
-		SourceObject = InSourceObject;
-		ActiveCount = 0;
-		InputPressed = false;
-		RemoveAfterActivation = false;
-		PendingRemove = false;
-		MostRecentArrayReplicationKey = -1;
-		ReplicationID = -1;
-		ReplicationKey = -1;
-
-		Handle.GenerateNewHandle();
+		This->Handle.GenerateNewHandle();
 	}
+
+	return This;
 }
 
 TSharedPtr<FAbilityReplicatedDataCache> FGameplayAbilityReplicatedDataContainer::Find(const FGameplayAbilitySpecHandleAndPredictionKey& Key) const
