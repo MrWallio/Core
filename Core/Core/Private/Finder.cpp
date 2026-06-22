@@ -4010,6 +4010,9 @@ uintptr_t Finder::FindUEngine_LoadMap() {
 	else if (Version::Fortnite_Version == 1.10) {
 		Addr = ImageBase + 0x1D01580;
 	}
+	else if (Version::Fortnite_Version == 1.11) {
+		Addr = ImageBase + 0x7433AC; // WRONG OFFSET I GUESS?? (stripped)
+	}
 	else {
 		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: %s").Get();
 		if (StringAddr) {
