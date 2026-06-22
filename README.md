@@ -13,8 +13,8 @@ Stuck or need help? Join our community information / help server!
 ## Version Support
 | Version | Status |
 |---------|--------|
-| 1.7.2 - 1.10 | ✅ Full Support |
-| 1.11+ | ⚠️ Partial Support |
+| 1.7.2 - 1.11 | ✅ Full Support |
+| 2.1+ | ⚠️ Partial Support |
 
 **We are working on each season individually ensuring that when we complete a season, everything below that season is as accurate as possible and allowing an enchanced user experience and gameplay.**
 
