@@ -69,9 +69,9 @@ DWORD Main(LPVOID)
 
         Utils::Hook();
 
-        if (!Utils::SetupDedicatedServer(Config)) {
+        /*if (!Utils::SetupDedicatedServer(Config)) {
             Log("Failed to setup dedicated server!");
-        }
+        }*/
 
         Sleep(3000);
 

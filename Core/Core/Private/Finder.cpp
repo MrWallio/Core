@@ -8932,14 +8932,26 @@ uintptr_t Finder::FindUFortAnalytics_SetGameSessionID() {
 		Addr = ImageBase + 0x3DBE70;
 	}
 	else {
-		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameSessionIDChanged").Get();
+		auto StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameSessionIDChanged").Get();
+
 		if (StringAddr) {
-			for (int i = 0; i < 1024; i++)
+			for (int i = 0; i < 2024; i++)
 			{
 				auto Ptr = (uint8_t*)(StringAddr - i);
+
 				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
 				{
 					Addr = uint64_t(Ptr);
+					std::cout << std::format("Finder::FindUFortAnalytics_SetGameSessionID: 0x{:X}", Addr - ImageBase).c_str() << "\n";
+					break;
+				}
+
+				/* 1.11 (UE4.19)
+				* 48 8B C4
+				*/
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
+				{
+					Addr = uint64(Ptr);
 					break;
 				}
 			}
@@ -8968,10 +8980,20 @@ uintptr_t Finder::FindUFortAnalytics_SetGameStateClassName() {
 	else {
 		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Core.GameStateClassNameChanged").Get();
 		if (StringAddr) {
-			for (int i = 0; i < 1024; i++)
+			for (int i = 0; i < 2024; i++)
 			{
 				auto Ptr = (uint8_t*)(StringAddr - i);
+
 				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+				{
+					Addr = uint64_t(Ptr);
+					break;
+				}
+
+				/*1.11 (UE4.19)
+				* 48 8B C4
+				*/
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
 				{
 					Addr = uint64_t(Ptr);
 					break;
