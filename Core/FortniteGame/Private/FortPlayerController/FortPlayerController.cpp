@@ -162,10 +162,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
-		if (!ItemObj) {
-			ItemObj = StaticLoadObject(ItemDefName);
-		}
+		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -242,10 +239,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
-		if (!ItemObj) {
-			ItemObj = StaticLoadObject(ItemDefName);
-		}
+		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -274,10 +268,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
-		if (!ItemObj) {
-			ItemObj = StaticLoadObject(ItemDefName);
-		}
+		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -494,10 +485,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		FVector Location = This->Pawn ? This->Pawn->K2_GetActorLocation() : FVector();
 		FRotator Rotation = This->Pawn ? This->Pawn->K2_GetActorRotation() : FRotator();
 
-		UObject* ActorClassObj = FUObjectArray::FindObject(ActorClassName, false);
-		if (!ActorClassObj) {
-			ActorClassObj = StaticLoadObject(ActorClassName);
-		}
+		UObject* ActorClassObj = Utils::GetObjectFromString(ActorClassName);
 		if (!ActorClassObj) {
 			This->ClientMessage("Actor class not found: " + ActorClassName);
 			return;
