@@ -32,7 +32,7 @@ void UFortAbilitySystemComponent::GiveAbilitySet(UFortAbilitySet* AbilitySet) {
 	if (!AbilitySetHandle.TargetAbilitySystemComponent.Get()) {
 		for (TSubclassOf<UFortGameplayAbility> GameplayAbility : AbilitySet->GameplayAbilities) {
 			if (GameplayAbility.Get()) {
-				FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec((UFortGameplayAbility*)GameplayAbility->GetDefaultObject());
+				FGameplayAbilitySpec AbilitySpec = *FGameplayAbilitySpec::ConstructAbilitySpec((UFortGameplayAbility*)GameplayAbility->GetDefaultObject(), 1, -1, nullptr);
 				GiveAbility(AbilitySpec);
 			}
 		}

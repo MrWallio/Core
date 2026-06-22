@@ -1106,8 +1106,9 @@ int32 AFortPlayerController::PayBuildingRepairCost(ABuildingSMActor* BuildingToR
 }
 
 void AFortPlayerController::ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset) {
+	ServerPlayEmoteItemOG(This, EmoteAsset);
 	if (Version::Fortnite_Version <= 1.82 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
-		return ServerPlayEmoteItemOG(This, EmoteAsset);
+		return;
 	}
 
 	if (!EmoteAsset) {
@@ -1139,11 +1140,9 @@ void AFortPlayerController::ServerPlayEmoteItem(AFortPlayerController* This, UFo
 	}
 
 	if (EmoteAbility) {
-		FGameplayAbilitySpec* EmoteAbilitySpec = new FGameplayAbilitySpec(EmoteAbility, 1, -1, EmoteAsset);
+		FGameplayAbilitySpec* EmoteAbilitySpec = FGameplayAbilitySpec::ConstructAbilitySpec(EmoteAbility, 1, -1, EmoteAsset);
 		ASC->GiveAbilityAndActivateOnce(EmoteAbilitySpec, nullptr);
 	}
-
-	return ServerPlayEmoteItemOG(This, EmoteAsset);
 }
 
 void AFortPlayerController::GetPlayerViewPoint(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation) {
