@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h"
 
+#include "Core/Public/Utils.h"
+
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h"
 
 UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictCheck)
@@ -16,8 +18,8 @@ UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictChec
 		if (!Object)
 			continue;
 
-		std::string objectFullName = Object->GetFullName();
-		if (bStrictCheck ? (objectFullName == FullName) : (objectFullName.contains(FullName)))
+		std::string objectFullName = Utils::StringToLower(Object->GetFullName());
+		if (bStrictCheck ? (objectFullName == Utils::StringToLower(FullName)) : (objectFullName.contains(Utils::StringToLower(FullName))))
 		{
 			return Object;
 		}
@@ -39,7 +41,7 @@ UObject* FUObjectArray::FindObjectFast(const std::string& Name)
 		if (!Object)
 			continue;
 
-		if (Object->GetName().ToString() == Name)
+		if (Utils::StringToLower(Object->GetName().ToString()) == Utils::StringToLower(Name))
 			return static_cast<UObject*>(Object);
 	}
 

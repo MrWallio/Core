@@ -39,6 +39,8 @@ public:
 	static UObject* GetObjectFromString(const std::string& InString);
 
     static wchar_t* StringToWChar(const std::string& input);
+
+	static std::string StringToLower(const std::string& str);
 };
 
 class FCommandParser
