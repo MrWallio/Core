@@ -29,6 +29,8 @@ APawn* AGameModeBase::SpawnDefaultPawnAtTransform(AController* NewPlayer, const 
 		APawn* (*&SpawnDefaultPawnAtTransformInternal)(AGameModeBase*, AController*, const FTransform&) = decltype(SpawnDefaultPawnAtTransformInternal)(VTable[VTableIdx]);
 		SpawnDefaultPawnAtTransformInternal(this, NewPlayer, SpawnTransform);
 	}
+
+	return nullptr;
 }
 
 void AGameModeBase::RestartPlayer(AController* NewPlayer)
