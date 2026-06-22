@@ -164,6 +164,9 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 
 		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
 		if (!ItemObj) {
+			ItemObj = StaticLoadObject(ItemDefName);
+		}
+		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
 		}
@@ -241,6 +244,9 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 
 		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
 		if (!ItemObj) {
+			ItemObj = StaticLoadObject(ItemDefName);
+		}
+		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
 		}
@@ -269,6 +275,9 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		int32 Count = Parser.GetArgInt(1, 1);
 
 		UObject* ItemObj = FUObjectArray::FindObjectFast(ItemDefName);
+		if (!ItemObj) {
+			ItemObj = StaticLoadObject(ItemDefName);
+		}
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -486,6 +495,9 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		FRotator Rotation = This->Pawn ? This->Pawn->K2_GetActorRotation() : FRotator();
 
 		UObject* ActorClassObj = FUObjectArray::FindObject(ActorClassName, false);
+		if (!ActorClassObj) {
+			ActorClassObj = StaticLoadObject(ActorClassName);
+		}
 		if (!ActorClassObj) {
 			This->ClientMessage("Actor class not found: " + ActorClassName);
 			return;
