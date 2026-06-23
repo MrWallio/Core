@@ -69,7 +69,7 @@ void Version::SetupVersion() {
                 Engine_Version = std::stod(engineStr);
                 Fortnite_CL = std::stoi(clStr);
 
-                if (Fortnite_CL == 3700114) {
+                if (Fortnite_CL == 3700114 || Fortnite_CL == 3640489) {
                     Fortnite_Version = 1.72;
                 }
                 else if (Fortnite_CL == 3724489) {
@@ -92,9 +92,6 @@ void Version::SetupVersion() {
                 }
                 else if (Fortnite_CL == 3807424) {
                     Fortnite_Version = 1.11;
-                }
-                else if (Fortnite_CL == 3640489) {
-                    Fortnite_Version = 1.63;
                 }
                 else if (Fortnite_CL == 3825894) {
                     Fortnite_Version = 2.1;
