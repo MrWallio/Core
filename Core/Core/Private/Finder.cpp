@@ -258,7 +258,7 @@ uintptr_t Finder::FindStaticFindObject() {
 	if (!Addr)
 	{
 		auto String = Memcury::Scanner::FindStringRef(L"Illegal call to StaticFindObject() while serializing object data!", true, 1, Version::Engine_Version >= 4.27);
-		auto addr = Memcury::Scanner::FindBytes(String, { 0x48, 0x89, 0x5C }, 1024, 0, true, 0, false);
+		Addr = Memcury::Scanner::FindBytes(String, { 0x48, 0x89, 0x5C }, 1024, 0, true, 0, false);
 	}
 
 	if (!Addr) {
@@ -266,6 +266,9 @@ uintptr_t Finder::FindStaticFindObject() {
 	}
 	if (!Addr) {
 		Addr = Memcury::Scanner::FindPattern("4C 8B DC 49 89 5B ? 49 89 6B ? 49 89 73 ? 57 41 56 41 57 48 83 EC ? 80 3D ? ? ? ? 00").Get();
+	}
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8B EC 48 83 EC ? 80 3D ? ? ? ? 00 45 0F B6 F1").Get();
 	}
 
 	if (Addr)
@@ -286,16 +289,6 @@ uintptr_t Finder::FindStaticLoadObject() {
 	{
 		auto String = Memcury::Scanner::FindStringRef(L"Calling StaticLoadObject during PostLoad may result in hitches during streaming.");
 		Addr = Memcury::Scanner::FindBytes(String, { 0x40, 0x55 }, 1000, 0, true);
-	}
-
-	for (int i = 0; i < 400 && Addr; i++)
-	{
-		if ((*(uint8_t*)(Addr - i) == 0x4C && *(uint8_t*)(Addr - i + 1) == 0x89 && *(uint8_t*)(Addr - i + 2) == 0x4C) ||
-			(*(uint8_t*)(Addr - i) == 0x48 && *(uint8_t*)(Addr - i + 1) == 0x8B && *(uint8_t*)(Addr - i + 2) == 0xC4))
-		{
-			Addr = Addr - i;
-			break;
-		}
 	}
 
 	if (!Addr)
@@ -6242,8 +6235,7 @@ uintptr_t Finder::FindUNetDriver__ReplicationFrame() {
 	ServerOffsets::UNetDriver__ReplicationFrame = *Memcury::Scanner::FindStringRef(
 		L"Attempt to replicate function '%s' on Actor '%s' while it is in the middle of variable replication!"
 	).ScanFor(
-		{ 0x41, 0xFF },
-		true
+		{ 0x41, 0xFF }
 	).AbsoluteOffset(Version::Engine_Version >= 4.19 ? 3 : 4)
 	.GetAs<uint32_t*>();
 
@@ -6943,9 +6935,12 @@ uintptr_t Finder::FindUNetConnection_CreateChannel() {
 	if (ServerOffsets::UNetConnection_CreateChannel)
 		return ServerOffsets::UNetConnection_CreateChannel;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Created channel %i of type %i").Get();
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"No free channel could be found in the channel list (current limit is %d channels). Consider increasing the max channels allowed using CVarMaxChannelSize.").Get();
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"Created channel %i of type %i").Get();
+	}
 	if (StringAddr) {
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < 1024; i++)
 		{
 			auto Ptr = (uint8_t*)(StringAddr - i);
 			if (*Ptr == 0x40 && *(Ptr + 1) == 0x56) {
@@ -7150,6 +7145,10 @@ uintptr_t Finder::FindUActorChannel_SetChannelActor() {
 				break;
 			}
 			else if (*Ptr == 0x4C && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
+				Addr = uint64_t(Ptr);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
 				Addr = uint64_t(Ptr);
 				break;
 			}

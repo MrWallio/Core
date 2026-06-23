@@ -172,7 +172,7 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This, uint8 PersistantSt
 				This->bDestroyContainerOnSearch = false;
 			}
 			else {
-				if (Version::Fortnite_Version <= 2.4) {
+				if (Version::Fortnite_Version <= 2.42) {
 					This->SearchedMesh = nullptr;
 					This->bAllowInteract = false;
 					This->bAlreadySearched = true;
