@@ -162,7 +162,7 @@ FScriptContainerElement* UFortQuestManager::ProcessPendingStatEvents() {
 }
 
 AFortPlayerController* UFortQuestManager::GetPlayerControllerBP() {
-	if (Version::Fortnite_Version <= 2.2 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+	if (Version::Fortnite_Version <= 2.3 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 		UWorld* World = UWorld::GetWorld();
 		if (!World) {
 			Log("UFortQuestManager::GetPlayerControllerBP: World is null!");
