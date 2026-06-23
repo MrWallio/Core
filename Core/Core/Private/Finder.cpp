@@ -256,12 +256,6 @@ uintptr_t Finder::FindStaticFindObject() {
 	if (ServerOffsets::StaticFindObject)
 		return ServerOffsets::StaticFindObject;
 
-	if (!Addr)
-	{
-		auto String = Memcury::Scanner::FindStringRef(L"Illegal call to StaticFindObject() while serializing object data!", true, 1, Version::Engine_Version >= 4.27);
-		Addr = Memcury::Scanner::FindBytes(String, { 0x48, 0x89, 0x5C }, 1024, 0, true, 0, false);
-	}
-
 	if (!Addr) {
 		Addr = Memcury::Scanner::FindPattern("4C 8B DC 57 48 81 EC ? ? ? ? 80 3D ? ? ? ? 00").Get();
 	}
@@ -270,6 +264,12 @@ uintptr_t Finder::FindStaticFindObject() {
 	}
 	if (!Addr) {
 		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8B EC 48 83 EC ? 80 3D ? ? ? ? 00 45 0F B6 F1").Get();
+	}
+
+	if (!Addr)
+	{
+		auto String = Memcury::Scanner::FindStringRef(L"Illegal call to StaticFindObject() while serializing object data!", true, 1, Version::Engine_Version >= 4.27);
+		Addr = Memcury::Scanner::FindBytes(String, { 0x48, 0x89, 0x5C }, 1024, 0, true, 0, false);
 	}
 
 	if (Addr)
@@ -289,7 +289,7 @@ uintptr_t Finder::FindStaticLoadObject() {
 	if (!Addr)
 	{
 		auto String = Memcury::Scanner::FindStringRef(L"Calling StaticLoadObject during PostLoad may result in hitches during streaming.");
-		Addr = Memcury::Scanner::FindBytes(String, { 0x40, 0x55 }, 1000, 0, true);
+		Addr = Memcury::Scanner::FindBytes(String, { 0x40, 0x55 }, 1024, 0, true);
 	}
 
 	if (!Addr)
