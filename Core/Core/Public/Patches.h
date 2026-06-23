@@ -27,5 +27,15 @@ public:
 				Log("Patched: " + std::to_string(Patch3 - ImageBase) + " with True");
 			}
 		}
+
+		if (Version::Fortnite_Version == 2.1)
+		{
+			uintptr_t WidgetCrashPatch = Memcury::Scanner::FindStringRef(L"Unable to create the widget {0}, no outer provided.").FindFunctionStart().Get();
+			
+			if (WidgetCrashPatch) {
+				MH_CreateHook(LPVOID(WidgetCrashPatch), RetNullptr, 0);
+				Log("Patched: " + std::to_string(WidgetCrashPatch - ImageBase) + " with RetNullptr");
+			}
+		}
 	}
 };

@@ -53,6 +53,14 @@
 #include <DbgHelp.h>
 #pragma comment(lib, "Dbghelp.lib")
 
+struct UNWIND_INFO_HDR
+{
+    BYTE VersionFlags;
+    BYTE PrologSize;
+    BYTE CountOfCodes;
+    BYTE FrameRegisterOffset;
+};
+
 
 #define MemcuryAssert(cond)                                              \
         if (!(cond))                                                         \
@@ -1239,6 +1247,27 @@ namespace Memcury
         auto IsValid() -> bool
         {
             return _address.IsValid();
+        }
+
+        auto FindFunctionStart() -> Scanner
+        {
+            uintptr_t ImageBase = Memcury::PE::GetModuleBase();
+
+            RUNTIME_FUNCTION* RFE = RtlLookupFunctionEntry(_address.Get(), &ImageBase, nullptr);
+            if (!RFE)
+                return *this;
+
+            while (true)
+            {
+                auto* Scuffness = reinterpret_cast<UNWIND_INFO_HDR*>(ImageBase + RFE->UnwindData);
+                BYTE Flags = Scuffness->VersionFlags >> 3;
+
+                if (!(Flags & UNW_FLAG_CHAININFO))
+                    return Scanner(ImageBase + RFE->BeginAddress);
+
+                DWORD CodesSize = ((Scuffness->CountOfCodes + 1) & ~1) * sizeof(WORD);
+                RFE = reinterpret_cast<RUNTIME_FUNCTION*>(reinterpret_cast<BYTE*>(Scuffness) + sizeof(UNWIND_INFO_HDR) + CodesSize);
+            }
         }
     };
 
