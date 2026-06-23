@@ -64,6 +64,11 @@ public:
 	DefineUnrealClass(UAthenaCosmeticItemDefinition);
 };
 
+class UAthenaBattleBusItemDefinition : public UAthenaCosmeticItemDefinition {
+public:
+	DefineUnrealClass(UAthenaBattleBusItemDefinition);
+};
+
 class UAthenaPickaxeItemDefinition : public UAthenaCosmeticItemDefinition {
 public:
 	DefineUnrealClass(UAthenaPickaxeItemDefinition);
