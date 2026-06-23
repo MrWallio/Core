@@ -28,7 +28,7 @@ public:
 			}
 		}
 
-		if (Version::Fortnite_Version == 2.1)
+		if (Version::Fortnite_Version >= 2.1 && Version::Fortnite_Version <= 2.2)
 		{
 			uintptr_t WidgetCrashPatch = Memcury::Scanner::FindStringRef(L"Unable to create the widget {0}, no outer provided.").FindFunctionStart().Get();
 			
