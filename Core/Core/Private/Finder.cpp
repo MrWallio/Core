@@ -4007,7 +4007,7 @@ uintptr_t Finder::FindUEngine_LoadMap() {
 	if (Version::Fortnite_Version >= 1.91) {
 		void** VTable = *(void***)(*(void**)(FindGEngine() + ImageBase));
 		
-		Addr = (uintptr_t)VTable[*Memcury::Scanner::FindStringRef(L"Servers can't open network URLs").ScanFor({ 0xFF, 0x93 }, false, 0).AbsoluteOffset(2).GetAs<uint32_t*>()];
+		Addr = (uintptr_t)VTable[(*Memcury::Scanner::FindStringRef(L"Servers can't open network URLs").ScanFor({ 0xFF, 0x93 }, false, 0).AbsoluteOffset(2).GetAs<uint32_t*>()) / 8];
 	}
 	else {
 		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: %s").Get();
