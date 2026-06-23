@@ -58,7 +58,7 @@ int32 UFortItemDefinition::GetMaxStackSize() const
 
 bool UFortItemDefinition::IsStackable() const
 {
-	if (Version::Fortnite_Version > 1.91) {
+	if (Version::Fortnite_Version > 2.1) {
 		static UFunction* Func = nullptr;
 
 		if (Func == nullptr)
