@@ -13,8 +13,8 @@ Stuck or need help? Join our community information / help server!
 ## Version Support
 | Version | Status |
 |---------|--------|
-| 1.6.3 - 2.1 | ✅ Full Support |
-| 2.2+ | ⚠️ Partial Support |
+| 1.6.3 - 2.2 | ✅ Full Support |
+| 2.3+ | ⚠️ Partial Support |
 
 > ⚠️ Please note Save the World is very unfinished!
 
