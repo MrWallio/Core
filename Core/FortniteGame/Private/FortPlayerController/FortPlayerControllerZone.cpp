@@ -20,16 +20,24 @@
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 
 void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P) {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortPlayerControllerZone::ServerAcknowledgePossession: World is null!");
+		return AFortPlayerController::ServerAcknowledgePossessionOG(This, P);
+	}
+
+	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+
 	auto PlayerState = (AFortPlayerStateZone*)This->PlayerState;
 	if (PlayerState) {
 		if (PlayerState->AbilitySystemComponent) {
-			UFortAbilitySet* FortAbilitySet = nullptr;
+			UFortAbilitySet* FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer");
 
-			if (Version::Fortnite_Version >= 2) {
-				FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer");
-			}
-			else {
-				FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer");
+			if (FortGameModeAthena) {
+				UFortAbilitySet* AthenaPlayerAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer");
+				if (AthenaPlayerAbilitySet) {
+					FortAbilitySet = AthenaPlayerAbilitySet;
+				}
 			}
 
 			PlayerState->AbilitySystemComponent->GiveAbilitySet(FortAbilitySet);
