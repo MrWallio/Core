@@ -5101,10 +5101,10 @@ uintptr_t Finder::FindUNetDriver_TickFlush() {
 	{
 		bInitialized = true;
 
-		Addr = Version::Engine_Version == 4.16 ? Memcury::Scanner::FindPattern("4C 8B DC 55 53 56 57 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 41 0F 29 7B").Get() : 0;
-
-		if (Version::Engine_Version == 4.19)
+		Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 53 56 57 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 41 0F 29 7B").Get();
+		if (!Addr) {
 			Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 45 0F 29 43 ? 45 0F 29 4B ? 48 8B 05 ? ? ? ? 48").Get();
+		}
 
 		else if (Version::Engine_Version >= 4.27 && Version::Engine_Version < 5.0)
 		{
@@ -5124,34 +5124,34 @@ uintptr_t Finder::FindUNetDriver_TickFlush() {
 		}
 		else if (!Addr)
 		{
-			auto sRef = Memcury::Scanner::FindStringRef(L"STAT_NetTickFlush", false).Get();
-			if (!sRef && Version::Engine_Version == 4.20) {
-				Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 45 0F 29 43 ? 45 0F 29 4B ? 48 8B 05 ? ? ? ? 48").Get();
-			}
-			else {
-				for (int i = 0; i < 1000; i++)
-				{
-					auto Ptr = (uint8_t*)(sRef - i);
+			Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 45 0F 29 43 ? 45 0F 29 4B ? 48 8B 05 ? ? ? ? 48").Get();
+			if (!Addr) {
+				auto sRef = Memcury::Scanner::FindStringRef(L"STAT_NetTickFlush", false).Get();
+				if (sRef) {
+					for (int i = 0; i < 1000; i++)
+					{
+						auto Ptr = (uint8_t*)(sRef - i);
 
-					if (*Ptr == 0x48 && *(Ptr + 1) == 0x8b && *(Ptr + 2) == 0xc4)
-					{
-						Addr = uint64_t(Ptr);
-						break;
-					}
-					else if (*Ptr == 0x4c && *(Ptr + 1) == 0x8b && *(Ptr + 2) == 0xdc)
-					{
-						Addr = uint64_t(Ptr);
-						break;
-					}
-					else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5c)
-					{
-						Addr = uint64_t(Ptr);
-						break;
-					}
-					else if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
-					{
-						Addr = uint64_t(Ptr);
-						break;
+						if (*Ptr == 0x48 && *(Ptr + 1) == 0x8b && *(Ptr + 2) == 0xc4)
+						{
+							Addr = uint64_t(Ptr);
+							break;
+						}
+						else if (*Ptr == 0x4c && *(Ptr + 1) == 0x8b && *(Ptr + 2) == 0xdc)
+						{
+							Addr = uint64_t(Ptr);
+							break;
+						}
+						else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5c)
+						{
+							Addr = uint64_t(Ptr);
+							break;
+						}
+						else if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
+						{
+							Addr = uint64_t(Ptr);
+							break;
+						}
 					}
 				}
 			}
