@@ -16,8 +16,6 @@ Stuck or need help? Join our community information / help server!
 | 1.6.3 - 2.1 | ✅ Full Support |
 | 2.2+ | ⚠️ Partial Support |
 
-**We are working on each build individually.**
-
 > ⚠️ Please note Save the World is very unfinished!
 
 ---
