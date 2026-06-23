@@ -287,7 +287,8 @@ public:
 		}
 	}
 
-	static UObject* FindObject(const std::string& FullName, bool bStrictCheck = true);
+	static UObject* FindObject(const std::string& FullName, bool bStrictCheck = true, EClassCastFlags Flags = EClassCastFlags::RF_NoFlags);
+	static UObject* FindObject(const std::string& FullName, bool bStrictCheck = true, UClass* Class = nullptr);
 
 	static UObject* FindObjectFast(const std::string& Name);
 

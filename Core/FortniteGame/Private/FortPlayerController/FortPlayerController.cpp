@@ -162,7 +162,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
+		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName, UFortItemDefinition::StaticClass());
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -239,7 +239,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
+		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName, UFortItemDefinition::StaticClass());
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -268,7 +268,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		std::string ItemDefName = Parser.GetArg(0);
 		int32 Count = Parser.GetArgInt(1, 1);
 
-		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName);
+		UObject* ItemObj = Utils::GetObjectFromString(ItemDefName, UFortItemDefinition::StaticClass());
 		if (!ItemObj) {
 			This->ClientMessage("ItemDefinition not found: " + ItemDefName);
 			return;
@@ -485,7 +485,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		FVector Location = This->Pawn ? This->Pawn->K2_GetActorLocation() : FVector();
 		FRotator Rotation = This->Pawn ? This->Pawn->K2_GetActorRotation() : FRotator();
 
-		UObject* ActorClassObj = Utils::GetObjectFromString(ActorClassName);
+		UObject* ActorClassObj = Utils::GetObjectFromString(ActorClassName, EClassCastFlags::CASTCLASS_UClass);
 		if (!ActorClassObj) {
 			This->ClientMessage("Actor class not found: " + ActorClassName);
 			return;

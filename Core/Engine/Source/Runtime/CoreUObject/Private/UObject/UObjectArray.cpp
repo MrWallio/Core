@@ -5,7 +5,7 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h"
 
-UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictCheck)
+UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictCheck, EClassCastFlags Flags)
 {
 	for (int i = 0; i < Num(); ++i)
 	{
@@ -19,7 +19,32 @@ UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictChec
 			continue;
 
 		std::string objectFullName = Utils::StringToLower(Object->GetFullName());
-		if (bStrictCheck ? (objectFullName == Utils::StringToLower(FullName)) : (objectFullName.contains(Utils::StringToLower(FullName))))
+		if (bStrictCheck ? (objectFullName == Utils::StringToLower(FullName)) : (objectFullName.contains(Utils::StringToLower(FullName)))
+			&& (Flags == EClassCastFlags::RF_NoFlags || Object->IsA(Flags)))
+		{
+			return Object;
+		}
+	}
+
+	return nullptr;
+}
+
+UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictCheck, UClass* Class)
+{
+	for (int i = 0; i < Num(); ++i)
+	{
+		FUObjectItem* Item = IndexToObject(i);
+		if (!Item)
+			continue;
+
+		UObject* Object = (UObject*)Item->Object;
+
+		if (!Object)
+			continue;
+
+		std::string objectFullName = Utils::StringToLower(Object->GetFullName());
+		if (bStrictCheck ? (objectFullName == Utils::StringToLower(FullName)) : (objectFullName.contains(Utils::StringToLower(FullName)))
+			&& (!Class || Object->IsA(Class)))
 		{
 			return Object;
 		}

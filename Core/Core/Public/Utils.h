@@ -36,7 +36,8 @@ public:
 
     static double NowSeconds();
 
-	static UObject* GetObjectFromString(const std::string& InString);
+	static UObject* GetObjectFromString(const std::string& InString, EClassCastFlags Flags = EClassCastFlags::RF_NoFlags);
+	static UObject* GetObjectFromString(const std::string& InString, UClass* Class = nullptr);
 
     static wchar_t* StringToWChar(const std::string& input);
 

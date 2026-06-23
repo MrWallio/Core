@@ -460,7 +460,7 @@ double Utils::NowSeconds()
 	return std::chrono::duration<double>(Clock::now().time_since_epoch()).count();
 }
 
-UObject* Utils::GetObjectFromString(const std::string& InString) {
+UObject* Utils::GetObjectFromString(const std::string& InString, EClassCastFlags Flags) {
 	std::string FinalString = InString;
 	UObject* OutObject = nullptr;
 	if (FinalString.contains("/")) {
@@ -502,7 +502,55 @@ UObject* Utils::GetObjectFromString(const std::string& InString) {
 		OutObject = StaticLoadObject(FinalString);
 	}
 	else {
-		OutObject = FUObjectArray::FindObject(FinalString, false);
+		OutObject = FUObjectArray::FindObject(FinalString, false, Flags);
+	}
+
+	return OutObject;
+}
+
+UObject* Utils::GetObjectFromString(const std::string& InString, UClass* Class) {
+	std::string FinalString = InString;
+	UObject* OutObject = nullptr;
+	if (FinalString.contains("/")) {
+		if (FinalString.starts_with("FortniteGame/"))
+		{
+			FinalString = "/Game/" + FinalString.substr(strlen("FortniteGame/"));
+		}
+
+		size_t contentPos = FinalString.find("/Content/");
+		if (contentPos != std::string::npos)
+		{
+			if (FinalString.contains("/Game/Content/"))
+			{
+				FinalString.replace(FinalString.find("/Game/Content/"), strlen("/Game/Content/"), "/Game/");
+			}
+			else
+			{
+				size_t contentPos = FinalString.find("/Content/");
+				FinalString = FinalString.substr(0, contentPos)
+					+ "/Game/"
+					+ FinalString.substr(contentPos + strlen("/Content/"));
+			}
+		}
+
+		if (!FinalString.contains("."))
+		{
+			size_t lastSlash = FinalString.find_last_of('/');
+			if (lastSlash != std::string::npos)
+			{
+				std::string className = FinalString.substr(lastSlash + 1);
+				FinalString += "." + className;
+			}
+			else
+			{
+				return nullptr;
+			}
+		}
+
+		OutObject = StaticLoadObject(FinalString);
+	}
+	else {
+		OutObject = FUObjectArray::FindObject(FinalString, false, Class);
 	}
 
 	return OutObject;
