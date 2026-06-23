@@ -29,7 +29,7 @@ UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictChec
 	return nullptr;
 }
 
-UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictCheck, UClass* Class)
+UObject* FUObjectArray::FindObjectWithClass(const std::string& FullName, bool bStrictCheck, UClass* Class)
 {
 	for (int i = 0; i < Num(); ++i)
 	{

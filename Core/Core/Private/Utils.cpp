@@ -550,7 +550,7 @@ UObject* Utils::GetObjectFromString(const std::string& InString, UClass* Class) 
 		OutObject = StaticLoadObject(FinalString);
 	}
 	else {
-		OutObject = FUObjectArray::FindObject(FinalString, false, Class);
+		OutObject = FUObjectArray::FindObjectWithClass(FinalString, false, Class);
 	}
 
 	return OutObject;

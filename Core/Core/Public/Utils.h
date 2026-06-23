@@ -4,6 +4,7 @@
 #include "Configuration.h"
 
 #include "Engine/Source/Runtime/Core/Public/Containers/UnrealString.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h"
 
 class UObject;
 
