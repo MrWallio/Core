@@ -1249,6 +1249,7 @@ namespace Memcury
             return _address.IsValid();
         }
 
+        //credits: BeRightBack
         auto FindFunctionStart() -> Scanner
         {
             uintptr_t ImageBase = Memcury::PE::GetModuleBase();
