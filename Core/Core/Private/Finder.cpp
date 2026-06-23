@@ -4004,17 +4004,10 @@ uintptr_t Finder::FindUEngine_LoadMap() {
 	if (ServerOffsets::UEngine_LoadMap)
 		return ServerOffsets::UEngine_LoadMap;
 	
-	if (Version::Fortnite_Version == 1.91) {
-		Addr = ImageBase + 0x25143C0;
-	}
-	else if (Version::Fortnite_Version == 1.10) {
-		Addr = ImageBase + 0x1D01580;
-	}
-	else if (Version::Fortnite_Version == 1.11) {
-		Addr = ImageBase + 0x1D1BF80;
-	}
-	else if (Version::Fortnite_Version == 2.1) {
-		Addr = ImageBase + 0x1D1F270;
+	if (Version::Fortnite_Version >= 1.91) {
+		void** VTable = *(void***)(*(void**)(FindGEngine() + ImageBase));
+		
+		Addr = (uintptr_t)VTable[*Memcury::Scanner::FindStringRef(L"Servers can't open network URLs").ScanFor({ 0xFF, 0x93 }, false, 0).AbsoluteOffset(2).GetAs<uint32_t*>()];
 	}
 	else {
 		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: %s").Get();
