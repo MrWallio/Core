@@ -18,4 +18,13 @@ class UReplicationDriver : public UObject {
 public:
 	DefineUnrealClass(UReplicationDriver);
 public:
+	int32 ServerReplicateActors(float DeltaSeconds) {
+		if (Finder::FindUReplicationDriver_ServerReplicateActorsVFT()) {
+			int32(*&ServerReplicateActorsInternal)(UReplicationDriver*, float) = decltype(ServerReplicateActorsInternal)(VTable[Finder::FindUReplicationDriver_ServerReplicateActorsVFT()]);
+			return ServerReplicateActorsInternal(this, DeltaSeconds);
+		}
+		else {
+			return 0;
+		}
+	}
 };

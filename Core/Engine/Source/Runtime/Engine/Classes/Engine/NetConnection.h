@@ -74,6 +74,17 @@ public:
 	UChannel* CreateChannel(EChannelType Type, bool bOpenedLocally, int32 ChannelIndex = INDEX_NONE);
 
 	void CleanUp();
+
+	UActorChannel* FindActorChannelRef(const TWeakObjectPtr<AActor>& Actor)
+	{
+		if (Finder::FindUNetConnection_FindActorChannelRef()) {
+			UActorChannel* (*FindActorChannelRefInternal)(UNetConnection*, const TWeakObjectPtr<AActor>&) = decltype(FindActorChannelRefInternal)(ImageBase + Finder::FindUNetConnection_FindActorChannelRef());
+			return FindActorChannelRefInternal(this, Actor);
+		}
+		else {
+			return ActorChannels().FindRef(Actor);
+		}
+	}
 public:
 	TMap<TWeakObjectPtr<AActor>, UActorChannel*>& ActorChannels() {
 		return *(TMap<TWeakObjectPtr<AActor>, UActorChannel*>*)((uintptr_t)this + ServerOffsets::UNetConnection__ActorChannels);

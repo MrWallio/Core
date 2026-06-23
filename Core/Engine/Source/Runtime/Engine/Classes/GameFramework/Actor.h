@@ -85,8 +85,13 @@ public:
 
 	inline bool IsPendingKillPending() const
 	{
-		bool (*IsPendingKillPendingInternal)(const AActor*) = decltype(IsPendingKillPendingInternal)(ImageBase + Finder::FindAActor_IsPendingKillPending());
-		return IsPendingKillPendingInternal(this);
+		if (Finder::FindAActor_IsPendingKillPending()) {
+			bool (*IsPendingKillPendingInternal)(const AActor*) = decltype(IsPendingKillPendingInternal)(ImageBase + Finder::FindAActor_IsPendingKillPending());
+			return IsPendingKillPendingInternal(this);
+		}
+		else {
+			return bActorIsBeingDestroyed;
+		}
 	}
 
 	FVector GetActorForwardVector() const;

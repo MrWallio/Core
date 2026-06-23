@@ -110,8 +110,10 @@ public:
 	static bool LoadMap(UEngine* This, FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error);
 
 	void BroadcastNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString = FString()) {
-		void (*BroadcastNetworkFailureInternal)(UEngine*, UWorld*, UNetDriver*, ENetworkFailure::Type, const FString&) = decltype(BroadcastNetworkFailureInternal)(ImageBase + Finder::FindUEngine_BroadcastNetworkFailure());
-		BroadcastNetworkFailureInternal(this, World, NetDriver, FailureType, ErrorString);
+		if (Finder::FindUEngine_BroadcastNetworkFailure()) {
+			void (*BroadcastNetworkFailureInternal)(UEngine*, UWorld*, UNetDriver*, ENetworkFailure::Type, const FString&) = decltype(BroadcastNetworkFailureInternal)(ImageBase + Finder::FindUEngine_BroadcastNetworkFailure());
+			BroadcastNetworkFailureInternal(this, World, NetDriver, FailureType, ErrorString);
+		}
 	}
 
 	UNetDriver* CreateNetDriver(UWorld* InWorld, FName NetDriverDefinition);

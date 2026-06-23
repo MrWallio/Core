@@ -102,6 +102,11 @@ bool UWorld::ServerTravel(const FString& FURL, bool bAbsolute, bool bShouldSkipG
 
 bool UWorld::Listen(FURL& InURL)
 {
+	if (!this) {
+		Log("UWorld::Listen: World is null!");
+		return false;
+	}
+
 	UEngine* Engine = UEngine::GetEngine();
 	FName NAME_GameNetDriver = UKismetStringLibrary::Conv_StringToName(L"GameNetDriver");
 
@@ -136,6 +141,7 @@ bool UWorld::Listen(FURL& InURL)
 		if (NetDriver == NULL)
 		{
 			Engine->BroadcastNetworkFailure(this, NULL, ENetworkFailure::NetDriverCreateFailure);
+			Log("Fucked up creating net driver");
 			return false;
 		}
 

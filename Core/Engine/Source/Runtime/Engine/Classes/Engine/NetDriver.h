@@ -158,25 +158,11 @@ public:
 	DefineCustomProperty(float, PercentMissingForTxStandby, ServerOffsets::UNetDriver__PercentMissingForTxStandby);
 
 	DefineCustomProperty(float, PercentForBadPing, ServerOffsets::UNetDriver__PercentForBadPing);
-public:
-	/**
-	 * Associate a world with this net driver.
-	 * Disassociates any previous world first.
-	 *
-	 * @param InWorld the world to associate with this netdriver
-	 */
-	void SetWorld(class UWorld* InWorld);
 
-	/**
-	 * Initialize the network driver in server mode (listener)
-	 *
-	 * @param InNotify notification object to associate with the net driver
-	 * @param ListenURL the connection URL for this listener
-	 * @param bReuseAddressAndPort whether to allow multiple sockets to be bound to the same address/port
-	 * @param Error out param with any error messages generated
-	 *
-	 * @return true if successful, false otherwise (check Error parameter)
-	 */
+	DefineCustomProperty(int32, NetTag, ServerOffsets::UNetDriver__NetTag);
+public:
+	void SetWorld(UWorld* InWorld);
+
 	bool InitListen(UWorld* InWorld, FURL& ListenURL, bool bReuseAddressAndPort, FString& Error) {
 		bool (*&InitListenInternal)(UNetDriver*, UWorld*, FURL&, bool, FString&) = decltype(InitListenInternal)(VTable[Finder::FindUNetDriver_InitListenVFT()]);
 		return InitListenInternal(this, InWorld, ListenURL, bReuseAddressAndPort, Error);
@@ -215,10 +201,6 @@ public:
 public:
 	TMap<FNetworkGUID, FActorDestructionInfo>& DestroyedStartupOrDormantActors() {
 		return *(TMap<FNetworkGUID, FActorDestructionInfo>*)((uintptr_t)this + ServerOffsets::UNetDriver__DestroyedStartupOrDormantActors);
-	}
-
-	int32& NetTag() {
-		return *(int32*)((uintptr_t)this + ServerOffsets::UNetDriver__NetTag);
 	}
 public:
 	static void Hook() {

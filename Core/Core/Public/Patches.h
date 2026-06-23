@@ -8,7 +8,7 @@ public:
 	static void ApplyPatches() {
 		// i like to keep patches at a minimal and if i can i would like to figure out a way to not use these patches
 
-		if (Version::Fortnite_Version >= 1.63 && Version::Fortnite_Version <= 2.42) {
+		if (Version::Fortnite_Version >= 1.63 && Version::Fortnite_Version <= 2.5) {
 			uintptr_t Patch1 = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8B F9 89 B1 ? ? ? ? 48 8B 89 ? ? ? ? 48 85 C9 74 ? E8 ? ? ? ? 89 B7").Get();
 			if (Patch1) {
 				MH_CreateHook((LPVOID)Patch1, RetNullptr, nullptr);
@@ -28,7 +28,7 @@ public:
 			}
 		}
 
-		if (Version::Fortnite_Version >= 2.1 && Version::Fortnite_Version <= 2.42)
+		if (Version::Fortnite_Version >= 2.1 && Version::Fortnite_Version <= 2.5)
 		{
 			uintptr_t WidgetCrashPatch = Memcury::Scanner::FindStringRef(L"Unable to create the widget {0}, no outer provided.").FindFunctionStart().Get();
 			
@@ -42,6 +42,10 @@ public:
 				MH_CreateHook((LPVOID)Patch4, RetNullptr, nullptr);
 				Log("Patched: " + std::to_string(Patch4 - ImageBase) + " with RetNullptr");
 			}
+		}
+
+		if (Version::Fortnite_Version >= 2.5 && Version::Fortnite_Version <= 2.5) {
+			
 		}
 	}
 };

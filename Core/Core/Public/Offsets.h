@@ -416,6 +416,7 @@ namespace ServerOffsets {
 	inline uintptr_t UFortPlaylistManager_InitializePlaylists = 0;
 
 	inline uintptr_t UReplicationDriver_ServerReplicateActors = 0;
+	inline uintptr_t UReplicationDriver_ServerReplicateActorsVFT = 0;
 
 	inline uintptr_t UAbilitySystemComponent_ClientActivateAbilityFailed = 0;
 	inline uintptr_t UAbilitySystemComponent_InternalTryActivateAbility = 0;
@@ -477,6 +478,7 @@ namespace ServerOffsets {
 	inline uintptr_t UNetConnection_IsNetReady = 0;
 	inline uintptr_t UNetConnection_IsNetReadyVFT = 0;
 	inline uintptr_t UNetConnection_GetUChildConnectionVFT = 0;
+	inline uintptr_t UNetConnection_FindActorChannelRef = 0;
 
 	inline uintptr_t UNetDriver__ReplicationFrame = 0;
 	inline uintptr_t UNetDriver_GetNetMode = 0;

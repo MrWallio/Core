@@ -12,6 +12,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetConnection.h"
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h"
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/GameplayAbility.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/ReplicationDriver.h"
 
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
@@ -337,14 +338,17 @@ uintptr_t Finder::FindUNetDriver_SetWorldVFT() {
 	static bool bInitialized = false;
 	if (bInitialized)
 		return ServerOffsets::UNetDriver_SetWorldVFT;
+	void** VTable = UNetDriver::StaticClass()->GetDefaultObject()->VTable;
 
-	auto stringAddr = Memcury::Scanner::FindStringRef(L"All Beacon Requests Paused.").Get();
+	uintptr_t SetWorldAddr = FindUNetDriver_SetWorld() + ImageBase;
+	if (!SetWorldAddr)
+		return 0;
 
-	for (int i = 0; i < 300; i++)
+	for (int i = 0; i < 512; i++)
 	{
-		if (*(uint8*)(stringAddr + i) == 0xFF && *(uint8*)(stringAddr + i + 1) == 0x90)
+		if ((uintptr_t)VTable[i] == SetWorldAddr)
 		{
-			ServerOffsets::UNetDriver_SetWorldVFT = (*(uint32*)(stringAddr + i + 2)) / 8;
+			ServerOffsets::UNetDriver_SetWorldVFT = i;
 			break;
 		}
 	}
@@ -357,25 +361,34 @@ uintptr_t Finder::FindUNetDriver_SetWorldVFT() {
 uintptr_t Finder::FindUNetDriver_SetWorld() {
 	if (ServerOffsets::UNetDriver_SetWorld)
 		return ServerOffsets::UNetDriver_SetWorld;
+	uintptr_t Addr = 0;
 
-	auto stringAddr = Memcury::Scanner::FindStringRef(L"All Beacon Requests Resumed.").Get();
+	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B B1 ? ? ? ? 48 8B FA 48 8B D9 48 85 F6 74 ? 48 8B 93").Get();
+	if (!Addr) {
+		auto stringAddr = Memcury::Scanner::FindStringRef(L"All Beacon Requests Resumed.").Get();
 
-	int skipped = 0;
+		int skipped = 0;
 
-	for (int i = 0; i < 150; i++)
-	{
-		if (*(uint8*)(stringAddr + i) == 0xE8)
+		for (int i = 0; i < 150; i++)
 		{
-			if (skipped == 1)
+			if (*(uint8*)(stringAddr + i) == 0xE8)
 			{
-				ServerOffsets::UNetDriver_SetWorld = Utils::GetCallDestination(stringAddr + i) - ImageBase;
-				break;
-			}
-			else
-			{
-				skipped++;
+				if (skipped == 1)
+				{
+					Addr = Utils::GetCallDestination(stringAddr + i);
+					break;
+				}
+				else
+				{
+					skipped++;
+				}
 			}
 		}
+	}
+
+	if (Addr)
+	{
+		ServerOffsets::UNetDriver_SetWorld = Addr - ImageBase;
 	}
 
 	Log("UNetDriver::SetWorld found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_SetWorld));
@@ -1609,6 +1622,8 @@ uintptr_t Finder::FindUEngine_BroadcastNetworkFailure() {
 	if (ServerOffsets::UEngine_BroadcastNetworkFailure)
 		return ServerOffsets::UEngine_BroadcastNetworkFailure;
 	static uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized) return ServerOffsets::UEngine_BroadcastNetworkFailure;
 
 	Addr = Memcury::Scanner::FindPattern("4C 8B DC 56 48 81 EC ? ? ? ? 49 89 5B ? 33 F6").Get();
 
@@ -1616,6 +1631,7 @@ uintptr_t Finder::FindUEngine_BroadcastNetworkFailure() {
 		ServerOffsets::UEngine_BroadcastNetworkFailure = Addr - ImageBase;
 	}
 
+	if (!bInitialized) bInitialized = true;
 	Log("UEngine::BroadcastNetworkFailure found at: 0x" + std::format("{:X}", ServerOffsets::UEngine_BroadcastNetworkFailure));
 	return ServerOffsets::UEngine_BroadcastNetworkFailure;
 }
@@ -2556,6 +2572,9 @@ uintptr_t Finder::FindAActor_CallPreReplication() {
 	}
 	if (!Addr) {
 		Addr = Memcury::Scanner::FindPattern("48 85 D2 0F 84 ? ? ? ? 48 8B C4 55 57 41 54").Get();
+	}
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("48 85 D2 0F 84 ? ? ? ? 56 41 56 48 83 EC ? 4C 8B F2").Get();
 	}
 
 	if (Addr) {
@@ -3909,6 +3928,11 @@ uintptr_t Finder::FindAActor_IsPendingKillPending() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AActor_IsPendingKillPending)
 		return ServerOffsets::AActor_IsPendingKillPending;
+	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::AActor_IsPendingKillPending;
+	}
+
 	Addr = Memcury::Scanner::FindPattern("F6 41 ? ? 75 ? 8B 41 ? 3B 05").Get();
 	if (!Addr) {
 		Addr = Memcury::Scanner::FindPattern("F6 81 ? ? ? ? ? 75 ? 48 63 41 ? 3B 05 ? ? ? ? 7D ? 48 8D 0C 40").Get();
@@ -3918,6 +3942,7 @@ uintptr_t Finder::FindAActor_IsPendingKillPending() {
 		ServerOffsets::AActor_IsPendingKillPending = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("AActor_IsPendingKillPending found at: 0x" + std::format("{:X}", ServerOffsets::AActor_IsPendingKillPending));
 	return ServerOffsets::AActor_IsPendingKillPending;
 }
@@ -5163,12 +5188,46 @@ uintptr_t Finder::FindUReplicationDriver_ServerReplicateActors() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UReplicationDriver_ServerReplicateActors)
 		return ServerOffsets::UReplicationDriver_ServerReplicateActors;
-	Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B 41 ? 49 89 5B ? 49 89 7B").Get();
+	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::UReplicationDriver_ServerReplicateActors;
+	}
+
 	if (Addr) {
 		ServerOffsets::UReplicationDriver_ServerReplicateActors = Addr - ImageBase;
 	}
+
+	bInitialized = true;
 	Log("UReplicationDriver_ServerReplicateActors found at: 0x" + std::format("{:X}", ServerOffsets::UReplicationDriver_ServerReplicateActors));
 	return ServerOffsets::UReplicationDriver_ServerReplicateActors;
+}
+
+uintptr_t Finder::FindUReplicationDriver_ServerReplicateActorsVFT() {
+	static uintptr_t Addr = 0;
+	if (ServerOffsets::UReplicationDriver_ServerReplicateActorsVFT)
+		return ServerOffsets::UReplicationDriver_ServerReplicateActorsVFT;
+	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::UReplicationDriver_ServerReplicateActorsVFT;
+	}
+
+	if (!UReplicationDriver::StaticClass()) {
+		return 0;
+	}
+	void** VTable = UReplicationDriver::StaticClass()->GetDefaultObject()->VTable;
+
+	uintptr_t ServerReplicateActorsAddr = FindUReplicationDriver_ServerReplicateActors() + ImageBase;
+
+	for (int i = 0; i < 0x100; i++) {
+		if ((uintptr_t)VTable[i] == ServerReplicateActorsAddr) {
+			Addr = (uintptr_t)&VTable[i];
+			break;
+		}
+	}
+
+	bInitialized = true;
+	Log("UReplicationDriver_ServerReplicateActorsVFT found at: 0x" + std::format("{:X}", ServerOffsets::UReplicationDriver_ServerReplicateActorsVFT));
+	return ServerOffsets::UReplicationDriver_ServerReplicateActorsVFT;
 }
 
 uintptr_t Finder::FindAFortWorldManager_HandleWorldQueryComplete() {
@@ -6125,35 +6184,18 @@ uintptr_t Finder::FindUEngine_CreateNetDriver_Local() {
 	static bool bInitialized = false;
 
 	Addr = Memcury::Scanner::FindPattern("4C 89 44 24 ? 53 56 57 41 56 41 57 48 81 EC ? ? ? ? 48 63 81").Get();
-	if (Addr) {
-		bInitialized = true;
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("4C 89 44 24 ? 53 56 57 41 56 41 57 48 81 EC ? ? ? ? 48 63 81").Get();
 	}
 
-	if (!bInitialized)
-	{
-		bInitialized = true;
-
-		Addr = Memcury::Scanner::FindPattern("49 8B D8 48 8B F9 E8 ?? ?? ?? ?? 48 8B D0 4C 8B C3 48 8B CF 48 8B 5C 24 ?? 48 83 C4 ?? 5F E9 ?? ?? ?? ??").Get();
-		if (!Addr)
+	if (!Addr) {
+		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"CreateNamedNetDriver failed to create driver from definition %s").Get();
+		if (StringAddr)
 		{
-			Addr = Memcury::Scanner::FindPattern("E8 ?? ?? ?? ?? 4C 8B 44 24 ?? 48 8B D0 48 8B CB E8 ?? ?? ?? ?? 48 83 C4 ?? 5B C3").Get();
-			if (!Addr)
-				Addr = Memcury::Scanner::FindPattern("33 D2 E8 ?? ?? ?? ?? 48 8B D0 4C 8B C3 48 8B CF E8 ?? ?? ?? ?? 48 8B 5C 24 ?? 48 83 C4 ?? 5F C3").Get();
-		}
-
-		if (Addr)
-		{
-			for (int i = 0; i < 0x200; i++)
+			for (int i = 0; i < 1024; i++)
 			{
-				auto Ptr = (uint8_t*)(Addr - i);
-
-				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5c)
-				{
-					Addr = uint64_t(Ptr);
-					break;
-				}
-				else if (*Ptr == 0x4C && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x44)
-				{
+				auto Ptr = (uint8_t*)(StringAddr - i);
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
 					Addr = uint64_t(Ptr);
 					break;
 				}
@@ -6165,6 +6207,7 @@ uintptr_t Finder::FindUEngine_CreateNetDriver_Local() {
 		ServerOffsets::UEngine_CreateNetDriver_Local = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("UEngine_CreateNetDriver_Local found at: 0x" + std::format("{:X}", ServerOffsets::UEngine_CreateNetDriver_Local));
 	return ServerOffsets::UEngine_CreateNetDriver_Local;
 }
@@ -6569,9 +6612,6 @@ uintptr_t Finder::FindUNetDriver__DebugRelevantActors() {
 	if (ServerOffsets::UNetDriver__DebugRelevantActors)
 		return ServerOffsets::UNetDriver__DebugRelevantActors;
 	uintptr_t Addr = 0;
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x1A4;
-	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver__DebugRelevantActors = Addr;
@@ -6630,6 +6670,11 @@ uintptr_t Finder::FindUNetDriver__DestroyedStartupOrDormantActors() {
 		{
 			auto Ptr = (uint8_t*)(StringAddr + i);
 			if (*Ptr == 0x4C && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0x9E) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0x9E) {
 				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
 				Addr = static_cast<uintptr_t>(Offset);
 				break;
@@ -6818,6 +6863,9 @@ uintptr_t Finder::FindAActor_GetWorld() {
 		return ServerOffsets::AActor_GetWorld;
 
 	Addr = Memcury::Scanner::FindPattern("48 83 EC ? 8B 41 ? 48 8B D1 C1 E8").Get();
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 8B 41 ? 48 8B D9 C1 E8 ? A8 ? 75 ? 48 8B 49 ? 8B 41").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::AActor_GetWorld = Addr - ImageBase;
@@ -6970,8 +7018,14 @@ uintptr_t Finder::FindUActorChannel_SetChannelActorForDestroy() {
 	if (sRef) {
 		for (int i = 0; i < 2000; i++)
 		{
-			if (*(uint8_t*)(sRef - i) == 0x40 && *(uint8_t*)(sRef - i + 1) == 0x55)
+			if (*(uint8_t*)(sRef - i) == 0x40 && *(uint8_t*)(sRef - i + 1) == 0x55) {
 				Addr = sRef - i;
+				break;
+			}
+			else if (*(uint8_t*)(sRef - i) == 0x4C && *(uint8_t*)(sRef - i + 1) == 0x8B && *(uint8_t*)(sRef - i + 2) == 0xDC) {
+				Addr = sRef - i;
+				break;
+			}
 		}
 	}
 
@@ -8143,6 +8197,9 @@ uintptr_t Finder::FindUAbilitySystemComponent_FindAbilitySpecFromHandle() {
 	uintptr_t Addr = 0;
 	
 	Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 6B C1 ? 4C 03 C0 49 3B C0 74 ? 66 0F 1F 44 00 ? 39 50").Get();
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 69 C1 ? ? ? ? 4C 03 C0 49 3B C0 74 ? ? ? ? 39 50").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::UAbilitySystemComponent_FindAbilitySpecFromHandle = Addr - ImageBase;
@@ -9150,6 +9207,11 @@ uintptr_t Finder::FindAFortGameSessionDedicated_FinalizeCreationPatch1() {
 			break;
 		}
 		else if (*Ptr == 0x0F && *(Ptr + 1) == 0x84 && *(Ptr + 2) == 0x97)
+		{
+			Addr = uint64_t(Ptr + 1);
+			break;
+		}
+		else if (*Ptr == 0x0F && *(Ptr + 1) == 0x84 && *(Ptr + 2) == 0x9E)
 		{
 			Addr = uint64_t(Ptr + 1);
 			break;
@@ -10312,6 +10374,24 @@ uintptr_t Finder::FindAFortGameModeAthena_RemoveFromAlivePlayers() {
 	return ServerOffsets::AFortGameModeAthena_RemoveFromAlivePlayers;
 }
 
+uintptr_t Finder::FindUNetConnection_FindActorChannelRef() {
+	if (ServerOffsets::UNetConnection_FindActorChannelRef)
+		return ServerOffsets::UNetConnection_FindActorChannelRef;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::UNetConnection_FindActorChannelRef;
+	}
+
+	if (Addr) {
+		ServerOffsets::UNetConnection_FindActorChannelRef = Addr - ImageBase;
+	}
+
+	bInitialized = true;
+	Log("UNetConnection_FindActorChannelRef found at: 0x" + std::format("{:X}", ServerOffsets::UNetConnection_FindActorChannelRef));
+	return ServerOffsets::UNetConnection_FindActorChannelRef;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10675,6 +10755,15 @@ void Finder::SetupOffsets() {
 	FindFName_Constructor1();
 
 	FindAFortGameModeAthena_RemoveFromAlivePlayers();
+
+	FindFURL_ToString();
+
+	FindUEngine_BroadcastNetworkFailure();
+
+	FindUReplicationDriver_ServerReplicateActors();
+	FindUReplicationDriver_ServerReplicateActorsVFT();
+
+	FindUNetConnection_FindActorChannelRef();
 
 	return;
 }

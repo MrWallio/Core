@@ -599,6 +599,8 @@ public:
 
 	static uintptr_t FindUReplicationDriver_ServerReplicateActors();
 
+	static uintptr_t FindUReplicationDriver_ServerReplicateActorsVFT();
+
 	static uintptr_t FindAFortWorldManager_HandleWorldQueryComplete();
 
 	static uintptr_t FindAFortGameModeAthena_SpawnDefaultPawnFor();
@@ -1074,6 +1076,8 @@ public:
 	static uintptr_t FindFName_Constructor1();
 
 	static uintptr_t FindAFortGameModeAthena_RemoveFromAlivePlayers();
+
+	static uintptr_t FindUNetConnection_FindActorChannelRef();
 public:
 	static void SetupCoreOffsets();
 

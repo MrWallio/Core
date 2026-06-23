@@ -55,16 +55,19 @@ UEngine* UEngine::GetEngine() {
 bool UEngine::LoadMap(UEngine* This, FWorldContext& WorldContext, FURL& URL, class UPendingNetGame* Pending, FString& Error)
 {
 	bool result = LoadMapOG(This, WorldContext, URL, Pending, Error);
+
 	// Get last URL so we can still use the URL
 	URL = WorldContext.LastURL;
+
 	// Listen for clients.
 	if (Pending == NULL && (!*GIsClient || URL.HasOption(TEXT("Listen"))))
 	{
 		if (!WorldContext.World()->Listen(URL))
 		{
-			Log("LoadMap: failed to Listen(" + URL.ToString().ToString() + ")");
+			//Log("LoadMap: failed to Listen(" + URL.ToString().ToString() + ")");
 		}
 	}
+
 	return result;
 }
 

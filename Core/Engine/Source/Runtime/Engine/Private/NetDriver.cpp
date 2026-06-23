@@ -71,11 +71,16 @@ FActorPriority::FActorPriority(class UNetConnection* InConnection, struct FActor
 	}
 }
 
-void UNetDriver::SetWorld(class UWorld* InWorld)
+void UNetDriver::SetWorld(UWorld* InWorld)
 {
-	if (Version::Engine_Version >= 4.26)
+	if (!this || !InWorld)
 	{
-		void (*SetWorldInternal)(UNetDriver*, UWorld*) = decltype(SetWorldInternal)(this->VTable[Finder::FindUNetDriver_SetWorldVFT()]);
+		return;
+	}
+
+	if (Finder::FindUNetDriver_SetWorldVFT())
+	{
+		void (*SetWorldInternal)(UNetDriver*, UWorld*) = decltype(SetWorldInternal)(VTable[Finder::FindUNetDriver_SetWorldVFT()]);
 		return SetWorldInternal(this, InWorld);
 	}
 	else
@@ -306,13 +311,18 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 		return 0;
 	}
 
+	if (ReplicationDriver)
+	{
+		return ReplicationDriver->ServerReplicateActors(DeltaSeconds);
+	}
+
 	check(World);
+
+	ReplicationFrame++;
 
 	int32 Updated = 0;
 
-	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.19) {
-		ReplicationFrame++;
-
+	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.20) {
 		const int32 NumClientsToTick = ServerReplicateActors_PrepConnections(DeltaSeconds);
 
 		if (NumClientsToTick == 0)
@@ -353,7 +363,7 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 					AActor* Actor = ActorInfo->Actor;
 					if (Actor != NULL && !ActorInfo->bPendingNetUpdate)
 					{
-						UActorChannel* Channel = Connection->ActorChannels().FindRef(Actor);
+						UActorChannel* Channel = Connection->FindActorChannelRef(ConsiderList[ConsiderIdx]->WeakActor);
 						if (Channel != NULL && Channel->LastUpdateTime < ActorInfo->LastNetUpdateTime)
 						{
 							ActorInfo->bPendingNetUpdate = true;
@@ -652,13 +662,13 @@ void UNetDriver::ServerReplicateActors_BuildConsiderList(TArray<FNetworkObjectIn
 
 int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connection, const TArray<FNetViewer>& ConnectionViewers, const TArray<FNetworkObjectInfo*> ConsiderList, const bool bCPUSaturated, FActorPriority*& OutPriorityList, FActorPriority**& OutPriorityActors)
 {
-	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.19) {
-		NetTag()++;
+	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.20) {
+		NetTag++;
 		Connection->TickCount++;
 
 		for (int32 j = 0; j < Connection->SentTemporaries.Num(); j++)
 		{
-			Connection->SentTemporaries[j]->NetTag = NetTag();
+			Connection->SentTemporaries[j]->NetTag = NetTag;
 		}
 
 		check(World == Connection->OwningActor->GetWorld());
@@ -683,7 +693,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 			{
 				AActor* Actor = ActorInfo->Actor;
 
-				UActorChannel* Channel = Connection->ActorChannels().FindRef(Actor);
+				UActorChannel* Channel = Connection->FindActorChannelRef(ActorInfo->WeakActor);;
 
 				if (!Channel)
 				{
@@ -729,9 +739,9 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 					}
 				}*/
 
-				if (Actor->NetTag != NetTag())
+				if (Actor->NetTag != NetTag)
 				{
-					Actor->NetTag = NetTag();
+					Actor->NetTag = NetTag;
 
 					OutPriorityList[FinalSortedCount] = FActorPriority(PriorityConnection, Channel, ActorInfo, ConnectionViewers, bLowNetBandwidth);
 					OutPriorityActors[FinalSortedCount] = OutPriorityList + FinalSortedCount;
