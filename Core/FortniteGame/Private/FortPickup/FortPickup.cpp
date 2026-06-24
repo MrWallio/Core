@@ -127,20 +127,19 @@ void AFortPickup::SetPickupItems(FFortItemEntry* PrimaryEntry, TArray<FFortItemE
 void AFortPickup::GivePickupTo(AFortPickup* This, IFortInventoryOwnerInterface* InventoryOwner, bool DestroyAfterPickup) {
 	GivePickupToOG(This, InventoryOwner, DestroyAfterPickup);
 
+	AFortInventory* Inventory = nullptr;
+
 	if (This->PickupLocationData.PickupTarget || This->PickupLocationData.ItemOwner) {
 		AFortPawn* PickupTargetPawn = This->PickupLocationData.PickupTarget ? This->PickupLocationData.PickupTarget : This->PickupLocationData.ItemOwner;
-		if (!PickupTargetPawn->Controller) {
-			Log("AFortPickup::GivePickupTo: PickupTargetPawn->Controller is null!");
-			return;
+		if (AFortPlayerController* PC = PickupTargetPawn->Controller->Cast<AFortPlayerController>()) {
+			Inventory = PC->WorldInventory;
 		}
+	}
 
-		AFortPlayerController* PickupTargetController = PickupTargetPawn->Controller->Cast<AFortPlayerController>();
-		if (!PickupTargetController) {
-			Log("AFortPickup::GivePickupTo: PickupTargetPawn->Controller is not a FortPlayerController!");
-			return;
-		}
+	if (Inventory) {
+		//Log(std::to_string(Inventory->GetOverflowFromAddingItem(This->PrimaryPickupItemEntry)));
 
-		PickupTargetController->WorldInventory->AddItemAndHandleOverflow(This->PrimaryPickupItemEntry);
+		Inventory->AddItemAndHandleOverflow(This->PrimaryPickupItemEntry);
 	}
 	else {
 		Log("AFortPickup::GivePickupTo: No valid inventory owner found for pickup!");

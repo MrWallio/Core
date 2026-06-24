@@ -340,21 +340,33 @@ FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
 
 int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 {
-	UFortItemDefinition* Def = ItemEntry.ItemDefinition;
-	int32 Count = ItemEntry.Count;
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC)
+		return ItemEntry.Count;
 
-	if (!CanAddItem(ItemEntry))
+	UFortItemDefinition* Def = ItemEntry.ItemDefinition;
+	int32 Remaining = ItemEntry.Count;
+
+	if (!Def || Remaining <= 0)
 		return 0;
 
 	const int32 MaxStackSize = Def->GetMaxStackSize();
 	if (MaxStackSize <= 0)
-		return Count;
+		return Remaining;
+
+	FGuid FocusedGuid;
+	const bool bHasFocusedGuid =
+		PC->MyFortPawn &&
+		PC->MyFortPawn->CurrentWeapon &&
+		(FocusedGuid = PC->MyFortPawn->CurrentWeapon->ItemEntryGuid, true); // setting the FocusedGuid on this line
+
+	bool bChanged = false;
 
 	if (IsPrimaryItem(Def))
 	{
 		if (!Def->IsStackable())
 		{
-			while (Count > 0 && !IsInventoryFull())
+			while (Remaining > 0 && !IsInventoryFull())
 			{
 				FFortItemEntry NewEntry = ItemEntry;
 				NewEntry.SetCount(1);
@@ -362,59 +374,93 @@ int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 				if (!AddItem(NewEntry))
 					break;
 
-				--Count;
+				--Remaining;
+				bChanged = true;
 			}
 
-			Update();
-			return Count;
+			if (bChanged) Update();
+			return Remaining;
 		}
 
+		// Stacking logic begins here
+
+		// 1) Fill focused matching stack first (the item the player is currently holding)
+		if (bHasFocusedGuid)
+		{
+			if (FFortItemEntry* FocusedEntry = FindItemEntry(FocusedGuid))
+			{
+				// Only add to the focused stack if it matches the item being added
+				if (FocusedEntry->ItemDefinition == Def)
+				{
+					const int32 Before = Remaining;
+					Remaining = TryAddToEntry(*FocusedEntry, Remaining, MaxStackSize);
+					bChanged |= (Remaining != Before);
+				}
+			}
+		}
+
+		// 2) Fill other existing stacks (skip focused one if already handled)
 		TArray<FFortItemEntry*> Entries = FindItemEntries(Def);
 		for (FFortItemEntry* Entry : Entries)
 		{
-			if (!Entry || Count <= 0)
+			if (!Entry || Remaining <= 0)
 				break;
 
-			Count = TryAddToEntry(*Entry, Count, MaxStackSize);
+			if (bHasFocusedGuid && Entry->ItemGuid == FocusedGuid)
+				continue;
+
+			const int32 Before = Remaining;
+			Remaining = TryAddToEntry(*Entry, Remaining, MaxStackSize);
+			bChanged |= (Remaining != Before);
 		}
 
-		while (Count > 0 && !IsInventoryFull())
+		// 3) Create new stacks while empty slots exist
+		while (Remaining > 0 && !IsInventoryFull())
 		{
+			const int32 ToGive = UKismetMathLibrary::Min(Remaining, MaxStackSize); // smart
+
 			FFortItemEntry NewEntry = ItemEntry;
-			NewEntry.SetCount((Count > MaxStackSize) ? MaxStackSize : Count);
+			NewEntry.SetCount(ToGive);
 
 			if (!AddItem(NewEntry))
 				break;
 
-			Count -= NewEntry.Count;
+			Remaining -= ToGive;
+			bChanged = true;
 		}
 	}
 	else if (IsSecondaryItem(Def))
 	{
-		FFortItemEntry* Entry = FindItemEntry(Def);
-		if (Entry)
+		if (FFortItemEntry* Entry = FindItemEntry(Def))
 		{
-			Count = TryAddToEntry(*Entry, Count, MaxStackSize);
+			const int32 Before = Remaining;
+			Remaining = TryAddToEntry(*Entry, Remaining, MaxStackSize);
+			bChanged |= (Remaining != Before);
 		}
 		else
 		{
+			const int32 ToGive = UKismetMathLibrary::Min(Remaining, MaxStackSize);
+
 			FFortItemEntry NewEntry = ItemEntry;
-			NewEntry.SetCount((Count > MaxStackSize) ? MaxStackSize : Count);
+			NewEntry.SetCount(ToGive);
 
 			if (AddItem(NewEntry))
 			{
-				Count -= NewEntry.Count;
+				Remaining -= ToGive;
+				bChanged = true;
 			}
 		}
 	}
 	else
 	{
 		Log("AFortInventory::GetOverflowFromAddingItem: ItemDefinition has an invalid QuickBar type!");
-		return Count;
+		return Remaining;
 	}
 
-	Update();
-	return Count;
+	if (bChanged)
+		Update();
+
+	return Remaining;
 }
 
 bool AFortInventory::RemoveItem(FGuid Guid, int32 Count)
@@ -621,14 +667,14 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 
 bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, bool bAllowSwap, bool bSpawnOverflowPickup)
 {
+	UWorld* World = UWorld::GetWorld();
+	if (!World)
+		return false;
+
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC) {
-		Log("AFortInventory::AddItemAndHandleOverflow: Owner player controller is null!");
 		return false;
 	}
-
-	if (!CanAddItem(ItemEntry))
-		return false;
 
 	int32 Overflow = GetOverflowFromAddingItem(ItemEntry);
 	if (Overflow <= 0)
@@ -637,23 +683,41 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 	FFortItemEntry OverflowEntry = ItemEntry;
 	OverflowEntry.SetCount(Overflow);
 
-	if (bAllowSwap && CanSwapForItem(OverflowEntry.ItemDefinition))
-	{
-		FFortItemEntry* AddedEntry = SwapCurrentItem(OverflowEntry, bSpawnOverflowPickup);
-		if (AddedEntry)
+	if (OverflowEntry.Count == ItemEntry.Count) {
+		if (bAllowSwap && CanSwapForItem(OverflowEntry.ItemDefinition))
 		{
-			PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
-			if (PC->IsUsingOldQuickBars())
+			FFortItemEntry* AddedEntry = SwapCurrentItem(OverflowEntry, bSpawnOverflowPickup);
+			if (AddedEntry)
 			{
-				PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
+				PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
+				if (PC->IsUsingOldQuickBars())
+				{
+					PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
+				}
+				return true;
 			}
-			return true;
 		}
 	}
 
 	if (bSpawnOverflowPickup)
 	{
-		SpawnPickupFromEntry(OverflowEntry);
+		AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+			World,
+			OverflowEntry.ItemDefinition,
+			OverflowEntry.Count,
+			PC->Pawn->K2_GetActorLocation(),
+			*FVector::Allocate(),
+			-1,
+			true,
+			true,
+			true,
+			-1,
+			EFortPickupSourceTypeFlag::GetPlayer(),
+			EFortPickupSpawnSource::GetTossedByPlayer(),
+			PC,
+			false
+		);
+		Pickup->PrimaryPickupItemEntry.LoadedAmmo = OverflowEntry.LoadedAmmo;
 		return true;
 	}
 
@@ -801,12 +865,13 @@ int32 AFortInventory::TryAddToEntry(FFortItemEntry& ItemEntry, int32 Count, int3
 	if (Count <= 0)
 		return 0;
 
-	const int32 Space = MaxStackSize - ItemEntry.Count;
+	const int32 Current = UKismetMathLibrary::Max(0, ItemEntry.Count);
+	const int32 Space = MaxStackSize - Current;
 	if (Space <= 0)
 		return Count;
 
-	const int32 ToAdd = (Count < Space) ? Count : Space;
-	ItemEntry.SetCount(ItemEntry.Count + ToAdd);
+	const int32 ToAdd = UKismetMathLibrary::Min(Count, Space);
+	ItemEntry.SetCount(Current + ToAdd);
 	ItemEntry.bIsDirty = true;
 	Inventory.MarkItemDirty(ItemEntry);
 
