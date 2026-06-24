@@ -6,6 +6,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/PackageMapClient.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Package.h"
+#include "Engine/Source/Runtime/Core/Public/Math/TransformNonVectorized.h"
 
 APawn* AGameModeBase::SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot)
 {
@@ -22,15 +23,28 @@ APawn* AGameModeBase::SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartS
 
 APawn* AGameModeBase::SpawnDefaultPawnAtTransform(AController* NewPlayer, const FTransform& SpawnTransform)
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"SpawnDefaultPawnAtTransform"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		APawn* (*&SpawnDefaultPawnAtTransformInternal)(AGameModeBase*, AController*, const FTransform&) = decltype(SpawnDefaultPawnAtTransformInternal)(VTable[VTableIdx]);
-		SpawnDefaultPawnAtTransformInternal(this, NewPlayer, SpawnTransform);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("SpawnDefaultPawnAtTransform");
 
-	return nullptr;
+	struct GameModeBase_SpawnDefaultPawnAtTransform
+	{
+	public:
+		AController* NewPlayer;
+		uint8 Pad_8[0x8];
+		FTransform SpawnTransform;
+		APawn* ReturnValue;
+	};
+
+	GameModeBase_SpawnDefaultPawnAtTransform Parms{};
+
+	Parms.NewPlayer = NewPlayer;
+	Parms.SpawnTransform = std::move(SpawnTransform);
+
+	ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
 }
 
 void AGameModeBase::RestartPlayer(AController* NewPlayer)

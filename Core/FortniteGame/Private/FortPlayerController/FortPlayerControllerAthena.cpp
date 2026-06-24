@@ -216,7 +216,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		}
 	}
 
-	if ((Version::Fortnite_Version < 2.1 && Version::Fortnite_Version >= 1.91) || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+	if ((Version::Fortnite_Version < 2.5 && Version::Fortnite_Version >= 1.91) || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 		if (FortGameModeAthena->bAllowSpectateAfterDeath) {
 			APawn* PawnToSpectate = DeathReport.KillerPawn;
 			if (!PawnToSpectate) {

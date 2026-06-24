@@ -10392,6 +10392,36 @@ uintptr_t Finder::FindUNetConnection_FindActorChannelRef() {
 	return ServerOffsets::UNetConnection_FindActorChannelRef;
 }
 
+uintptr_t Finder::FindUFortAssetManager_Get() {
+	if (ServerOffsets::UFortAssetManager_Get)
+		return ServerOffsets::UFortAssetManager_Get;
+	uintptr_t Addr = 0;
+	
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Invalid Engine class used, must be FortEngine or FortUnrealEdEngine").Get();
+	if (!StringAddr) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"Invalid AssetManager class used, must be UFortAssetManager").Get();
+	}
+	
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x53)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::UFortAssetManager_Get = Addr - ImageBase;
+	}
+
+	Log("UFortAssetManager_Get found at: 0x" + std::format("{:X}", ServerOffsets::UFortAssetManager_Get));
+	return ServerOffsets::UFortAssetManager_Get;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10764,6 +10794,8 @@ void Finder::SetupOffsets() {
 	FindUReplicationDriver_ServerReplicateActorsVFT();
 
 	FindUNetConnection_FindActorChannelRef();
+
+	FindUFortAssetManager_Get();
 
 	return;
 }

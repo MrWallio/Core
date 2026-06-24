@@ -1078,6 +1078,8 @@ public:
 	static uintptr_t FindAFortGameModeAthena_RemoveFromAlivePlayers();
 
 	static uintptr_t FindUNetConnection_FindActorChannelRef();
+
+	static uintptr_t FindUFortAssetManager_Get();
 public:
 	static void SetupCoreOffsets();
 
