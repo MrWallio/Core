@@ -825,7 +825,7 @@ void AFortPlayerController::ServerBeginEditingBuildingActor(AFortPlayerControlle
 
 	AFortPlayerStateAthena* PlayerStateAthena = PlayerState->Cast<AFortPlayerStateAthena>();
 	if (PlayerStateAthena) {
-		if (PlayerStateAthena->TeamIndex != BuildingActorToEdit->Team) {
+		if (PlayerStateAthena->TeamIndex != BuildingActorToEdit->Team && BuildingActorToEdit->bPlayerPlaced) {
 			Log("ServerBeginEditingBuildingActor: Player is not on the same team as the building, cannot edit. Player hacking?");
 			return;
 		}
@@ -896,7 +896,7 @@ void AFortPlayerController::ServerEditBuildingActor(AFortPlayerController* This,
 
 	AFortPlayerStateAthena* PlayerStateAthena = PlayerState->Cast<AFortPlayerStateAthena>();
 	if (PlayerStateAthena) {
-		if (PlayerStateAthena->TeamIndex != BuildingActorToEdit->Team) {
+		if (PlayerStateAthena->TeamIndex != BuildingActorToEdit->Team && BuildingActorToEdit->bPlayerPlaced) {
 			Log("ServerEditBuildingActor: Player is not on the same team as the building, cannot edit. Player hacking?");
 			return;
 		}
