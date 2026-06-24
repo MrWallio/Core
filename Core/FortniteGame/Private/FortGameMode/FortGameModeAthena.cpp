@@ -45,7 +45,6 @@ APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, ACont
 	APawn* Pawn = AFortGameModeZone::SpawnDefaultPawnFor(This, NewPlayer, StartSpot);
 	if (!Pawn) {
 		// sometimes it doesent work when you get kicked from the bus because the startspot is obstructed by another pawn
-		Log("AFortGameModeAthena::SpawnDefaultPawnFor: Failed to spawn default pawn. NewPlayer=" + (NewPlayer ? NewPlayer->GetName().ToString() : "None") + " StartSpot=" + (StartSpot ? StartSpot->GetName().ToString() : "None"));
 		Pawn = This->SpawnDefaultPawnAtTransform(NewPlayer, StartSpot->GetTransform());
 	}
 

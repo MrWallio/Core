@@ -173,6 +173,7 @@
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Logging\LogMacros.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Logging\LogVerbosity.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\AI\Navigation\NavigationSystem.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\AssetManager.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\NavigationObjectBase.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\TimerHandle.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\MovementComponent.h" />
@@ -288,6 +289,7 @@
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingContainer.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingSMActor.h" />
     <ClInclude Include="FortniteGame\Public\FortAnalytics\FortAnalytics.h" />
+    <ClInclude Include="FortniteGame\Public\Asset\FortAssetManager.h" />
     <ClInclude Include="FortniteGame\Public\FortGameInstance\FortGameInstance.h" />
     <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameModeFrontEnd.h" />
     <ClInclude Include="FortniteGame\Public\FortGameMode\FortGameModeOutpost.h" />
@@ -442,6 +444,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\URL.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\World.cpp" />
     <ClCompile Include="FortniteGame\Private\AI\FortAIDirector.cpp" />
+    <ClCompile Include="FortniteGame\Private\Asset\FortAssetManager.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingActor.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingGameplayActor.cpp" />
