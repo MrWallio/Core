@@ -9,6 +9,7 @@
 
 bool FFortLootPackageData::DoesLootPackageMatchWorldLevel(int32 WorldLevel)
 {
+	return true;
 	if (WorldLevel == -1)
 		return true;
 
@@ -129,10 +130,9 @@ TArray<FFortLootPackageData*> FFortLootPackageData::GetCandidateLootPackages(
 
 			if (CurrentLP->LootPackageID.ToString().ToString() == LootPackageID.ToString())
 			{
-				if (CurrentLP->ItemDefinition.Get()) {
-					CandidateLootPackages.Add(CurrentLP);
-				}
-				else if (!CurrentLP->LootPackageCall.ToString().empty()) {
+				CandidateLootPackages.Add(CurrentLP);
+
+				if (CurrentLP->LootPackageCall.Num() > 1) {
 					TArray<FFortLootPackageData*> SubCandidateLootPackages =
 						GetCandidateLootPackages(LootPackageDataTables, LootPackages, CurrentLP->LootPackageCall.ToString(), LootTierData, WorldLevel);
 
@@ -168,10 +168,9 @@ TArray<FFortLootPackageData*> FFortLootPackageData::GetCandidateLootPackages(
 
 				if (LootPackage->LootPackageID.ToString().ToString() == LootPackageID.ToString())
 				{
-					if (LootPackage->ItemDefinition.Get()) {
-						CandidateLootPackages.Add(LootPackage);
-					}
-					else if (!LootPackage->LootPackageCall.ToString().empty()) {
+					CandidateLootPackages.Add(LootPackage);
+
+					if (LootPackage->LootPackageCall.Num() > 1) {
 						TArray<FFortLootPackageData*> SubCandidateLootPackages =
 							GetCandidateLootPackages(LootPackageDataTables, LootPackages, LootPackage->LootPackageCall.ToString(), LootTierData, WorldLevel);
 
@@ -222,8 +221,10 @@ TArray<FFortItemEntry> FFortLootPackageData::GetLootItems(
 			break;
 
 		FFortLootPackageData* LootPackage = LootPackages[i];
-		if (!LootPackage)
+		if (!LootPackage) {
+			NumLootPackageDrops++;
 			continue;
+		}
 
 		FString LookupPackageID = LootPackage->LootPackageID.ToString();
 		if (!LootPackage->LootPackageCall.ToString().empty())
@@ -242,6 +243,7 @@ TArray<FFortItemEntry> FFortLootPackageData::GetLootItems(
 		FFortLootPackageData* PickedLootPackage = GetLootPackage(CandidateLootPackages);
 		if (!PickedLootPackage) {
 			Log("FFortLootPackageData::GetLootItems: Failed to pick loot package for loot package call '" + LootPackage->LootPackageCall.ToString() + "'!");
+			NumLootPackageDrops++;
 			continue;
 		}
 

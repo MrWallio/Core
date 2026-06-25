@@ -59,6 +59,11 @@ public:
 		return Data;
 	}
 
+	int32 Num() const
+	{
+		return Data.Num();
+	}
+
 	FString& Append(const TCHAR* Text, int32 Count)
 	{
 		FString& (*AppendInternal)(FString&, const TCHAR*, int32) = decltype(AppendInternal)(ImageBase + Finder::FindFString_Append());
@@ -141,9 +146,14 @@ public:
 		return Result;
 	}
 
-	operator std::string() const
+	operator std::string() const 
 	{
 		return ToString();
+	}
+
+	bool operator==(const FString& Other) const
+	{
+		return Data == Other.Data;
 	}
 
 	bool IsValid() const
