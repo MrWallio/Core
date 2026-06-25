@@ -19,7 +19,7 @@
 
 class UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinition(const uint8 ResourceType)
 {
-	if (Version::Fortnite_Version > 2.5) {
+	if (Version::Fortnite_Version > 3.0) {
 		static UFunction* Func = nullptr;
 
 		if (Func == nullptr)

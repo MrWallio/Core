@@ -5847,7 +5847,6 @@ uintptr_t Finder::FindABuildingContainer_SpawnLootVFT() {
 		return ServerOffsets::ABuildingContainer_SpawnLootVFT;
 
 	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ABuildingContainer::ServerOnAttemptInteract %s failed for %s").Get();
-
 	if (StringAddr)
 	{
 		for (int i = 0; i < 300; i++)
@@ -5858,15 +5857,17 @@ uintptr_t Finder::FindABuildingContainer_SpawnLootVFT() {
 			}
 		}
 	}
-	else
-	{
-		uintptr_t ServerOnAttemptInteract_Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 0F B6 02 48 8B D9 FE C8").Get();
+	else {
+		if (!Finder::FindABuildingContainer_ServerOnAttemptInteract())
+			return 0;
 
-		for (int i = 0; i < 150; i++)
+		uintptr_t ServerOnAttemptInteractAddr = Finder::FindABuildingContainer_ServerOnAttemptInteract() + ImageBase;
+
+		for (int i = 0; i < 512; i++)
 		{
-			if (*(uint8*)(ServerOnAttemptInteract_Addr + i + 0) == 0x41 && *(uint8*)(ServerOnAttemptInteract_Addr + i + 1) == 0xff)
+			if (*(uint8*)(ServerOnAttemptInteractAddr + i) == 0x41 && *(uint8*)(ServerOnAttemptInteractAddr + i + 1) == 0xff)
 			{
-				ServerOffsets::ABuildingContainer_SpawnLootVFT = *(uint32_t*)(ServerOnAttemptInteract_Addr + i + 3) / 8;
+				ServerOffsets::ABuildingContainer_SpawnLootVFT = *(uint32_t*)(ServerOnAttemptInteractAddr + i + 3) / 8;
 			}
 		}
 	}
@@ -9654,11 +9655,14 @@ uintptr_t Finder::FindABuildingContainer_ServerOnAttemptInteract() {
 	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ABuildingContainer::ServerOnAttemptInteract %s failed for %s").Get();
 	if (StringAddr)
 	{
-		
+		Addr = Memcury::Scanner(StringAddr).FindFunctionStart().Get();
 	}
 	else
 	{
 		Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 0F B6 02 48 8B D9 FE C8").Get();
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8D 6A").Get();
+		}
 	}
 
 	if (Addr) {
@@ -9697,21 +9701,26 @@ uintptr_t Finder::FindUWorld_ListenPatch() {
 
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: failed to Listen(%s)").Get();
-	if (StringAddr) {
-		int Skipped = 0;
+	if (Version::Fortnite_Version >= 1.91 && Version::Fortnite_Version <= 3.0) {
+		// obfuscated
+	}
+	else {
+		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: failed to Listen(%s)").Get();
+		if (StringAddr) {
+			int Skipped = 0;
 
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0xE8)
+			for (int i = 0; i < 1024; i++)
 			{
-				if (Skipped == 1) {
-					Addr = uint64_t(Ptr);
-					break;
-				}
+				auto Ptr = (uint8_t*)(StringAddr - i);
+				if (*Ptr == 0xE8)
+				{
+					if (Skipped == 1) {
+						Addr = uint64_t(Ptr);
+						break;
+					}
 
-				Skipped++;
+					Skipped++;
+				}
 			}
 		}
 	}
