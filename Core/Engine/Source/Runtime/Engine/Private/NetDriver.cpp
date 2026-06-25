@@ -668,6 +668,10 @@ void UNetDriver::ServerReplicateActors_BuildConsiderList(TArray<FNetworkObjectIn
 
 int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connection, const TArray<FNetViewer>& ConnectionViewers, const TArray<FNetworkObjectInfo*> ConsiderList, const bool bCPUSaturated, FActorPriority*& OutPriorityList, FActorPriority**& OutPriorityActors)
 {
+	if (!Connection) {
+		return 0;
+	}
+
 	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.20) {
 		NetTag++;
 		Connection->TickCount++;
@@ -694,7 +698,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 
 			AGameNetworkManager* const NetworkManager = World->NetworkManager;
 			const bool bLowNetBandwidth = NetworkManager ? NetworkManager->IsInLowBandwidthMode() : false;
-
+			
 			for (FNetworkObjectInfo* ActorInfo : ConsiderList)
 			{
 				AActor* Actor = ActorInfo->Actor;
@@ -787,6 +791,10 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 
 int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection* Connection, const TArray<FNetViewer>& ConnectionViewers, FActorPriority** PriorityActors, const int32 FinalSortedCount, int32& OutUpdated)
 {
+	if (!Connection) {
+		return 0;
+	}
+
 	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.21) {
 		int32 ActorUpdatesThisConnection = 0;
 		int32 ActorUpdatesThisConnectionSent = 0;
@@ -870,15 +878,15 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 
 					if (Channel)
 					{
-						if (bIsRelevant)
+						if (Channel && bIsRelevant)
 						{
 							Channel->RelevantTime = Time + 0.5f * UKismetMathLibrary::RandomFloat();
 						}
-						if (Channel->IsNetReady(0))
+						if (Channel && Channel->IsNetReady(0))
 						{
 							double ChannelLastNetUpdateTime = Channel->LastUpdateTime;
 
-							if (Channel->ReplicateActor())
+							if (Channel && Channel->ReplicateActor())
 							{
 								ActorUpdatesThisConnectionSent++;
 

@@ -62,6 +62,15 @@ static void* RetNullptr() {
 	return nullptr;
 }
 
+static inline void* (*CheckThisOG)(void* a1, void* a2);
+static void* CheckThis(void* a1, void* a2) {
+    if (!a1) {
+		return nullptr;
+    }
+
+	return CheckThisOG(a1, a2);
+}
+
 static void RetNull() {}
 
 class UObject;
