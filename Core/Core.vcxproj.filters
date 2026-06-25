@@ -765,6 +765,9 @@
     <ClInclude Include="FortniteGame\Public\Asset\FortAssetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortPlaylist\FortAthenaPlaylistBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">

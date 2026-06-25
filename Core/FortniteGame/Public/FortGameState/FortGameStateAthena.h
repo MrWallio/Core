@@ -7,6 +7,7 @@
 class AFortAthenaMapInfo;
 class APlayerState;
 class UAthenaBattleBusItemDefinition;
+class AFortAthenaPlaylistBase;
 
 class AFortGameStateAthena : public AFortGameStateZone {
 public:
@@ -25,6 +26,7 @@ public:
 	DefineUProperty(FPlaylistPropertyArray, CurrentPlaylistInfo);
 	DefineUProperty(int32, CurrentPlaylistId);
 	DefineUProperty(UAthenaBattleBusItemDefinition*, DefaultBattleBus);
+	DefineUProperty(AFortAthenaPlaylistBase*, FortAthenaPlaylistCDO);
 public:
 	void OnRep_CurrentPlaylistInfo();
 	void OnRep_CurrentPlaylistId();
