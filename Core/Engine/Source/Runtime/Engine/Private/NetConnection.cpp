@@ -6,6 +6,14 @@
 
 int32 UNetConnection::IsNetReady(bool Saturate)
 {
+	if (!this) {
+		return 0;
+	}
+
+	if (!IsValidLowLevelFast()) {
+		return 0;
+	}
+
 	int32(*&IsNetReadyInternal)(UNetConnection*, bool) = decltype(IsNetReadyInternal)(VTable[Finder::FindUNetConnection_IsNetReadyVFT()]);
 	return IsNetReadyInternal(this, Saturate);
 }

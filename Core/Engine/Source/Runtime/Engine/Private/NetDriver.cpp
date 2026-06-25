@@ -742,18 +742,20 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 						continue;
 					}
 				}
-				/*else if (CVarSetNetDormancyEnabled && *CVarSetNetDormancyEnabled != 0) // This is broken for some reason
+				else if (CVarSetNetDormancyEnabled && *CVarSetNetDormancyEnabled != 0) // This is broken for some reason
 				{
-					if (IsActorDormant(ActorInfo, Connection))
-					{
-						continue;
-					}
+					if (Version::Fortnite_Version <= 1.72) {
+						if (IsActorDormant(ActorInfo, Connection))
+						{
+							continue;
+						}
 
-					if (ShouldActorGoDormant(Actor, ConnectionViewers, Channel, Time, bLowNetBandwidth))
-					{
-						Channel->StartBecomingDormant();
+						if (ShouldActorGoDormant(Actor, ConnectionViewers, Channel, Time, bLowNetBandwidth))
+						{
+							Channel->StartBecomingDormant();
+						}
 					}
-				}*/
+				}
 
 				if (Actor->NetTag != NetTag)
 				{
