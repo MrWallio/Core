@@ -43,5 +43,13 @@ public:
 				Log("Patched: " + std::to_string(Patch4 - ImageBase) + " with RetNullptr");
 			}
 		}
+
+		if (Version::Fortnite_Version >= 3.0 && Version::Fortnite_Version <= 3.0) {
+			uintptr_t Patch5 = Memcury::Scanner::FindPattern("4C 8B DC 56 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? 00").Get();
+			if (Patch5) {
+				MH_CreateHook((LPVOID)Patch5, RetNull, nullptr);
+				Log("Patched: " + std::to_string(Patch5 - ImageBase) + " with RetNull");
+			}
+		}
 	}
 };
