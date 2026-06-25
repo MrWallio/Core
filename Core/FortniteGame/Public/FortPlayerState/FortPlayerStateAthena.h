@@ -30,6 +30,7 @@ public:
 	DefineUProperty(int32, DownScore);
 	DefineUProperty(int32, Place);
 	DefineUProperty(AFortTeamInfo*, PlayerTeam);
+	DefineUProperty(bool, bHasWonAGame);
 public:
 	void OnRep_TeamKillScore();
 

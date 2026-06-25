@@ -175,7 +175,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 		// Now we need to calculate if the player or team won
 		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1;
-		if (bTeamWon) {
+		if (bTeamWon && !PlayerStateAthena->bHasWonAGame) {
 			KillerPCAthena->ClientNotifyWon(KillerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
 
 			if (KillerPlayerStateAthena->PlayerTeam) {
@@ -186,6 +186,8 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 						if (TeamMemberPlayerState) {
 							TeamMemberPlayerState->Place = FortGameStateAthena->TeamsLeft; // we wanna do this before removing the player from alive players, so that the place is correct
 							TeamMemberPlayerState->OnRep_Place();
+
+							TeamMemberPlayerState->bHasWonAGame = true;
 						}
 
 						TeamMemberController->ClientNotifyTeamWon(KillerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
