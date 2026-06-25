@@ -744,7 +744,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 				}
 				else if (CVarSetNetDormancyEnabled && *CVarSetNetDormancyEnabled != 0) // This is broken for some reason
 				{
-					if (Version::Fortnite_Version <= 1.72) {
+					/*if (Version::Fortnite_Version > 1.72) {
 						if (IsActorDormant(ActorInfo, Connection))
 						{
 							continue;
@@ -754,7 +754,7 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 						{
 							Channel->StartBecomingDormant();
 						}
-					}
+					}*/
 				}
 
 				if (Actor->NetTag != NetTag)
