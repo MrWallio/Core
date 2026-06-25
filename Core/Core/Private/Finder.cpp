@@ -6275,12 +6275,17 @@ uintptr_t Finder::FindUNetConnection_IsNetReadyVFT() {
 uintptr_t Finder::FindUNetDriver__ReplicationFrame() {
 	if (ServerOffsets::UNetDriver__ReplicationFrame)
 		return ServerOffsets::UNetDriver__ReplicationFrame;
+
+	int32 AbsoluteOffset = Version::Engine_Version >= 4.19 ? 3 : 4;
+	if (Version::Engine_Version == 4.20) {
+		AbsoluteOffset = 4;
+	}
 	
 	ServerOffsets::UNetDriver__ReplicationFrame = *Memcury::Scanner::FindStringRef(
 		L"Attempt to replicate function '%s' on Actor '%s' while it is in the middle of variable replication!"
 	).ScanFor(
 		{ 0x41, 0xFF }
-	).AbsoluteOffset(Version::Engine_Version >= 4.19 ? 3 : 4)
+	).AbsoluteOffset(AbsoluteOffset)
 	.GetAs<uint32_t*>();
 
 	Log("UNetDriver__ReplicationFrame found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver__ReplicationFrame));
