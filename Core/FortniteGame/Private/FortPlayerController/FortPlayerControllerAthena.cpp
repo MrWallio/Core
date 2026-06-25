@@ -174,7 +174,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		);
 
 		// Now we need to calculate if the player or team won
-		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1 && FortGameStateAthena->WinningTeam != KillerPlayerStateAthena->TeamIndex;
+		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1;
 		if (bTeamWon) {
 			KillerPCAthena->ClientNotifyWon(KillerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
 
