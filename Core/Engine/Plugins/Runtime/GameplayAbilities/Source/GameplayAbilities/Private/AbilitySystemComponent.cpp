@@ -10,6 +10,10 @@ void UAbilitySystemComponent::ClientActivateAbilityFailed(FGameplayAbilitySpecHa
 	if (Func == nullptr)
 		Func = FindFunction("ClientActivateAbilityFailed");
 
+	if (!Func) {
+		return;
+	}
+
 	struct AbilitySystemComponent_ClientActivateAbilityFailed
 	{
 	public:
@@ -146,6 +150,10 @@ FActiveGameplayEffectHandle UAbilitySystemComponent::BP_ApplyGameplayEffectToSel
 	if (Func == nullptr)
 		Func = FindFunction("BP_ApplyGameplayEffectToSelf");
 
+	if (!Func) {
+		return FActiveGameplayEffectHandle();
+	}
+
 	struct AbilitySystemComponent_BP_ApplyGameplayEffectToSelf
 	{
 	public:
@@ -174,6 +182,10 @@ FGameplayEffectContextHandle UAbilitySystemComponent::MakeEffectContext() const
 	if (Func == nullptr)
 		Func = FindFunction("MakeEffectContext");
 
+	if (!Func) {
+		return FGameplayEffectContextHandle();
+	}
+
 	struct AbilitySystemComponent_MakeEffectContext
 	{
 	public:
@@ -185,4 +197,87 @@ FGameplayEffectContextHandle UAbilitySystemComponent::MakeEffectContext() const
 	const_cast<UAbilitySystemComponent*>(this)->ProcessEvent(Func, &Parms);
 
 	return Parms.ReturnValue;
+}
+
+void UAbilitySystemComponent::ClientCancelAbility(const FGameplayAbilitySpecHandle& AbilityToCancel, const FGameplayAbilityActivationInfo& ActivationInfo)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientCancelAbility");
+
+	if (!Func) {
+		return;
+	}
+
+	struct AbilitySystemComponent_ClientCancelAbility
+	{
+	public:
+		FGameplayAbilitySpecHandle AbilityToCancel;
+		uint8 Pad_4[0x4];
+		FGameplayAbilityActivationInfo ActivationInfo;
+	};
+
+	AbilitySystemComponent_ClientCancelAbility Parms{};
+
+	Parms.AbilityToCancel = std::move(AbilityToCancel);
+	Parms.ActivationInfo = std::move(ActivationInfo);
+
+	ProcessEvent(Func, &Parms);
+}
+
+void UAbilitySystemComponent::ClientEndAbility(const struct FGameplayAbilitySpecHandle& AbilityToEnd, const struct FGameplayAbilityActivationInfo& ActivationInfo)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientEndAbility");
+
+	if (!Func) {
+		return;
+	}
+
+	struct AbilitySystemComponent_ClientEndAbility
+	{
+	public:
+		FGameplayAbilitySpecHandle AbilityToEnd;
+		uint8 Pad_4[0x4];
+		FGameplayAbilityActivationInfo ActivationInfo;
+	};
+
+	AbilitySystemComponent_ClientEndAbility Parms{};
+
+	Parms.AbilityToEnd = std::move(AbilityToEnd);
+	Parms.ActivationInfo = std::move(ActivationInfo);
+
+	ProcessEvent(Func, &Parms);
+}
+
+void UAbilitySystemComponent::ServerEndAbility(const FGameplayAbilitySpecHandle& AbilityToEnd, const FGameplayAbilityActivationInfo& ActivationInfo, const FPredictionKey& PredictionKey)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ServerEndAbility");
+
+	if (!Func) {
+		return;
+	}
+
+	struct AbilitySystemComponent_ServerEndAbility
+	{
+	public:
+		FGameplayAbilitySpecHandle AbilityToEnd;
+		uint8 Pad_4[0x4];
+		FGameplayAbilityActivationInfo ActivationInfo;
+		FPredictionKey PredictionKey;
+	};
+
+	AbilitySystemComponent_ServerEndAbility Parms{};
+
+	Parms.AbilityToEnd = std::move(AbilityToEnd);
+	Parms.ActivationInfo = std::move(ActivationInfo);
+	Parms.PredictionKey = std::move(PredictionKey);
+
+	ProcessEvent(Func, &Parms);
 }

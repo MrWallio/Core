@@ -17,8 +17,10 @@ void UChannel::Close()
 
 void UChannel::StartBecomingDormant()
 {
-	void (*&StartBecomingDormantInternal)(UChannel*) = decltype(StartBecomingDormantInternal)(VTable[Finder::FindUChannel_StartBecomingDormantVFT()]);
-	StartBecomingDormantInternal(this);
+	if (Finder::FindUChannel_StartBecomingDormantVFT()) {
+		void (*&StartBecomingDormantInternal)(UChannel*) = decltype(StartBecomingDormantInternal)(VTable[Finder::FindUChannel_StartBecomingDormantVFT()]);
+		StartBecomingDormantInternal(this);
+	}
 }
 
 void UActorChannel::SetChannelActorForDestroy(FActorDestructionInfo* DestructInfo)

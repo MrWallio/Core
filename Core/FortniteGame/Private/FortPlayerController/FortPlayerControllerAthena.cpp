@@ -26,6 +26,7 @@
 #include "FortniteGame/Public/Athena/AthenaMatchStats.h"
 #include "FortniteGame/Public/Athena/AthenaMatchTeamStats.h"
 #include "FortniteGame/Public/Athena/AthenaPlayerMatchReport.h"
+#include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 
 void AFortPlayerControllerAthena::EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft) {
 	EnterAircraftOG(This, InAircraft);
@@ -60,6 +61,9 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		Log("ClientOnPawnDied: PlayerState is null or not a FortPlayerStateAthena!");
 		return;
 	}
+
+	UFortAbilitySystemComponentAthena* AbilitySystemComponentAthena = 
+		PlayerStateAthena ? PlayerStateAthena->AbilitySystemComponent->Cast<UFortAbilitySystemComponentAthena>() : nullptr;
 
 	AFortPlayerPawnAthena* PlayerPawnAthena = This->MyFortPawn->Cast<AFortPlayerPawnAthena>();
 	if (!PlayerPawnAthena) {

@@ -371,7 +371,13 @@ public:
             } \
         } \
         return Size; \
-    }
+    } \
+    static void* Allocate() \
+    { \
+        void* Mem = FMemory::Malloc(GetSize()); \
+        if (Mem) memset(Mem, 0, GetSize()); \
+        return Mem; \
+    } \
 
 #define DefineUnrealEnum(__Class) \
     static UEnum* StaticEnum() \

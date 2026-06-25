@@ -9,6 +9,11 @@
 class UAbilitySystemComponent;
 class UGameplayAbility;
 
+struct FGameplayAbilityActivationInfo {
+public:
+	DefineUnrealStruct(FGameplayAbilityActivationInfo);
+};
+
 struct FGameplayAbilitySpec : public FFastArraySerializerItem {
 public:
 	DefineUnrealStruct(FGameplayAbilitySpec);
@@ -30,6 +35,8 @@ public:
 	DefineBitfieldStructProperty(RemoveAfterActivation);
 
 	DefineBitfieldStructProperty(PendingRemove);
+
+	DefineStructProperty(FGameplayAbilityActivationInfo, ActivationInfo)
 public:
 	uint8 Padding[0x6C];
 public:

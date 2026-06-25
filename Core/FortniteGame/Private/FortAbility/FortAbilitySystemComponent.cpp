@@ -45,3 +45,28 @@ void UFortAbilitySystemComponent::GiveAbilitySet(UFortAbilitySet* AbilitySet) {
 		}
 	}
 }
+
+void UFortAbilitySystemComponent::EndAllAbilities() {
+	for (int32 i = 0; i < ActivatableAbilities.Items.Num(); i++) {
+		FGameplayAbilitySpec& AbilitySpec = ActivatableAbilities.Items.GetWithSize(i, FGameplayAbilitySpec::GetSize());
+		if (AbilitySpec.Ability) {
+			ClientCancelAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+			ClientEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+			ServerEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo, FPredictionKey());
+		}
+	}
+}
+
+void UFortAbilitySystemComponentAthena::EndDBNOAbilities() {
+	for (int32 i = 0; i < ActivatableAbilities.Items.Num(); i++) {
+		FGameplayAbilitySpec& AbilitySpec = ActivatableAbilities.Items.GetWithSize(i, FGameplayAbilitySpec::GetSize());
+		if (AbilitySpec.Ability) {
+			UGameplayAbility* Ability = AbilitySpec.Ability;
+			if (Ability && Utils::StringToLower(Ability->GetName().ToString()).contains("dbno")) {
+				ClientCancelAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+				ClientEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+				ServerEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo, FPredictionKey());
+			}
+		}
+	}
+}

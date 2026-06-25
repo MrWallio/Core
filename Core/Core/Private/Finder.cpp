@@ -10,6 +10,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetConnection.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/ActorChannel.h"
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h"
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/GameplayAbility.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/ReplicationDriver.h"
@@ -6758,11 +6759,27 @@ uintptr_t Finder::FindUActorChannel_StartBecomingDormant() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UActorChannel_StartBecomingDormant)
 		return ServerOffsets::UActorChannel_StartBecomingDormant;
-	Addr = Memcury::Scanner::FindPattern("48 8B C4 55 53 56 57 48 8D 68 ? 48 81 EC ? ? ? ? 80 3D").Get();
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"StartBecomingDormant: %s").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
+				Addr = uint64_t(Ptr);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
 
 	if (Addr) {
 		ServerOffsets::UActorChannel_StartBecomingDormant = Addr - ImageBase;
 	}
+
 	Log("UActorChannel_StartBecomingDormant found at: 0x" + std::format("{:X}", ServerOffsets::UActorChannel_StartBecomingDormant));
 	return ServerOffsets::UActorChannel_StartBecomingDormant;
 }
@@ -8256,9 +8273,19 @@ uintptr_t Finder::FindUChannel_CloseVFT() {
 uintptr_t Finder::FindUChannel_StartBecomingDormantVFT() {
 	if (ServerOffsets::UChannel_StartBecomingDormantVFT)
 		return ServerOffsets::UChannel_StartBecomingDormantVFT;
+	void** VFT = UActorChannel::StaticClass()->GetDefaultObject()->VTable;
 
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::UChannel_StartBecomingDormantVFT = 0x51;
+	if (!FindUActorChannel_StartBecomingDormant())
+		return 0;
+	uintptr_t Addr = FindUActorChannel_StartBecomingDormant() + ImageBase;
+
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(Addr))
+		{
+			ServerOffsets::UChannel_StartBecomingDormantVFT = i;
+			break;
+		}
 	}
 
 	Log("UChannel_StartBecomingDormantVFT found at: 0x" + std::format("{:X}", ServerOffsets::UChannel_StartBecomingDormantVFT));
@@ -10796,6 +10823,8 @@ void Finder::SetupOffsets() {
 	FindUNetConnection_FindActorChannelRef();
 
 	FindUFortAssetManager_Get();
+
+	FindUChannel_StartBecomingDormantVFT();
 
 	return;
 }

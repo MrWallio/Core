@@ -11,9 +11,13 @@ public:
 	DefineUnrealClass(UFortAbilitySystemComponent);
 public:
 	void GiveAbilitySet(UFortAbilitySet* AbilitySet);
+
+	void EndAllAbilities();
 };
 
 class UFortAbilitySystemComponentAthena : public UFortAbilitySystemComponent {
 public:
 	DefineUnrealClass(UFortAbilitySystemComponentAthena);
+public:
+	void EndDBNOAbilities();
 };

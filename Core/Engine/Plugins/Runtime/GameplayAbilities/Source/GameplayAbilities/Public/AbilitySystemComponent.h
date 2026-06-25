@@ -82,6 +82,12 @@ public:
 		uintptr_t AvatarActorOffset = StaticClass()->GetPropertyOffset("AvatarActor");
 		return *(TSharedPtr<FGameplayAbilityActorInfo>*)(__int64(this) + AvatarActorOffset + 8);
 	}
+
+	void ClientCancelAbility(const FGameplayAbilitySpecHandle& AbilityToCancel, const FGameplayAbilityActivationInfo& ActivationInfo);
+
+	void ClientEndAbility(const FGameplayAbilitySpecHandle& AbilityToEnd, const FGameplayAbilityActivationInfo& ActivationInfo);
+
+	void ServerEndAbility(const FGameplayAbilitySpecHandle& AbilityToEnd, const FGameplayAbilityActivationInfo& ActivationInfo, const FPredictionKey& PredictionKey);
 public:
 	static void Hook() {
 		HookEveryVTableIdx(UAbilitySystemComponent::StaticClass(), Finder::FindInternalServerTryActivateAbilityVFT(), InternalServerTryActivateAbility);
