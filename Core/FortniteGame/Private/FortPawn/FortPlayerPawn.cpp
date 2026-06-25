@@ -95,7 +95,7 @@ void AFortPlayerPawn::ServerHandlePickup(AFortPlayerPawn* This, AFortPickup* Pic
 		return;
 	}
 	if (Pickup->bPickedUp) {
-		Log("ServerHandlePickup: Pickup is already picked up!");
+		//Log("ServerHandlePickup: Pickup is already picked up!");
 		return;
 	}
 

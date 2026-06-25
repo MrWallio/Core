@@ -69,7 +69,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 
 	AFortPlayerStateAthena* KillerPlayerStateAthena = DeathReport.KillerPlayerState->Cast<AFortPlayerStateAthena>();
 	AFortPlayerPawnAthena* KillerPlayerPawnAthena = DeathReport.KillerPawn->Cast<AFortPlayerPawnAthena>();
-	AFortPlayerControllerAthena* KillerPCAthena = KillerPlayerPawnAthena->Controller->Cast<AFortPlayerControllerAthena>();
+	AFortPlayerControllerAthena* KillerPCAthena = KillerPlayerPawnAthena ? KillerPlayerPawnAthena->Controller->Cast<AFortPlayerControllerAthena>() : nullptr;
 	UFortWeaponItemDefinition* FinishingWeapon = DeathReport.DamageCauser->IsA(AFortWeapon::StaticClass())
 		? DeathReport.DamageCauser->Cast<AFortWeapon>()->WeaponData : nullptr;
 

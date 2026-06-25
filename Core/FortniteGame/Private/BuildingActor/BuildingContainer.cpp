@@ -168,7 +168,10 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This, uint8 PersistantSt
 				This->SearchLootTierGroup = Loot_AthenaAmmoLarge;
 				This->bDestroyContainerOnSearch = false;
 			}
-			else if (This->SearchLootTierGroup == Loot_AthenaFloorLoot || This->SearchLootTierGroup == Loot_AthenaFloorLoot_Warmup) {
+			else if (This->SearchLootTierGroup == Loot_AthenaFloorLoot) {
+				This->bDestroyContainerOnSearch = false;
+			}
+			else if (This->SearchLootTierGroup == Loot_AthenaFloorLoot_Warmup) {
 				This->bDestroyContainerOnSearch = false;
 			}
 			else {

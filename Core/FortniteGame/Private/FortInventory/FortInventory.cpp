@@ -826,7 +826,7 @@ bool AFortInventory::CanAddItemWithStacking(UFortItemDefinition* Def, int32 Coun
 			return true;
 	}
 
-	return Owner != nullptr;
+	return false;
 }
 
 bool AFortInventory::CanAddItem(UFortItemDefinition* Def, int32 Count) const
