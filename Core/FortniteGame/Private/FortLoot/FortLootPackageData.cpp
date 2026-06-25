@@ -254,7 +254,7 @@ TArray<FFortItemEntry> FFortLootPackageData::GetLootItems(
 
 		UFortItemDefinition* ItemDefinition = PickedLootPackage->ItemDefinition.Get();
 		if (!ItemDefinition) {
-			Log("FFortLootPackageData::GetLootItems: Failed to load item definition for loot package '" + PickedLootPackage->LootPackageID.ToString().ToString() + "'!");
+			//Log("FFortLootPackageData::GetLootItems: Failed to load item definition for loot package '" + PickedLootPackage->LootPackageID.ToString().ToString() + "'!");
 			NumLootPackageDrops++;
 			continue;
 		}
