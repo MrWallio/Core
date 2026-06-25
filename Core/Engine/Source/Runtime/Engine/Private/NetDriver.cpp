@@ -54,7 +54,7 @@ FActorPriority::FActorPriority(class UNetConnection* InConnection, struct FActor
 	{
 		float Time = InConnection->Driver->SpawnPrioritySeconds;
 
-		FVector Dir = DestructionInfo->DestroyedPosition() - Viewers[i].ViewLocation;
+		FVector Dir = DestructionInfo->DestroyedPosition - Viewers[i].ViewLocation;
 		float DistSq = Dir.SizeSquared();
 
 		if ((Viewers[i].ViewDir | Dir) < 0.f)
@@ -801,8 +801,8 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 		{
 			if (PriorityActors[j]->ActorInfo == NULL && PriorityActors[j]->DestructionInfo)
 			{
-				if (PriorityActors[j]->DestructionInfo->StreamingLevelName() != UKismetStringLibrary::Conv_StringToName(L"None")
-					&& !Connection->ClientVisibleLevelNames.Contains(PriorityActors[j]->DestructionInfo->StreamingLevelName()))
+				if (PriorityActors[j]->DestructionInfo->StreamingLevelName != UKismetStringLibrary::Conv_StringToName(L"None")
+					&& !Connection->ClientVisibleLevelNames.Contains(PriorityActors[j]->DestructionInfo->StreamingLevelName))
 				{
 					continue;
 				}
@@ -813,7 +813,7 @@ int32 UNetDriver::ServerReplicateActors_ProcessPrioritizedActors(UNetConnection*
 					FinalRelevantCount++;
 
 					Channel->SetChannelActorForDestroy(PriorityActors[j]->DestructionInfo);
-					Connection->DestroyedStartupOrDormantActors().Remove(PriorityActors[j]->DestructionInfo->NetGUID());
+					Connection->DestroyedStartupOrDormantActors().Remove(PriorityActors[j]->DestructionInfo->NetGUID);
 				}
 				continue;
 			}

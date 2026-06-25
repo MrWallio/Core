@@ -6242,10 +6242,42 @@ uintptr_t Finder::FindUNetConnection_IsNetReady() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UNetConnection_IsNetReady)
 		return ServerOffsets::UNetConnection_IsNetReady;
-	Addr = Memcury::Scanner::FindPattern("84 D2 74 ? 8B 81 ? ? ? ? F7 D8").Get();
+	
+	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::UNetConnection_IsNetReady;
+	}
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		auto IsNetReady_ = Memcury::Scanner::FindPattern("84 D2 74 ? 8B 81 ? ? ? ? F7 D8");
+
+		if (Version::Fortnite_Version >= 20 && IsNetReady_.Get())
+		{
+			for (int i = 0; i < 0x30; i++)
+			{
+				if (*(uint8_t*)(IsNetReady_.Get() - i) == 0x48 && *(uint8_t*)(IsNetReady_.Get() - i + 1) == 0x83 && *(uint8_t*)(IsNetReady_.Get() - i + 2) == 0xEC) {
+					Addr = IsNetReady_.Get() - i;
+					break;
+				}
+			}
+			
+			if (!Addr)
+			{
+				Addr = IsNetReady_.Get();
+			}
+		}
+		else {
+			Addr = IsNetReady_.Get();
+		}
+	}
+	
 	if (Addr) {
 		ServerOffsets::UNetConnection_IsNetReady = Addr - ImageBase;
 	}
+
 	Log("UNetConnection_IsNetReady found at: 0x" + std::format("{:X}", ServerOffsets::UNetConnection_IsNetReady));
 	return ServerOffsets::UNetConnection_IsNetReady;
 }
@@ -7293,14 +7325,54 @@ uintptr_t Finder::FindUActorChannel_ReplicateActor() {
 	if (ServerOffsets::UActorChannel_ReplicateActor)
 		return ServerOffsets::UActorChannel_ReplicateActor;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ReplicateActor: bPausedUntilReliableACK is ending now that reliables have been ACK'd. %s").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 512; i++)
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::UActorChannel_ReplicateActor;
+
+	if (!bInitialized)
+	{
+		bInitialized = true;
+
+		if (Version::Fortnite_Version == 4.16) {
+			Addr = Memcury::Scanner::FindPattern("40 55 53 57 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8D 59 68 4C 8B F1 48 8B").Get();
+		}
+		else if (Version::Fortnite_Version == 3.3) {
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 55 53 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 A8 0F 29 78 98 48 89 70 E8 4C").Get();
+		}
+		else if (Version::Fortnite_Version >= 4.19 && Version::Fortnite_Version <= 3.2)
 		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55) {
-				Addr = uint64_t(Ptr);
-				break;
+			Addr = Memcury::Scanner::FindPattern("40 55 56 57 41 54 41 55 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 4C", false).Get();
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("40 55 56 41 54 41 55 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 4C 8B E9 48 8B 49 68 48").Get();
+			}
+		}
+		else if (Version::Fortnite_Version >= 20)
+		{
+			auto sRef = Memcury::Scanner::FindStringRef(L"STAT_NetReplicateActorTime").Get();
+
+			for (int i = 0; i < 2000; i++)
+			{
+				if (*(uint8_t*)(sRef - i) == 0x40 && *(uint8_t*)(sRef - i + 1) == 0x55) {
+					Addr = sRef - i;
+					break;
+				}
+				else if (*(uint8_t*)(sRef - i) == 0x48 && *(uint8_t*)(sRef - i + 1) == 0x8B && *(uint8_t*)(sRef - i + 2) == 0xC4) {
+					Addr = sRef - i;
+					break;
+				}
+			}
+		}
+
+		if (!Addr) {
+			uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ReplicateActor: bPausedUntilReliableACK is ending now that reliables have been ACK'd. %s").Get();
+			if (StringAddr) {
+				for (int i = 0; i < 512; i++) {
+					auto Ptr = (uint8_t*)(StringAddr - i);
+					if (*Ptr == 0x40 && *(Ptr + 1) == 0x55) {
+						Addr = uint64_t(Ptr);
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -7309,6 +7381,7 @@ uintptr_t Finder::FindUActorChannel_ReplicateActor() {
 		ServerOffsets::UActorChannel_ReplicateActor = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("UActorChannel_ReplicateActor found at: 0x" + std::format("{:X}", ServerOffsets::UActorChannel_ReplicateActor));
 	return ServerOffsets::UActorChannel_ReplicateActor;
 }

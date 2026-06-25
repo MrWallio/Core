@@ -190,26 +190,6 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This, uint8 PersistantSt
 	}
 }
 
-void ABuildingContainer::PostLoad(ABuildingContainer* This) {
-	PostLoadOG(This);
-}
-
-bool ABuildingContainer::ServerOnAttemptInteract(ABuildingContainer* This, FInteractionType& InteractType) {
-	UWorld* World = UWorld::GetWorld();
-	if (!World) {
-		Log("ABuildingContainer::ServerOnAttemptInteract: World is null!");
-		return ServerOnAttemptInteractOG(This, InteractType);
-	}
-
-	//Log("ABuildingContainer::ServerOnAttemptInteract: " + This->GetFullName());
-
-	return ServerOnAttemptInteractOG(This, InteractType);
-}
-
-void ABuildingContainer::BeginPlay(ABuildingContainer* This) {
-	BeginPlayOG(This);
-}
-
 void ABuildingContainer::OnSetSearched()
 {
 	static UFunction* Func = nullptr;

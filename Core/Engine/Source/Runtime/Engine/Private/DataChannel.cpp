@@ -41,7 +41,7 @@ void UActorChannel::SetChannelActorForDestroy(FActorDestructionInfo* DestructInf
 				CloseBunch.SetbDormant(0);
 
 				// Serialize DestructInfo
-				Connection->PackageMap->WriteObject(CloseBunch, DestructInfo->ObjOuter().Get(), DestructInfo->NetGUID(), DestructInfo->PathName());
+				Connection->PackageMap->WriteObject(CloseBunch, DestructInfo->ObjOuter.Get(), DestructInfo->NetGUID, DestructInfo->PathName);
 
 				Log("SetChannelActorForDestroy");
 

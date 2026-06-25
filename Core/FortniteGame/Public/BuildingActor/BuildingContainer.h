@@ -61,26 +61,6 @@ public:
 			(LPVOID*)&PostUpdateOG
 		);
 
-		HookEveryVTableIdx(
-			ABuildingContainer::StaticClass(),
-			Finder::FindUObject_PostLoadVFT(),
-			PostLoad,
-			(LPVOID*)&PostLoadOG
-		);
-
-		HookEveryVTableIdx(
-			ABuildingContainer::StaticClass(),
-			Finder::FindABuildingActor_ServerOnAttemptInteractVFT(),
-			ServerOnAttemptInteract,
-			(LPVOID*)&ServerOnAttemptInteractOG
-		);
-
-		MH_CreateHook(
-			(LPVOID)(GetOffsetFromVTable(ABuildingContainer::GetDefaultObj(), Finder::FindAActor_BeginPlayVFT())),
-			BeginPlay,
-			(LPVOID*)&BeginPlayOG
-		);
-
 		Log("ABuildingContainer Hooked!");
 	}
 };

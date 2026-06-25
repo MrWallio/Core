@@ -9,6 +9,8 @@
 #include "Engine/Source/Runtime/Core/Public/Templates/SharedPointer.h"
 #include "Engine/Source/Runtime/Core/Public/Misc/NetworkGuid.h"
 #include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/WeakObjectPtr.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 
 class Error;
 class FNetGUIDCache;
@@ -58,37 +60,15 @@ struct FActorPriority
 struct FActorDestructionInfo
 {
 public:
-	TWeakObjectPtr<UObject>& ObjOuter() {
-		return *(TWeakObjectPtr<UObject>*)((uintptr_t)this + 0x0);
-	}
-	FVector& DestroyedPosition() {
-		if (Version::Engine_Version == 4.16) {
-			return *(FVector*)((uintptr_t)this + 0x8);
-		}
+	TWeakObjectPtr<ULevel> Level;
+	TWeakObjectPtr<UObject> ObjOuter;
+	FVector DestroyedPosition;
+	uint32 NetGUID;
+	FString PathName;
+	FName StreamingLevelName;
+	uint8_t Reason;
 
-		return *(FVector*)((uintptr_t)this + 0x0);
-	}
-	FNetworkGUID& NetGUID() {
-		if (Version::Engine_Version == 4.16) {
-			return *(FNetworkGUID*)((uintptr_t)this + 0x14);
-		}
-
-		return *(FNetworkGUID*)((uintptr_t)this + 0x0);
-	}
-	FString& PathName() {
-		if (Version::Engine_Version == 4.16) {
-			return *(FString*)((uintptr_t)this + 0x18);
-		}
-
-		return *(FString*)((uintptr_t)this + 0x0);
-	}
-	FName& StreamingLevelName() {
-		if (Version::Engine_Version == 4.16) {
-			return *(FName*)((uintptr_t)this + 0x28);
-		}
-
-		return *(FName*)((uintptr_t)this + 0x0);
-	}
+	bool bIgnoreDistanceCulling;
 };
 
 class UNetDriver : public UObject {
