@@ -21,8 +21,7 @@ public:
 	static inline void (*ServerReturnToMainMenuOG)(AFortPlayerControllerZone* This);
 	static void ServerReturnToMainMenu(AFortPlayerControllerZone* This);
 
-	static inline void (*ClientOnPawnDied_ImplementationOG)(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport);
-	static void ClientOnPawnDied_Implementation(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport);
+	void ClientOnPawnDied_Implementation(FFortPlayerDeathReport& DeathReport);
 
 	static inline void (*ClientOnPawnDiedOG)(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport);
 	static void ClientOnPawnDied(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport);

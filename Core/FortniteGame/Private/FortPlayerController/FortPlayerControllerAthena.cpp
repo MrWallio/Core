@@ -40,9 +40,7 @@ void AFortPlayerControllerAthena::ServerAttemptAircraftJump(AFortPlayerControlle
 	}
 }
 
-void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerControllerAthena* This, FFortPlayerDeathReport& DeathReport) {
-	//ClientOnPawnDied_ImplementationOG(This, DeathReport);
-	
+void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDeathReport& DeathReport) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ClientOnPawnDied: World is null!");
@@ -56,7 +54,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		return;
 	}
 
-	AFortPlayerStateAthena* PlayerStateAthena = This->PlayerState->Cast<AFortPlayerStateAthena>();
+	AFortPlayerStateAthena* PlayerStateAthena = PlayerState->Cast<AFortPlayerStateAthena>();
 	if (!PlayerStateAthena) {
 		Log("ClientOnPawnDied: PlayerState is null or not a FortPlayerStateAthena!");
 		return;
@@ -65,7 +63,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	UFortAbilitySystemComponentAthena* AbilitySystemComponentAthena = 
 		PlayerStateAthena ? PlayerStateAthena->AbilitySystemComponent->Cast<UFortAbilitySystemComponentAthena>() : nullptr;
 
-	AFortPlayerPawnAthena* PlayerPawnAthena = This->MyFortPawn->Cast<AFortPlayerPawnAthena>();
+	AFortPlayerPawnAthena* PlayerPawnAthena = MyFortPawn->Cast<AFortPlayerPawnAthena>();
 	if (!PlayerPawnAthena) {
 		Log("ClientOnPawnDied: MyFortPawn is null or not a FortPlayerPawnAthena!");
 		return;
@@ -77,8 +75,8 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	UFortWeaponItemDefinition* FinishingWeapon = DeathReport.DamageCauser->IsA(AFortWeapon::StaticClass())
 		? DeathReport.DamageCauser->Cast<AFortWeapon>()->WeaponData : nullptr;
 
-	if (This->WorldInventory) {
-		This->WorldInventory->DropAllItems();
+	if (WorldInventory) {
+		WorldInventory->DropAllItems();
 	}
 
 	bool bHasAliveTeamMember = false;
@@ -87,7 +85,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	if (PlayerStateAthena && PlayerStateAthena->PlayerTeam) {
 		for (AController* TeamMember : PlayerStateAthena->PlayerTeam->TeamMembers) {
 			AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
-			if (!TeamMemberController || TeamMemberController == This || !TeamMemberController->bMarkedAlive) {
+			if (!TeamMemberController || TeamMemberController == this || !TeamMemberController->bMarkedAlive) {
 				continue;
 			}
 
@@ -169,7 +167,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		}
 
 		FortGameModeAthena->RemoveFromAlivePlayers(
-			This,
+			this,
 			KillerPlayerStateAthena == PlayerStateAthena ? nullptr : KillerPlayerStateAthena,
 			KillerPlayerPawnAthena,
 			FinishingWeapon,
@@ -195,7 +193,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 			}
 			if (!WinnerPCAthena) {
 				// assume there was only 1 player playing this match
-				WinnerPCAthena = This;
+				WinnerPCAthena = this;
 			}
 
 			AFortPlayerStateAthena* WinnerPlayerStateAthena = WinnerPCAthena ? WinnerPCAthena->PlayerState->Cast<AFortPlayerStateAthena>() : nullptr;
@@ -259,9 +257,9 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 			}
 
 			if (PawnToSpectate) {
-				This->PlayerToSpectateOnDeath = PawnToSpectate;
+				PlayerToSpectateOnDeath = PawnToSpectate;
 
-				FTimerHandle TimerHandle = UKismetSystemLibrary::K2_SetTimer(This, "SpectateOnDeath", 5.f, false);
+				FTimerHandle TimerHandle = UKismetSystemLibrary::K2_SetTimer(this, "SpectateOnDeath", 5.f, false);
 				if (!TimerHandle.IsValid()) {
 					Log("AFortPlayerControllerAthena::ClientOnPawnDied: Failed to set timer for SpectateOnDeath!");
 				}
@@ -275,7 +273,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	TArray<FString> Medals;
 	TArray<FFortQuestObjectiveCompletion> Advance;
 
-	UFortQuestManager* QuestManager = This->GetQuestManager(ESubGame::GetAthena());
+	UFortQuestManager* QuestManager = GetQuestManager(ESubGame::GetAthena());
 	if (QuestManager) {
 		Advance = QuestManager->PendingChanges;
 	}
@@ -285,9 +283,9 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 	int32 TeamKills = PlayerStateAthena ? PlayerStateAthena->TeamKillScore : -1;
 	int32 Placement = PlayerStateAthena ? PlayerStateAthena->Place : -1;
 
-	if (This->AthenaProfile) {
+	if (AthenaProfile) {
 		FDedicatedServerUrlContext Context;
-		This->AthenaProfile->EndBattleRoyaleGame(
+		AthenaProfile->EndBattleRoyaleGame(
 			Advance,
 			FortGameModeAthena->CurrentPlaylistId,
 			MinutesAlive,

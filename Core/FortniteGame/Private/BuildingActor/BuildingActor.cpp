@@ -37,13 +37,26 @@ float ABuildingActor::GetHealthPercent() const
 
 float ABuildingActor::GetMaxHealth() const
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName("GetMaxHealth"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		float (*&GetMaxHealthInternal)(const ABuildingActor*) = decltype(GetMaxHealthInternal)(VTable[VTableIdx]);
-		return GetMaxHealthInternal(this);
+	if (Func == nullptr)
+		Func = FindFunction("GetMaxHealth");
+
+	if (!Func) {
+		return 0.0f;
 	}
+
+	struct BuildingActor_GetMaxHealth
+	{
+	public:
+		float ReturnValue;
+	};
+
+	BuildingActor_GetMaxHealth Parms{};
+
+	const_cast<ABuildingActor*>(this)->ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
 }
 
 void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FGameplayTagContainer& DamageTags, const FVector& Momentum, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser, const FGameplayEffectContextHandle& EffectContext) {

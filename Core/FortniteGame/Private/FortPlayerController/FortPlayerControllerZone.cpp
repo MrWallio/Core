@@ -130,16 +130,16 @@ void AFortPlayerControllerZone::ServerReturnToMainMenu(AFortPlayerControllerZone
 	ServerReturnToMainMenuOG(This);
 }
 
-void AFortPlayerControllerZone::ClientOnPawnDied_Implementation(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport) {
-	//ClientOnPawnDied_ImplementationOG(This, DeathReport);
+void AFortPlayerControllerZone::ClientOnPawnDied_Implementation(FFortPlayerDeathReport& DeathReport) {
+	
 }
 
 void AFortPlayerControllerZone::ClientOnPawnDied(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport) {
 	if (AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>()) {
-		FortPCAthena->ClientOnPawnDied_Implementation(FortPCAthena, DeathReport);
+		FortPCAthena->ClientOnPawnDied_Implementation(DeathReport);
 	}
 	else {
-		This->ClientOnPawnDied_Implementation(This, DeathReport);
+		This->ClientOnPawnDied_Implementation(DeathReport);
 	}
 
 	ClientOnPawnDiedOG(This, DeathReport);
@@ -156,17 +156,6 @@ void AFortPlayerControllerZone::Hook() {
 		ServerReturnToMainMenu,
 		(LPVOID*)&ServerReturnToMainMenuOG
 	);
-
-	/*HookVTable(
-		AFortPlayerControllerZone::StaticClass(),
-		AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerControllerZone.ClientOnPawnDied"),
-		ClientOnPawnDied,
-		(LPVOID*)&ClientOnPawnDiedOG
-	);*/
-	MH_CreateHook((LPVOID)(GetOffsetFromVTable(
-		AFortPlayerControllerZone::GetDefaultObj(),
-		AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerControllerZone.ClientOnPawnDied")
-	)), ClientOnPawnDied_Implementation, (LPVOID*)&ClientOnPawnDied_ImplementationOG);
 
 	MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerControllerZone_ClientOnPawnDied()), ClientOnPawnDied, (LPVOID*)&ClientOnPawnDiedOG);
 
