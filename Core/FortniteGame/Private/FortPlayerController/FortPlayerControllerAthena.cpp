@@ -176,45 +176,68 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(AFortPlayerCon
 		// Now we need to calculate if the player or team won
 		bool bTeamWon = FortGameStateAthena->TeamsLeft <= 1;
 		if (bTeamWon && !PlayerStateAthena->bHasWonAGame) {
-			KillerPCAthena->ClientNotifyWon(KillerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
-
-			if (KillerPlayerStateAthena->PlayerTeam) {
-				for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
-					AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
-					if (TeamMemberController) {
-						AFortPlayerStateAthena* TeamMemberPlayerState = TeamMemberController->PlayerState->Cast<AFortPlayerStateAthena>();
-						if (TeamMemberPlayerState) {
-							TeamMemberPlayerState->Place = FortGameStateAthena->TeamsLeft; // we wanna do this before removing the player from alive players, so that the place is correct
-							TeamMemberPlayerState->OnRep_Place();
-
-							TeamMemberPlayerState->bHasWonAGame = true;
-						}
-
-						TeamMemberController->ClientNotifyTeamWon(KillerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
-
-						if (FAthenaRewardResult::StaticStruct()) {
-							TeamMemberController->ClientSendEndBattleRoyaleMatchForPlayer(true, TeamMemberController->ConstructAthenaRewardResult());
-						}
-
-						if (FAthenaMatchStats::StaticStruct()) {
-							TeamMemberController->ClientSendMatchStatsForPlayer(TeamMemberController->ConstructAthenaMatchStats());
-						}
-
-						if (FAthenaMatchTeamStats::StaticStruct()) {
-							TeamMemberController->ClientSendTeamStatsForPlayer(TeamMemberController->ConstructAthenaMatchTeamStats());
+			AFortPlayerControllerAthena* WinnerPCAthena = KillerPCAthena;
+			if (!WinnerPCAthena) {
+				// Find the winning team and get a player controller from it
+				for (AFortTeamInfo* Team : FortGameStateAthena->Teams) {
+					for (AController* TeamMember : Team->TeamMembers) {
+						AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
+						if (TeamMemberController && TeamMemberController->bMarkedAlive) {
+							WinnerPCAthena = TeamMemberController;
+							break;
 						}
 					}
 				}
 			}
+			if (!WinnerPCAthena) {
+				// assume there was only 1 player playing this match
+				WinnerPCAthena = This;
+			}
 
-			FortGameStateAthena->WinningTeam = KillerPlayerStateAthena->TeamIndex;
-			FortGameStateAthena->OnRep_WinningTeam();
+			AFortPlayerStateAthena* WinnerPlayerStateAthena = WinnerPCAthena ? WinnerPCAthena->PlayerState->Cast<AFortPlayerStateAthena>() : nullptr;
+			AFortPlayerPawnAthena* WinnerPlayerPawnAthena = WinnerPCAthena ? WinnerPCAthena->MyFortPawn->Cast<AFortPlayerPawnAthena>() : nullptr;
 
-			FortGameStateAthena->WinningPlayerName = KillerPlayerStateAthena->GetPlayerName();
-			FortGameStateAthena->OnRep_WinningPlayerName();
+			if (WinnerPCAthena) {
+				WinnerPCAthena->ClientNotifyWon(WinnerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
 
-			FortGameStateAthena->WinningPlayerState = KillerPlayerStateAthena;
-			FortGameStateAthena->OnRep_WinningPlayerState();
+				if (WinnerPlayerStateAthena->PlayerTeam) {
+					for (AController* TeamMember : WinnerPlayerStateAthena->PlayerTeam->TeamMembers) {
+						AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
+						if (TeamMemberController) {
+							AFortPlayerStateAthena* TeamMemberPlayerState = TeamMemberController->PlayerState->Cast<AFortPlayerStateAthena>();
+							if (TeamMemberPlayerState) {
+								TeamMemberPlayerState->Place = FortGameStateAthena->TeamsLeft; // we wanna do this before removing the player from alive players, so that the place is correct
+								TeamMemberPlayerState->OnRep_Place();
+
+								TeamMemberPlayerState->bHasWonAGame = true;
+							}
+
+							TeamMemberController->ClientNotifyTeamWon(WinnerPlayerPawnAthena, FinishingWeapon, PlayerStateAthena->DeathInfo.DeathCause);
+
+							if (FAthenaRewardResult::StaticStruct()) {
+								TeamMemberController->ClientSendEndBattleRoyaleMatchForPlayer(true, TeamMemberController->ConstructAthenaRewardResult());
+							}
+
+							if (FAthenaMatchStats::StaticStruct()) {
+								TeamMemberController->ClientSendMatchStatsForPlayer(TeamMemberController->ConstructAthenaMatchStats());
+							}
+
+							if (FAthenaMatchTeamStats::StaticStruct()) {
+								TeamMemberController->ClientSendTeamStatsForPlayer(TeamMemberController->ConstructAthenaMatchTeamStats());
+							}
+						}
+					}
+				}
+
+				FortGameStateAthena->WinningTeam = WinnerPlayerStateAthena->TeamIndex;
+				FortGameStateAthena->OnRep_WinningTeam();
+
+				FortGameStateAthena->WinningPlayerName = WinnerPlayerStateAthena->GetPlayerName();
+				FortGameStateAthena->OnRep_WinningPlayerName();
+
+				FortGameStateAthena->WinningPlayerState = WinnerPlayerStateAthena;
+				FortGameStateAthena->OnRep_WinningPlayerState();
+			}
 		}
 	}
 
