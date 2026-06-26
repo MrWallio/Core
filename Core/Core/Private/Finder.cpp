@@ -14,6 +14,7 @@
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h"
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/GameplayAbility.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/ReplicationDriver.h"
+#include "Engine/Plugins/Runtime/ReplicationGraph/Source/Public/ReplicationGraph.h"
 
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
@@ -5194,6 +5195,19 @@ uintptr_t Finder::FindUReplicationDriver_ServerReplicateActors() {
 		return ServerOffsets::UReplicationDriver_ServerReplicateActors;
 	}
 
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UReplicationDriver::ServerReplicateActors").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 512; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x53)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
 	if (Addr) {
 		ServerOffsets::UReplicationDriver_ServerReplicateActors = Addr - ImageBase;
 	}
@@ -5219,11 +5233,15 @@ uintptr_t Finder::FindUReplicationDriver_ServerReplicateActorsVFT() {
 
 	uintptr_t ServerReplicateActorsAddr = FindUReplicationDriver_ServerReplicateActors() + ImageBase;
 
-	for (int i = 0; i < 0x100; i++) {
-		if ((uintptr_t)VTable[i] == ServerReplicateActorsAddr) {
-			Addr = (uintptr_t)&VTable[i];
+	for (int i = 0; i < 1024; i++) {
+		if (VTable[i] == (void*)ServerReplicateActorsAddr) {
+			Addr = i;
 			break;
 		}
+	}
+
+	if (Addr) {
+		ServerOffsets::UReplicationDriver_ServerReplicateActorsVFT = Addr;
 	}
 
 	bInitialized = true;
@@ -6312,12 +6330,20 @@ uintptr_t Finder::FindUNetDriver__ReplicationFrame() {
 	int32 AbsoluteOffset = Version::Engine_Version >= 4.19 ? 3 : 4;
 	if (Version::Engine_Version == 4.20) {
 		AbsoluteOffset = 4;
+		if (Version::Fortnite_Version >= 3.3) {
+			AbsoluteOffset = 2;
+		}
+	}
+
+	std::vector<uint8_t> Pattern = { 0x41, 0xFF };
+	if (Version::Fortnite_Version >= 3.3) {
+		Pattern = { 0xFF, 0x81 };
 	}
 	
 	ServerOffsets::UNetDriver__ReplicationFrame = *Memcury::Scanner::FindStringRef(
 		L"Attempt to replicate function '%s' on Actor '%s' while it is in the middle of variable replication!"
 	).ScanFor(
-		{ 0x41, 0xFF }
+		Pattern
 	).AbsoluteOffset(AbsoluteOffset)
 	.GetAs<uint32_t*>();
 
@@ -6434,6 +6460,21 @@ uintptr_t Finder::FindUNetConnection__ActorChannels() {
 				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
 				Addr = static_cast<uintptr_t>(Offset);
 				break;
+			}
+		}
+	}
+
+	if (!Addr) {
+		uintptr_t StringAddr2 = Memcury::Scanner::FindStringRef(L"ServerUpdateLevelVisibility() Removed '%s'").Get();
+		if (StringAddr2) {
+			for (int i = 0; i < 512; i++)
+			{
+				auto Ptr = (uint8_t*)(StringAddr2 + i);
+				if (*Ptr == 0x49 && *(Ptr + 1) == 0x8D) {
+					int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+					Addr = static_cast<uintptr_t>(Offset);
+					break;
+				}
 			}
 		}
 	}
@@ -6708,7 +6749,7 @@ uintptr_t Finder::FindUNetDriver__DestroyedStartupOrDormantActors() {
 
 	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"AddClientConnection: Added client connection: %s").Get();
 	if (StringAddr) {
-		for (int i = 0; i < 512; i++)
+		for (int i = 0; i < 1024; i++)
 		{
 			auto Ptr = (uint8_t*)(StringAddr + i);
 			if (*Ptr == 0x4C && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0x9E) {
@@ -6718,6 +6759,11 @@ uintptr_t Finder::FindUNetDriver__DestroyedStartupOrDormantActors() {
 			}
 			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0x9E) {
 				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x81 && *(Ptr + 2) == 0xC6) {
+				uint32_t Offset = *reinterpret_cast<uint32_t*>(Ptr + 3);
 				Addr = static_cast<uintptr_t>(Offset);
 				break;
 			}
@@ -6972,6 +7018,21 @@ uintptr_t Finder::FindUNetConnection__DestroyedStartupOrDormantActors() {
 		}
 	}
 
+	if (!Addr) {
+		uintptr_t StringAddr2 = Memcury::Scanner::FindStringRef(L"ServerUpdateLevelVisibility() Added '%s'").Get();
+		if (StringAddr2) {
+			for (int i = 0; i < 1024; i++)
+			{
+				auto Ptr = (uint8_t*)(StringAddr2 + i);
+				if (*Ptr == 0x49 && *(Ptr + 1) == 0x8D) {
+					int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+					Addr = static_cast<uintptr_t>(Offset);
+					break;
+				}
+			}
+		}
+	}
+
 	if (Addr) {
 		ServerOffsets::UNetConnection__DestroyedStartupOrDormantActors = Addr;
 	}
@@ -7020,7 +7081,7 @@ uintptr_t Finder::FindUNetConnection__ClientVisibleLevelNames() {
 			auto Ptr = (uint8_t*)(StringAddr - i);
 			if ((*Ptr == 0x49 || *Ptr == 0x48)
 				&& *(Ptr + 1) == 0x8D
-				&& (*(Ptr + 2) == 0x8F || *(Ptr + 2) == 0x8D)) {
+				&& (*(Ptr + 2) == 0x8F || *(Ptr + 2) == 0x8D || *(Ptr + 2) == 0x8E)) {
 				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
 				Addr = static_cast<uintptr_t>(Offset);
 				break;

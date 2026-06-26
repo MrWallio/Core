@@ -771,6 +771,9 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\DemoNetDriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Plugins\Runtime\ReplicationGraph\Source\Public\ReplicationGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">

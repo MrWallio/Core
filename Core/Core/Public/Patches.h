@@ -8,7 +8,7 @@ public:
 	static void ApplyPatches() {
 		// i like to keep patches at a minimal and if i can i would like to figure out a way to not use these patches
 
-		if (Version::Fortnite_Version >= 1.63 && Version::Fortnite_Version <= 3.2) {
+		if (Version::Fortnite_Version >= 1.63 && Version::Fortnite_Version <= 3.3) {
 			uintptr_t Patch1 = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8B F9 89 B1 ? ? ? ? 48 8B 89 ? ? ? ? 48 85 C9 74 ? E8 ? ? ? ? 89 B7").Get();
 			if (Patch1) {
 				MH_CreateHook((LPVOID)Patch1, RetNullptr, nullptr);
@@ -28,7 +28,7 @@ public:
 			}
 		}
 
-		if (Version::Fortnite_Version >= 2.1 && Version::Fortnite_Version <= 3.2)
+		if (Version::Fortnite_Version >= 2.1 && Version::Fortnite_Version <= 3.3)
 		{
 			uintptr_t WidgetCrashPatch = Memcury::Scanner::FindStringRef(L"Unable to create the widget {0}, no outer provided.").FindFunctionStart().Get();
 			
@@ -44,12 +44,26 @@ public:
 			}
 		}
 
-		if (Version::Fortnite_Version >= 3.0 && Version::Fortnite_Version <= 3.0) {
+		if (Version::Fortnite_Version == 3.0) {
 			uintptr_t Patch6 = Memcury::Scanner::FindPattern("40 53 55 56 48 81 EC ? ? ? ? 33 F6 48 8B D9").Get();
 			if (Patch6) {
 				MH_CreateHook((LPVOID)Patch6, RetNull, nullptr);
 				Log("Patched: " + std::to_string(Patch6 - ImageBase) + " with RetNull");
 			}
 		}
+
+		/*if (Version::Fortnite_Version == 3.3) { // Figured out theres a reason its disabled the hard way lol
+			uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UFortReplicationGraph is disabled").Get();
+			if (StringAddr) {
+				for (int i = 0; i < 256; i++) {
+					auto Ptr = (uint8_t*)(StringAddr - i);
+					if (*Ptr == 0x75) {
+						PatchByte((uintptr_t)Ptr, 0xEB);
+						Log("Patched: " + std::to_string((uintptr_t)Ptr - ImageBase) + " with 0xEB");
+						break;
+					}
+				}
+			}
+		}*/
 	}
 };

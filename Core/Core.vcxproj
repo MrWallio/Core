@@ -160,6 +160,7 @@
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayEffectTypes.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\GameplayPrediction.h" />
     <ClInclude Include="Engine\Plugins\Runtime\GameplayAbilities\Source\GameplayAbilities\Public\ScalableFloat.h" />
+    <ClInclude Include="Engine\Plugins\Runtime\ReplicationGraph\Source\Public\ReplicationGraph.h" />
     <ClInclude Include="Engine\Source\Runtime\AIModule\Classes\AIController.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreOnline\Public\Online\CoreOnline.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\Misc\StringAssetReference.h" />
