@@ -6605,12 +6605,21 @@ uintptr_t Finder::FindAActor_GetNetPriority() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AActor_GetNetPriority)
 		return ServerOffsets::AActor_GetNetPriority;
+	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::AActor_GetNetPriority;
+	}
+
 	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 49 8B F9 49 8B F0 48 8B EA 48 8B D9 4D 85 C9").Get();
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("F6 81 ? ? ? ? ? 74 ? 4C 8B 99").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::AActor_GetNetPriority = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("AActor_GetNetPriority found at: 0x" + std::format("{:X}", ServerOffsets::AActor_GetNetPriority));
 	return ServerOffsets::AActor_GetNetPriority;
 }
@@ -6618,15 +6627,20 @@ uintptr_t Finder::FindAActor_GetNetPriority() {
 uintptr_t Finder::FindAActor_GetNetPriorityVFT() {
 	if (ServerOffsets::AActor_GetNetPriorityVFT)
 		return ServerOffsets::AActor_GetNetPriorityVFT;
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.Actor"))->GetDefaultObject()->VTable;
 
-	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x6E;
+	if (!Finder::FindAActor_GetNetPriority()) {
+		return 0;
 	}
+	uintptr_t GetNetPriorityAddr = FindAActor_GetNetPriority() + ImageBase;
 
-	if (Addr) {
-		ServerOffsets::AActor_GetNetPriorityVFT = Addr;
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(GetNetPriorityAddr))
+		{
+			ServerOffsets::AActor_GetNetPriorityVFT = i;
+			break;
+		}
 	}
 
 	Log("AActor_GetNetPriorityVFT found at: 0x" + std::format("{:X}", ServerOffsets::AActor_GetNetPriorityVFT));
@@ -10953,6 +10967,8 @@ void Finder::SetupOffsets() {
 
 	FindCollectGarbage();
 	FindCollectGarbageInternal();
+
+	FindAActor_GetNetPriorityVFT();
 
 	return;
 }

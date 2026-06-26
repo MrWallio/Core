@@ -73,8 +73,12 @@ public:
 	bool IsNetStartupActor() const;
 
 	float GetNetPriority(const FVector& ViewPos, const FVector& ViewDir, class AActor* Viewer, AActor* ViewTarget, UActorChannel* InChannel, float Time, bool bLowBandwidth) {
-		float (*&GetNetPriorityInternal)(AActor*, const FVector&, const FVector&, AActor*, AActor*, UActorChannel*, float, bool) = decltype(GetNetPriorityInternal)(VTable[Finder::FindAActor_GetNetPriorityVFT()]);
-		return GetNetPriorityInternal(this, ViewPos, ViewDir, Viewer, ViewTarget, InChannel, Time, bLowBandwidth);
+		if (Finder::FindAActor_GetNetPriorityVFT()) {
+			float (*&GetNetPriorityInternal)(AActor*, const FVector&, const FVector&, AActor*, AActor*, UActorChannel*, float, bool) = decltype(GetNetPriorityInternal)(VTable[Finder::FindAActor_GetNetPriorityVFT()]);
+			return GetNetPriorityInternal(this, ViewPos, ViewDir, Viewer, ViewTarget, InChannel, Time, bLowBandwidth);
+		}
+
+		return 0.f;
 	}
 
 	bool IsRelevancyOwnerFor(const AActor* ReplicatedActor, const AActor* ActorOwner, const AActor* ConnectionActor) const;

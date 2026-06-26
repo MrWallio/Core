@@ -59,7 +59,7 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	AFortGameStateAthena* GameState = This->GameState ? This->GameState->Cast<AFortGameStateAthena>() : nullptr;
 	if (!GameState) {
 		Log("FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
-		return FinishWorldInitializationOG(This, WorldManager);
+		return;
 	}
 
 	This->DefaultPawnClass = (UClass*)StaticLoadObject("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");

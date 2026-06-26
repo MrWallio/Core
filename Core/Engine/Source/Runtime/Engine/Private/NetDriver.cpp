@@ -33,7 +33,7 @@ FActorPriority::FActorPriority(UNetConnection* InConnection, UActorChannel* InCh
 		return;
 	}
 
-	if (Version::Engine_Version <= 4.16 && Version::Engine_Version >= 4.24) {
+	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.24) {
 		float Time = Channel ? (InConnection->Driver->Time - Channel->LastUpdateTime) : InConnection->Driver->SpawnPrioritySeconds;
 
 		Priority = 0;
@@ -184,9 +184,9 @@ static FORCEINLINE bool IsActorDormant(FNetworkObjectInfo* ActorInfo, const UNet
 static FORCEINLINE bool ShouldActorGoDormant(AActor* Actor, const TArray<FNetViewer>& ConnectionViewers, UActorChannel* Channel, const float Time, const bool bLowNetBandwidth)
 {
 	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 4.20) {
-		UActorChannelUE416* ActorChannel = (UActorChannelUE416*)Channel;
+		UActorChannel* ActorChannel = Channel;
 
-		if (Actor->NetDormancy <= DORM_Awake || !ActorChannel || ActorChannel->bPendingDormancy || ActorChannel->Dormant)
+		if (Actor->NetDormancy <= DORM_Awake || !ActorChannel/* || ActorChannel->bPendingDormancy || ActorChannel->Dormant*/)
 		{
 			return false;
 		}
@@ -596,8 +596,8 @@ void UNetDriver::ServerReplicateActors_BuildConsiderList(TArray<FNetworkObjectIn
 				continue;
 			}
 
-			ULevelUE416* Level = (ULevelUE416*)Actor->GetLevel();
-			if (Level->HasVisibilityChangeRequestPending() || Level->bIsAssociatingLevel)
+			ULevel* Level = Actor->GetLevel();
+			if (Level->HasVisibilityChangeRequestPending()/* || Level->bIsAssociatingLevel*/)
 			{
 				continue;
 			}
