@@ -7860,27 +7860,32 @@ uintptr_t Finder::FindCollectGarbageInternal() {
 	if (ServerOffsets::CollectGarbageInternal)
 		return ServerOffsets::CollectGarbageInternal;
 
-	auto sRef = Memcury::Scanner::FindStringRef(L"CollectGarbageInternal() is flushing async loading").Get();
-	if (sRef)
-	{
-		for (int i = 0; i < 1000; i++)
+	if (Version::Fortnite_Version == 3.0) {
+		Addr = 0x4FBF2BD + ImageBase;
+	}
+	else {
+		auto sRef = Memcury::Scanner::FindStringRef(L"CollectGarbageInternal() is flushing async loading").Get();
+		if (sRef)
 		{
-			auto Ptr = (uint8_t*)(sRef - i);
+			for (int i = 0; i < 1024; i++)
+			{
+				auto Ptr = (uint8_t*)(sRef - i);
 
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-			else if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
-			{
-				Addr = uint64_t(Ptr);
-				break;
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+				{
+					Addr = uint64_t(Ptr);
+					break;
+				}
+				else if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
+				{
+					Addr = uint64_t(Ptr);
+					break;
+				}
+				else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
+				{
+					Addr = uint64_t(Ptr);
+					break;
+				}
 			}
 		}
 	}
@@ -10541,6 +10546,32 @@ uintptr_t Finder::FindUFortAssetManager_Get() {
 	return ServerOffsets::UFortAssetManager_Get;
 }
 
+uintptr_t Finder::FindUDemoNetDriver_TickFlushInternal() {
+	if (ServerOffsets::UDemoNetDriver_TickFlushInternal)
+		return ServerOffsets::UDemoNetDriver_TickFlushInternal;
+	uintptr_t Addr = 0;
+	
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UDemoNetDriver::TickFlush: ReplayStreamer ERROR: %s").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+	
+	if (Addr) {
+		ServerOffsets::UDemoNetDriver_TickFlushInternal = Addr - ImageBase;
+	}
+
+	Log("UDemoNetDriver_TickFlushInternal found at: 0x" + std::format("{:X}", ServerOffsets::UDemoNetDriver_TickFlushInternal));
+	return ServerOffsets::UDemoNetDriver_TickFlushInternal;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -10917,6 +10948,11 @@ void Finder::SetupOffsets() {
 	FindUFortAssetManager_Get();
 
 	FindUChannel_StartBecomingDormantVFT();
+
+	FindUDemoNetDriver_TickFlushInternal();
+
+	FindCollectGarbage();
+	FindCollectGarbageInternal();
 
 	return;
 }

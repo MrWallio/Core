@@ -45,10 +45,16 @@ public:
 		}
 
 		if (Version::Fortnite_Version >= 3.0 && Version::Fortnite_Version <= 3.0) {
-			uintptr_t Patch5 = Memcury::Scanner::FindPattern("4C 8B DC 56 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 83 B9 ? ? ? ? 00").Get();
+			/*uintptr_t Patch5 = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 83 79 ? 00 48 8B F9 75").Get(); // bro i hate 3.0
 			if (Patch5) {
-				MH_CreateHook((LPVOID)Patch5, RetNull, nullptr);
-				Log("Patched: " + std::to_string(Patch5 - ImageBase) + " with RetNull");
+				MH_CreateHook((LPVOID)Patch5, True, nullptr);
+				Log("Patched: " + std::to_string(Patch5 - ImageBase) + " with True");
+			}*/
+
+			uintptr_t Patch6 = Memcury::Scanner::FindPattern("40 53 55 56 48 81 EC ? ? ? ? 33 F6 48 8B D9").Get();
+			if (Patch6) {
+				MH_CreateHook((LPVOID)Patch6, RetNull, nullptr);
+				Log("Patched: " + std::to_string(Patch6 - ImageBase) + " with RetNull");
 			}
 		}
 	}

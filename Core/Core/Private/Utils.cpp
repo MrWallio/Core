@@ -7,6 +7,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/Engine.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/DemoNetDriver.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/GameInstance.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/LocalPlayer.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
@@ -202,6 +203,7 @@ void Utils::Hook() {
 	UWorld::Hook();
 	AActor::Hook();
 	UNetDriver::Hook();
+	//UDemoNetDriver::Hook();
 	AGameSession::Hook();
 	UAbilitySystemComponent::Hook();
 	APlayerController::Hook();
@@ -377,9 +379,6 @@ void Utils::RemoveLocalPlayer() {
 	if (World->OwningGameInstance && World->OwningGameInstance->LocalPlayers.Num() > 0) {
 		World->OwningGameInstance->LocalPlayers.RemoveAt(0);
 		Log("Utils::RemoveLocalPlayer: Local Player Removed!");
-	}
-	else {
-		Log("Utils::RemoveLocalPlayer: No Local Players Found!");
 	}
 }
 

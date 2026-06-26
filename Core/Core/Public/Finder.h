@@ -1080,6 +1080,8 @@ public:
 	static uintptr_t FindUNetConnection_FindActorChannelRef();
 
 	static uintptr_t FindUFortAssetManager_Get();
+
+	static uintptr_t FindUDemoNetDriver_TickFlushInternal();
 public:
 	static void SetupCoreOffsets();
 

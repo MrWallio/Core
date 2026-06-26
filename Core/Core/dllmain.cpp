@@ -75,9 +75,26 @@ DWORD Main(LPVOID)
 
         Sleep(3000);
 
+        Utils::RemoveLocalPlayer();
 		if (!Utils::LoadWorld(Config)) {
 			Log("Failed to load world!");
 		}
+
+        if (Finder::FindCollectGarbage()) {
+            uintptr_t Patch1 = Finder::FindCollectGarbage() + ImageBase;
+            if (Patch1) {
+                MH_CreateHook((LPVOID)Patch1, RetNull, nullptr);
+                Log("Patched: " + std::to_string(Patch1 - ImageBase) + " with RetNull");
+            }
+        }
+
+        if (Finder::FindCollectGarbageInternal()) {
+            uintptr_t Patch2 = Finder::FindCollectGarbageInternal() + ImageBase;
+            if (Patch2) {
+                MH_CreateHook((LPVOID)Patch2, RetNull, nullptr);
+                Log("Patched: " + std::to_string(Patch2 - ImageBase) + " with RetNull");
+            }
+        }
     }
 
     return 0;

@@ -663,4 +663,6 @@ namespace ServerOffsets {
 	inline uintptr_t FMsg_Logf = 0;
 
 	inline uintptr_t UFortAssetManager_Get = 0;
+
+	inline uintptr_t UDemoNetDriver_TickFlushInternal = 0;
 }
