@@ -6451,23 +6451,7 @@ uintptr_t Finder::FindUActorChannel__LastUpdateTime() {
 		return ServerOffsets::UActorChannel__LastUpdateTime;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ActorChannel[%d]: Sending ObjKeys: %s").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 512; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr + i);
-			if (*Ptr == 0xF2 && *(Ptr + 1) == 0x41) {
-				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 5);
-				Addr = static_cast<uintptr_t>(Offset);
-				break;
-			}
-			else if (*Ptr == 0x49 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0x55) {
-				int8_t Disp8 = *reinterpret_cast<int8_t*>(Ptr + 3);
-				Addr = static_cast<uintptr_t>(static_cast<uint8_t>(Disp8));
-				break;
-			}
-		}
-	}
+	Addr = UActorChannel::StaticClass()->GetPropertyOffset("Actor") + 4 + 4 + 8 + 8; // idk if this will change in future
 
 	if (Addr) {
 		ServerOffsets::UActorChannel__LastUpdateTime = Addr;
