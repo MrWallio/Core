@@ -80,6 +80,8 @@ DWORD Main(LPVOID)
 			Log("Failed to load world!");
 		}
 
+        Sleep(2000);
+
         if (Finder::FindCollectGarbage()) {
             uintptr_t Patch1 = Finder::FindCollectGarbage() + ImageBase;
             if (Patch1) {
