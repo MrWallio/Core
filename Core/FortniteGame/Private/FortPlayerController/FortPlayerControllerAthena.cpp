@@ -246,8 +246,23 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDea
 	if ((Version::Fortnite_Version < 3.0 && Version::Fortnite_Version >= 1.91) || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 		if (FortGameModeAthena->bAllowSpectateAfterDeath) {
 			APawn* PawnToSpectate = DeathReport.KillerPawn;
+			if (!PawnToSpectate && PlayerStateAthena->PlayerTeam) {
+				// check if there is any team member alive to spectate
+				for (AController* TeamMember : PlayerStateAthena->PlayerTeam->TeamMembers) {
+					AFortPlayerControllerAthena* TeamMemberController = TeamMember->Cast<AFortPlayerControllerAthena>();
+					if (!TeamMemberController || TeamMemberController == this || !TeamMemberController->bMarkedAlive) {
+						continue;
+					}
+					AFortPlayerPawnAthena* TeamMemberPlayerPawn = TeamMemberController->MyFortPawn->Cast<AFortPlayerPawnAthena>();
+					if (!TeamMemberPlayerPawn) {
+						continue;
+					}
+					PawnToSpectate = TeamMemberPlayerPawn;
+					break;
+				}
+			}
 			if (!PawnToSpectate) {
-				// Find next spectatable player
+				// if no team memeber alive, then find the next alive player
 				for (AFortPlayerControllerAthena* PC : FortGameModeAthena->AlivePlayers) {
 					if (PC && PC->Pawn) {
 						PawnToSpectate = PC->Pawn;
