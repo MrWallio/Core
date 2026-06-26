@@ -363,7 +363,14 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 					AActor* Actor = ActorInfo->Actor;
 					if (Actor != NULL && !ActorInfo->bPendingNetUpdate)
 					{
-						UActorChannel* Channel = Connection->ActorChannels().FindRef(Actor);
+						UActorChannel* Channel = nullptr;
+						if (Version::Engine_Version >= 4.20) {
+							Channel = Connection->FindActorChannelRef(ConsiderList[ConsiderIdx]->WeakActor);
+						}
+						else {
+							Channel = Connection->ActorChannels().FindRef(Actor);
+						}
+
 						if (Channel != NULL && Channel->LastUpdateTime < ActorInfo->LastNetUpdateTime)
 						{
 							ActorInfo->bPendingNetUpdate = true;
@@ -697,7 +704,13 @@ int32 UNetDriver::ServerReplicateActors_PrioritizeActors(UNetConnection* Connect
 			{
 				AActor* Actor = ActorInfo->Actor;
 
-				UActorChannel* Channel = Connection->ActorChannels().FindRef(Actor);
+				UActorChannel* Channel = nullptr;
+				if (Version::Engine_Version >= 4.20) {
+					Channel = Connection->FindActorChannelRef(ActorInfo->WeakActor);
+				}
+				else {
+					Channel = Connection->ActorChannels().FindRef(Actor);
+				}
 
 				if (!Channel)
 				{
