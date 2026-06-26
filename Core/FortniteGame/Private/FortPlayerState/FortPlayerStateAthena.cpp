@@ -231,7 +231,7 @@ void AFortPlayerStateAthena::OnRep_TeamIndex()
 
 uint8 AFortPlayerStateAthena::ToDeathCause(const FGameplayTagContainer& InTags, bool bWasDBNO)
 {
-	if (Version::Fortnite_Version <= 3.0 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+	if (Version::Fortnite_Version <= 3.1 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 		// need to reimplement this for older versions, but for now just return unspecified
 		return EDeathCause::GetUnspecified();
 	}

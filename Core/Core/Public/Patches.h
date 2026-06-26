@@ -8,7 +8,7 @@ public:
 	static void ApplyPatches() {
 		// i like to keep patches at a minimal and if i can i would like to figure out a way to not use these patches
 
-		if (Version::Fortnite_Version >= 1.63 && Version::Fortnite_Version <= 3.0) {
+		if (Version::Fortnite_Version >= 1.63 && Version::Fortnite_Version <= 3.1) {
 			uintptr_t Patch1 = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8B F9 89 B1 ? ? ? ? 48 8B 89 ? ? ? ? 48 85 C9 74 ? E8 ? ? ? ? 89 B7").Get();
 			if (Patch1) {
 				MH_CreateHook((LPVOID)Patch1, RetNullptr, nullptr);
@@ -28,7 +28,7 @@ public:
 			}
 		}
 
-		if (Version::Fortnite_Version >= 2.1 && Version::Fortnite_Version <= 3.0)
+		if (Version::Fortnite_Version >= 2.1 && Version::Fortnite_Version <= 3.1)
 		{
 			uintptr_t WidgetCrashPatch = Memcury::Scanner::FindStringRef(L"Unable to create the widget {0}, no outer provided.").FindFunctionStart().Get();
 			
@@ -45,12 +45,6 @@ public:
 		}
 
 		if (Version::Fortnite_Version >= 3.0 && Version::Fortnite_Version <= 3.0) {
-			/*uintptr_t Patch5 = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 83 79 ? 00 48 8B F9 75").Get(); // bro i hate 3.0
-			if (Patch5) {
-				MH_CreateHook((LPVOID)Patch5, True, nullptr);
-				Log("Patched: " + std::to_string(Patch5 - ImageBase) + " with True");
-			}*/
-
 			uintptr_t Patch6 = Memcury::Scanner::FindPattern("40 53 55 56 48 81 EC ? ? ? ? 33 F6 48 8B D9").Get();
 			if (Patch6) {
 				MH_CreateHook((LPVOID)Patch6, RetNull, nullptr);

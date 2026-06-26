@@ -9522,6 +9522,11 @@ uintptr_t Finder::FindUFortKismetLibrary_GetWeaponStatsRow() {
 				Addr = uint64_t(Ptr);
 				break;
 			}
+			else if (*Ptr == 0x40 && *(Ptr + 1) == 0x53)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
 		}
 	}
 
