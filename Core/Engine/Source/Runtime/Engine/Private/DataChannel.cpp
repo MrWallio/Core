@@ -11,8 +11,14 @@
 
 void UChannel::Close()
 {
-	void (*&CloseInternal)(UChannel*) = decltype(CloseInternal)(VTable[Finder::FindUChannel_CloseVFT()]);
-	CloseInternal(this);
+	if (!this) {
+		return;
+	}
+
+	if (Finder::FindUChannel_CloseVFT()) {
+		void (*&CloseInternal)(UChannel*) = decltype(CloseInternal)(VTable[Finder::FindUChannel_CloseVFT()]);
+		CloseInternal(this);
+	}
 }
 
 void UChannel::StartBecomingDormant()
