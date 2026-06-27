@@ -513,7 +513,11 @@ uintptr_t Finder::FindInternalServerTryActivateAbilityVFT() {
 		return ServerOffsets::InternalServerTryActivateAbilityVFT;
 	uintptr_t VTableIndex = 0x0;
 
-	UObject* DefaultObj = UAbilitySystemComponent::GetDefaultObj();
+	UObject* DefaultObj = UAbilitySystemComponent::StaticClass()->GetDefaultObject();
+	if (!DefaultObj) {
+		Log("Failed to find UAbilitySystemComponent default object.");
+		return 0;
+	}
 
 	if (Version::Engine_Version > 4.20)
 	{
@@ -522,7 +526,7 @@ uintptr_t Finder::FindInternalServerTryActivateAbilityVFT() {
 	}
 	else
 	{
-		auto ServerTryActivateAbilityWithEventData = DefaultObj->FindFunction("ServerTryActivateAbilityWithEventData");
+		auto ServerTryActivateAbilityWithEventData = (UFunction*)FUObjectArray::FindObject("Function /Script/GameplayAbilities.AbilitySystemComponent.ServerTryActivateAbilityWithEventData");
 		auto ServerTryActivateAbilityWithEventDataNativeAddr = __int64(DefaultObj->VTable[ServerTryActivateAbilityWithEventData->GetVTableIndex()]);
 
 		for (int i = 0; i < 400; i++)
@@ -6763,6 +6767,11 @@ uintptr_t Finder::FindUNetDriver__DestroyedStartupOrDormantActors() {
 				break;
 			}
 			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x81 && *(Ptr + 2) == 0xC6) {
+				uint32_t Offset = *reinterpret_cast<uint32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+			else if (*Ptr == 0x4D && *(Ptr + 1) == 0x8D) {
 				uint32_t Offset = *reinterpret_cast<uint32_t*>(Ptr + 3);
 				Addr = static_cast<uintptr_t>(Offset);
 				break;
