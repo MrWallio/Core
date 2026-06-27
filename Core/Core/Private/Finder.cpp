@@ -286,12 +286,12 @@ uintptr_t Finder::FindStaticFindObject() {
 uintptr_t Finder::FindStaticLoadObject() {
 	if (ServerOffsets::StaticLoadObject)
 		return ServerOffsets::StaticLoadObject;
-	auto Addr = Memcury::Scanner::FindStringRef(L"STAT_LoadObject", false).Get();
+	uintptr_t Addr = 0;
 
 	if (!Addr)
 	{
 		auto String = Memcury::Scanner::FindStringRef(L"Calling StaticLoadObject during PostLoad may result in hitches during streaming.");
-		Addr = Memcury::Scanner::FindBytes(String, { 0x40, 0x55 }, 1024, 0, true);
+		Addr = String.FindFunctionStart().Get();
 	}
 
 	if (!Addr)
@@ -302,6 +302,11 @@ uintptr_t Finder::FindStaticLoadObject() {
 	if (Addr)
 	{
 		ServerOffsets::StaticLoadObject = Addr - ImageBase;
+	}
+	if (!Addr) {
+		if (Version::Fortnite_CL == 4008490) {
+			ServerOffsets::StaticLoadObject = 0x14D62F0;
+		}
 	}
 
 	Log("StaticLoadObject found at: 0x" + std::format("{:X}", ServerOffsets::StaticLoadObject));
@@ -5491,6 +5496,10 @@ uintptr_t Finder::FindUGameplayStatics_BeginDeferredActorSpawnFromClass() {
 		{
 			auto Ptr = (uint8_t*)(StringAddr - i);
 			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
+				Addr = reinterpret_cast<uintptr_t>(Ptr);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
 				Addr = reinterpret_cast<uintptr_t>(Ptr);
 				break;
 			}

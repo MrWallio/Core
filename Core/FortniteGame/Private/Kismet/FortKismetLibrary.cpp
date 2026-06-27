@@ -428,14 +428,10 @@ bool UFortKismetLibrary::PickLootDrops(
 		if (LootTierDataTables.Num() == 0) {
 			UDataTable* DefaultLTD = nullptr;
 			if (FortGameModeAthena) {
-				DefaultLTD = (UDataTable*)StaticLoadObject(
-					"/Game/Items/Datatables/AthenaLootTierData_Client.AthenaLootTierData_Client"
-				);
+				DefaultLTD = StaticLoadObject("/Game/Items/Datatables/AthenaLootTierData_Client.AthenaLootTierData_Client")->Cast<UDataTable>();
 			}
 			else {
-				DefaultLTD = (UDataTable*)StaticLoadObject(
-					"/Game/Items/Datatables/LootTierData_Client.LootTierData_Client"
-				);
+				DefaultLTD = StaticLoadObject("/Game/Items/Datatables/LootTierData_Client.LootTierData_Client")->Cast<UDataTable>();
 			}
 			if (DefaultLTD) {
 				LootTierDataTables.Add(DefaultLTD);
@@ -447,14 +443,10 @@ bool UFortKismetLibrary::PickLootDrops(
 		if (LootPackagesDataTables.Num() == 0) {
 			UDataTable* DefaultLP = nullptr;
 			if (FortGameModeAthena) {
-				DefaultLP = (UDataTable*)StaticLoadObject(
-					"/Game/Items/Datatables/AthenaLootPackages_Client.AthenaLootPackages_Client"
-				);
+				DefaultLP = StaticLoadObject("/Game/Items/Datatables/AthenaLootPackages_Client.AthenaLootPackages_Client")->Cast<UDataTable>();
 			}
 			else {
-				DefaultLP = (UDataTable*)StaticLoadObject(
-					"/Game/Items/Datatables/LootPackages_Client.LootPackages_Client"
-				);
+				DefaultLP = StaticLoadObject("/Game/Items/Datatables/LootPackages_Client.LootPackages_Client")->Cast<UDataTable>();
 			}
 
 			if (DefaultLP) {

@@ -65,5 +65,13 @@ public:
 				}
 			}
 		}*/
+
+		if (Version::Fortnite_Version >= 3.5 && Version::Fortnite_Version <= 3.5) {
+			uintptr_t Patch7 = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 49 89 5B ? 48 8D 05 ? ? ? ? 48 8B 1D").Get();
+			if (Patch7) {
+				MH_CreateHook((LPVOID)Patch7, RetNullptr, nullptr);
+				Log("Patched: " + std::to_string(Patch7 - ImageBase) + " with RetNullptr");
+			}
+		}
 	}
 };
