@@ -90,6 +90,8 @@ DWORD Main(LPVOID)
         }
         Log(std::format("Fortnite CL: {}", Version::Fortnite_CL));
 
+        Sleep(2000);
+
         Finder::SetupOffsets();
 
         Utils::DumpGObjects(false);

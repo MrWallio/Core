@@ -5700,7 +5700,8 @@ uintptr_t Finder::FindUAbilitySystemComponent_GiveAbilityAndActivateOnce() {
 
 uintptr_t Finder::FindAFortPickup_FinishedTargetSpline() {
 	static uintptr_t Addr = 0;
-	if (ServerOffsets::AFortPickup_FinishedTargetSpline)
+	static bool bInitialized = false;
+	if (ServerOffsets::AFortPickup_FinishedTargetSpline || bInitialized)
 		return ServerOffsets::AFortPickup_FinishedTargetSpline;
 
 	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"%s did not have PickupTargetInventoryOwnerInterface to pickup %s, already dead: %d").Get();
@@ -5715,10 +5716,106 @@ uintptr_t Finder::FindAFortPickup_FinishedTargetSpline() {
 		}
 	}
 
+	if (!Addr)
+	{
+		if (Version::Engine_Version == 4.16 || Version::Engine_Version == 4.19) {
+			Addr = Memcury::Scanner::FindPattern("4C 8B DC 53 55 56 48 83 EC 60 48 8B F1 48 8B 89 ? ? ? ? 48 85 C9").Get();
+		}
+		else if (Version::Engine_Version == 4.20)
+		{
+			Addr = Memcury::Scanner::FindPattern("4C 8B DC 53 55 56 48 83 EC 60 48 8B F1 48 8B 89", false).Get();
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC 20 48 8B D9 48 8B 89 ? ? ? ? 48 85 C9 74 20 48 8D 44 24").Get();
+			}
+		}
+		else if (Version::Engine_Version == 4.21)
+		{
+			Addr = Memcury::Scanner::FindPattern("40 53 56 48 83 EC 38 4C 89 6C 24 ? 48 8B F1 4C 8B A9", false).Get();
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("40 53 56 57 48 83 EC 30 4C 89 6C 24 ? 48 8B F1 4C 8B A9 ? ? ? ? 4D 85 ED 0F 84").Get();
+			}
+		}
+		else if (Version::Engine_Version == 4.22) {
+			Addr = Memcury::Scanner::FindPattern("40 53 56 57 48 83 EC 30 4C 89 6C 24 ? 48 8B F1 4C 8B A9 ? ? ? ? 4D 85 ED 0F 84").Get();
+		}
+		else if (Version::Engine_Version >= 4.23 && Version::Engine_Version <= 4.26) {
+			Addr = Memcury::Scanner::FindPattern("40 53 56 48 83 EC 38 4C 89 6C 24 ? 48 8B F1 4C 8B A9 ? ? ? ? 4D 85 ED").Get();
+		}
+		else if (Version::Engine_Version == 4.27)
+		{
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 08 48 89 68 10 48 89 70 18 48 89 78 20 41 54 41 56 41 57 48 83 EC 20 48 8B B1 ? ? ? ? 48 8B D9 48 85 F6", false).Get();
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B B9 ? ? ? ? 48 8B D9 48 85 FF 74 16 48 89", false).Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 10 48 89 68 18 57 48 83 EC 20 48 8B D9 48 8B 89 ? ? ? ? 48 85").Get();
+			}
+		}
+		else if (Version::Engine_Version == 5.0)
+		{
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B B9", false).Get();
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 48 8D AC 24 ? ? ? ? 48 81 EC A0 01 00 00").Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 10 48 89 70 18 48 89 78 20 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B B9 ? ? ? ? 45 33 E4 48 8B D9 48 85 FF 74 0F").Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 10 48 89 70 18 48 89 78 20 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B B9 ? ? ? ? 48 8B D9 48 85 FF 0F 84").Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 10 48 89 70 18 48 89 78 20 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 8B 89 ? ? ? ? 45 33 ED").Get();
+			}
+		}
+		else if (Version::Engine_Version == 5.1)
+		{
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 55 41 56 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 8B 91").Get();
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 8B 81 ? ? ? ? 48 8B F9").Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 89 5C ?? ?? 48 89 74 ?? ?? 55 57 41 55 41 56 41 57 48 8D AC ?? ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 44 8B 91 ?? ?? ?? ??").Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 8B 81").Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 55 57 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 8B 89").Get();
+			}
+		}
+		else if (Version::Engine_Version == 5.2) {
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 8B 81 ? ? ? ? 48 8B D9 BE").Get();
+		}
+		else if (Version::Engine_Version >= 5.3)
+		{
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B E1 48 89 4C 24 ? 48 81 C1").Get();
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B F9 48 89 4C 24 ? 48 81 C1").Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B F9 48 89 4C 24 ? 48 81 C1 ? ? ? ? E8").Get();
+			}
+
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B F1 48 89 4C 24 ? 48 81 C1 ? ? ? ? E8").Get();
+			}
+		}
+	}
+
 	if (Addr) {
 		ServerOffsets::AFortPickup_FinishedTargetSpline = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("AFortPickup_FinishedTargetSpline found at: 0x" + std::format("{:X}", ServerOffsets::AFortPickup_FinishedTargetSpline));
 	return ServerOffsets::AFortPickup_FinishedTargetSpline;
 }
@@ -5930,15 +6027,15 @@ uintptr_t Finder::FindAFortPickup_SetPickupItems() {
 		else if (Version::Fortnite_Version <= 3.3) {
 			Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9 49 8B F8 48 8B F1 0F 85 ? ? ? ? 48 83 7A").Get();
 		}
-		else if (Version::Engine_Version == 4.20) {
+		else if (Version::Engine_Version == 4.20 || Version::Engine_Version == 4.21) {
 			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC 20 80 B9 ? ? ? ? ? 45 0F B6 F1 49 8B E8").Get();
-		}
-		else if (Version::Engine_Version == 4.21)
-		{
-			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 41 0F B6", false).Get();
+			if (!Addr) {
+				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 41 0F B6", false).Get();
+			}
 
-			if (!Addr)
+			if (!Addr) {
 				Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9").Get();
+			}
 		}
 		else if (Version::Engine_Version == 4.22) {
 			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 41 56 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 45 0F B6 F1").Get();
@@ -5952,9 +6049,9 @@ uintptr_t Finder::FindAFortPickup_SetPickupItems() {
 		else if (Version::Engine_Version == 4.26)
 		{
 			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC ? 80 B9").Get();
-
-			if (!Addr)
+			if (!Addr) {
 				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 56 57 41 57 48 83 EC ? 80 B9").Get();
+			}
 		}
 		else if (Version::Engine_Version == 4.27) {
 			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A").Get();
@@ -5962,9 +6059,9 @@ uintptr_t Finder::FindAFortPickup_SetPickupItems() {
 		else if (Version::Engine_Version >= 5.0)
 		{
 			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A F9").Get();
-
-			if (!Addr)
+			if (!Addr) {
 				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A F1").Get();
+			}
 		}
 	}
 	
@@ -7439,9 +7536,13 @@ uintptr_t Finder::FindUActorChannel_ReplicateActor() {
 		if (!Addr) {
 			uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ReplicateActor: bPausedUntilReliableACK is ending now that reliables have been ACK'd. %s").Get();
 			if (StringAddr) {
-				for (int i = 0; i < 512; i++) {
+				for (int i = 0; i < 1024; i++) {
 					auto Ptr = (uint8_t*)(StringAddr - i);
 					if (*Ptr == 0x40 && *(Ptr + 1) == 0x55) {
+						Addr = uint64_t(Ptr);
+						break;
+					}
+					else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
 						Addr = uint64_t(Ptr);
 						break;
 					}
@@ -7914,6 +8015,9 @@ uintptr_t Finder::FindCollectGarbage() {
 		return ServerOffsets::CollectGarbage;
 
 	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 8B F9 0F B6 DA").Get();
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 0F B6 DA 8B F9").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::CollectGarbage = Addr - ImageBase;
@@ -8370,9 +8474,24 @@ uintptr_t Finder::FindUAbilitySystemComponent_FindAbilitySpecFromHandle() {
 		return ServerOffsets::UAbilitySystemComponent_FindAbilitySpecFromHandle;
 	uintptr_t Addr = 0;
 	
-	Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 6B C1 ? 4C 03 C0 49 3B C0 74 ? 66 0F 1F 44 00 ? 39 50").Get();
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"STAT_FindAbilitySpecFromHandle").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1000; i++)
+		{
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x40 && *(Ptr + 1) == 0x53)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
+		}
+	}
+
 	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 69 C1 ? ? ? ? 4C 03 C0 49 3B C0 74 ? ? ? ? 39 50").Get();
+		Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 6B C1 ? 4C 03 C0 49 3B C0 74 ? 66 0F 1F 44 00 ? 39 50").Get();
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 69 C1 ? ? ? ? 4C 03 C0 49 3B C0 74 ? ? ? ? 39 50").Get();
+		}
 	}
 
 	if (Addr) {
@@ -8801,7 +8920,11 @@ uintptr_t Finder::FindUFortWorldItem_SetLoadedAmmoVFT() {
 	if (ServerOffsets::UFortWorldItem_SetLoadedAmmoVFT)
 		return ServerOffsets::UFortWorldItem_SetLoadedAmmoVFT;
 
-	bool bHasPhantomReserveAmmo = FFortItemEntry::StaticStruct()->FindPropertyByName("PhantomReserveAmmo") != nullptr;
+	UStruct* ItemEntryStruct = (UStruct*)FUObjectArray::FindObject("ScriptStruct /Script/FortniteGame.FortItemEntry");
+	if (!ItemEntryStruct)
+		return 0;
+
+	bool bHasPhantomReserveAmmo = ItemEntryStruct->FindPropertyByName("PhantomReserveAmmo") != nullptr;
 	uintptr_t SetOwningInventoryIdx = FindUFortWorldItem_SetOwningInventoryVFT();
 
 	if (bHasPhantomReserveAmmo) {
@@ -9792,6 +9915,10 @@ uintptr_t Finder::FindUNavigationSystem_CreateNavigationSystem() {
 	if (ServerOffsets::UNavigationSystem_CreateNavigationSystem)
 		return ServerOffsets::UNavigationSystem_CreateNavigationSystem;
 	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::UNavigationSystem_CreateNavigationSystem;
+	}
 	
 	Addr = Memcury::Scanner::FindPattern("48 89 74 24 ? 57 48 83 EC ? 33 F6 48 8B F9 48 85 C9").Get();
 
@@ -9799,6 +9926,7 @@ uintptr_t Finder::FindUNavigationSystem_CreateNavigationSystem() {
 		ServerOffsets::UNavigationSystem_CreateNavigationSystem = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("UNavigationSystem_CreateNavigationSystem found at: 0x" + std::format("{:X}", ServerOffsets::UNavigationSystem_CreateNavigationSystem));
 	return ServerOffsets::UNavigationSystem_CreateNavigationSystem;
 }
@@ -10507,7 +10635,12 @@ uintptr_t Finder::FindFName_Constructor1() {
 		return ServerOffsets::FName_Constructor1;
 	uintptr_t Addr = 0;
 
-	Addr = Memcury::Scanner::FindStringRef("GamepadNextBuildingOrBuildingPicker").ScanFor({ 0xE8 }).RelativeOffset(1).Get();
+	if (Version::Fortnite_CL == 4008490) {
+		Addr = ImageBase + 0x13179E0;
+	}
+	else {
+		Addr = Memcury::Scanner::FindStringRef("GamepadNextBuildingOrBuildingPicker").ScanFor({ 0xE8 }).RelativeOffset(1).Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::FName_Constructor1 = Addr - ImageBase;
