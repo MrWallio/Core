@@ -128,7 +128,7 @@ TArray<FFortLootPackageData*> FFortLootPackageData::GetCandidateLootPackages(
 			if (!CurrentLP->DoesLootPackageMatchWorldLevel(WorldLevel))
 				continue;
 
-			if (CurrentLP->LootPackageID.ToString() == LootPackageID.ToString())
+			if (CurrentLP->LootPackageID.ToString().ToString() == LootPackageID.ToString())
 			{
 				CandidateLootPackages.Add(CurrentLP);
 
@@ -166,7 +166,7 @@ TArray<FFortLootPackageData*> FFortLootPackageData::GetCandidateLootPackages(
 				if (!LootPackage->DoesLootPackageMatchWorldLevel(WorldLevel))
 					continue;
 
-				if (LootPackage->LootPackageID.ToString() == LootPackageID)
+				if (LootPackage->LootPackageID.ToString().ToString() == LootPackageID.ToString())
 				{
 					CandidateLootPackages.Add(LootPackage);
 
