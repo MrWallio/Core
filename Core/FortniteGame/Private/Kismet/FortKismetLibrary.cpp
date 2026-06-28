@@ -491,22 +491,17 @@ bool UFortKismetLibrary::PickLootDrops(
 		WorldLevel
 	);
 
-	Log("Start copy, FFortItemEntry::GetSize=" + std::to_string(FFortItemEntry::GetSize()));
 	for (int i = 0; i < LootItems.Num(); i++) {
-		Log("Before GetWithSize");
 		FFortItemEntry& LootItem = LootItems.GetWithSize(i, FFortItemEntry::GetSize());
-		Log("Before Add");
 		OutLootToDrop->Add(LootItem, FFortItemEntry::GetSize());
-		Log("After Add");
 	}
-	Log("Finished copy");
 
 	if (OutLootToDrop->Num() > 0) {
-		Log("UFortKismetLibrary::PickLootDrops: Successfully picked " + std::to_string(OutLootToDrop->Num()) + " loot items to drop!");
+		//Log("UFortKismetLibrary::PickLootDrops: Successfully picked " + std::to_string(OutLootToDrop->Num()) + " loot items to drop!");
 		return true;
 	}
 
-	Log("UFortKismetLibrary::PickLootDrops: No loot items were picked to drop!");
+	//Log("UFortKismetLibrary::PickLootDrops: No loot items were picked to drop!");
 	return false;
 }
 
