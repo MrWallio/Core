@@ -306,6 +306,7 @@ int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 
 	UEngine* GEngine = UEngine::GetEngine();
 
+	//Log("UNetDriver::ServerReplicateActors");
 	if (ClientConnections.Num() == 0)
 	{
 		return 0;

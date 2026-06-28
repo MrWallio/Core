@@ -122,14 +122,6 @@ DWORD Main(LPVOID)
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
-        if (Finder::FindCollectGarbage()) {
-            uintptr_t Patch1 = Finder::FindCollectGarbage() + ImageBase;
-            if (Patch1) {
-                MH_CreateHook((LPVOID)Patch1, RetNull, nullptr);
-                Log("Patched: " + std::to_string(Patch1 - ImageBase) + " with RetNull");
-            }
-        }
-
         if (Finder::FindCollectGarbageInternal()) {
             uintptr_t Patch2 = Finder::FindCollectGarbageInternal() + ImageBase;
             if (Patch2) {

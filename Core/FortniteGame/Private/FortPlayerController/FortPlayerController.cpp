@@ -40,7 +40,7 @@ void AFortPlayerController::ClientForceProfileQuery()
 void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
 	OnReadyToStartMatchOG(This);
 
-	if ((!This->QuickBars || !This->ClientQuickBars))
+	if (Version::Fortnite_Version <= 2.5 && (!This->QuickBars || !This->ClientQuickBars))
 	{
 		This->SpawnQuickBars();
 		This->SetupQuickBars();
@@ -66,6 +66,8 @@ void AFortPlayerController::SpawnQuickBars()
 				AActor* NewQuickBars = World->SpawnActor(AFortQuickBars::StaticClass(), FVector(), FRotator(), this);
 				if (NewQuickBars && NewQuickBars->Cast<AFortQuickBars>()) {
 					QuickBars = NewQuickBars->Cast<AFortQuickBars>();
+					QuickBars->ForceNetUpdate();
+					ForceNetUpdate();
 					Log("Spawned QuickBars: " + QuickBars->GetName().ToString());
 				}
 			}
@@ -76,6 +78,8 @@ void AFortPlayerController::SpawnQuickBars()
 				AActor* NewQuickBars = World->SpawnActor(AFortQuickBars::StaticClass(), FVector(), FRotator(), this);
 				if (NewQuickBars && NewQuickBars->Cast<AFortQuickBars>()) {
 					ClientQuickBars = NewQuickBars->Cast<AFortQuickBars>();
+					ClientQuickBars->ForceNetUpdate();
+					ForceNetUpdate();
 					Log("Spawned ClientQuickBars: " + ClientQuickBars->GetName().ToString());
 				}
 			}

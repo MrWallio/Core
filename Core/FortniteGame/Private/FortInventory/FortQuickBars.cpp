@@ -16,7 +16,6 @@ void AFortQuickBars::ServerAddItemInternal(const FGuid& Item, uint8 InQuickBar, 
 		Func = FindFunction("ServerAddItemInternal");
 
 	if (!Func) {
-		Log("AFortQuickBars::ServerAddItemInternal: Failed to find function!");
 		return;
 	}
 
@@ -39,10 +38,15 @@ void AFortQuickBars::ServerAddItemInternal(const FGuid& Item, uint8 InQuickBar, 
 
 void AFortQuickBars::ServerRemoveItemInternal(const FGuid& Item, bool bFindReplacement, bool bForce)
 {
+	if (!this) return;
 	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction("ServerRemoveItemInternal");
+
+	if (!Func) {
+		return;
+	}
 
 	struct FortQuickBars_ServerRemoveItemInternal final
 	{
@@ -63,10 +67,15 @@ void AFortQuickBars::ServerRemoveItemInternal(const FGuid& Item, bool bFindRepla
 
 void AFortQuickBars::EmptySlot(uint8 InQuickBar, int32 SlotIndex)
 {
+	if (!this) return;
 	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction("EmptySlot");
+
+	if (!Func) {
+		return;
+	}
 
 	struct FortQuickBars_EmptySlot final
 	{
@@ -86,10 +95,15 @@ void AFortQuickBars::EmptySlot(uint8 InQuickBar, int32 SlotIndex)
 
 void AFortQuickBars::ServerActivateSlotInternal(uint8 InQuickBar, int32 Slot, float ActivateDelay, bool bUpdatePreviousFocusedSlot)
 {
+	if (!this) return;
 	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction("ServerActivateSlotInternal");
+
+	if (!Func) {
+		return;
+	}
 
 	struct FortQuickBars_ServerActivateSlotInternal final
 	{
@@ -114,10 +128,15 @@ void AFortQuickBars::ServerActivateSlotInternal(uint8 InQuickBar, int32 Slot, fl
 
 void AFortQuickBars::EnableSlot(uint8 InQuickBar, int32 SlotIndex)
 {
+	if (!this) return;
 	static class UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction("EnableSlot");
+
+	if (!Func) {
+		return;
+	}
 
 	struct FortQuickBars_EnableSlot final
 	{
@@ -137,6 +156,7 @@ void AFortQuickBars::EnableSlot(uint8 InQuickBar, int32 SlotIndex)
 
 int32 AFortQuickBars::FindQuickBarSlotForItem(uint8 QuickBar, FGuid Guid) const
 {
+	if (!this) return -1;
 	if (!Guid.IsValid())
 		return -1;
 
@@ -171,6 +191,7 @@ int32 AFortQuickBars::FindQuickBarSlotForItem(uint8 QuickBar, FGuid Guid) const
 
 void AFortQuickBars::EmptyQuickbarSlot(FGuid Guid)
 {
+	if (!this) return;
 	if (!Guid.IsValid())
 		return;
 
@@ -200,15 +221,18 @@ void AFortQuickBars::EmptyQuickbarSlot(FGuid Guid)
 
 AFortPlayerController* AFortQuickBars::GetOwnerPlayerController() const
 {
+	if (!this) return nullptr;
 	return Owner ? Owner->Cast<AFortPlayerController>() : nullptr;
 }
 
 void AFortQuickBars::EquipHarvestingTool() {
+	if (!this) return;
 	ServerActivateSlotInternal(EFortQuickBars::GetPrimary(), 0, 0.f, true);
 }
 
 void AFortQuickBars::AddItemToQuickBar(FGuid Guid, uint8 QuickBar)
 {
+	if (!this) return;
 	if (!Guid.IsValid())
 		return;
 
@@ -217,25 +241,36 @@ void AFortQuickBars::AddItemToQuickBar(FGuid Guid, uint8 QuickBar)
 
 void AFortQuickBars::OnRep_PrimaryQuickBar()
 {
+	if (!this) return;
 	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction("OnRep_PrimaryQuickBar");
+
+	if (!Func) {
+		return;
+	}
 
 	ProcessEvent(Func, nullptr);
 }
 
 void AFortQuickBars::OnRep_SecondaryQuickBar()
 {
+	if (!this) return;
 	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction("OnRep_SecondaryQuickBar");
 
+	if (!Func) {
+		return;
+	}
+
 	ProcessEvent(Func, nullptr);
 }
 
 bool AFortQuickBars::EquipItem(FGuid Guid) {
+	if (!this) return false;
 	if (!Guid.IsValid())
 		return false;
 

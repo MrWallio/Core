@@ -204,7 +204,7 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 		Pickup->bOnlyRelevantToOwner = true;
 	}
 
-	//Pickup->ForceNetUpdate();
+	Pickup->ForceNetUpdate();
 
 	//Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Spawned Pickup: " + Pickup->GetName().ToString());
 	return Pickup;

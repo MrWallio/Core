@@ -44,7 +44,7 @@ void UAbilitySystemComponent::InternalServerTryActivateAbility(UAbilitySystemCom
 		return;
 	}
 
-	const UGameplayAbility* AbilityToActivate = Spec->Ability;
+	UGameplayAbility* AbilityToActivate = Spec->Ability;
 	if (!AbilityToActivate)
 	{
 		Log("InternalServerTryActiveAbility. Rejecting ClientActivation of unconfigured spec ability!");

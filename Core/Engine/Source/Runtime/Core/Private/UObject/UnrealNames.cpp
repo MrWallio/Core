@@ -11,7 +11,11 @@ const FNameEntry* FName::GetComparisonNameEntry() const
 
 FString FName::ToString() const
 {
-	FString Out = FString();
+	if (IsNone()) {
+		return L"None";
+	}
+
+	FString Out = L"";
 
 	if (Finder::FindFName_ToStringOut() != 0)
 	{

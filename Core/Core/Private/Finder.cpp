@@ -5125,72 +5125,49 @@ uintptr_t Finder::FindUNetDriver_TickFlush() {
 		return ServerOffsets::UNetDriver_TickFlush;
 
 	static bool bInitialized = false;
+	if (bInitialized) {
+		return ServerOffsets::UNetDriver_TickFlush;
+	}
 
-	if (!bInitialized)
-	{
-		bInitialized = true;
+	auto sRef = Memcury::Scanner::FindStringRef(L"STAT_NetTickFlush");
+	if (sRef.IsValid()) {
+		Addr = sRef.FindFunctionStart().Get();
+	}
 
+	if (!Addr) {
 		Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 53 56 57 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 41 0F 29 7B").Get();
-		if (!Addr) {
-			Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 45 0F 29 43 ? 45 0F 29 4B ? 48 8B 05 ? ? ? ? 48").Get();
-		}
+	}
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 45 0F 29 43 ? 45 0F 29 4B ? 48 8B 05 ? ? ? ? 48").Get();
+	}
 
-		else if (Version::Engine_Version >= 4.27 && Version::Engine_Version < 5.0)
-		{
-			Addr = Memcury::Scanner::FindPattern(
-				"48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 B8 0F 29 78 A8 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 8A")
-				.Get();
+	if (!Addr && Version::Engine_Version >= 4.27 && Version::Engine_Version < 5.0)
+	{
+		Addr = Memcury::Scanner::FindPattern(
+			"48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 B8 0F 29 78 A8 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 8A")
+			.Get();
 
-			if (!Addr)
-				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 B8 0F 29 78 A8 48 8B "
-					"05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 0F")
-				.Get();
+		if (!Addr)
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 B8 0F 29 78 A8 48 8B "
+				"05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 0F")
+			.Get();
 
-			if (!Addr)
-				Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 B8 0F 29 78 A8 48 8B "
-					"05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B F9 48 89 4D 38 48 8D 4D 40")
-				.Get();
-		}
-		else if (!Addr)
-		{
-			Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 45 0F 29 43 ? 45 0F 29 4B ? 48 8B 05 ? ? ? ? 48").Get();
-			if (!Addr) {
-				auto sRef = Memcury::Scanner::FindStringRef(L"STAT_NetTickFlush", false).Get();
-				if (sRef) {
-					for (int i = 0; i < 1000; i++)
-					{
-						auto Ptr = (uint8_t*)(sRef - i);
+		if (!Addr)
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 18 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 B8 0F 29 78 A8 48 8B "
+				"05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B F9 48 89 4D 38 48 8D 4D 40")
+			.Get();
+	}
 
-						if (*Ptr == 0x48 && *(Ptr + 1) == 0x8b && *(Ptr + 2) == 0xc4)
-						{
-							Addr = uint64_t(Ptr);
-							break;
-						}
-						else if (*Ptr == 0x4c && *(Ptr + 1) == 0x8b && *(Ptr + 2) == 0xdc)
-						{
-							Addr = uint64_t(Ptr);
-							break;
-						}
-						else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5c)
-						{
-							Addr = uint64_t(Ptr);
-							break;
-						}
-						else if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
-						{
-							Addr = uint64_t(Ptr);
-							break;
-						}
-					}
-				}
-			}
-		}
+	if (!Addr)
+	{
+		Addr = Memcury::Scanner::FindPattern("4C 8B DC 55 49 8D AB ? ? ? ? 48 81 EC ? ? ? ? 45 0F 29 43 ? 45 0F 29 4B ? 48 8B 05 ? ? ? ? 48").Get();
 	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver_TickFlush = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("UNetDriver_TickFlush found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_TickFlush));
 	return ServerOffsets::UNetDriver_TickFlush;
 }
@@ -8483,24 +8460,12 @@ uintptr_t Finder::FindUAbilitySystemComponent_FindAbilitySpecFromHandle() {
 		return ServerOffsets::UAbilitySystemComponent_FindAbilitySpecFromHandle;
 	uintptr_t Addr = 0;
 	
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"STAT_FindAbilitySpecFromHandle").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1000; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x53)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
-	}
-
+	Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 6B C1 ? 4C 03 C0 49 3B C0 74 ? 66 0F 1F 44 00 ? 39 50").Get();
 	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 6B C1 ? 4C 03 C0 49 3B C0 74 ? 66 0F 1F 44 00 ? 39 50").Get();
-		if (!Addr) {
-			Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 69 C1 ? ? ? ? 4C 03 C0 49 3B C0 74 ? ? ? ? 39 50").Get();
-		}
+		Addr = Memcury::Scanner::FindPattern("48 8B 81 ? ? ? ? 48 63 89 ? ? ? ? 4C 69 C1 ? ? ? ? 4C 03 C0 49 3B C0 74 ? ? ? ? 39 50").Get();
+	}
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 48 8B 99 ? ? ? ? 48 8D 05").Get();
 	}
 
 	if (Addr) {
@@ -9994,8 +9959,10 @@ uintptr_t Finder::FindUWorld_ListenPatch() {
 
 	uintptr_t Addr = 0;
 
-	if (Version::Fortnite_Version >= 1.91 && Version::Fortnite_Version <= 3.0) {
-		// obfuscated
+	if (Version::Fortnite_Version >= 1.91 && Version::Fortnite_Version <= 3.5) {
+		if (Version::Fortnite_CL == 4008490) {
+			Addr = ImageBase + 0x250397C;
+		}
 	}
 	else {
 		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: failed to Listen(%s)").Get();

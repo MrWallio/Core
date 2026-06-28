@@ -52,7 +52,7 @@ public:
 			}
 		}
 
-		/*if (Version::Fortnite_Version == 3.3) { // Figured out theres a reason its disabled the hard way lol
+		/*if (Version::Fortnite_Version == 3.3) { // replgraph very unfinished lol
 			uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UFortReplicationGraph is disabled").Get();
 			if (StringAddr) {
 				for (int i = 0; i < 256; i++) {
@@ -71,6 +71,12 @@ public:
 			if (Patch7) {
 				MH_CreateHook((LPVOID)Patch7, RetNullptr, nullptr);
 				Log("Patched: " + std::to_string(Patch7 - ImageBase) + " with RetNullptr");
+			}
+
+			uintptr_t Patch8 = Memcury::Scanner::FindPattern("48 8B C4 57 48 81 EC ? ? ? ? 4C 8B 82").Get();
+			if (Patch8) {
+				MH_CreateHook((LPVOID)Patch8, True, nullptr);
+				Log("Patched: " + std::to_string(Patch8 - ImageBase) + " with True"); // bool AFortPoiVolume::OverlapsPawn
 			}
 		}
 	}

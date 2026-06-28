@@ -56,7 +56,7 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
 	FinishWorldInitializationOG(This, WorldManager);
 	
-	AFortGameStateAthena* GameState = This->GameState ? This->GameState->Cast<AFortGameStateAthena>() : nullptr;
+	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
 	if (!GameState) {
 		Log("FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
 		return;

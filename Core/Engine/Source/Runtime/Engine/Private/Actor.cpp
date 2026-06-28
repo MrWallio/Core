@@ -188,10 +188,17 @@ void AActor::CallPreReplication(UNetDriver* NetDriver)
 
 void AActor::ForceNetUpdate()
 {
+	if (!this) {
+		return;
+	}
 	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction("ForceNetUpdate");
+
+	if (!Func) {
+		return;
+	}
 
 	ProcessEvent(Func, nullptr);
 }

@@ -203,7 +203,7 @@ void Utils::Hook() {
 	UWorld::Hook();
 	AActor::Hook();
 	UNetDriver::Hook();
-	//UDemoNetDriver::Hook();
+	UDemoNetDriver::Hook();
 	AGameSession::Hook();
 	UAbilitySystemComponent::Hook();
 	APlayerController::Hook();
@@ -405,6 +405,18 @@ bool Utils::SetupDedicatedServer(FCoreConfig& Config) {
 	if (!bTravelOk) {
 		Log("Utils::SetupDedicatedServer: ServerTravel failed!");
 		return false;
+	}
+
+	while (true) {
+		UWorld* World = UWorld::GetWorld();
+		if (World && World->AuthorityGameMode) {
+			AGameMode* GameMode = World->AuthorityGameMode->Cast<AGameMode>();
+			if (GameMode && GameMode->MatchState == MatchState::InProgress) {
+				break;
+			}
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	return true;
