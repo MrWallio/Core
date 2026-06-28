@@ -29,4 +29,7 @@ public:
 	DefineUProperty(TSoftObjectPtr<UDataTable>, LootPackages);
 
 	DefineUProperty(TSoftObjectPtr<UCurveTable>, ResourceRates);
+public:
+	int32& GetPlaylistId();
+	FName& GetPlaylistName();
 };

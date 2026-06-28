@@ -774,6 +774,9 @@
     <ClInclude Include="Engine\Plugins\Runtime\ReplicationGraph\Source\Public\ReplicationGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortPlaylist\FortPlaylistManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">
@@ -1083,6 +1086,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\DemoNetDriver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortPlaylist\FortPlaylistManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortPlaylist\FortPlaylist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

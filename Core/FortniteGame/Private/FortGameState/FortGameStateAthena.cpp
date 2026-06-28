@@ -5,21 +5,6 @@
 #include "FortniteGame/Public/FortHero/FortHeroSpecialization.h"
 #include "FortniteGame/Public/FortHero/FortHeroType.h"
 
-void AFortGameStateAthena::OnRep_CurrentPlaylistInfo() {
-	if (Finder::FindAFortGameStateAthena_OnRep_CurrentPlaylistInfo()) {
-		void (*OnRep_CurrentPlaylistInfoInternal)(AFortGameStateAthena*) = decltype(OnRep_CurrentPlaylistInfoInternal)(ImageBase + Finder::FindAFortGameStateAthena_OnRep_CurrentPlaylistInfo());
-		OnRep_CurrentPlaylistInfoInternal(this);
-	}
-	else {
-		static UFunction* Func = nullptr;
-
-		if (Func == nullptr)
-			Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_CurrentPlaylistInfo"));
-
-		ProcessEvent(Func, nullptr);
-	}
-}
-
 void AFortGameStateAthena::OnRep_CurrentPlaylistId()
 {
 	static UFunction* Func = nullptr;
@@ -47,6 +32,7 @@ void AFortGameStateAthena::SetCurrentPlaylistId(int InPlaylistId) {
 	}
 	else {
 		CurrentPlaylistId = InPlaylistId;
+		OnRep_CurrentPlaylistId();
 	}
 }
 
@@ -125,6 +111,26 @@ void AFortGameStateAthena::OnRep_WinningPlayerState()
 	if (!Func) {
 		return;
 	}
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortGameStateAthena::OnRep_CurrentPlaylistData()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_CurrentPlaylistData");
+
+	ProcessEvent(Func, nullptr);
+}
+
+void AFortGameStateAthena::OnRep_CurrentPlaylistInfo()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_CurrentPlaylistInfo");
 
 	ProcessEvent(Func, nullptr);
 }

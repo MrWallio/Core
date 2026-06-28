@@ -106,8 +106,12 @@ void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FG
 	UCurveTable* ResourceRates = nullptr;
 
 	if (FortGameModeAthena && FortGameStateAthena) {
-		if (FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist) {
-			ResourceRates = FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist->ResourceRates.Get();
+		UFortPlaylistAthena* CurrentPlaylist = FortGameStateAthena->CurrentPlaylistData;
+		if (!CurrentPlaylist) {
+			CurrentPlaylist = FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist;
+		}
+		if (CurrentPlaylist) {
+			ResourceRates = CurrentPlaylist->ResourceRates.Get();
 		}
 	}
 	if (!ResourceRates)

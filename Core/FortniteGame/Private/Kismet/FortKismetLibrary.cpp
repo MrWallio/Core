@@ -402,27 +402,33 @@ bool UFortKismetLibrary::PickLootDrops(
 	TArray<UDataTable*> LootTierDataTables;
 	TArray<UDataTable*> LootPackagesDataTables;
 	if (LootTierDataTables.Num() == 0 || LootPackagesDataTables.Num() == 0) {
-		if (FortGameModeAthena && FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist) {
-			UDataTable* MainLTD = (UDataTable*)StaticLoadObject(
-				FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist->LootTierData.ObjectID.AssetPathName.ToString().ToString()
-			);
-
-			UDataTable* MainLP = (UDataTable*)StaticLoadObject(
-				FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist->LootPackages.ObjectID.AssetPathName.ToString().ToString()
-			);
-
-			if (MainLTD) {
-				LootTierDataTables.Add(MainLTD);
+		if (FortGameModeAthena) {
+			UFortPlaylistAthena* CurrentPlaylist = FortGameStateAthena->CurrentPlaylistData;
+			if (!CurrentPlaylist) {
+				CurrentPlaylist = FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist;
 			}
-			else {
-				Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot tier data table from playlist!");
-			}
+			if (CurrentPlaylist) {
+				UDataTable* MainLTD = (UDataTable*)StaticLoadObject(
+					CurrentPlaylist->LootTierData.ObjectID.AssetPathName.ToString().ToString()
+				);
 
-			if (MainLP) {
-				LootPackagesDataTables.Add(MainLP);
-			}
-			else {
-				Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot packages data table from playlist!");
+				UDataTable* MainLP = (UDataTable*)StaticLoadObject(
+					CurrentPlaylist->LootPackages.ObjectID.AssetPathName.ToString().ToString()
+				);
+
+				if (MainLTD) {
+					LootTierDataTables.Add(MainLTD);
+				}
+				else {
+					Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot tier data table from playlist!");
+				}
+
+				if (MainLP) {
+					LootPackagesDataTables.Add(MainLP);
+				}
+				else {
+					Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot packages data table from playlist!");
+				}
 			}
 		}
 		if (LootTierDataTables.Num() == 0) {
