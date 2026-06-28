@@ -17,18 +17,51 @@ public:
 	int32 ArrayMax;
 
 public:
-	TArray()
-		: Data(nullptr), ArrayNum(0), ArrayMax(0)
+	TArray() : Data(nullptr), ArrayNum(0), ArrayMax(0) {}
+
+	//~TArray() { Free(); }
+
+	TArray(const TArray& Other) : Data(nullptr), ArrayNum(0), ArrayMax(0)
 	{
+		if (Other.ArrayNum > 0)
+		{
+			Reserve(Other.ArrayNum);
+			std::memcpy(Data, Other.Data, Other.ArrayNum * ElementSize);
+			ArrayNum = Other.ArrayNum;
+		}
 	}
 
-	TArray(const TArray&) = default;
+	TArray& operator=(const TArray& Other)
+	{
+		if (this != &Other)
+		{
+			Free();
+			if (Other.ArrayNum > 0)
+			{
+				Reserve(Other.ArrayNum);
+				std::memcpy(Data, Other.Data, Other.ArrayNum * ElementSize);
+				ArrayNum = Other.ArrayNum;
+			}
+		}
+		return *this;
+	}
 
-	TArray(TArray&&) = default;
+	TArray(TArray&& Other) noexcept
+		: Data(Other.Data), ArrayNum(Other.ArrayNum), ArrayMax(Other.ArrayMax)
+	{
+		Other.Data = nullptr; Other.ArrayNum = 0; Other.ArrayMax = 0;
+	}
 
-public:
-	TArray& operator=(TArray&&) = default;
-	TArray& operator=(const TArray&) = default;
+	TArray& operator=(TArray&& Other) noexcept
+	{
+		if (this != &Other)
+		{
+			Free();
+			Data = Other.Data; ArrayNum = Other.ArrayNum; ArrayMax = Other.ArrayMax;
+			Other.Data = nullptr; Other.ArrayNum = 0; Other.ArrayMax = 0;
+		}
+		return *this;
+	}
 
 public:
 	inline int32 GetSlack() const { return ArrayMax - ArrayNum; }

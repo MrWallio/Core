@@ -230,6 +230,7 @@ namespace ServerOffsets {
 	inline uintptr_t AGameModeBase_InitGame = 0;
 	inline uintptr_t AGameModeBase_InitGameVFT = 0;
 	inline uintptr_t AGameModeBase_InitGameState = 0;
+	inline uintptr_t AGameModeBase_InitGameStateVFT = 0;
 	inline uintptr_t AGameModeBase_CanServerTravel = 0;
 	inline uintptr_t AGameModeBase_SpawnDefaultPawnFor = 0;
 	inline uintptr_t AGameModeBase_SpawnDefaultPawnAtTransform = 0;

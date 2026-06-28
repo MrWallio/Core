@@ -867,7 +867,7 @@ uintptr_t Finder::FindFMemory_Free() {
 		}
 	}
 
-	Log("FMemory::Free found at: 0x" + std::format("{:X}", ServerOffsets::FMemory_Free));
+	Log("FMemory_Free found at: 0x" + std::format("{:X}", ServerOffsets::FMemory_Free));
 	return ServerOffsets::FMemory_Free;
 }
 
@@ -883,7 +883,7 @@ uintptr_t Finder::FindFMemory_Realloc() {
 		ServerOffsets::FMemory_Realloc = Addr - ImageBase;
 	}
 
-	Log("FMemory::Realloc found at: 0x" + std::format("{:X}", ServerOffsets::FMemory_Realloc));
+	Log("FMemory_Realloc found at: 0x" + std::format("{:X}", ServerOffsets::FMemory_Realloc));
 	return ServerOffsets::FMemory_Realloc;
 }
 
@@ -3042,6 +3042,28 @@ uintptr_t Finder::FindAGameModeBase_InitGameState() {
 	return ServerOffsets::AGameModeBase_InitGameState;
 }
 
+uintptr_t Finder::FindAGameModeBase_InitGameStateVFT() {
+	if (ServerOffsets::AGameModeBase_InitGameStateVFT)
+		return ServerOffsets::AGameModeBase_InitGameStateVFT;
+
+	if (!FindAGameModeBase_InitGameState())
+		return 0;
+
+	void** VFT = ((UClass*)FUObjectArray::FindObject("Class /Script/Engine.GameModeBase"))->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 1024; i++)
+	{
+		if (VFT[i] == (void*)(FindAGameModeBase_InitGameState() + ImageBase))
+		{
+			ServerOffsets::AGameModeBase_InitGameStateVFT = i;
+			break;
+		}
+	}
+
+	Log("AGameModeBase_InitGameStateVFT found at: 0x" + std::format("{:X}", ServerOffsets::AGameModeBase_InitGameStateVFT));
+	return ServerOffsets::AGameModeBase_InitGameStateVFT;
+}
+
 uintptr_t Finder::FindAGameModeBase_CanServerTravel() {
 	if (ServerOffsets::AGameModeBase_CanServerTravel)
 		return ServerOffsets::AGameModeBase_CanServerTravel;
@@ -5097,12 +5119,6 @@ uintptr_t Finder::FindAFortGameModeAthena_InitGameState() {
 		ServerOffsets::AFortGameModeAthena_InitGameState = Addr - ImageBase;
 	}
 
-	if (!ServerOffsets::AFortGameModeAthena_InitGameState) {
-		if (Version::Fortnite_CL == 3700114) {
-			ServerOffsets::AFortGameModeAthena_InitGameState = 0x57D710;
-		}
-	}
-
 	Log("AFortGameModeAthena_InitGameState found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeAthena_InitGameState));
 	return ServerOffsets::AFortGameModeAthena_InitGameState;
 }
@@ -5111,10 +5127,13 @@ uintptr_t Finder::FindUFortPlaylistManager_InitializePlaylists() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UFortPlaylistManager_InitializePlaylists)
 		return ServerOffsets::UFortPlaylistManager_InitializePlaylists;
+	
 	Addr = Memcury::Scanner::FindPattern("48 89 4C 24 ? 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 33 F6 48 89 75").Get();
+	
 	if (Addr) {
 		ServerOffsets::UFortPlaylistManager_InitializePlaylists = Addr - ImageBase;
 	}
+
 	Log("UFortPlaylistManager_InitializePlaylists found at: 0x" + std::format("{:X}", ServerOffsets::UFortPlaylistManager_InitializePlaylists));
 	return ServerOffsets::UFortPlaylistManager_InitializePlaylists;
 }
@@ -11137,6 +11156,8 @@ void Finder::SetupOffsets() {
 	FindCollectGarbageInternal();
 
 	FindAActor_GetNetPriorityVFT();
+
+	FindAGameModeBase_InitGameStateVFT();
 
 	return;
 }

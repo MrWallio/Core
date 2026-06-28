@@ -370,6 +370,8 @@ bool UFortKismetLibrary::PickLootDrops(
 	int32 WorldLevel,
 	int32 ForcedLootTier)
 {
+	OutLootToDrop->Reset(0, FFortItemEntry::GetSize());
+
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("UFortKismetLibrary::PickLootDrops: Failed to get world!");
@@ -399,24 +401,32 @@ bool UFortKismetLibrary::PickLootDrops(
 		" In World: " + World->GetName().ToString()
 	);*/
 
-	TArray<UDataTable*> LootTierDataTables;
-	TArray<UDataTable*> LootPackagesDataTables;
+	static TArray<UDataTable*> LootTierDataTables;
+	static TArray<UDataTable*> LootPackagesDataTables;
 	if (LootTierDataTables.Num() == 0 || LootPackagesDataTables.Num() == 0) {
 		if (FortGameModeAthena) {
 			UFortPlaylistAthena* CurrentPlaylist = FortGameStateAthena->CurrentPlaylistData;
 			if (!CurrentPlaylist) {
 				CurrentPlaylist = FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist;
 			}
-			if (CurrentPlaylist) {
-				UDataTable* MainLTD = (UDataTable*)StaticLoadObject(
-					CurrentPlaylist->LootTierData.ObjectID.AssetPathName.ToString().ToString()
-				);
+			if (CurrentPlaylist && CurrentPlaylist->LootTierData && CurrentPlaylist->LootPackages) {
+				UDataTable* MainLTD = nullptr;
+				UDataTable* MainLP = nullptr;
 
-				UDataTable* MainLP = (UDataTable*)StaticLoadObject(
-					CurrentPlaylist->LootPackages.ObjectID.AssetPathName.ToString().ToString()
-				);
+				if (CurrentPlaylist->LootTierData) {
+					MainLTD = (UDataTable*)StaticLoadObject(
+						CurrentPlaylist->LootTierData.ObjectID.AssetPathName.ToString().ToString()
+					);
+				}
+
+				if (CurrentPlaylist->LootPackages) {
+					MainLP = (UDataTable*)StaticLoadObject(
+						CurrentPlaylist->LootPackages.ObjectID.AssetPathName.ToString().ToString()
+					);
+				}
 
 				if (MainLTD) {
+					Log("UFortKismetLibrary::PickLootDrops: Added to LootTierDataTables: " + MainLTD->GetName().ToString());
 					LootTierDataTables.Add(MainLTD);
 				}
 				else {
@@ -424,6 +434,7 @@ bool UFortKismetLibrary::PickLootDrops(
 				}
 
 				if (MainLP) {
+					Log("UFortKismetLibrary::PickLootDrops: Added to LootPackagesDataTables: " + MainLP->GetName().ToString());
 					LootPackagesDataTables.Add(MainLP);
 				}
 				else {
@@ -434,12 +445,14 @@ bool UFortKismetLibrary::PickLootDrops(
 		if (LootTierDataTables.Num() == 0) {
 			UDataTable* DefaultLTD = nullptr;
 			if (FortGameModeAthena) {
-				DefaultLTD = StaticLoadObject("/Game/Items/Datatables/AthenaLootTierData_Client.AthenaLootTierData_Client")->Cast<UDataTable>();
+				DefaultLTD = (UDataTable*)StaticLoadObject("/Game/Items/Datatables/AthenaLootTierData_Client.AthenaLootTierData_Client");
 			}
 			else {
-				DefaultLTD = StaticLoadObject("/Game/Items/Datatables/LootTierData_Client.LootTierData_Client")->Cast<UDataTable>();
+				DefaultLTD = (UDataTable*)StaticLoadObject("/Game/Items/Datatables/LootTierData_Client.LootTierData_Client");
 			}
+
 			if (DefaultLTD) {
+				Log("UFortKismetLibrary::PickLootDrops: Added to LootTierDataTables: " + DefaultLTD->GetName().ToString());
 				LootTierDataTables.Add(DefaultLTD);
 			}
 			else {
@@ -449,13 +462,14 @@ bool UFortKismetLibrary::PickLootDrops(
 		if (LootPackagesDataTables.Num() == 0) {
 			UDataTable* DefaultLP = nullptr;
 			if (FortGameModeAthena) {
-				DefaultLP = StaticLoadObject("/Game/Items/Datatables/AthenaLootPackages_Client.AthenaLootPackages_Client")->Cast<UDataTable>();
+				DefaultLP = (UDataTable*)StaticLoadObject("/Game/Items/Datatables/AthenaLootPackages_Client.AthenaLootPackages_Client");
 			}
 			else {
-				DefaultLP = StaticLoadObject("/Game/Items/Datatables/LootPackages_Client.LootPackages_Client")->Cast<UDataTable>();
+				DefaultLP = (UDataTable*)StaticLoadObject("/Game/Items/Datatables/LootPackages_Client.LootPackages_Client");
 			}
 
 			if (DefaultLP) {
+				Log("UFortKismetLibrary::PickLootDrops: Added to LootPackagesDataTables: " + DefaultLP->GetName().ToString());
 				LootPackagesDataTables.Add(DefaultLP);
 			}
 			else {
@@ -477,17 +491,22 @@ bool UFortKismetLibrary::PickLootDrops(
 		WorldLevel
 	);
 
+	Log("Start copy, FFortItemEntry::GetSize=" + std::to_string(FFortItemEntry::GetSize()));
 	for (int i = 0; i < LootItems.Num(); i++) {
+		Log("Before GetWithSize");
 		FFortItemEntry& LootItem = LootItems.GetWithSize(i, FFortItemEntry::GetSize());
+		Log("Before Add");
 		OutLootToDrop->Add(LootItem, FFortItemEntry::GetSize());
+		Log("After Add");
 	}
+	Log("Finished copy");
 
 	if (OutLootToDrop->Num() > 0) {
-		//Log("UFortKismetLibrary::PickLootDrops: Successfully picked " + std::to_string(OutLootToDrop.Num()) + " loot items to drop!");
+		Log("UFortKismetLibrary::PickLootDrops: Successfully picked " + std::to_string(OutLootToDrop->Num()) + " loot items to drop!");
 		return true;
 	}
 
-	//Log("UFortKismetLibrary::PickLootDrops: No loot items were picked to drop!");
+	Log("UFortKismetLibrary::PickLootDrops: No loot items were picked to drop!");
 	return false;
 }
 

@@ -317,6 +317,8 @@ public:
 
 	static uintptr_t FindAGameModeBase_InitGameState();
 
+	static uintptr_t FindAGameModeBase_InitGameStateVFT();
+
 	static uintptr_t FindAGameModeBase_CanServerTravel();
 
 	static uintptr_t FindUKismetStringLibrary_Conv_StringToName();

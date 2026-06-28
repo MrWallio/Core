@@ -114,7 +114,7 @@ DWORD Main(LPVOID)
 			UWorld* World = UWorld::GetWorld();
             if (World && World->AuthorityGameMode) {
 				AGameMode* GameMode = World->AuthorityGameMode->Cast<AGameMode>();
-				if (GameMode && GameMode->MatchState == MatchState::WaitingToStart) {
+				if (GameMode && GameMode->MatchState == MatchState::InProgress) {
                     break;
 				}
             }

@@ -48,6 +48,9 @@ public:
 	static inline uint8 (*PickTeamOG)(AFortGameModeAthena* This, uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor);
 	static uint8 PickTeam(AFortGameModeAthena* This, uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor);
 
+	static inline void (*InitGameStateOG)(AFortGameModeAthena* This);
+	static void InitGameState(AFortGameModeAthena* This);
+
 	static void Hook() {
 		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
 		HookEveryVTable(
@@ -86,6 +89,13 @@ public:
 			Finder::FindAFortGameMode_PickTeamVFT(),
 			PickTeam,
 			(LPVOID*)&PickTeamOG
+		);
+
+		HookEveryVTableIdx(
+			AFortGameModeAthena::StaticClass(),
+			Finder::FindAGameModeBase_InitGameStateVFT(),
+			InitGameState,
+			(LPVOID*)&InitGameStateOG
 		);
 
 		Log("Hooked AFortGameModeAthena");
