@@ -1235,7 +1235,7 @@ uintptr_t Finder::FindUObjectBaseUtility_GetInterfaceAddress() {
 		ServerOffsets::UObjectBaseUtility_GetInterfaceAddress = Addr - ImageBase;
 	}
 
-	Log("UObjectBaseUtility::GetInterfaceAddress found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_GetInterfaceAddress));
+	Log("UObjectBaseUtility_GetInterfaceAddress found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_GetInterfaceAddress));
 	return ServerOffsets::UObjectBaseUtility_GetInterfaceAddress;
 }
 
@@ -5970,11 +5970,11 @@ uintptr_t Finder::FindABuildingContainer_SpawnLootVFT() {
 	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ABuildingContainer::ServerOnAttemptInteract %s failed for %s").Get();
 	if (StringAddr)
 	{
-		for (int i = 0; i < 300; i++)
+		for (int i = 0; i < 512; i++)
 		{
 			if (*(uint8*)(StringAddr - i + 0) == 0x41 && *(uint8*)(StringAddr - i + 1) == 0xff)
 			{
-				ServerOffsets::ABuildingContainer_SpawnLootVFT = *(uint32_t*)(StringAddr - i + 2) / 8;
+				ServerOffsets::ABuildingContainer_SpawnLootVFT = *(uint32_t*)(StringAddr - i + 3) / 8;
 			}
 		}
 	}

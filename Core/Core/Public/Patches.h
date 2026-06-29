@@ -78,6 +78,12 @@ public:
 				MH_CreateHook((LPVOID)Patch8, True, nullptr);
 				Log("Patched: " + std::to_string(Patch8 - ImageBase) + " with True"); // bool AFortPoiVolume::OverlapsPawn
 			}
+
+			uintptr_t Patch9 = Memcury::Scanner::FindPattern("4C 8B DC 48 81 EC ? ? ? ? 49 89 5B ? 48 8D 05 ? ? ? ? 49 89 6B ? 48 8B D9 49 89 73 ? 33 F6").Get();
+			if (Patch9) {
+				MH_CreateHook((LPVOID)Patch9, RetNull, nullptr);
+				Log("Patched: " + std::to_string(Patch9 - ImageBase) + " with RetNull");
+			}
 		}
 	}
 };

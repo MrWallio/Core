@@ -754,14 +754,12 @@ void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* 
 	}
 
 	if (!This->CanAffordToPlaceBuildableClass(&BuildingClassData)) {
-		Log("ServerCreateBuildingActor: Cannot afford to place building!");
 		return;
 	}
 
 	TArray<ABuildingActor*> BuildingsToRemove;
 	uint8 OptionalAdjustment;
 	if (UFortKismetLibrary::CanPlaceBuildableClassInStructuralGrid(World, BuildingClassData.BuildingClass.Get(), BuildLoc, BuildRot, bMirrored, &BuildingsToRemove, &OptionalAdjustment)) {
-		Log("ServerCreateBuildingActor: Cannot place building at location!");
 		return;
 	}
 
@@ -967,20 +965,6 @@ void AFortPlayerController::ServerEndEditingBuildingActor(AFortPlayerController*
 
 	EditingTool->EditActor = nullptr;
 	EditingTool->OnRep_EditActor();
-}
-
-void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType) {
-	ServerAttemptInteractOG(This, ReceivingActor, InteractComponent, InteractType);
-
-	UWorld* World = UWorld::GetWorld();
-	if (!World) {
-		Log("AFortPlayerController::ServerAttemptInteract: World is null!");
-		return;
-	}
-
-	if (ReceivingActor) {
-		//Log("ReceivingActor: " + ReceivingActor->GetFullName());
-	}
 }
 
 void AFortPlayerController::ServerRemoveInventoryStateValue(AFortPlayerController* This, FGuid& ItemGuid, uint8 StateValueType) {

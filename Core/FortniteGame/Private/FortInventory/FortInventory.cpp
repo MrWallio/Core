@@ -333,7 +333,8 @@ FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
 	if (!RepEntry)
 		return nullptr;
 
-	RepEntry->CopyGenericValuesFrom(&ItemEntry);
+	RepEntry->LoadedAmmo = ItemEntry.LoadedAmmo;
+	RepEntry->Durability = ItemEntry.Durability;
 
 	return RepEntry;
 }
@@ -577,20 +578,43 @@ int32 AFortInventory::GetInventoryUsed()
 		return 0;
 	}
 
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC) {
+		return 0;
+	}
+
+	int32 InventoryUsed = 0;
+
 	if (Version::Fortnite_Version >= 1.9 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11)
 	{
 		IFortInventoryOwnerInterface* InventoryOwner = (IFortInventoryOwnerInterface*)Owner->GetInterfaceAddress(IFortInventoryOwnerInterface::StaticClass());
 		if (!InventoryOwner)
 		{
+			Log("AFortInventory::GetInventoryUsed: Owner does not implement IFortInventoryOwnerInterface!");
 			return 0;
 		}
 
 		int32(*GetInventoryUsedInternal)(IFortInventoryOwnerInterface*, uint8) = decltype(GetInventoryUsedInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryUsed());
-		return GetInventoryUsedInternal(InventoryOwner, InventoryType);
+		InventoryUsed = GetInventoryUsedInternal(InventoryOwner, InventoryType);
+	}
+	else {
+		int32(*GetInventoryUsedInternal)(AActor*, uint8) = decltype(GetInventoryUsedInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryUsed());
+		InventoryUsed = GetInventoryUsedInternal(Owner, InventoryType);
 	}
 
-	int32(*GetInventoryUsedInternal)(AActor*, uint8) = decltype(GetInventoryUsedInternal)(ImageBase + Finder::FindAFortInventory_GetInventoryUsed());
-	return GetInventoryUsedInternal(Owner, InventoryType);
+	// semi fallback just incase the above fails
+	if (InventoryUsed <= 0) {
+		InventoryUsed = 0;
+
+		for (int32 i = 0; i < Inventory.ReplicatedEntries.Num(); i++) {
+			FFortItemEntry& ItemEntry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
+			if (ItemEntry.ItemDefinition && ItemEntry.ItemDefinition->GetQuickBarForItem() == EFortQuickBars::GetPrimary()) {
+				InventoryUsed += 1;
+			}
+		}
+	}
+
+	return InventoryUsed;
 }
 
 bool AFortInventory::IsInventoryFull()
