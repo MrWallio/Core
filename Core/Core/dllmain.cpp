@@ -99,11 +99,23 @@ DWORD Main(LPVOID)
 
         Utils::Hook();
 
+        Sleep(1000);
+
         if (!Utils::SetupDedicatedServer(Config)) {
             Log("Failed to setup dedicated server!");
         }
 
-        Sleep(3000);
+        while (true) {
+            UWorld* World = UWorld::GetWorld();
+            if (World && World->AuthorityGameMode && World->GetName().ToString() != "Frontend") {
+                AGameMode* GameMode = World->AuthorityGameMode->Cast<AGameMode>();
+                if (GameMode && GameMode->MatchState == MatchState::InProgress) {
+                    break;
+                }
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
 
         Utils::RemoveLocalPlayer();
 		if (!Utils::LoadWorld(Config)) {
@@ -112,7 +124,7 @@ DWORD Main(LPVOID)
 
         while (true) {
 			UWorld* World = UWorld::GetWorld();
-            if (World && World->AuthorityGameMode) {
+            if (World && World->AuthorityGameMode && World->GetName().ToString() != "FortniteEmptyDedicated") {
 				AGameMode* GameMode = World->AuthorityGameMode->Cast<AGameMode>();
 				if (GameMode && GameMode->MatchState == MatchState::InProgress) {
                     break;

@@ -141,7 +141,6 @@ bool UWorld::Listen(FURL& InURL)
 		if (NetDriver == NULL)
 		{
 			Engine->BroadcastNetworkFailure(this, NULL, ENetworkFailure::NetDriverCreateFailure);
-			Log("Fucked up creating net driver");
 			return false;
 		}
 
