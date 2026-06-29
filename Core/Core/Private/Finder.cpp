@@ -303,11 +303,6 @@ uintptr_t Finder::FindStaticLoadObject() {
 	{
 		ServerOffsets::StaticLoadObject = Addr - ImageBase;
 	}
-	if (!Addr) {
-		if (Version::Fortnite_CL == 4008490) {
-			ServerOffsets::StaticLoadObject = 0x14D62F0;
-		}
-	}
 
 	Log("StaticLoadObject found at: 0x" + std::format("{:X}", ServerOffsets::StaticLoadObject));
 	return ServerOffsets::StaticLoadObject;
@@ -10630,12 +10625,7 @@ uintptr_t Finder::FindFName_Constructor1() {
 		return ServerOffsets::FName_Constructor1;
 	uintptr_t Addr = 0;
 
-	if (Version::Fortnite_CL == 4008490) {
-		Addr = ImageBase + 0x13179E0;
-	}
-	else {
-		Addr = Memcury::Scanner::FindStringRef("GamepadNextBuildingOrBuildingPicker").ScanFor({ 0xE8 }).RelativeOffset(1).Get();
-	}
+	Addr = Memcury::Scanner::FindStringRef("GamepadNextBuildingOrBuildingPicker").ScanFor({ 0xE8 }).RelativeOffset(1).Get();
 
 	if (Addr) {
 		ServerOffsets::FName_Constructor1 = Addr - ImageBase;
