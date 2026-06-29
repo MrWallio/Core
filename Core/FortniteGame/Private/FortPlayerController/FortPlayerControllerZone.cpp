@@ -124,6 +124,8 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 			This->WorldInventory->AddItem(EditTool);
 		}
 	}
+
+	This->WorldInventory->EquipHarvestingTool();
 }
 
 void AFortPlayerControllerZone::ServerReturnToMainMenu(AFortPlayerControllerZone* This) {

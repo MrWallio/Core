@@ -40,7 +40,7 @@ void AFortPlayerController::ClientForceProfileQuery()
 void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
 	OnReadyToStartMatchOG(This);
 
-	if (Version::Fortnite_Version <= 2.5 && (!This->QuickBars || !This->ClientQuickBars))
+	if (Version::Fortnite_Version <= 2.5 && !This->QuickBars)
 	{
 		This->SpawnQuickBars();
 		This->SetupQuickBars();
@@ -150,6 +150,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("SetMaxShield <MaxShield> - Sets the player's max shield.");
 		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] - Spawns an actor");
 		This->ClientMessage("ClearEquippedItem - Clears the currently equipped item.");
+		This->ClientMessage("GetWeaponStats - Gets the stats of the currently equipped weapon.");
 	}
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
@@ -527,6 +528,28 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 
 		This->WorldInventory->RemoveItem(This->MyFortPawn->CurrentWeapon->ItemEntryGuid);
 		This->ClientMessage("Cleared currently equipped item.");
+	}
+	else if (Parser.IsCommand("GetWeaponStats")) {
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+		AFortWeapon* CurrentWeapon = This->MyFortPawn->CurrentWeapon;
+		if (!CurrentWeapon) {
+			This->ClientMessage("CurrentWeapon is null!");
+			return;
+		}
+		UFortWeaponItemDefinition* WeaponDef = CurrentWeapon->WeaponData;
+		if (!WeaponDef) {
+			This->ClientMessage("WeaponData is null!");
+			return;
+		}
+
+		This->ClientMessage("=== Weapon Stats ===");
+		This->ClientMessage("Weapon Name: " + WeaponDef->GetName().ToString());
+		This->ClientMessage("ClipSize: " + std::to_string(WeaponDef->GetClipSize()));
+		This->ClientMessage("Durability: " + std::to_string(WeaponDef->GetDurability()));
+		This->ClientMessage("=== End of Weapon Stats ===");
 	}
 }
 

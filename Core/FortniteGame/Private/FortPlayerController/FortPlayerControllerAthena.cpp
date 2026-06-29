@@ -328,6 +328,8 @@ void AFortPlayerControllerAthena::OnReadyToStartMatch(AFortPlayerControllerAthen
 	if (This->CustomizationLoadout.Pickaxe) {
 		This->WorldInventory->AddItem(This->CustomizationLoadout.Pickaxe->WeaponDefinition);
 	}
+
+	This->WorldInventory->EquipHarvestingTool();
 }
 
 void AFortPlayerControllerAthena::ServerReturnToMainMenu(AFortPlayerControllerAthena* This) {

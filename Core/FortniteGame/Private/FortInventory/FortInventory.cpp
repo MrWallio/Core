@@ -335,6 +335,7 @@ FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
 
 	RepEntry->LoadedAmmo = ItemEntry.LoadedAmmo;
 	RepEntry->Durability = ItemEntry.Durability;
+	RepEntry->bIsDirty = true;
 
 	return RepEntry;
 }
@@ -657,8 +658,14 @@ bool AFortInventory::CanSwapForItem(UFortItemDefinition* Def)
 
 FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEntry, bool bSpawnPickup)
 {
-	if (!CanAddItem(NewItemEntry))
+	UWorld* World = UWorld::GetWorld();
+	if (!World)
 		return nullptr;
+
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC) {
+		return nullptr;
+	}
 
 	if (!CanSwapForItem(NewItemEntry.ItemDefinition))
 		return nullptr;
@@ -683,7 +690,29 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 
 	if (bSpawnPickup)
 	{
-		SpawnPickupFromEntry(OldItemEntry);
+		AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+			World,
+			OldItemEntry.ItemDefinition,
+			OldItemEntry.Count,
+			PC->Pawn->K2_GetActorLocation(),
+			*FVector::Allocate(),
+			-1,
+			true,
+			true,
+			true,
+			-1,
+			EFortPickupSourceTypeFlag::GetPlayer(),
+			EFortPickupSpawnSource::GetTossedByPlayer(),
+			PC,
+			false
+		);
+
+		Pickup->PrimaryPickupItemEntry.LoadedAmmo = OldItemEntry.LoadedAmmo;
+		Pickup->PrimaryPickupItemEntry.Durability = OldItemEntry.Durability;
+		Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+
+		Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+		Pickup->OnRep_PrimaryPickupItemEntry();
 	}
 
 	return AddedEntry;
@@ -718,6 +747,7 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 				{
 					PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
 				}
+
 				return true;
 			}
 		}
@@ -741,7 +771,14 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 			PC,
 			false
 		);
+
 		Pickup->PrimaryPickupItemEntry.LoadedAmmo = OverflowEntry.LoadedAmmo;
+		Pickup->PrimaryPickupItemEntry.Durability = OverflowEntry.Durability;
+		Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+
+		Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+		Pickup->OnRep_PrimaryPickupItemEntry();
+
 		return true;
 	}
 
