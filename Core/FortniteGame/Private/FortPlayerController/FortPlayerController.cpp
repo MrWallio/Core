@@ -980,7 +980,6 @@ void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, A
 
 	if (ReceivingActor) {
 		//Log("ReceivingActor: " + ReceivingActor->GetFullName());
-		ReceivingActor->ForceNetUpdate();
 	}
 }
 
