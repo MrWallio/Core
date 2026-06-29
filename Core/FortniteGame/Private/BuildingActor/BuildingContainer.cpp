@@ -153,18 +153,25 @@ void ABuildingContainer::PostUpdate(ABuildingContainer* This, uint8 PersistantSt
 			}
 		}
 		else {
-			if (This->SearchLootTierGroup == "Loot_Treasure") {
-				This->SearchLootTierGroup = "Loot_AthenaTreasure";
+			static FName Loot_Treasure = UKismetStringLibrary::Conv_StringToName("Loot_Treasure");
+			static FName Loot_Ammo = UKismetStringLibrary::Conv_StringToName("Loot_Ammo");
+			static FName Loot_AthenaTreasure = UKismetStringLibrary::Conv_StringToName("Loot_AthenaTreasure");
+			static FName Loot_AthenaAmmoLarge = UKismetStringLibrary::Conv_StringToName("Loot_AthenaAmmoLarge");
+			static FName Loot_AthenaFloorLoot = UKismetStringLibrary::Conv_StringToName("Loot_AthenaFloorLoot");
+			static FName Loot_AthenaFloorLoot_Warmup = UKismetStringLibrary::Conv_StringToName("Loot_AthenaFloorLoot_Warmup");
+
+			if (This->SearchLootTierGroup == Loot_Treasure) {
+				This->SearchLootTierGroup = Loot_AthenaTreasure;
 				This->bDestroyContainerOnSearch = false;
 			}
-			else if (This->SearchLootTierGroup == "Loot_Ammo") {
-				This->SearchLootTierGroup = "Loot_AthenaAmmoLarge";
+			else if (This->SearchLootTierGroup == Loot_Ammo) {
+				This->SearchLootTierGroup = Loot_AthenaAmmoLarge;
 				This->bDestroyContainerOnSearch = false;
 			}
-			else if (This->SearchLootTierGroup == "Loot_AthenaFloorLoot") {
+			else if (This->SearchLootTierGroup == Loot_AthenaFloorLoot) {
 				This->bDestroyContainerOnSearch = false;
 			}
-			else if (This->SearchLootTierGroup == "Loot_AthenaFloorLoot_Warmup") {
+			else if (This->SearchLootTierGroup == Loot_AthenaFloorLoot_Warmup) {
 				This->bDestroyContainerOnSearch = false;
 			}
 			else {

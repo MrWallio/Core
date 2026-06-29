@@ -401,8 +401,8 @@ bool UFortKismetLibrary::PickLootDrops(
 		" In World: " + World->GetName().ToString()
 	);*/
 
-	static TArray<UDataTable*> LootTierDataTables;
-	static TArray<UDataTable*> LootPackagesDataTables;
+	TArray<UDataTable*> LootTierDataTables;
+	TArray<UDataTable*> LootPackagesDataTables;
 	if (LootTierDataTables.Num() == 0 || LootPackagesDataTables.Num() == 0) {
 		if (FortGameModeAthena) {
 			UFortPlaylistAthena* CurrentPlaylist = FortGameStateAthena->CurrentPlaylistData;
@@ -426,7 +426,7 @@ bool UFortKismetLibrary::PickLootDrops(
 				}
 
 				if (MainLTD) {
-					Log("UFortKismetLibrary::PickLootDrops: Added to LootTierDataTables: " + MainLTD->GetName().ToString());
+					//Log("UFortKismetLibrary::PickLootDrops: Added to LootTierDataTables: " + MainLTD->GetName().ToString());
 					LootTierDataTables.Add(MainLTD);
 				}
 				else {
@@ -434,7 +434,7 @@ bool UFortKismetLibrary::PickLootDrops(
 				}
 
 				if (MainLP) {
-					Log("UFortKismetLibrary::PickLootDrops: Added to LootPackagesDataTables: " + MainLP->GetName().ToString());
+					//Log("UFortKismetLibrary::PickLootDrops: Added to LootPackagesDataTables: " + MainLP->GetName().ToString());
 					LootPackagesDataTables.Add(MainLP);
 				}
 				else {
@@ -452,7 +452,7 @@ bool UFortKismetLibrary::PickLootDrops(
 			}
 
 			if (DefaultLTD) {
-				Log("UFortKismetLibrary::PickLootDrops: Added to LootTierDataTables: " + DefaultLTD->GetName().ToString());
+				//Log("UFortKismetLibrary::PickLootDrops: Added to LootTierDataTables: " + DefaultLTD->GetName().ToString());
 				LootTierDataTables.Add(DefaultLTD);
 			}
 			else {
@@ -469,7 +469,7 @@ bool UFortKismetLibrary::PickLootDrops(
 			}
 
 			if (DefaultLP) {
-				Log("UFortKismetLibrary::PickLootDrops: Added to LootPackagesDataTables: " + DefaultLP->GetName().ToString());
+				//Log("UFortKismetLibrary::PickLootDrops: Added to LootPackagesDataTables: " + DefaultLP->GetName().ToString());
 				LootPackagesDataTables.Add(DefaultLP);
 			}
 			else {
