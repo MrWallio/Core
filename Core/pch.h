@@ -25,6 +25,9 @@
 #include <winternl.h>
 #include <cstdlib>
 #include <cmath>
+#include <intrin.h>
+#include <windows.h>
+#include <psapi.h>
 
 #include "../includes/memcury.h"
 #include "../includes/MinHook/MinHook.h"
@@ -234,5 +237,16 @@ struct _Pad_0x18
 {
     uint8_t Padding[0x18];
 };
+
+static bool IsAddressInModule(uintptr_t addr, HMODULE module)
+{
+    MODULEINFO mi{};
+    if (!GetModuleInformation(GetCurrentProcess(), module, &mi, sizeof(mi)))
+        return false;
+
+    const uintptr_t base = reinterpret_cast<uintptr_t>(mi.lpBaseOfDll);
+    const uintptr_t end = base + mi.SizeOfImage;
+    return addr >= base && addr < end;
+}
 
 #endif //PCH_H

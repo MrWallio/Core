@@ -151,17 +151,17 @@ public:
 
 		UFunction* ServerAttemptInventoryDropFunc = AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerAttemptInventoryDrop");
 		if (ServerAttemptInventoryDropFunc) {
-			HookEveryVTable(
+			HookEveryVTableIdx(
 				AFortPlayerController::StaticClass(),
-				ServerAttemptInventoryDropFunc,
+				ServerAttemptInventoryDropFunc->GetVTableIndex(),
 				ServerAttemptInventoryDrop,
 				nullptr
 			);
 		}
 		else {
-			HookEveryVTable(
+			HookEveryVTableIdx(
 				AFortPlayerController::StaticClass(),
-				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerSpawnInventoryDrop"),
+				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerSpawnInventoryDrop")->GetVTableIndex(),
 				ServerAttemptInventoryDrop,
 				nullptr
 			);

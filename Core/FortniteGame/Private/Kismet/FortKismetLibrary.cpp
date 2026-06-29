@@ -370,8 +370,6 @@ bool UFortKismetLibrary::PickLootDrops(
 	int32 WorldLevel,
 	int32 ForcedLootTier)
 {
-	OutLootToDrop->Reset(0, FFortItemEntry::GetSize());
-
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("UFortKismetLibrary::PickLootDrops: Failed to get world!");

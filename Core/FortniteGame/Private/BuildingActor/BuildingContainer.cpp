@@ -29,7 +29,6 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 		(This->GetActorRightVector() * LootSpawnLocation.Y) + (This->GetActorUpVector() * LootSpawnLocation.Z);
 
 	TArray<FFortItemEntry> LootDrops;
-
 	bool bSuccess = UFortKismetLibrary::PickLootDrops(This, &LootDrops, This->SearchLootTierGroup, 0, This->ReplicatedLootTier);
 
 	for (int i = 0; i < LootDrops.Num(); i++) {

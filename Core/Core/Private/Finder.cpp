@@ -291,7 +291,9 @@ uintptr_t Finder::FindStaticLoadObject() {
 	if (!Addr)
 	{
 		auto String = Memcury::Scanner::FindStringRef(L"Calling StaticLoadObject during PostLoad may result in hitches during streaming.");
-		Addr = String.FindFunctionStart().Get();
+		if (String.IsValid()) {
+			Addr = String.FindFunctionStart().Get();
+		}
 	}
 
 	if (!Addr)

@@ -28,6 +28,9 @@ void UObject::ProcessEvent(UFunction* Function, void* Parms)
 	if (!Function)
 		return;
 
+	if (!IsValidLowLevelFast())
+		return;
+
 	void (*&ProcessEventInternal)(UObject*, UFunction*, void*) = decltype(ProcessEventInternal)(VTable[Finder::FindProcessEventVFT()]);
 	ProcessEventInternal(this, Function, Parms);
 }

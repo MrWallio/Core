@@ -44,7 +44,7 @@ public:
 			}
 		}
 
-		if (Version::Fortnite_Version == 3.0) {
+		if (Version::Fortnite_Version >= 3.0 && Version::Fortnite_Version <= 3.5) {
 			uintptr_t Patch6 = Memcury::Scanner::FindPattern("40 53 55 56 48 81 EC ? ? ? ? 33 F6 48 8B D9").Get();
 			if (Patch6) {
 				MH_CreateHook((LPVOID)Patch6, RetNull, nullptr);

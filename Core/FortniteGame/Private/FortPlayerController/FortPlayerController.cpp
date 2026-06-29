@@ -293,11 +293,11 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			-1,
 			true,
 			true,
-			false,
+			true,
 			-1,
 			EFortPickupSourceTypeFlag::GetPlayer(),
 			EFortPickupSpawnSource::GetUnset(),
-			nullptr,
+			This,
 			false
 		);
 	}
