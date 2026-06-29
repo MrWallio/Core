@@ -10625,7 +10625,7 @@ uintptr_t Finder::FindFName_Constructor1() {
 		return ServerOffsets::FName_Constructor1;
 	uintptr_t Addr = 0;
 
-	Addr = Memcury::Scanner::FindStringRef("GamepadNextBuildingOrBuildingPicker").ScanFor({ 0xE8 }).RelativeOffset(1).Get();
+	Addr = Memcury::Scanner::FindStringRef("GamepadNextBuildingOrBuildingPicker").ScanFor("48 ? ? ? E8").RelativeOffset(5).Get();
 
 	if (Addr) {
 		ServerOffsets::FName_Constructor1 = Addr - ImageBase;
