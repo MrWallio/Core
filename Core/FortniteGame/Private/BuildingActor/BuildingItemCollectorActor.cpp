@@ -183,7 +183,7 @@ bool ABuildingItemCollectorActor::Setup() {
 		}
 	}
 
-	StartingGoalLevel = Rarity;
+	StartingGoalLevel = Rarity == -1 ? StartingGoalLevel : Rarity;
 
 	// build the items for each collector unit
 	for (int32 i = 0; i < ItemCollections.Num(); i++)
