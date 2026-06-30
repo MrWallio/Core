@@ -12,17 +12,15 @@
 #include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
 
 bool ABuildingItemCollectorActor::GrantOutput() {
-	Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: " + GetName().ToString());
-	
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
-		Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: World is nullptr!");
+		Log("ABuildingItemCollectorActor::GrantOutput: World is nullptr!");
 		return false;
 	}
 	
 	AFortPlayerController* PC = ControllingPlayer;
 	if (!PC) {
-		Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: PC is nullptr!");
+		Log("ABuildingItemCollectorActor::GrantOutput: PC is nullptr!");
 		return false;
 	}
 
@@ -36,7 +34,7 @@ bool ABuildingItemCollectorActor::GrantOutput() {
 	}
 
 	if (!Collection) {
-		Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: Collection not found!");
+		Log("ABuildingItemCollectorActor::GrantOutput: Collection not found!");
 		return false;
 	}
 
