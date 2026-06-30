@@ -243,6 +243,7 @@ void Utils::Hook() {
 	UFortQuestManager::Hook();
 	ABuildingItemCollectorActor::Hook();
 	AFortAthenaMapInfo::Hook();
+	AFortAthenaSupplyDrop::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

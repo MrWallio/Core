@@ -27,6 +27,7 @@
 #include "FortniteGame/Public/Info/FortTeamInfo.h"
 #include "FortniteGame/Public/FortPlaylist/FortPlaylistAthena.h"
 #include "FortniteGame/Public/FortPlaylist/FortPlaylistManager.h"
+#include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
 
 bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
 	if (This->bWorldIsReady
@@ -60,7 +61,7 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	
 	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
 	if (!GameState) {
-		Log("FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
+		Log("AFortGameModeAthena::FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
 		return;
 	}
 
@@ -71,6 +72,13 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 
 	GameState->OnRep_CurrentPlaylistData();
 	GameState->OnRep_CurrentPlaylistInfo();
+
+	if (GameState->MapInfo) {
+		GameState->MapInfo->SpawnLlamas();
+	}
+	else {
+		Log("AFortGameModeAthena::FinishWorldInitialization: MapInfo is null");
+	}
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {

@@ -17,3 +17,10 @@
 #include "FortniteGame/Public/Kismet/FortMissionLibrary.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 #include "FortniteGame/Public/BuildingActor/BuildingItemCollectorActor.h"
+
+int32 AFortAthenaMapInfo::SpawnLlamas() {
+	int32 SpawnedLlamas = 0;
+
+	Log("AFortAthenaMapInfo::SpawnLlamas: Spawned " + std::to_string(SpawnedLlamas) + " llamas.");
+	return SpawnedLlamas;
+}

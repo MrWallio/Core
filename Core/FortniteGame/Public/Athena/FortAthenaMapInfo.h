@@ -27,4 +27,10 @@ public:
 
 	DefineUProperty(TSubclassOf<ABuildingItemCollectorActor>, VendingMachineClass);
 	DefineUProperty(FScalableFloat, VendingMachineRarityCount);
+public:
+	int32 SpawnLlamas();
+
+	static void Hook() {
+		Log("Hooked AFortAthenaMapInfo");
+	}
 };
