@@ -41,7 +41,13 @@ void AFortPlayerController::ClientForceProfileQuery()
 void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
 	OnReadyToStartMatchOG(This);
 
-	if (Version::Fortnite_Version <= 2.5 && !This->QuickBars)
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortPlayerController::OnReadyToStartMatch: World is null!");
+		return;
+	}
+
+	if ((!World || !World->NetDriver || !World->NetDriver->ReplicationDriver) && (This->_HasQuickBars() && !This->QuickBars))
 	{
 		This->SpawnQuickBars();
 		This->SetupQuickBars();

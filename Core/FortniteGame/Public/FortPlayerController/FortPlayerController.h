@@ -22,6 +22,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
 
 class AFortPlayerPawn;
 class ABuildingSMActor;

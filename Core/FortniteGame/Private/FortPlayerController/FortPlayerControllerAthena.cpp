@@ -317,7 +317,7 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDea
 }
 
 void AFortPlayerControllerAthena::OnReadyToStartMatch(AFortPlayerControllerAthena* This) {
-	if (This->CustomizationLoadout.Pickaxe) {
+	if (This->_HasCustomizationLoadout() && This->CustomizationLoadout.Pickaxe) {
 		This->WorldInventory->AddItem(This->CustomizationLoadout.Pickaxe->WeaponDefinition);
 	}
 	
