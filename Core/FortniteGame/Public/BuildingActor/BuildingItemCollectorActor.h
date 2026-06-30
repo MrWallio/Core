@@ -59,7 +59,7 @@ public:
 	DefineUProperty(UFortWorldItemDefinition*, ClientPausedActiveInputItem);
 	DefineUProperty(FVector, LootSpawnLocation);
 public:
-	void GrantOutput();
+	bool GrantOutput();
 
 	static inline void (*BeginPlayOG)(ABuildingItemCollectorActor* This);
 	static void BeginPlay(ABuildingItemCollectorActor* This);

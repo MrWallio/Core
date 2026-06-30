@@ -1198,10 +1198,11 @@ void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, A
 
 	if (ABuildingItemCollectorActor* ItemCollector = ReceivingActor->Cast<ABuildingItemCollectorActor>()) {
 		ItemCollector->ControllingPlayer = This;
-		ItemCollector->GrantOutput();
+		ItemCollector->bCurrentInteractionSuccess = ItemCollector->GrantOutput();
+		ItemCollector->ControllingPlayer = nullptr;
 	}
 
-	Log("ReceivingActor: " + ReceivingActor->GetName().ToString());
+	//Log("ReceivingActor: " + ReceivingActor->GetName().ToString());
 	ReceivingActor->ForceNetUpdate();
 }
 

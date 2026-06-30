@@ -7,25 +7,25 @@
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 
-void ABuildingItemCollectorActor::GrantOutput() {
+bool ABuildingItemCollectorActor::GrantOutput() {
 	Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: " + GetName().ToString());
 	
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: World is nullptr!");
-		return;
+		return false;
 	}
 	
 	AFortPlayerController* PC = ControllingPlayer;
 	if (!PC) {
 		Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: PC is nullptr!");
-		return;
+		return false;
 	}
 
 	FColletorUnitInfo* Collection = nullptr;
 	for (int32 i = 0; i < ItemCollections.Num(); i++) {
 		FColletorUnitInfo& CollectorUnitInfo = ItemCollections.GetWithSize(i, FColletorUnitInfo::GetSize());
-		if (CollectorUnitInfo.InputItem == ClientPausedActiveInputItem) {
+		if (CollectorUnitInfo.InputItem == ActiveInputItem) {
 			Collection = &CollectorUnitInfo;
 			break;
 		}
@@ -33,7 +33,7 @@ void ABuildingItemCollectorActor::GrantOutput() {
 
 	if (!Collection) {
 		Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: Collection not found!");
-		return;
+		return false;
 	}
 
 	ClientPausedActiveInputItem = nullptr;
@@ -89,8 +89,7 @@ void ABuildingItemCollectorActor::GrantOutput() {
 		K2_DestroyActor();
 	}
 
-	// reset it
-	ControllingPlayer = nullptr;
+	return true;
 }
 
 void ABuildingItemCollectorActor::BeginPlay(ABuildingItemCollectorActor* This) {
