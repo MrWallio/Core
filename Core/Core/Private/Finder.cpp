@@ -9979,6 +9979,9 @@ uintptr_t Finder::FindUWorld_ListenPatch() {
 		if (Version::Fortnite_CL == 4008490) {
 			Addr = ImageBase + 0x250397C;
 		}
+		else if (Version::Fortnite_CL == 4019403) {
+			Addr = ImageBase + 0x25131EC;
+		}
 	}
 	else {
 		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"LoadMap: failed to Listen(%s)").Get();
@@ -10186,17 +10189,13 @@ uintptr_t Finder::FindUObject_CanCreateInCurrentContext() {
 
 	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Unable to spawn class '%s' due to client/server context.").Get();
 	if (StringAddr) {
-		int Skipped = 0;
 		for (int i = 0; i < 512; i++)
 		{
 			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0xE8)
+			if (*Ptr == 0xE8 && *(Ptr - 3) == 0x49)
 			{
-				if (Skipped == 1) {
-					Addr = Utils::GetCallDestination((uintptr_t)Ptr);
-					break;
-				}
-				Skipped++;
+				Addr = Utils::GetCallDestination((uintptr_t)Ptr);
+				break;
 			}
 		}
 	}
