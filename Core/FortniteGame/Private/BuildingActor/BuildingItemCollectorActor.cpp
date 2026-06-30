@@ -43,11 +43,13 @@ bool ABuildingItemCollectorActor::GrantOutput() {
 	ClientPausedActiveInputItem = nullptr;
 
 	float Cost = Collection->InputCount.Evaluate();
+	float FinalCost = Cost * (StartingGoalLevel + 1);
+
 	UFortItemDefinition* InputItemDef = Collection->InputItem;
 
 	FFortItemEntry* ItemEntry = PC->WorldInventory->FindItemEntry(InputItemDef);
-	if (ItemEntry) {
-		PC->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Cost);
+	if (ItemEntry && ItemEntry->Count >= FinalCost) {
+		PC->WorldInventory->RemoveItem(ItemEntry->ItemGuid, FinalCost);
 	}
 
 	FVector ItemCollectorLocation = K2_GetActorLocation();

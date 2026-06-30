@@ -62,7 +62,7 @@ TArray<FFortLootPackageData*> FFortLootPackageData::GetLootPackages(
 	int32 WorldLevel)
 {
 	if (!LootTierData) {
-		Log("FFortLootPackageData::GetLootPackages: LootTierData is null!");
+		//Log("FFortLootPackageData::GetLootPackages: LootTierData is null!");
 		return TArray<FFortLootPackageData*>();
 	}
 
@@ -110,7 +110,7 @@ TArray<FFortLootPackageData*> FFortLootPackageData::GetCandidateLootPackages(
 	TArray<FFortLootPackageData*> CandidateLootPackages;
 
 	if (!LootTierData) {
-		Log("FFortLootPackageData::GetCandidateLootPackages: LootTierData is null!");
+		//Log("FFortLootPackageData::GetCandidateLootPackages: LootTierData is null!");
 		return CandidateLootPackages;
 	}
 
@@ -195,7 +195,7 @@ TArray<FFortItemEntry> FFortLootPackageData::GetLootItems(
 	int32 WorldLevel)
 {
 	if (!LootTierData) {
-		Log("FFortLootPackageData::PickLootPackageData: LootTierData is null!");
+		//Log("FFortLootPackageData::PickLootPackageData: LootTierData is null!");
 		return TArray<FFortItemEntry>();
 	}
 
