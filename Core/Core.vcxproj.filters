@@ -780,6 +780,9 @@
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingItemCollectorActor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\Athena\FortAthenaMapInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">
@@ -1098,6 +1101,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingItemCollectorActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

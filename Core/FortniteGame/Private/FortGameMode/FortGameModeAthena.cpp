@@ -55,8 +55,8 @@ APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, ACont
 }
 
 void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager) {
-	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
 	FinishWorldInitializationOG(This, WorldManager);
+	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
 	
 	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
 	if (!GameState) {

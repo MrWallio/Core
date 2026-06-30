@@ -28,6 +28,8 @@
 #include <intrin.h>
 #include <windows.h>
 #include <psapi.h>
+#include <unordered_map>
+#include <numeric>
 
 #include "../includes/memcury.h"
 #include "../includes/MinHook/MinHook.h"

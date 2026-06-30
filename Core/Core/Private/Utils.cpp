@@ -36,6 +36,7 @@
 #include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
 #include "FortniteGame/Public/FortWeapon/FortDecoTool.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
+#include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -241,6 +242,7 @@ void Utils::Hook() {
 	AB_SupplyDropPlacement_C::Hook();
 	UFortQuestManager::Hook();
 	ABuildingItemCollectorActor::Hook();
+	AFortAthenaMapInfo::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

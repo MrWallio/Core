@@ -58,8 +58,12 @@ public:
 	DefineUProperty(UFortWorldItemDefinition*, ActiveInputItem);
 	DefineUProperty(UFortWorldItemDefinition*, ClientPausedActiveInputItem);
 	DefineUProperty(FVector, LootSpawnLocation);
+	DefineUProperty(int32, StartingGoalLevel);
+	DefineUProperty(bool, bTossOnGround);
 public:
 	bool GrantOutput();
+
+	bool Setup();
 
 	static inline void (*BeginPlayOG)(ABuildingItemCollectorActor* This);
 	static void BeginPlay(ABuildingItemCollectorActor* This);

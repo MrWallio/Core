@@ -29,6 +29,7 @@ public:
 	DefineUProperty(TSoftObjectPtr<UDataTable>, LootPackages);
 
 	DefineUProperty(TSoftObjectPtr<UCurveTable>, ResourceRates);
+	DefineUProperty(TSoftObjectPtr<UCurveTable>, GameData);
 public:
 	int32& GetPlaylistId();
 	FName& GetPlaylistName();

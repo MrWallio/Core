@@ -6,6 +6,10 @@
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
+#include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
+#include "FortniteGame/Public/FortPlaylist/FortPlaylistAthena.h"
+#include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
 
 bool ABuildingItemCollectorActor::GrantOutput() {
 	Log("ABuildingItemCollectorActor::VendWobble__FinishedFunc: " + GetName().ToString());
@@ -63,7 +67,7 @@ bool ABuildingItemCollectorActor::GrantOutput() {
 			FinalSpawnLocation,
 			FVector(),
 			-1,
-			true,
+			bTossOnGround,
 			true,
 			false,
 			-1,
@@ -92,42 +96,137 @@ bool ABuildingItemCollectorActor::GrantOutput() {
 	return true;
 }
 
-void ABuildingItemCollectorActor::BeginPlay(ABuildingItemCollectorActor* This) {
-	BeginPlayOG(This);
-
+bool ABuildingItemCollectorActor::Setup() {
 	UWorld* World = UWorld::GetWorld();
-	if (!World) {
-		return;
+	if (!World || !World->AuthorityGameMode || !World->GameState)
+		return false;
+
+	AFortGameMode* GameMode = World->AuthorityGameMode->Cast<AFortGameMode>();
+	AFortGameState* GameState = World->GameState->Cast<AFortGameState>();
+	if (!GameMode || !GameState)
+		return false;
+
+	if (!GameMode->bWorldIsReady) {
+		return false;
 	}
 
-	for (int32 i = 0; i < This->ItemCollections.Num(); i++) {
-		FColletorUnitInfo& CollectorUnitInfo = This->ItemCollections.GetWithSize(i, FColletorUnitInfo::GetSize());
-		if (CollectorUnitInfo.bUseDefinedOutputItem) {
-			continue;
+	int32 Rarity = -1;
+
+	UClass* VendingMachineClass = (UClass*)StaticLoadObject(
+		"/Game/Athena/Items/Gameplay/VendingMachine/B_Athena_VendingMachine.B_Athena_VendingMachine_C"
+	);
+
+	if (VendingMachineClass && IsA(VendingMachineClass))
+	{
+		AFortGameModeAthena* GameModeAthena = GameMode->Cast<AFortGameModeAthena>();
+		AFortGameStateAthena* GameStateAthena = GameState->Cast<AFortGameStateAthena>();
+		if (!GameModeAthena || !GameStateAthena) {
+			Log("ABuildingItemCollectorActor::BeginPlay: GameModeAthena or GameStateAthena is null!");
+			return false;
 		}
 
-		if (CollectorUnitInfo.OutputItemEntry.Num() > 0) {
+		if (!GameStateAthena->MapInfo) {
+			Log("ABuildingItemCollectorActor::BeginPlay: MapInfo is null!");
+			return false;
+		}
+
+		const auto& RarityCurve = GameStateAthena->MapInfo->VendingMachineRarityCount.Curve;
+		if (!RarityCurve.CurveTable) {
+			Log("ABuildingItemCollectorActor::BeginPlay: RarityCurve.CurveTable is null!");
+			return false;
+		}
+
+		float Weights[6] = { 0, 0, 0, 0, 0, 0 };
+		float TotalWeight = 0.0f;
+
+		for (int32 i = 0; i < 6; ++i)
+		{
+			float Weight = 0.0f;
+			UDataTableFunctionLibrary::EvaluateCurveTableRow(
+				RarityCurve.CurveTable,
+				RarityCurve.RowName,
+				(float)i,
+				nullptr,
+				&Weight,
+				FString()
+			);
+
+			if (Weight > 0.0f)
+			{
+				Weights[i] = Weight;
+				TotalWeight += Weight;
+			}
+		}
+
+		if (TotalWeight > 0.0f)
+		{
+			float RandomNumber = UKismetMathLibrary::RandomFloatInRange(0.0f, TotalWeight);
+
+			for (int32 i = 0; i < 6; ++i)
+			{
+				if (Weights[i] <= 0.0f)
+					continue;
+
+				if (RandomNumber <= Weights[i])
+				{
+					Rarity = i;
+					break;
+				}
+
+				RandomNumber -= Weights[i];
+			}
+		}
+	}
+
+	StartingGoalLevel = Rarity;
+
+	// build the items for each collector unit
+	for (int32 i = 0; i < ItemCollections.Num(); i++)
+	{
+		FColletorUnitInfo& CollectorUnitInfo = ItemCollections.GetWithSize(i, FColletorUnitInfo::GetSize());
+		if (CollectorUnitInfo.bUseDefinedOutputItem)
+			continue;
+
+		if (CollectorUnitInfo.OutputItemEntry.Num() > 0)
+		{
 			CollectorUnitInfo.OutputItemEntry.Empty();
 			CollectorUnitInfo.OutputItem = nullptr;
 		}
 
 		TArray<FFortItemEntry> LootDrops;
-		bool bSuccess = UFortKismetLibrary::PickLootDrops(World, &LootDrops, This->DefaultItemLootTierGroupName, -1, -1);
+		const bool bSuccess = UFortKismetLibrary::PickLootDrops(
+			World,
+			&LootDrops,
+			DefaultItemLootTierGroupName,
+			-1,
+			Rarity
+		);
 
-		if (bSuccess) {
-			for (int32 j = 0; j < LootDrops.Num(); j++) {
-				FFortItemEntry& ItemEntry = LootDrops.GetWithSize(j, FFortItemEntry::GetSize());
+		if (!bSuccess || LootDrops.Num() <= 0)
+			continue;
 
-				if (ItemEntry.ItemDefinition) {
-					if (!CollectorUnitInfo.OutputItem) {
-						CollectorUnitInfo.OutputItem = ItemEntry.ItemDefinition->Cast<UFortWorldItemDefinition>();
-					}
+		for (int32 j = 0; j < LootDrops.Num(); ++j)
+		{
+			FFortItemEntry& ItemEntry = LootDrops.GetWithSize(j, FFortItemEntry::GetSize());
+			if (!ItemEntry.ItemDefinition)
+				continue;
 
-					CollectorUnitInfo.OutputItemEntry.Add(ItemEntry);
-				}
+			if (!CollectorUnitInfo.OutputItem)
+			{
+				CollectorUnitInfo.OutputItem = ItemEntry.ItemDefinition->Cast<UFortWorldItemDefinition>();
 			}
+
+			CollectorUnitInfo.OutputItemEntry.Add(ItemEntry);
 		}
 	}
+
+	return true;
+}
+
+void ABuildingItemCollectorActor::BeginPlay(ABuildingItemCollectorActor* This) {
+	BeginPlayOG(This);
+
+	This->Setup();
 }
 
 void ABuildingItemCollectorActor::Hook() {

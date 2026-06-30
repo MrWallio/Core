@@ -277,6 +277,7 @@
     <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchTeamStats.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaPlayerMatchReport.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaRewardResult.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\FortAthenaMapInfo.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingGameplayActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingItemCollectorActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTrap.h" />
@@ -451,6 +452,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\World.cpp" />
     <ClCompile Include="FortniteGame\Private\AI\FortAIDirector.cpp" />
     <ClCompile Include="FortniteGame\Private\Asset\FortAssetManager.cpp" />
+    <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingActor.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingGameplayActor.cpp" />

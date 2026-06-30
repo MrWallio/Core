@@ -94,6 +94,17 @@ void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFort
 			Log("AFortGameModeZone::FinishWorldInitialization: Loaded mission " + MissionInfo->GetName().ToString());
 		}
 	}
+
+	TArray<AActor*> ItemCollectors;
+	UGameplayStatics::GetAllActorsOfClass(World, ABuildingItemCollectorActor::StaticClass(), &ItemCollectors);
+	for (AActor* ItemCollectorActor : ItemCollectors) {
+		ABuildingItemCollectorActor* ItemCollector = ItemCollectorActor->Cast<ABuildingItemCollectorActor>();
+		if (ItemCollector) {
+			if (!ItemCollector->Setup()) {
+				Log("AFortGameModeZone::FinishWorldInitialization: Failed to setup ItemCollector: " + ItemCollector->GetName().ToString());
+			}
+		}
+	}
 }
 
 APawn* AFortGameModeZone::SpawnDefaultPawnFor(AFortGameModeZone* This, AController* NewPlayer, AActor* StartSpot) {
