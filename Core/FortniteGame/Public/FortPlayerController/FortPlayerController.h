@@ -116,6 +116,9 @@ public:
 
 	FUniqueNetIdRepl GetGameAccountId() const;
 
+	static inline void (*ServerAttemptInteractOG)(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType);
+	static void ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
@@ -236,6 +239,13 @@ public:
 		);
 
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_GetPlayerViewPoint()), GetPlayerViewPoint, (LPVOID*)&GetPlayerViewPointOG);
+
+		HookEveryVTable(
+			AFortPlayerController::StaticClass(),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerAttemptInteract"),
+			ServerAttemptInteract,
+			(LPVOID*)&ServerAttemptInteractOG
+		);
 
 		Log("Hooked AFortPlayerController");
 	}

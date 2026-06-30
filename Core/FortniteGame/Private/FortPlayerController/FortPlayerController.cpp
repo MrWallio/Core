@@ -20,6 +20,7 @@
 #include "FortniteGame/Public/FortHero/FortHeroSpecialization.h"
 #include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
+#include "FortniteGame/Public/BuildingActor/BuildingItemCollectorActor.h"
 #include "FortniteGame/Public/Mcp/FortMcpProfileAccount.h"
 #include "FortniteGame/Public/FortAbility/FortGameplayAbility.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
@@ -1176,4 +1177,25 @@ FUniqueNetIdRepl AFortPlayerController::GetGameAccountId() const
 	const_cast<AFortPlayerController*>(this)->ProcessEvent(Func, &Parms);
 
 	return Parms.ReturnValue;
+}
+
+void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType) {
+	ServerAttemptInteractOG(This, ReceivingActor, InteractComponent, InteractType);
+
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortPlayerController::ServerAttemptInteract: World is null!");
+		return;
+	}
+
+	if (!ReceivingActor) {
+		return;
+	}
+
+	if (ABuildingItemCollectorActor* ItemCollector = ReceivingActor->Cast<ABuildingItemCollectorActor>()) {
+		ItemCollector->ControllingPlayer = This;
+		ItemCollector->GrantOutput();
+	}
+
+	ReceivingActor->ForceNetUpdate();
 }

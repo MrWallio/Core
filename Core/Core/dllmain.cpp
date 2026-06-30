@@ -38,6 +38,7 @@
 #include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
 #include "FortniteGame/Public/FortWeapon/FortDecoTool.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
+#include "FortniteGame/Public/BuildingActor/BuildingItemCollectorActor.h"
 
 #include "CrashReporter/Public/CrashReporter.h"
 

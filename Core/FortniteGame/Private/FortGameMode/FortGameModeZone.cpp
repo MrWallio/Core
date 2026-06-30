@@ -16,6 +16,7 @@
 #include "FortniteGame/Public/FortManager/FortMissionManager.h"
 #include "FortniteGame/Public/Kismet/FortMissionLibrary.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
+#include "FortniteGame/Public/BuildingActor/BuildingItemCollectorActor.h"
 
 void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer) {
 	HandleStartingNewPlayerOG(This, NewPlayer);
