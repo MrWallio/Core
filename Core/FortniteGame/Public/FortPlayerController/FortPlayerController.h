@@ -8,6 +8,20 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/GameInstance.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/LocalPlayer.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/OnlineReplStructs.h"
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/BlueprintFunctionLibrary.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/Templates/SubclassOf.h"
+#include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
+#include "Engine/Source/Runtime/Core/Public/Math/Rotator.h"
+#include "Engine/Source/Runtime/Core/Public/Misc/OutputDevice.h"
+#include "Engine/Source/Runtime/Core/Public/Templates/TypeCompatibleBytes.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/ScriptInterface.h"
+#include "Engine/Source/Runtime/Net/Core/Classes/Net/Serialization/FastArraySerializer.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/DataAsset.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/DataTable.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/CurveTable.h"
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 
 class AFortPlayerPawn;
 class ABuildingSMActor;
@@ -116,8 +130,9 @@ public:
 
 	FUniqueNetIdRepl GetGameAccountId() const;
 
-	static inline void (*ServerAttemptInteractOG)(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType);
-	static void ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType);
+	static void ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType, UObject* OptionalObjectData);
+	static inline void (*execServerAttemptInteractOG)(AFortPlayerController* Context, FFrame& Stack);
+	static void execServerAttemptInteract(AFortPlayerController* Context, FFrame& Stack);
 
 	static void Hook() {
 		/*HookVTableIdx(
@@ -240,12 +255,16 @@ public:
 
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_GetPlayerViewPoint()), GetPlayerViewPoint, (LPVOID*)&GetPlayerViewPointOG);
 
-		HookEveryVTable(
-			AFortPlayerController::StaticClass(),
-			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerAttemptInteract"),
-			ServerAttemptInteract,
-			(LPVOID*)&ServerAttemptInteractOG
-		);
+		UFunction* ServerAttemptInteractFunc = AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerAttemptInteract");
+		if (ServerAttemptInteractFunc) {
+			/*HookEveryVTable(
+				AFortPlayerController::StaticClass(),
+				ServerAttemptInteractFunc,
+				ServerAttemptInteract,
+				(LPVOID*)&ServerAttemptInteractOG
+			);*/
+			ExecHook(ServerAttemptInteractFunc, execServerAttemptInteract, execServerAttemptInteractOG);
+		}
 
 		Log("Hooked AFortPlayerController");
 	}

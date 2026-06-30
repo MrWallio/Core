@@ -681,6 +681,11 @@ void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* Th
 					false
 				);
 				Pickup->PrimaryPickupItemEntry.LoadedAmmo = ItemEntry->LoadedAmmo;
+				Pickup->PrimaryPickupItemEntry.Durability = ItemEntry->Durability;
+				Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+
+				Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+				Pickup->OnRep_PrimaryPickupItemEntry();
 			}
 			This->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
 		}
@@ -1179,9 +1184,7 @@ FUniqueNetIdRepl AFortPlayerController::GetGameAccountId() const
 	return Parms.ReturnValue;
 }
 
-void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType) {
-	ServerAttemptInteractOG(This, ReceivingActor, InteractComponent, InteractType);
-
+void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType, UObject* OptionalObjectData) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("AFortPlayerController::ServerAttemptInteract: World is null!");
@@ -1189,6 +1192,7 @@ void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, A
 	}
 
 	if (!ReceivingActor) {
+		Log("AFortPlayerController::ServerAttemptInteract: ReceivingActor is null!");
 		return;
 	}
 
@@ -1197,5 +1201,21 @@ void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, A
 		ItemCollector->GrantOutput();
 	}
 
+	Log("ReceivingActor: " + ReceivingActor->GetName().ToString());
 	ReceivingActor->ForceNetUpdate();
+}
+
+void AFortPlayerController::execServerAttemptInteract(AFortPlayerController* Context, FFrame& Stack) {
+	struct FortPlayerController_ServerAttemptInteract
+	{
+	public:
+		AActor* ReceivingActor;
+		UPrimitiveComponent* InteractComponent;
+		uint8 InteractType;
+		UObject* OptionalObjectData;
+	};
+	FortPlayerController_ServerAttemptInteract* Parms = (FortPlayerController_ServerAttemptInteract*)Stack.Locals;
+
+	ServerAttemptInteract(Context, Parms->ReceivingActor, Parms->InteractComponent, Parms->InteractType, Parms->OptionalObjectData);
+	execServerAttemptInteractOG(Context, Stack);
 }

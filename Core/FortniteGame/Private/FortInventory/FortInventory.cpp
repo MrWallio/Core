@@ -337,7 +337,12 @@ FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
 	RepEntry->Durability = ItemEntry.Durability;
 	RepEntry->bIsDirty = true;
 
-	return RepEntry;
+	if (Update(RepEntry))
+	{
+		return RepEntry;
+	}
+
+	return nullptr;
 }
 
 int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
@@ -1012,16 +1017,6 @@ bool AFortInventory::SetNewItemCountStateValue(FFortItemEntry* ItemEntry, int32 
 	FGuid ItemGuid = ItemEntry->ItemGuid;
 
 	ItemEntry->SetStateValue(EFortItemEntryState::GetNewItemCount(), Count);
-
-	/*std::thread([this, ItemGuid]()
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		FFortItemEntry* Entry = FindItemEntry(ItemGuid);
-		if (Entry)
-		{
-			Entry->SetStateValue(EFortItemEntryState::GetNewItemCount(), 0);
-		}
-	}).detach();*/
 
 	return true;
 }

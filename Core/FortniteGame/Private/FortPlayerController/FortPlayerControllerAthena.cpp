@@ -317,19 +317,11 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDea
 }
 
 void AFortPlayerControllerAthena::OnReadyToStartMatch(AFortPlayerControllerAthena* This) {
-	OnReadyToStartMatchOG(This);
-
-	UWorld* World = UWorld::GetWorld();
-	if (!World) {
-		Log("AFortPlayerControllerAthena::OnReadyToStartMatch: World is null!");
-		return;
-	}
-
 	if (This->CustomizationLoadout.Pickaxe) {
 		This->WorldInventory->AddItem(This->CustomizationLoadout.Pickaxe->WeaponDefinition);
 	}
-
-	This->WorldInventory->EquipHarvestingTool();
+	
+	OnReadyToStartMatchOG(This);
 }
 
 void AFortPlayerControllerAthena::ServerReturnToMainMenu(AFortPlayerControllerAthena* This) {

@@ -11150,5 +11150,8 @@ void Finder::SetupOffsets() {
 
 	FindAGameModeBase_InitGameStateVFT();
 
+	FindABuildingSMActor_SetEditingPlayerVFT();
+	FindABuildingSMActor_ReplaceBuildingActorVFT();
+
 	return;
 }
