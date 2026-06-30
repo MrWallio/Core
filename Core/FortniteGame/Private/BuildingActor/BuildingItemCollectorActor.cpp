@@ -47,9 +47,14 @@ bool ABuildingItemCollectorActor::GrantOutput() {
 
 	UFortItemDefinition* InputItemDef = Collection->InputItem;
 
-	FFortItemEntry* ItemEntry = PC->WorldInventory->FindItemEntry(InputItemDef);
-	if (ItemEntry && ItemEntry->Count >= FinalCost) {
-		PC->WorldInventory->RemoveItem(ItemEntry->ItemGuid, FinalCost);
+	if (FinalCost > 0) {
+		FFortItemEntry* ItemEntry = PC->WorldInventory->FindItemEntry(InputItemDef);
+		if (ItemEntry && ItemEntry->Count >= FinalCost) {
+			PC->WorldInventory->RemoveItem(ItemEntry->ItemGuid, FinalCost);
+		}
+		else {
+			return false;
+		}
 	}
 
 	FVector ItemCollectorLocation = K2_GetActorLocation();
