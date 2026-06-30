@@ -152,6 +152,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] - Spawns an actor");
 		This->ClientMessage("ClearEquippedItem - Clears the currently equipped item.");
 		This->ClientMessage("GetWeaponStats - Gets the stats of the currently equipped weapon.");
+		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
 		if (Parser.GetArgCount() < 1)
@@ -229,6 +230,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			AFortPlayerPawn::ServerHandlePickup(Pawn, Pickup, Pickup->PickupLocationData.FlyTime, ZeroVector, true);
 			This->ClientMessage("Given Item: (Item=" + ItemDef->GetName().ToString() + " Count=" + std::to_string(Count) + ")");
 		}
+		return;
 	}
 	else if (Parser.IsCommand("ForceGiveItem")) {
 		if (Parser.GetArgCount() < 1)
@@ -258,6 +260,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		}
 
 		This->WorldInventory->AddItem(ItemDef, Count);
+		return;
 	}
 	else if (Parser.IsCommand("SpawnPickup")) {
 		if (Parser.GetArgCount() < 1)
@@ -302,6 +305,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			This,
 			false
 		);
+		return;
 	}
 	else if (Parser.IsCommand("SetLoadedAmmo")) {
 		if (Parser.GetArgCount() < 1)
@@ -331,6 +335,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		WeaponEntry->LoadedAmmo = LoadedAmmo;
 		This->WorldInventory->Update(WeaponEntry);
 		This->ClientMessage("Set loaded ammo of current weapon to " + std::to_string(LoadedAmmo));
+		return;
 	}
 	else if (Parser.IsCommand("GiveAmmo")) {
 		int32 AmmoAmount = Parser.GetArgInt(0, 30);
@@ -378,6 +383,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 				This->ClientMessage("Failed to add ammo item: " + AmmoItemDef->GetName().ToString());
 			}
 		}
+		return;
 	} else if (Parser.IsCommand("DumpInventory")) {
 		if (!This->WorldInventory) {
 			This->ClientMessage("WorldInventory is null!");
@@ -399,6 +405,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		}
 
 		This->ClientMessage("=== End of Inventory Dump ===");
+		return;
 	}
 	else if (Parser.IsCommand("SpawnBot")) {
 		bool bSpawnAtPlayer = Parser.GetArgBool(0, false);
@@ -410,6 +417,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		else {
 			This->ClientMessage("Failed to spawn bot.");
 		}
+		return;
 	} else if (Parser.IsCommand("SetHealth")) {
 		if (Parser.GetArgCount() < 1)
 		{
@@ -427,6 +435,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->MyFortPawn->SetHealth(Health);
 
 		This->ClientMessage("Set health to " + std::to_string(Health));
+		return;
 	} else if (Parser.IsCommand("SetShield")) {
 		if (Parser.GetArgCount() < 1)
 		{
@@ -444,6 +453,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->MyFortPawn->SetShield(Shield);
 
 		This->ClientMessage("Set shield to " + std::to_string(Shield));
+		return;
 	} else if (Parser.IsCommand("SetMaxHealth")) {
 		if (Parser.GetArgCount() < 1)
 		{
@@ -461,6 +471,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->MyFortPawn->SetMaxHealth(MaxHealth);
 
 		This->ClientMessage("Set max health to " + std::to_string(MaxHealth));
+		return;
 	} else if (Parser.IsCommand("SetMaxShield")) {
 		if (Parser.GetArgCount() < 1)
 		{
@@ -478,6 +489,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->MyFortPawn->SetMaxShield(MaxShield);
 
 		This->ClientMessage("Set max shield to " + std::to_string(MaxShield));
+		return;
 	}
 	else if (Parser.IsCommand("SpawnActor")) {
 		if (Parser.GetArgCount() < 1)
@@ -510,6 +522,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		else {
 			This->ClientMessage("Failed to spawn actor of class: " + ActorClass->GetName().ToString());
 		}
+		return;
 	}
 	else if (Parser.IsCommand("ClearEquippedItem")) {
 		if (!This->WorldInventory) {
@@ -529,6 +542,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 
 		This->WorldInventory->RemoveItem(This->MyFortPawn->CurrentWeapon->ItemEntryGuid);
 		This->ClientMessage("Cleared currently equipped item.");
+		return;
 	}
 	else if (Parser.IsCommand("GetWeaponStats")) {
 		if (!This->MyFortPawn) {
@@ -551,7 +565,10 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("ClipSize: " + std::to_string(WeaponDef->GetClipSize()));
 		This->ClientMessage("Durability: " + std::to_string(WeaponDef->GetDurability()));
 		This->ClientMessage("=== End of Weapon Stats ===");
+		return;
 	}
+
+	UKismetSystemLibrary::ExecuteConsoleCommand(*GWorld, *Msg, This);
 }
 
 void AFortPlayerController::ServerExecuteInventoryItem(AFortPlayerController* This, FGuid& ItemGuid) {
