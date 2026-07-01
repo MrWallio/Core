@@ -45,20 +45,8 @@ void AFortDecoTool::ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRot
 }
 
 bool AFortDecoTool::ShouldAllowServerSpawnDeco(FVector& InLocation, FRotator& InRotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType) {
-	bool (*ShouldAllowServerSpawnDecoInternal)(AFortDecoTool*, FVector&, FRotator&, ABuildingSMActor*, uint8) = decltype(ShouldAllowServerSpawnDecoInternal)(VTable[Finder::FindAFortDecoTool_ShouldAllowServerSpawnDecoVFT()]);
+	bool (*&ShouldAllowServerSpawnDecoInternal)(AFortDecoTool*, FVector&, FRotator&, ABuildingSMActor*, uint8) = decltype(ShouldAllowServerSpawnDecoInternal)(VTable[Finder::FindAFortDecoTool_ShouldAllowServerSpawnDecoVFT()]);
     return ShouldAllowServerSpawnDecoInternal(this, InLocation, InRotation, AttachedActor, InBuildingAttachmentType);
-}
-
-ABuildingActor* AFortDecoTool::SpawnDeco(
-    TSubclassOf<ABuildingActor> SpawnClass,
-    FVector& Location,
-    FRotator& Rotation,
-    ABuildingSMActor* AttachedActor,
-    uint8 InBuildingAttachmentType,
-    int32 PlacementReason
-) {
-	ABuildingActor* (*SpawnDecoInternal)(AFortDecoTool*, TSubclassOf<ABuildingActor>, FVector&, FRotator&, ABuildingSMActor*, uint8, int32) = decltype(SpawnDecoInternal)(VTable[Finder::FindAFortDecoTool_SpawnDecoVFT()]);
-	return SpawnDecoInternal(this, SpawnClass, Location, Rotation, AttachedActor, InBuildingAttachmentType, PlacementReason);
 }
 
 ABuildingActor* AFortDecoTool::SpawnDeco(
@@ -69,6 +57,6 @@ ABuildingActor* AFortDecoTool::SpawnDeco(
     uint8 InBuildingAttachmentType,
     int32 PlacementReason
 ) {
-    ABuildingActor* (*SpawnDecoInternal)(AFortDecoTool*, UClass*, FVector&, FRotator&, ABuildingSMActor*, uint8, int32) = decltype(SpawnDecoInternal)(VTable[Finder::FindAFortDecoTool_SpawnDecoVFT()]);
+    ABuildingActor* (*&SpawnDecoInternal)(AFortDecoTool*, UClass*, FVector&, FRotator&, ABuildingSMActor*, uint8, int32) = decltype(SpawnDecoInternal)(VTable[Finder::FindAFortDecoTool_SpawnDecoVFT()]);
     return SpawnDecoInternal(this, SpawnClass, Location, Rotation, AttachedActor, InBuildingAttachmentType, PlacementReason);
 }

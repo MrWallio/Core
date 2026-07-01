@@ -65,6 +65,10 @@ void AFortAthenaMapInfo::SpawnLlamas()
 	{
 		SafeZoneDef = &SafeZoneDefinition;
 	}
+	if (!SafeZoneDef && SafeZoneDefinitions.Num() > 0)
+	{
+		SafeZoneDef = &SafeZoneDefinitions[0];
+	}
 
 	float Radius = SafeZoneDef ? SafeZoneDef->Radius.Evaluate(0) : 120000.0f;
 	if (Radius <= 0.0f)
@@ -77,7 +81,7 @@ void AFortAthenaMapInfo::SpawnLlamas()
 
 	for (int32 i = 0; i < LlamaCount; ++i)
 	{
-		const FVector Loc = PickSupplyDropLocation(&Center, Radius, 0, -1, -1);
+		const FVector Loc = PickSupplyDropLocation(Center, Radius, 0, -1, -1);
 		const bool bValidLoc = (Loc.X != 0.0f || Loc.Y != 0.0f || Loc.Z != 0.0f);
 		if (!bValidLoc)
 			continue;

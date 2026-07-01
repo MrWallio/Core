@@ -1,9 +1,12 @@
 #pragma once
 #include "pch.h"
 
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
+
 #include "FortWeapon.h"
 #include "FortniteGame/Public/FortEnums.h"
 
+class ABuildingActor;
 class ABuildingSMActor;
 class UFortItemDefinition;
 class AFortDecoHelper;
@@ -22,15 +25,6 @@ public:
 	static void ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType);
 
 	bool ShouldAllowServerSpawnDeco(FVector& InLocation, FRotator& InRotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType);
-
-	ABuildingActor* SpawnDeco(
-		TSubclassOf<ABuildingActor> SpawnClass,
-		FVector& Location,
-		FRotator& Rotation,
-		ABuildingSMActor* AttachedActor,
-		uint8 InBuildingAttachmentType,
-		int32 PlacementReason
-	);
 
 	ABuildingActor* SpawnDeco(
 		UClass* SpawnClass,
