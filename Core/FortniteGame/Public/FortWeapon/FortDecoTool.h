@@ -5,13 +5,41 @@
 #include "FortniteGame/Public/FortEnums.h"
 
 class ABuildingSMActor;
+class UFortItemDefinition;
+class AFortDecoHelper;
 
 class AFortDecoTool : public AFortWeapon {
 public:
 	DefineUnrealClass(AFortDecoTool);
+
+	DefineUProperty(bool, bButtonDown);
+	DefineUProperty(UFortItemDefinition*, ItemDefinition);
+	DefineUProperty(AFortDecoHelper*, DecoHelper);
+	DefineUProperty(AActor*, CarriedActor);
+	DefineUProperty(bool, bPlaceCarriedActor);
 public:
-	static inline void (*ServerSpawnDecoOG)(AFortDecoTool* This, FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, EBuildingAttachmentType InBuildingAttachmentType);
-	static void ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, EBuildingAttachmentType InBuildingAttachmentType);
+	static inline void (*ServerSpawnDecoOG)(AFortDecoTool* This, FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType);
+	static void ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType);
+
+	bool ShouldAllowServerSpawnDeco(FVector& InLocation, FRotator& InRotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType);
+
+	ABuildingActor* SpawnDeco(
+		TSubclassOf<ABuildingActor> SpawnClass,
+		FVector& Location,
+		FRotator& Rotation,
+		ABuildingSMActor* AttachedActor,
+		uint8 InBuildingAttachmentType,
+		int32 PlacementReason
+	);
+
+	ABuildingActor* SpawnDeco(
+		UClass* SpawnClass,
+		FVector& Location,
+		FRotator& Rotation,
+		ABuildingSMActor* AttachedActor,
+		uint8 InBuildingAttachmentType,
+		int32 PlacementReason
+	);
 
 	static void Hook() {
 		HookEveryVTable(

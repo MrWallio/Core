@@ -1086,6 +1086,10 @@ public:
 	static uintptr_t FindUDemoNetDriver_TickFlushInternal();
 
 	static uintptr_t FindAFortAthenaMapInfo_PickSupplyDropLocation();
+
+	static uintptr_t FindAFortDecoTool_ShouldAllowServerSpawnDecoVFT();
+
+	static uintptr_t FindAFortDecoTool_SpawnDecoVFT();
 public:
 	static void SetupCoreOffsets();
 

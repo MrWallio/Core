@@ -21,6 +21,7 @@
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
 #include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
+#include "FortniteGame/Public/FortWeapon/FortDecoTool.h"
 
 uintptr_t Finder::FindGUObjectArray() {
 	static uintptr_t Addr = 0;
@@ -10785,6 +10786,100 @@ uintptr_t Finder::FindAFortAthenaMapInfo_PickSupplyDropLocation() {
 	return ServerOffsets::AFortAthenaMapInfo_PickSupplyDropLocation;
 }
 
+uintptr_t Finder::FindAFortDecoTool_ShouldAllowServerSpawnDecoVFT() {
+	if (ServerOffsets::AFortDecoTool_ShouldAllowServerSpawnDecoVFT)
+		return ServerOffsets::AFortDecoTool_ShouldAllowServerSpawnDecoVFT;
+
+	auto sRef = Memcury::Scanner::FindStringRef(L"Tried to place deco item %s %s that isn't actually in player inventory!", false, 0, Version::Fortnite_Version >= 19, false);
+
+	uint64 ShouldAllowServerSpawnDecoPart = 0;
+
+	for (int i = 0; i < 2000; i++)
+	{
+		auto Ptr = (uint8_t*)(sRef.Get() - i);
+
+		if (*Ptr == 0x48 && *(Ptr + 1) == 0x83 && *(Ptr + 2) == 0xEC)
+		{
+			ShouldAllowServerSpawnDecoPart = uint64_t(Ptr);
+			break;
+		}
+		else if (*Ptr == 0x48 && *(Ptr + 1) == 0x81 && *(Ptr + 2) == 0xEC)
+		{
+			ShouldAllowServerSpawnDecoPart = uint64_t(Ptr);
+			break;
+		}
+	}
+
+	uint64 ShouldAllowServerSpawnDeco = 0;
+	for (int i = 0; i < 2000; i++)
+	{
+		auto Ptr = (uint8_t*)(ShouldAllowServerSpawnDecoPart - i);
+
+		if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
+		{
+			ShouldAllowServerSpawnDeco = uint64_t(Ptr);
+			break;
+		}
+		else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+		{
+			ShouldAllowServerSpawnDeco = uint64_t(Ptr);
+			break;
+		}
+	}
+
+	void** VFT = AFortDecoTool::StaticClass()->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(ShouldAllowServerSpawnDeco))
+		{
+			ServerOffsets::AFortDecoTool_ShouldAllowServerSpawnDecoVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortDecoTool_ShouldAllowServerSpawnDecoVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortDecoTool_ShouldAllowServerSpawnDecoVFT));
+	return ServerOffsets::AFortDecoTool_ShouldAllowServerSpawnDecoVFT;
+}
+
+uintptr_t Finder::FindAFortDecoTool_SpawnDecoVFT() {
+	if (ServerOffsets::AFortDecoTool_SpawnDecoVFT)
+		return ServerOffsets::AFortDecoTool_SpawnDecoVFT;
+	
+	auto sRef = Memcury::Scanner::FindStringRef(L"AFortTrapTool::SpawnDeco World is tearing down.  Early-ing out.", false, 0, Version::Fortnite_Version >= 19);
+
+	uint64 SpawnDeco = 0;
+	for (int i = 0; i < 2000; i++)
+	{
+		auto Ptr = (uint8_t*)(sRef.Get() - i);
+
+		if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
+		{
+			SpawnDeco = uint64_t(Ptr);
+			break;
+		}
+		else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+		{
+			SpawnDeco = uint64_t(Ptr);
+			break;
+		}
+	}
+
+	void** VFT = AFortDecoTool::StaticClass()->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(SpawnDeco))
+		{
+			ServerOffsets::AFortDecoTool_SpawnDecoVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortDecoTool_SpawnDecoVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortDecoTool_SpawnDecoVFT));
+	return ServerOffsets::AFortDecoTool_SpawnDecoVFT;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -11175,6 +11270,9 @@ void Finder::SetupOffsets() {
 	FindABuildingSMActor_ReplaceBuildingActorVFT();
 
 	FindAFortAthenaMapInfo_PickSupplyDropLocation();
+
+	FindAFortDecoTool_ShouldAllowServerSpawnDecoVFT();
+	FindAFortDecoTool_SpawnDecoVFT();
 
 	return;
 }

@@ -5,11 +5,10 @@
 #include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 
-void AFortDecoTool::ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, EBuildingAttachmentType InBuildingAttachmentType) {
+void AFortDecoTool::ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType) {
 	Log("ServerSpawnDeco Called!");
-
-	ServerSpawnDecoOG(This, Location, Rotation, AttachedActor, InBuildingAttachmentType);
 
 	AFortPawn* Pawn = This->Owner->Cast<AFortPawn>();
 	if (!Pawn) {
@@ -22,6 +21,8 @@ void AFortDecoTool::ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRot
         Log("ServerSpawnDeco: Failed to get PlayerController from Pawn!");
         return;
 	}
+
+    ServerSpawnDecoOG(This, Location, Rotation, AttachedActor, InBuildingAttachmentType);
 
 	AFortPlayerStateAthena* FortPlayerStateAthena = PlayerController->PlayerState->Cast<AFortPlayerStateAthena>();
     if (FortPlayerStateAthena) {
@@ -41,4 +42,33 @@ void AFortDecoTool::ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRot
 			Log("ServerSpawnDeco: Updated trap team to " + std::to_string(TrapActor->Team));
         }
     }
+}
+
+bool AFortDecoTool::ShouldAllowServerSpawnDeco(FVector& InLocation, FRotator& InRotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType) {
+	bool (*ShouldAllowServerSpawnDecoInternal)(AFortDecoTool*, FVector&, FRotator&, ABuildingSMActor*, uint8) = decltype(ShouldAllowServerSpawnDecoInternal)(VTable[Finder::FindAFortDecoTool_ShouldAllowServerSpawnDecoVFT()]);
+    return ShouldAllowServerSpawnDecoInternal(this, InLocation, InRotation, AttachedActor, InBuildingAttachmentType);
+}
+
+ABuildingActor* AFortDecoTool::SpawnDeco(
+    TSubclassOf<ABuildingActor> SpawnClass,
+    FVector& Location,
+    FRotator& Rotation,
+    ABuildingSMActor* AttachedActor,
+    uint8 InBuildingAttachmentType,
+    int32 PlacementReason
+) {
+	ABuildingActor* (*SpawnDecoInternal)(AFortDecoTool*, TSubclassOf<ABuildingActor>, FVector&, FRotator&, ABuildingSMActor*, uint8, int32) = decltype(SpawnDecoInternal)(VTable[Finder::FindAFortDecoTool_SpawnDecoVFT()]);
+	return SpawnDecoInternal(this, SpawnClass, Location, Rotation, AttachedActor, InBuildingAttachmentType, PlacementReason);
+}
+
+ABuildingActor* AFortDecoTool::SpawnDeco(
+    UClass* SpawnClass,
+    FVector& Location,
+    FRotator& Rotation,
+    ABuildingSMActor* AttachedActor,
+    uint8 InBuildingAttachmentType,
+    int32 PlacementReason
+) {
+    ABuildingActor* (*SpawnDecoInternal)(AFortDecoTool*, UClass*, FVector&, FRotator&, ABuildingSMActor*, uint8, int32) = decltype(SpawnDecoInternal)(VTable[Finder::FindAFortDecoTool_SpawnDecoVFT()]);
+    return SpawnDecoInternal(this, SpawnClass, Location, Rotation, AttachedActor, InBuildingAttachmentType, PlacementReason);
 }
