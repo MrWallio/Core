@@ -10847,32 +10847,33 @@ uintptr_t Finder::FindAFortDecoTool_SpawnDecoVFT() {
 		return ServerOffsets::AFortDecoTool_SpawnDecoVFT;
 	
 	auto sRef = Memcury::Scanner::FindStringRef(L"AFortTrapTool::SpawnDeco World is tearing down.  Early-ing out.", false, 0, Version::Fortnite_Version >= 19);
-
-	uint64 SpawnDeco = 0;
-	for (int i = 0; i < 2000; i++)
-	{
-		auto Ptr = (uint8_t*)(sRef.Get() - i);
-
-		if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
+	if (sRef.IsValid()) {
+		uint64 SpawnDeco = 0;
+		for (int i = 0; i < 2000; i++)
 		{
-			SpawnDeco = uint64_t(Ptr);
-			break;
+			auto Ptr = (uint8_t*)(sRef.Get() - i);
+
+			if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4)
+			{
+				SpawnDeco = uint64_t(Ptr);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
+			{
+				SpawnDeco = uint64_t(Ptr);
+				break;
+			}
 		}
-		else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
-		{
-			SpawnDeco = uint64_t(Ptr);
-			break;
-		}
-	}
 
-	void** VFT = AFortDecoTool::StaticClass()->GetDefaultObject()->VTable;
+		void** VFT = AFortDecoTool::StaticClass()->GetDefaultObject()->VTable;
 
-	for (int i = 0; i < 2048; i++)
-	{
-		if (VFT[i] == (void*)(SpawnDeco))
+		for (int i = 0; i < 2048; i++)
 		{
-			ServerOffsets::AFortDecoTool_SpawnDecoVFT = i;
-			break;
+			if (VFT[i] == (void*)(SpawnDeco))
+			{
+				ServerOffsets::AFortDecoTool_SpawnDecoVFT = i;
+				break;
+			}
 		}
 	}
 
