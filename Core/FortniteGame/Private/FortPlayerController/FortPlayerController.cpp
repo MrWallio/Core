@@ -1347,7 +1347,7 @@ FVector AFortPlayerController::GetDropFinalLocation()
 	FinalLoc.Z += 50.0f;
 
 	const float AngleDeg = UKismetMathLibrary::RandomFloatInRange(0.0f, 360.0f);
-	const float AngleRad = AngleDeg * 0.017453292519943295f; // deg->rad
+	const float AngleRad = AngleDeg * 0.017453292519943295f;
 	const float Radius = UKismetMathLibrary::RandomFloatInRange(0.0f, 100.0f);
 
 	FinalLoc.X += std::cos(AngleRad) * Radius;
