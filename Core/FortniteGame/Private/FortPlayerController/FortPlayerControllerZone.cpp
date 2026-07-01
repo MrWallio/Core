@@ -82,7 +82,7 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 		}
 	}
 
-	if (FortGameModeAthena->_HasStartingItems() && FortGameModeZone->StartingItems.Num() > 0)
+	if (FortGameModeZone->_HasStartingItems() && FortGameModeZone->StartingItems.Num() > 0)
 	{
 		Log("OnReadyToStartMatch: Processing StartingItems for new player. Count: " + std::to_string(FortGameModeZone->StartingItems.Num()));
 		for (int i = 0; i < FortGameModeZone->StartingItems.Num(); i++)
