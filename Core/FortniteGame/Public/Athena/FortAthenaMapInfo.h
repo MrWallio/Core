@@ -19,7 +19,10 @@
 #include "Engine/Source/Runtime/GameplayTags/Classes/GameplayTagContainer.h"
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/ScalableFloat.h"
 
+#include "FortniteGame/Public/FortSafeZone/FortSafeZoneDefinition.h"
+
 class ABuildingItemCollectorActor;
+class AFortAthenaSupplyDrop;
 
 class AFortAthenaMapInfo : public AActor {
 public:
@@ -27,8 +30,17 @@ public:
 
 	DefineUProperty(TSubclassOf<ABuildingItemCollectorActor>, VendingMachineClass);
 	DefineUProperty(FScalableFloat, VendingMachineRarityCount);
+	DefineUProperty(TSubclassOf<AFortAthenaSupplyDrop>, LlamaClass);
+	DefineUProperty(FScalableFloat, LlamaQuantityMin);
+	DefineUProperty(FScalableFloat, LlamaQuantityMax);
+	DefineUProperty(FFortSafeZoneDefinition, SafeZoneDefinition);
+	DefineUProperty(TArray<FFortSafeZoneDefinition>, SafeZoneDefinitions);
 public:
-	int32 SpawnLlamas();
+	void SpawnLlamas();
+
+	FVector PickSupplyDropLocation(FVector* CenterLocation, double MaxRadius, bool bAvoidWater, float TraceStartZ, float TraceEndZ);
+
+	FVector GetMapCenter() const;
 
 	static void Hook() {
 		Log("Hooked AFortAthenaMapInfo");

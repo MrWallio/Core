@@ -10764,6 +10764,27 @@ uintptr_t Finder::FindUDemoNetDriver_TickFlushInternal() {
 	return ServerOffsets::UDemoNetDriver_TickFlushInternal;
 }
 
+uintptr_t Finder::FindAFortAthenaMapInfo_PickSupplyDropLocation() {
+	if (ServerOffsets::AFortAthenaMapInfo_PickSupplyDropLocation)
+		return ServerOffsets::AFortAthenaMapInfo_PickSupplyDropLocation;
+	uintptr_t Addr = 0;
+
+	auto sRef = Memcury::Scanner::FindStringRef(L"PickSupplyDropLocation: Failed to find valid location using rejection.  Using safe zone location.", false, 0, Version::Fortnite_Version >= 19, false);
+	if (!sRef.IsValid())
+		sRef = Memcury::Scanner::FindStringRef("AFortAthenaMapInfo::PickSupplyDropLocation");
+
+	if (sRef.IsValid()) {
+		Addr = sRef.FindFunctionStart().Get();
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortAthenaMapInfo_PickSupplyDropLocation = Addr - ImageBase;
+	}
+
+	Log("AFortAthenaMapInfo_PickSupplyDropLocation found at: 0x" + std::format("{:X}", ServerOffsets::AFortAthenaMapInfo_PickSupplyDropLocation));
+	return ServerOffsets::AFortAthenaMapInfo_PickSupplyDropLocation;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -11152,6 +11173,8 @@ void Finder::SetupOffsets() {
 
 	FindABuildingSMActor_SetEditingPlayerVFT();
 	FindABuildingSMActor_ReplaceBuildingActorVFT();
+
+	FindAFortAthenaMapInfo_PickSupplyDropLocation();
 
 	return;
 }

@@ -1084,6 +1084,8 @@ public:
 	static uintptr_t FindUFortAssetManager_Get();
 
 	static uintptr_t FindUDemoNetDriver_TickFlushInternal();
+
+	static uintptr_t FindAFortAthenaMapInfo_PickSupplyDropLocation();
 public:
 	static void SetupCoreOffsets();
 

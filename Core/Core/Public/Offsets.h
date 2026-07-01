@@ -666,4 +666,6 @@ namespace ServerOffsets {
 	inline uintptr_t UFortAssetManager_Get = 0;
 
 	inline uintptr_t UDemoNetDriver_TickFlushInternal = 0;
+
+	inline uintptr_t AFortAthenaMapInfo_PickSupplyDropLocation = 0;
 }

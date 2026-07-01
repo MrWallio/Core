@@ -34,6 +34,8 @@ public:
 	AFortPickup* SpawnPickup(UFortWorldItemDefinition* ItemDefinition, int32 NumberToSpawn, AFortPawn* TriggeringPawn, FVector& Position, FVector& Direction);
 	static void execSpawnPickup(AFortAthenaSupplyDrop* Context, FFrame& Stack, AFortPickup** Result);
 
+	FVector FindGroundLocationAt(const FVector& InLocation);
+
 	static void Hook() {
 		ExecHook("Function /Script/FortniteGame.FortAthenaSupplyDrop.SpawnPickup", execSpawnPickup);
 

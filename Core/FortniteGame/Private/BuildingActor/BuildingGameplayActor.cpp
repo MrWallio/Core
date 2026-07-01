@@ -48,3 +48,30 @@ void AFortAthenaSupplyDrop::execSpawnPickup(AFortAthenaSupplyDrop* Context, FFra
 
 	*Result = Context->SpawnPickup(ItemDefinition, NumberToSpawn, TriggeringPawn, Position, Direction);
 }
+
+FVector AFortAthenaSupplyDrop::FindGroundLocationAt(const FVector& InLocation)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("FindGroundLocationAt");
+
+	if (!Func) {
+		return FVector(0, 0, 0);
+	}
+
+	struct FortAthenaSupplyDrop_FindGroundLocationAt
+	{
+	public:
+		FVector InLocation;
+		FVector ReturnValue;
+	};
+
+	FortAthenaSupplyDrop_FindGroundLocationAt Parms{};
+
+	Parms.InLocation = std::move(InLocation);
+
+	ProcessEvent(Func, &Parms);
+
+	return Parms.ReturnValue;
+}

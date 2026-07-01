@@ -314,6 +314,7 @@
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveCompletion.h" />
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveInfo.h" />
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveStatTableRow.h" />
+    <ClInclude Include="FortniteGame\Public\FortSafeZone\FortSafeZoneDefinition.h" />
     <ClInclude Include="FortniteGame\Public\FortSet\FortAttributeSet.h" />
     <ClInclude Include="FortniteGame\Public\FortSet\FortBuildingActorSet.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortCheatManager.h" />
