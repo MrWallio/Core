@@ -65,10 +65,6 @@ void AFortAthenaMapInfo::SpawnLlamas()
 	{
 		SafeZoneDef = &SafeZoneDefinition;
 	}
-	else if (SafeZoneDefinitions.Num() > 0)
-	{
-		SafeZoneDef = &SafeZoneDefinitions[0];
-	}
 
 	float Radius = SafeZoneDef ? SafeZoneDef->Radius.Evaluate(0) : 120000.0f;
 	if (Radius <= 0.0f)
