@@ -1106,5 +1106,8 @@
     <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\CheatManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

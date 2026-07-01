@@ -317,11 +317,11 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDea
 }
 
 void AFortPlayerControllerAthena::OnReadyToStartMatch(AFortPlayerControllerAthena* This) {
+	OnReadyToStartMatchOG(This); // Note: OG makes the pickaxe not appearing the inventory, so i move it above (Also tested in above seasons)
+
 	if (This->CustomizationLoadout.Pickaxe) {
 		This->WorldInventory->AddItem(This->CustomizationLoadout.Pickaxe->WeaponDefinition);
 	}
-	
-	OnReadyToStartMatchOG(This);
 }
 
 void AFortPlayerControllerAthena::ServerReturnToMainMenu(AFortPlayerControllerAthena* This) {

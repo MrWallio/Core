@@ -573,6 +573,11 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("=== End of Weapon Stats ===");
 		return;
 	}
+	else if (Parser.IsCommand("DestroyTarget"))
+	{
+		This->CheatManager->DestroyTarget();
+		return;
+	}
 
 	UKismetSystemLibrary::ExecuteConsoleCommand(*GWorld, *Msg, This);
 }

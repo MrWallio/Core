@@ -424,6 +424,7 @@
     <ClCompile Include="Engine\Source\Runtime\Core\Private\UObject\UnrealNames.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\Actor.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\AI\Navigation\NavigationSystem.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\CheatManager.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\Controller.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\DataBunch.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\DataChannel.cpp" />
