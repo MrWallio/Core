@@ -27,6 +27,8 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 	FVector LootSpawnLocation = This->LootSpawnLocation;
 	FVector FinalSpawnLocation = ContainerLocation + (This->GetActorForwardVector() * LootSpawnLocation.X) +
 		(This->GetActorRightVector() * LootSpawnLocation.Y) + (This->GetActorUpVector() * LootSpawnLocation.Z);
+	FVector LootFinalLocation = ContainerLocation + (This->GetActorForwardVector() * This->LootFinalLocation.X) + (This->GetActorRightVector() * This->LootFinalLocation.Y) +
+		(This->GetActorUpVector() * This->LootFinalLocation.Z);
 
 	TArray<FFortItemEntry> LootDrops;
 	bool bSuccess = UFortKismetLibrary::PickLootDrops(This, &LootDrops, This->SearchLootTierGroup, 0, This->ReplicatedLootTier);
@@ -43,7 +45,7 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 			ItemEntry.ItemDefinition,
 			ItemEntry.Count,
 			FinalSpawnLocation,
-			FVector(),
+			LootFinalLocation,
 			-1,
 			true,
 			true,

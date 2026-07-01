@@ -222,7 +222,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			ItemDef,
 			Count,
 			FinalLoc,
-			FVector(),
+			This->GetDropFinalLocation(),
 			-1,
 			true,
 			true,
@@ -303,7 +303,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 			ItemDef,
 			Count,
 			This->Pawn->K2_GetActorLocation(),
-			FVector(),
+			This->GetDropFinalLocation(),
 			-1,
 			true,
 			true,
@@ -764,39 +764,46 @@ void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* Th
 		return;
 	}
 
-	FVector PawnLocation = This->MyFortPawn->K2_GetActorLocation();
+	FVector FinalLoc = This->MyFortPawn->K2_GetActorLocation();
 
 	Log("AFortPlayerController::ServerAttemptInventoryDrop: Attempting to drop item with GUID: " + ItemGuid.FormatGuid() + ", Count: " + std::to_string(Count) + ", bTrash: " + std::to_string(bTrash));
 	FFortItemEntry* ItemEntry = This->FindItemEntry(ItemGuid);
-	if (ItemEntry) {
-		if (ItemEntry->ItemDefinition) {
-			if (!bTrash) {
-				AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
-					World,
-					ItemEntry->ItemDefinition,
-					Count,
-					PawnLocation,
-					FVector(),
-					-1,
-					true,
-					true,
-					true,
-					-1,
-					EFortPickupSourceTypeFlag::GetPlayer(),
-					EFortPickupSpawnSource::GetTossedByPlayer(),
-					This,
-					false
-				);
-				Pickup->PrimaryPickupItemEntry.LoadedAmmo = ItemEntry->LoadedAmmo;
-				Pickup->PrimaryPickupItemEntry.Durability = ItemEntry->Durability;
-				Pickup->PrimaryPickupItemEntry.bIsDirty = true;
-
-				Pickup->PrimaryPickupItemEntry.ReplicationKey++;
-				Pickup->OnRep_PrimaryPickupItemEntry();
-			}
-			This->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
-		}
+	if (!ItemEntry) {
+		Log("AFortPlayerController::ServerAttemptInventoryDrop: ItemEntry not found for GUID: " + ItemGuid.FormatGuid());
+		return;
 	}
+
+	if (!ItemEntry->ItemDefinition) {
+		Log("AFortPlayerController::ServerAttemptInventoryDrop: ItemDefinition is null for GUID: " + ItemGuid.FormatGuid());
+		return;
+	}
+
+	if (!bTrash) {
+		AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+			World,
+			ItemEntry->ItemDefinition,
+			Count,
+			FinalLoc,
+			This->GetDropFinalLocation(),
+			-1,
+			true,
+			true,
+			true,
+			-1,
+			EFortPickupSourceTypeFlag::GetPlayer(),
+			EFortPickupSpawnSource::GetTossedByPlayer(),
+			This,
+			false
+		);
+		Pickup->PrimaryPickupItemEntry.LoadedAmmo = ItemEntry->LoadedAmmo;
+		Pickup->PrimaryPickupItemEntry.Durability = ItemEntry->Durability;
+		Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+
+		Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+		Pickup->OnRep_PrimaryPickupItemEntry();
+	}
+
+	This->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
 }
 
 void AFortPlayerController::ClientForceUpdateQuickbar(uint8 QuickbarToRefresh)
@@ -1326,4 +1333,25 @@ void AFortPlayerController::execServerAttemptInteract(AFortPlayerController* Con
 
 	ServerAttemptInteract(Context, Parms->ReceivingActor, Parms->InteractComponent, Parms->InteractType, Parms->OptionalObjectData);
 	execServerAttemptInteractOG(Context, Stack);
+}
+
+FVector AFortPlayerController::GetDropFinalLocation()
+{
+	if (!MyFortPawn)
+		return FVector{};
+
+	FVector FinalLoc = MyFortPawn->K2_GetActorLocation();
+	const FVector Forward = MyFortPawn->GetActorForwardVector();
+
+	FinalLoc += Forward * 450.0f;
+	FinalLoc.Z += 50.0f;
+
+	const float AngleDeg = UKismetMathLibrary::RandomFloatInRange(0.0f, 360.0f);
+	const float AngleRad = AngleDeg * 0.017453292519943295f; // deg->rad
+	const float Radius = UKismetMathLibrary::RandomFloatInRange(0.0f, 100.0f);
+
+	FinalLoc.X += std::cos(AngleRad) * Radius;
+	FinalLoc.Y += std::sin(AngleRad) * Radius;
+
+	return FinalLoc;
 }

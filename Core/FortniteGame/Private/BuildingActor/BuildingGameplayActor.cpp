@@ -18,7 +18,7 @@ AFortPickup* AFortAthenaSupplyDrop::SpawnPickup(UFortWorldItemDefinition* ItemDe
 		ItemDefinition,
 		NumberToSpawn,
 		Position,
-		Direction,
+		*FVector::Allocate(),
 		-1,
 		true,
 		true,
@@ -29,6 +29,17 @@ AFortPickup* AFortAthenaSupplyDrop::SpawnPickup(UFortWorldItemDefinition* ItemDe
 		nullptr,
 		false
 	);
+	if (Pickup) {
+		UFortWeaponItemDefinition* WeaponDef = Pickup->PrimaryPickupItemEntry.ItemDefinition->Cast<UFortWeaponItemDefinition>();
+		if (WeaponDef) {
+			int32 Level = Pickup->PrimaryPickupItemEntry.Level;
+			Pickup->PrimaryPickupItemEntry.LoadedAmmo = WeaponDef->GetClipSize(Level);
+			Pickup->PrimaryPickupItemEntry.Durability = WeaponDef->GetDurability(Level);
+			Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+			Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+			Pickup->OnRep_PrimaryPickupItemEntry();
+		}
+	}
 
 	return Pickup;
 }

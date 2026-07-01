@@ -58,6 +58,7 @@ public:
 	DefineUProperty(UFortWorldItemDefinition*, ActiveInputItem);
 	DefineUProperty(UFortWorldItemDefinition*, ClientPausedActiveInputItem);
 	DefineUProperty(FVector, LootSpawnLocation);
+	DefineUProperty(FRotator, LootTossDirection);
 	DefineUProperty(int32, StartingGoalLevel);
 	DefineUProperty(bool, bTossOnGround);
 public:

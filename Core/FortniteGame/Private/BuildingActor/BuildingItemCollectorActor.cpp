@@ -70,7 +70,7 @@ bool ABuildingItemCollectorActor::GrantOutput() {
 			ItemEntry.ItemDefinition,
 			ItemEntry.Count,
 			FinalSpawnLocation,
-			FVector(),
+			*FVector::Allocate(),
 			-1,
 			bTossOnGround,
 			true,

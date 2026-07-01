@@ -267,3 +267,45 @@ float UKismetMathLibrary::RandomFloat()
 
 	return Parms.ReturnValue;
 }
+
+FVector UKismetMathLibrary::GetForwardVector(const FRotator& InRot)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.KismetMathLibrary.GetForwardVector");
+
+	if (!Func) {
+		return FVector(0, 0, 0);
+	}
+
+	return GetDefaultObj()->Call<FVector>(Func, InRot);
+}
+
+FVector UKismetMathLibrary::GetRightVector(const FRotator& InRot)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.KismetMathLibrary.GetRightVector");
+
+	if (!Func) {
+		return FVector(0, 0, 0);
+	}
+
+	return GetDefaultObj()->Call<FVector>(Func, InRot);
+}
+
+FVector UKismetMathLibrary::GetUpVector(const FRotator& InRot)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.KismetMathLibrary.GetUpVector");
+
+	if (!Func) {
+		return FVector(0, 0, 0);
+	}
+
+	return GetDefaultObj()->Call<FVector>(Func, InRot);
+}

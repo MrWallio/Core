@@ -184,8 +184,12 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 		Pickup->PawnWhoDroppedPickup = ItemOwner;
 	}
 
+	FVector FinalLocation = Position;
+	if (Direction.X || Direction.Y || Direction.Z)
+		FinalLocation = Direction;
+
 	Pickup->TossPickup(
-		Position,
+		FinalLocation,
 		OptionalOwnerPC ? OptionalOwnerPC->Pawn->Cast<AFortPawn>() : nullptr,
 		OverrideMaxStackCount,
 		bToss,

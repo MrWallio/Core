@@ -135,6 +135,8 @@ public:
 	static inline void (*execServerAttemptInteractOG)(AFortPlayerController* Context, FFrame& Stack);
 	static void execServerAttemptInteract(AFortPlayerController* Context, FFrame& Stack);
 
+	FVector GetDropFinalLocation();
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
