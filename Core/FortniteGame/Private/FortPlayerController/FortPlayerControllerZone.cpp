@@ -18,6 +18,17 @@
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySet.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
+#include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWorldItemDefinition.h"
+#include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortQuest/FortQuestObjectiveCompletion.h"
+#include "FortniteGame/Public/FortPlayer/FortPlayerDeathReport.h"
+#include "FortniteGame/Public/Info/FortTeamInfo.h"
+#include "FortniteGame/Public/FortWeapon/FortWeapon.h"
+#include "FortniteGame/Public/Athena/AthenaRewardResult.h"
+#include "FortniteGame/Public/Athena/AthenaMatchStats.h"
+#include "FortniteGame/Public/Athena/AthenaMatchTeamStats.h"
+#include "FortniteGame/Public/Athena/AthenaPlayerMatchReport.h"
 
 void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerControllerZone* This, AFortPlayerPawnAthena* P) {
 	UWorld* World = UWorld::GetWorld();
@@ -82,6 +93,13 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 		}
 	}
 
+	AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>();
+	if (FortPCAthena) {
+		if (FortPCAthena->CustomizationLoadout.Pickaxe) {
+			FortPCAthena->WorldInventory->AddItem(FortPCAthena->CustomizationLoadout.Pickaxe->WeaponDefinition);
+		}
+	}
+
 	if (FortGameModeZone->_HasStartingItems() && FortGameModeZone->StartingItems.Num() > 0)
 	{
 		Log("OnReadyToStartMatch: Processing StartingItems for new player. Count: " + std::to_string(FortGameModeZone->StartingItems.Num()));
@@ -90,8 +108,7 @@ void AFortPlayerControllerZone::OnReadyToStartMatch(AFortPlayerControllerZone* T
 			auto& StartingItem = FortGameModeZone->StartingItems.GetWithSize(i, FItemAndCount::GetSize());
 
 			Log(std::format("StartingItem {}: Item={}, Count={}", i, StartingItem.Item ? StartingItem.Item->GetFName().ToString().ToString() : "None", StartingItem.Count));
-			if (StartingItem.Count)
-				This->WorldInventory->AddItem(StartingItem.Item, StartingItem.Count);
+			This->WorldInventory->AddItem(StartingItem.Item, StartingItem.Count);
 		}
 	}
 	else {
