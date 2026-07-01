@@ -161,6 +161,8 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("DumpActorsWithClass <ClassName> - Dumps all actors of a specific class.");
 		This->ClientMessage("TeleportToLocation <X> <Y> <Z> - Teleports the player to a specific location.");
 		This->ClientMessage("DumpCurrentLocation - Dumps the player's current location.");
+		This->ClientMessage("SpawnQuickBars - Spawns the player's quickbars.");
+		This->ClientMessage("DestroyQuickBars - Destroys the player's quickbars.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -657,6 +659,31 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 
 		return;
 	}
+	else if (Parser.IsCommand("SpawnQuickBars")) {
+		This->SpawnQuickBars();
+		This->ClientMessage("Spawned QuickBars.");
+
+		return;
+	}
+	else if (Parser.IsCommand("DestroyQuickBars")) {
+		if (This->QuickBars) {
+			This->QuickBars->K2_DestroyActor();
+			This->QuickBars = nullptr;
+			This->ForceNetUpdate();
+			This->ClientMessage("Destroyed QuickBars.");
+		}
+		else if (This->ClientQuickBars) {
+			This->ClientQuickBars->K2_DestroyActor();
+			This->ClientQuickBars = nullptr;
+			This->ForceNetUpdate();
+			This->ClientMessage("Destroyed ClientQuickBars.");
+		}
+		else {
+			This->ClientMessage("No QuickBars to destroy.");
+		}
+
+		return;
+	}
 
 	UKismetSystemLibrary::ExecuteConsoleCommand(*GWorld, *Msg, This);
 }
@@ -674,6 +701,7 @@ void AFortPlayerController::ServerExecuteInventoryItem(AFortPlayerController* Th
 		return;
 	}
 
+	//Log("ServerExecuteInventoryItem: " + ItemDef->GetName().ToString() + " (GUID: " + ItemGuid.FormatGuid() + ")");
 	ItemDef->ServerExecute(ItemInstance, This);
 }
 

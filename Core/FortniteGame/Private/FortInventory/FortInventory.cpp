@@ -693,6 +693,16 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 		return nullptr;
 	}
 
+	if (!Update()) {
+		return nullptr;
+	}
+
+	PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
+	if (PC->IsUsingOldQuickBars())
+	{
+		PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
+	}
+
 	if (bSpawnPickup)
 	{
 		AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
@@ -747,12 +757,7 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 			FFortItemEntry* AddedEntry = SwapCurrentItem(OverflowEntry, bSpawnOverflowPickup);
 			if (AddedEntry)
 			{
-				PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
-				if (PC->IsUsingOldQuickBars())
-				{
-					PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
-				}
-
+				//Log("AFortInventory::AddItemAndHandleOverflow: Swapped current item for new item: " + AddedEntry->ItemDefinition->GetName().ToString());
 				return true;
 			}
 		}
