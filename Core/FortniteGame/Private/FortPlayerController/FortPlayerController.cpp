@@ -158,6 +158,9 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] - Spawns an actor");
 		This->ClientMessage("ClearEquippedItem - Clears the currently equipped item.");
 		This->ClientMessage("GetWeaponStats - Gets the stats of the currently equipped weapon.");
+		This->ClientMessage("DumpActorsWithClass <ClassName> - Dumps all actors of a specific class.");
+		This->ClientMessage("TeleportToLocation <X> <Y> <Z> - Teleports the player to a specific location.");
+		This->ClientMessage("DumpCurrentLocation - Dumps the player's current location.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -576,6 +579,82 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 	else if (Parser.IsCommand("DestroyTarget"))
 	{
 		This->CheatManager->DestroyTarget();
+		return;
+	}
+	else if (Parser.IsCommand("DumpActorsWithClass")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: DumpActorsWithClass <ClassName>");
+			return;
+		}
+
+		std::string ActorClassName = Parser.GetArg(0);
+
+		UObject* ActorClassObj = Utils::GetObjectFromString(ActorClassName, EClassCastFlags::CASTCLASS_UClass);
+		if (!ActorClassObj) {
+			This->ClientMessage("Actor class not found: " + ActorClassName);
+			return;
+		}
+
+		UClass* ActorClass = ActorClassObj->Cast<UClass>();
+		if (!ActorClass) {
+			This->ClientMessage("Object is not a UClass: " + ActorClassObj->GetName().ToString());
+			return;
+		}
+
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(World, ActorClass, &FoundActors);
+
+		This->ClientMessage("Found " + std::to_string(FoundActors.Num()) + " actors of class: " + ActorClass->GetName().ToString());
+		This->ClientMessage("=== Actor List ===");
+		for (AActor* Actor : FoundActors) {
+			This->ClientMessage("");
+			This->ClientMessage("Actor: " + Actor->GetName().ToString());
+			FVector ActorLocation = Actor->K2_GetActorLocation();
+			This->ClientMessage("Location: X=" + std::to_string(ActorLocation.X) + " Y=" + std::to_string(ActorLocation.Y) + " Z=" + std::to_string(ActorLocation.Z));
+			This->ClientMessage("");
+		}
+		This->ClientMessage("=== End of Actor List ===");
+		return;
+	}
+	else if (Parser.IsCommand("TeleportToLocation")) {
+		if (Parser.GetArgCount() < 3)
+		{
+			This->ClientMessage("Usage: TeleportToLocation <X> <Y> <Z>");
+			return;
+		}
+
+		float X = Parser.GetArgFloat(0, 0.0f);
+		float Y = Parser.GetArgFloat(1, 0.0f);
+		float Z = Parser.GetArgFloat(2, 0.0f);
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		FVector NewLocation(X, Y, Z);
+
+		FHitResult HitResult;
+		This->MyFortPawn->K2_SetActorLocation(NewLocation, false, &HitResult, true);
+		This->ClientMessage("Teleported to location: X=" + std::to_string(X) + " Y=" + std::to_string(Y) + " Z=" + std::to_string(Z));
+		
+		return;
+	}
+	else if (Parser.IsCommand("DumpCurrentLocation")) {
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		FVector CurrentLocation = This->MyFortPawn->K2_GetActorLocation();
+
+		This->ClientMessage("=== Current Location ===");
+		This->ClientMessage("X: " + std::to_string(CurrentLocation.X));
+		This->ClientMessage("Y: " + std::to_string(CurrentLocation.Y));
+		This->ClientMessage("Z: " + std::to_string(CurrentLocation.Z));
+		This->ClientMessage("=== End of Current Location ===");
+
 		return;
 	}
 

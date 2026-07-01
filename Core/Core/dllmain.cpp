@@ -75,11 +75,6 @@ DWORD Main(LPVOID)
 
         UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "Fort.Pickup.ServerSideWeaponAutoPickupsEnabled 1", nullptr);
 
-        if (!Config.bListenServer) {
-            *GIsClient = false;
-        }
-        *GIsServer = true;
-
         Version::SetupVersion();
         Log(std::format("ImageBase: 0x{:X}", ImageBase).c_str());
         Log("FullVersion: " + Version::VersionString);
@@ -90,6 +85,13 @@ DWORD Main(LPVOID)
             SetConsoleTitleA(std::format("Core ({:.2f}) | Starting...", Version::Fortnite_Version).c_str());
         }
         Log(std::format("Fortnite CL: {}", Version::Fortnite_CL));
+
+        if (!Config.bListenServer) {
+            *GIsClient = false;
+        }
+        if (Version::Fortnite_Version >= 4) {
+            *GIsServer = true;
+        }
 
         Sleep(2000);
 

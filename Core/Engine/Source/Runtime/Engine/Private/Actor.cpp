@@ -7,6 +7,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Pawn.h"
 #include "Engine/Plugins/Online/OnlineSubsystemUtils/Source/OnlineSubsystemUtils/Public/OnlineBeaconClient.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/HitResult.h"
 
 ENetMode AActor::InternalGetNetMode(AActor* This)
 {
@@ -321,4 +322,14 @@ float AActor::GetDistanceTo(const AActor* OtherActor) const
 	const_cast<AActor*>(this)->ProcessEvent(Func, &Parms);
 
 	return Parms.ReturnValue;
+}
+
+bool AActor::K2_SetActorLocation(FVector& NewLocation, bool bSweep, FHitResult* SweepHitResult, bool bTeleport)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("K2_SetActorLocation");
+
+	return Call<bool>(Func, NewLocation, bSweep, SweepHitResult, bTeleport);
 }

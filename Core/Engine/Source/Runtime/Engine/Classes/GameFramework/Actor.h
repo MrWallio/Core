@@ -26,6 +26,7 @@ struct FNetworkObjectInfo;
 struct FComponentInstanceDataCache;
 class ULevel;
 class AOnlineBeaconClient;
+struct FHitResult;
 
 class AActor : public UObject {
 public:
@@ -147,6 +148,8 @@ public:
 	void Reset();
 
 	float GetDistanceTo(const AActor* OtherActor) const;
+
+	bool K2_SetActorLocation(FVector& NewLocation, bool bSweep, FHitResult* SweepHitResult, bool bTeleport);
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAActor_InternalGetNetMode()), InternalGetNetMode, (LPVOID*)&InternalGetNetModeOG);
