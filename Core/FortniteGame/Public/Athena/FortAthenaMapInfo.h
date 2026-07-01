@@ -38,7 +38,7 @@ public:
 public:
 	void SpawnLlamas();
 
-	FVector PickSupplyDropLocation(FVector* CenterLocation, double MaxRadius, bool bAvoidWater, float TraceStartZ, float TraceEndZ);
+	FVector PickSupplyDropLocation(FVector& CenterLocation, double MaxRadius, bool bAvoidWater, float TraceStartZ, float TraceEndZ);
 
 	FVector GetMapCenter() const;
 

@@ -108,9 +108,9 @@ void AFortAthenaMapInfo::SpawnLlamas()
 		" of " + std::to_string(LlamaCount) + " llamas.");
 }
 
-FVector AFortAthenaMapInfo::PickSupplyDropLocation(FVector* CenterLocation, double MaxRadius, bool bAvoidWater, float TraceStartZ, float TraceEndZ) {
+FVector AFortAthenaMapInfo::PickSupplyDropLocation(FVector& CenterLocation, double MaxRadius, bool bAvoidWater, float TraceStartZ, float TraceEndZ) {
 	FVector ResultLocation;
-	FVector* (*PickSupplyDropLocationInternal)(AFortAthenaMapInfo*, FVector* result, FVector*, double, bool, float, float) = decltype(PickSupplyDropLocationInternal)(ImageBase + Finder::FindAFortAthenaMapInfo_PickSupplyDropLocation());
+	FVector* (*PickSupplyDropLocationInternal)(AFortAthenaMapInfo*, FVector* result, FVector&, double, bool, float, float) = decltype(PickSupplyDropLocationInternal)(ImageBase + Finder::FindAFortAthenaMapInfo_PickSupplyDropLocation());
 	PickSupplyDropLocationInternal(this, &ResultLocation, CenterLocation, MaxRadius, bAvoidWater, TraceStartZ, TraceEndZ);
 	return ResultLocation;
 }
