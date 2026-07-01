@@ -285,16 +285,6 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
 	{
 		PC->QuickBars->AddItemToQuickBar(ItemGuid, Item->ItemEntry.ItemDefinition->GetQuickBarForItem());
 	}
-	else
-	{
-		uint8 QuickBar = Item->GetQuickBarForItem();
-
-		AFortQuickBars* QuickBars = PC->QuickBars->Cast<AFortQuickBars>();
-		if (!QuickBars)
-			return nullptr;
-
-		QuickBars->ServerAddItemInternal(ItemGuid, QuickBar, QuickBars->GetOpenSlot(QuickBar, ItemGuid));
-	}
 
 	FFortItemEntry* RepEntry = FindItemEntry(ItemGuid);
 	if (!RepEntry)

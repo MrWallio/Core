@@ -84,7 +84,4 @@ public:
 	void OnRep_SecondaryQuickBar();
 
 	bool EquipItem(FGuid Guid);
-
-	// Implemented
-	int GetOpenSlot(uint8 QuickBar, FGuid Guid);
 };
