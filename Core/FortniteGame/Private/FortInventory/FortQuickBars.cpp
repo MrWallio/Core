@@ -295,29 +295,3 @@ bool AFortQuickBars::EquipItem(FGuid Guid) {
 
 	return true;
 }
-
-int AFortQuickBars::GetOpenSlot(uint8 QuickBar, FGuid Guid)
-{
-	if (!this)
-		return -1;
-
-	auto& QuickBarData = QuickBar == EFortQuickBars::GetPrimary() ? PrimaryQuickBar : SecondaryQuickBar;
-
-	for (int i = 0; i < QuickBarData.Slots.Num(); i++)
-	{
-		auto& Slots = QuickBarData.Slots.GetWithSize(i, FQuickBarSlot::GetSize());
-		if (Slots.Items.Num() == 0)
-			return i;
-
-		if (Guid != FGuid())
-		{
-			for (int j = 0; j < Slots.Items.Num(); j++)
-			{
-				if (Slots.Items.GetWithSize(j, FGuid::GetSize()) == Guid)
-					return i;
-			}
-		}
-	}
-
-	return -1;
-}
