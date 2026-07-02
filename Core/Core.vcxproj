@@ -276,6 +276,7 @@
     <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchStats.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchTeamStats.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaPlayerMatchReport.h" />
+    <ClInclude Include="FortniteGame\Public\QuickChat\AthenaQuickChatActiveEntry.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaRewardResult.h" />
     <ClInclude Include="FortniteGame\Public\Athena\FortAthenaMapInfo.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingGameplayActor.h" />
@@ -394,6 +395,8 @@
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h" />
     <ClInclude Include="FortniteGame\Public\Data\BuildingEditModeMetadata.h" />
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileSys.h" />
+    <ClInclude Include="FortniteGame\Public\QuickChat\AthenaQuickChatBank.h" />
+    <ClInclude Include="FortniteGame\Public\QuickChat\AthenaQuickChatLeafEntry.h" />
     <ClInclude Include="FortniteGame\Public\Server\EmptyServerReservation.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />

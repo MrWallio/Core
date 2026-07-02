@@ -259,3 +259,17 @@ uint8 AFortPlayerStateAthena::ToDeathCause(const FGameplayTagContainer& InTags, 
 		return Parms.ReturnValue;
 	}
 }
+
+void AFortPlayerStateAthena::OnRep_ReplicatedTeamMemberState()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_ReplicatedTeamMemberState");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}

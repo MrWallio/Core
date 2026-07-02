@@ -1289,7 +1289,7 @@ int32 AFortPlayerController::PayBuildingRepairCost(ABuildingSMActor* BuildingToR
 	return PayBuildingRepairCostInternal(this, BuildingToRepair);
 }
 
-void AFortPlayerController::ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset) {
+void AFortPlayerController::ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset, float EmoteRandomNumber) {
 	ServerPlayEmoteItemOG(This, EmoteAsset);
 	if (Version::Fortnite_Version <= 1.82 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
 		return;

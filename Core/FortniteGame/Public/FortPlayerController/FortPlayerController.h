@@ -124,7 +124,7 @@ public:
 	int32 PayBuildingRepairCost(ABuildingSMActor* BuildingToRepair);
 
 	static inline void (*ServerPlayEmoteItemOG)(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset);
-	static void ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset);
+	static void ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset, float EmoteRandomNumber);
 
 	static inline void (*GetPlayerViewPointOG)(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation);
 	static void GetPlayerViewPoint(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation);

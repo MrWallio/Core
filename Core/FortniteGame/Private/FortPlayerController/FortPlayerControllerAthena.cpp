@@ -27,6 +27,7 @@
 #include "FortniteGame/Public/Athena/AthenaMatchTeamStats.h"
 #include "FortniteGame/Public/Athena/AthenaPlayerMatchReport.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
+#include "FortniteGame/Public/QuickChat/AthenaQuickChatBank.h"
 
 void AFortPlayerControllerAthena::EnterAircraft(AFortPlayerControllerAthena* This, AFortAircraft* InAircraft) {
 	EnterAircraftOG(This, InAircraft);
@@ -538,4 +539,33 @@ FAthenaMatchTeamStats& AFortPlayerControllerAthena::ConstructAthenaMatchTeamStat
 	AthenaMatchTeamStats->TotalPlayers = FortGameStateAthena->TotalPlayers;
 
 	return *AthenaMatchTeamStats;
+}
+
+void AFortPlayerControllerAthena::ServerPlaySquadQuickChatMessage(AFortPlayerControllerAthena* This, FAthenaQuickChatActiveEntry& ChatEntry, FUniqueNetIdRepl& SenderID) {
+	ServerPlaySquadQuickChatMessageOG(This, ChatEntry, SenderID);
+	
+	AFortPlayerStateAthena* PlayerStateAthena = This->PlayerState->Cast<AFortPlayerStateAthena>();
+	if (!PlayerStateAthena) {
+		Log("ServerPlaySquadQuickChatMessage: PlayerState is null or not a FortPlayerStateAthena!");
+		return;
+	}
+	
+	UAthenaQuickChatBank* QuickChatBank = ChatEntry.GetBank();
+	if (!QuickChatBank) {
+		Log("ServerPlaySquadQuickChatMessage: QuickChatBank is null!");
+		return;
+	}
+
+	if (!QuickChatBank->ChatOptions.IsValidIndex(ChatEntry.Index)) {
+		Log("ServerPlaySquadQuickChatMessage: ChatEntry index is out of bounds!");
+		return;
+	}
+
+	FAthenaQuickChatLeafEntry& LeafEntry = QuickChatBank->ChatOptions.GetWithSize(ChatEntry.Index, FAthenaQuickChatLeafEntry::GetSize());
+
+	ServerPlayEmoteItem(This, LeafEntry.EmojiItemDefinition, 0.f);
+
+	PlayerStateAthena->TeamMemberState = LeafEntry.TeamCommType;
+	PlayerStateAthena->ReplicatedTeamMemberState = LeafEntry.TeamCommType;
+	PlayerStateAthena->OnRep_ReplicatedTeamMemberState();
 }
