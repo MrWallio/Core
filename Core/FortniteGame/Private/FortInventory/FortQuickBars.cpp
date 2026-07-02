@@ -5,6 +5,8 @@
 #include "FortniteGame/Public/FortItem/FortWorldItem.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
+#include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 
 void AFortQuickBars::ServerAddItemInternal(const FGuid& Item, uint8 InQuickBar, int32 Slot)
 {
@@ -294,4 +296,23 @@ bool AFortQuickBars::EquipItem(FGuid Guid) {
 	ServerActivateSlotInternal(ItemDefQuickBar, FindQuickBarSlotForItem(ItemDefQuickBar, Guid), 0.f, true);
 
 	return true;
+}
+
+UClass* AFortQuickBars::GetDefaultQuickBarsClass()
+{
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		return AFortQuickBars::StaticClass();
+	}
+
+	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
+	if (FortGameModeAthena) {
+		if (!AFortQuickBarsAthena::StaticClass()) {
+			return AFortQuickBars::StaticClass();
+		}
+
+		return AFortQuickBarsAthena::StaticClass();
+	}
+
+	return AFortQuickBars::StaticClass();
 }

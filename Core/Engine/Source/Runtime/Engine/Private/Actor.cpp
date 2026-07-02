@@ -333,3 +333,45 @@ bool AActor::K2_SetActorLocation(FVector& NewLocation, bool bSweep, FHitResult* 
 
 	return Call<bool>(Func, NewLocation, bSweep, SweepHitResult, bTeleport);
 }
+
+void AActor::FlushNetDormancy()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("FlushNetDormancy");
+
+	if (!Func) {
+		return;
+	}
+
+	Call(Func);
+}
+
+void AActor::SetOwner(class AActor* NewOwner)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("SetOwner");
+
+	if (!Func) {
+		return;
+	}
+
+	Call(Func, NewOwner);
+}
+
+void AActor::SetReplicateMovement(bool bInReplicateMovement)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("SetReplicateMovement");
+
+	if (!Func) {
+		return;
+	}
+
+	Call(Func, bInReplicateMovement);
+}

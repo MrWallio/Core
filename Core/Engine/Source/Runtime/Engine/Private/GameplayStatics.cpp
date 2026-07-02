@@ -6,62 +6,28 @@
 
 AActor* UGameplayStatics::BeginDeferredActorSpawnFromClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, const FTransform& SpawnTransform, ESpawnActorCollisionHandlingMethod CollisionHandlingOverride, AActor* Owner)
 {
-	if (!WorldContextObject) {
-		Log("UGameplayStatics::BeginDeferredActorSpawnFromClass: WorldContextObject is null!");
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.BeginDeferredActorSpawnFromClass");
+
+	if (!Func)
 		return nullptr;
-	}
 
-	if (!ActorClass) {
-		Log("UGameplayStatics::BeginDeferredActorSpawnFromClass: ActorClass is null!");
-		return nullptr;
-	}
-
-	if (Finder::FindUGameplayStatics_BeginDeferredActorSpawnFromClass()) {
-		AActor* (*BeginDeferredActorSpawnFromClassInternal)(const UObject*, TSubclassOf<AActor>, const FTransform&, ESpawnActorCollisionHandlingMethod, AActor*) = decltype(BeginDeferredActorSpawnFromClassInternal)(ImageBase + Finder::FindUGameplayStatics_BeginDeferredActorSpawnFromClass());
-		return BeginDeferredActorSpawnFromClassInternal(WorldContextObject, ActorClass, SpawnTransform, CollisionHandlingOverride, Owner);
-	}
-	else {
-		static UFunction* Func = nullptr;
-
-		if (Func == nullptr)
-			Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.BeginDeferredActorSpawnFromClass");
-
-		if (!Func)
-			return nullptr;
-
-		struct GameplayStatics_BeginDeferredActorSpawnFromClass final
-		{
-		public:
-			const UObject* WorldContextObject;
-			TSubclassOf<AActor> ActorClass;
-			FTransform SpawnTransform;
-			ESpawnActorCollisionHandlingMethod CollisionHandlingOverride;
-			AActor* Owner;
-			AActor* ReturnValue;
-		};
-
-		GameplayStatics_BeginDeferredActorSpawnFromClass Parms{};
-
-		Parms.WorldContextObject = WorldContextObject;
-		Parms.ActorClass = ActorClass;
-		Parms.SpawnTransform = std::move(SpawnTransform);
-		Parms.CollisionHandlingOverride = CollisionHandlingOverride;
-		Parms.Owner = Owner;
-
-		GetDefaultObj()->ProcessEvent(Func, &Parms);
-
-		return Parms.ReturnValue;
-	}
+	return GetDefaultObj()->Call<AActor*>(Func, WorldContextObject, ActorClass, SpawnTransform, CollisionHandlingOverride, Owner);
 }
 
 AActor* UGameplayStatics::FinishSpawningActor(AActor* Actor, const FTransform& SpawnTransform)
 {
-	// UE 4.25 Implementation
-	if (Actor) {
-		Actor->FinishSpawning(SpawnTransform);
-	}
+	static UFunction* Func = nullptr;
 
-	return Actor;
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.FinishSpawningActor");
+
+	if (!Func)
+		return nullptr;
+
+	return GetDefaultObj()->Call<AActor*>(Func, Actor, SpawnTransform);
 }
 
 UObject* UGameplayStatics::SpawnObject(TSubclassOf<UObject> ObjectClass, UObject* Outer) {

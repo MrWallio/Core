@@ -693,10 +693,6 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 		return nullptr;
 	}
 
-	if (!Update()) {
-		return nullptr;
-	}
-
 	PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
 	if (PC->IsUsingOldQuickBars())
 	{

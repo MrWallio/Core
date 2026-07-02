@@ -150,6 +150,12 @@ public:
 	float GetDistanceTo(const AActor* OtherActor) const;
 
 	bool K2_SetActorLocation(FVector& NewLocation, bool bSweep, FHitResult* SweepHitResult, bool bTeleport);
+
+	void FlushNetDormancy();
+
+	void SetOwner(AActor* NewOwner);
+
+	void SetReplicateMovement(bool bInReplicateMovement);
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAActor_InternalGetNetMode()), InternalGetNetMode, (LPVOID*)&InternalGetNetModeOG);

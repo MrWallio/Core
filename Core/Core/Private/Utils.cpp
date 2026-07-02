@@ -37,6 +37,7 @@
 #include "FortniteGame/Public/FortWeapon/FortDecoTool.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
 #include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
+#include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -244,6 +245,7 @@ void Utils::Hook() {
 	ABuildingItemCollectorActor::Hook();
 	AFortAthenaMapInfo::Hook();
 	AFortAthenaSupplyDrop::Hook();
+	AFortQuickBars::Hook();
 
 	status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK) {

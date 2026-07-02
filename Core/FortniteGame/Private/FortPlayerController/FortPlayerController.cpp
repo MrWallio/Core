@@ -67,14 +67,24 @@ void AFortPlayerController::SpawnQuickBars()
 			return;
 		}
 
+		UClass* QuickBarsClass = AFortQuickBars::GetDefaultQuickBarsClass();
+
 		if (IsUsingOldQuickBars()) {
 			if (!QuickBars)
 			{
-				AActor* NewQuickBars = World->SpawnActor(AFortQuickBars::StaticClass(), FVector(), FRotator(), this);
+				AActor* NewQuickBars = World->SpawnActor(QuickBarsClass, FVector(), FRotator(), this);
 				if (NewQuickBars && NewQuickBars->Cast<AFortQuickBars>()) {
 					QuickBars = NewQuickBars->Cast<AFortQuickBars>();
+
+					QuickBars->SetOwner(this);
+					QuickBars->bReplicates = true;
+					QuickBars->bOnlyRelevantToOwner = true;
+					QuickBars->SetReplicateMovement(false);
+
+					QuickBars->FlushNetDormancy();
 					QuickBars->ForceNetUpdate();
 					ForceNetUpdate();
+
 					Log("Spawned QuickBars: " + QuickBars->GetName().ToString());
 				}
 			}
@@ -82,7 +92,7 @@ void AFortPlayerController::SpawnQuickBars()
 		else {
 			if (!ClientQuickBars)
 			{
-				AActor* NewQuickBars = World->SpawnActor(AFortQuickBars::StaticClass(), FVector(), FRotator(), this);
+				AActor* NewQuickBars = World->SpawnActor(QuickBarsClass, FVector(), FRotator(), this);
 				if (NewQuickBars && NewQuickBars->Cast<AFortQuickBars>()) {
 					ClientQuickBars = NewQuickBars->Cast<AFortQuickBars>();
 					ClientQuickBars->ForceNetUpdate();
@@ -163,6 +173,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("DumpCurrentLocation - Dumps the player's current location.");
 		This->ClientMessage("SpawnQuickBars - Spawns the player's quickbars.");
 		This->ClientMessage("DestroyQuickBars - Destroys the player's quickbars.");
+		This->ClientMessage("DumpQuickBars - Dumps the player's quickbars.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -661,6 +672,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 	}
 	else if (Parser.IsCommand("SpawnQuickBars")) {
 		This->SpawnQuickBars();
+		This->SetupQuickBars();
 		This->ClientMessage("Spawned QuickBars.");
 
 		return;
@@ -683,6 +695,25 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		}
 
 		return;
+		}
+	else if (Parser.IsCommand("DumpQuickBars")) {
+		if (This->QuickBars) {
+			This->ClientMessage("=== QuickBars ===");
+			This->ClientMessage("QuickBars: " + This->QuickBars->GetName().ToString());
+			This->ClientMessage("QuickBars Address: " + std::to_string((uintptr_t)This->QuickBars));
+			This->ClientMessage("=== End of QuickBars ===");
+		}
+		else if (This->ClientQuickBars) {
+			This->ClientMessage("=== ClientQuickBars ===");
+			This->ClientMessage("ClientQuickBars: " + This->ClientQuickBars->GetName().ToString());
+			This->ClientMessage("ClientQuickBars Address: " + std::to_string((uintptr_t)This->ClientQuickBars));
+			This->ClientMessage("=== End of ClientQuickBars ===");
+		}
+		else {
+			This->ClientMessage("No QuickBars to dump.");
+		}
+
+		return;
 	}
 
 	UKismetSystemLibrary::ExecuteConsoleCommand(*GWorld, *Msg, This);
@@ -701,7 +732,13 @@ void AFortPlayerController::ServerExecuteInventoryItem(AFortPlayerController* Th
 		return;
 	}
 
-	//Log("ServerExecuteInventoryItem: " + ItemDef->GetName().ToString() + " (GUID: " + ItemGuid.FormatGuid() + ")");
+	AFortPawn* FortPawn = This->MyFortPawn;
+	if (!FortPawn) {
+		Log("AFortPlayerController::ServerExecuteInventoryItem: MyFortPawn is null!");
+		return;
+	}
+
+	Log("ServerExecuteInventoryItem: " + ItemDef->GetName().ToString() + " (GUID: " + ItemGuid.FormatGuid() + ")");
 	ItemDef->ServerExecute(ItemInstance, This);
 }
 
