@@ -754,6 +754,13 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 			if (AddedEntry)
 			{
 				//Log("AFortInventory::AddItemAndHandleOverflow: Swapped current item for new item: " + AddedEntry->ItemDefinition->GetName().ToString());
+				
+				PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
+				if (PC->IsUsingOldQuickBars())
+				{
+					PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
+				}
+				
 				return true;
 			}
 		}

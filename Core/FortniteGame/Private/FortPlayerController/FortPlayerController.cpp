@@ -85,6 +85,9 @@ void AFortPlayerController::SpawnQuickBars()
 					QuickBars->ForceNetUpdate();
 					ForceNetUpdate();
 
+					QuickBars->OnRep_PrimaryQuickBar();
+					QuickBars->OnRep_SecondaryQuickBar();	
+
 					Log("Spawned QuickBars: " + QuickBars->GetName().ToString());
 				}
 			}
@@ -174,6 +177,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		This->ClientMessage("SpawnQuickBars - Spawns the player's quickbars.");
 		This->ClientMessage("DestroyQuickBars - Destroys the player's quickbars.");
 		This->ClientMessage("DumpQuickBars - Dumps the player's quickbars.");
+		This->ClientMessage("ServerExecuteInventoryItem <ItemGuid> - Executes an inventory item by its GUID.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -712,6 +716,21 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		else {
 			This->ClientMessage("No QuickBars to dump.");
 		}
+
+		return;
+	}
+	else if (Parser.IsCommand("ServerExecuteInventoryItem")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: ServerExecuteInventoryItem <ItemGuid>");
+			return;
+		}
+
+		std::string GuidA = Parser.GetArg(0);
+
+		FGuid ItemGuid = FGuid::ParseGUID(GuidA);
+
+		This->ServerExecuteInventoryItem(This, ItemGuid);
 
 		return;
 	}
@@ -1419,4 +1438,18 @@ FVector AFortPlayerController::GetDropFinalLocation()
 	FinalLoc.Y += std::sin(AngleRad) * Radius;
 
 	return FinalLoc;
+}
+
+void AFortPlayerController::ClientExecuteInventoryItem(FGuid& ItemGuid, float Delay, bool bForceExecute, bool bActivateSlotAfterSettingFocused)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientExecuteInventoryItem");
+
+	if (!Func) {
+		return;
+	}
+
+	Call(Func, ItemGuid, Delay, bForceExecute, bActivateSlotAfterSettingFocused);
 }

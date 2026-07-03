@@ -137,6 +137,8 @@ public:
 
 	FVector GetDropFinalLocation();
 
+	void ClientExecuteInventoryItem(FGuid& ItemGuid, float Delay, bool bForceExecute, bool bActivateSlotAfterSettingFocused);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),
