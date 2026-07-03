@@ -47,7 +47,7 @@ void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
 		return;
 	}
 
-	if ((!World || !World->NetDriver || !World->NetDriver->ReplicationDriver) && (This->_HasQuickBars() && !This->QuickBars))
+	if (Version::Fortnite_Version < 3.0 && (This->_HasQuickBars() && !This->QuickBars))
 	{
 		This->SpawnQuickBars();
 		This->SetupQuickBars();
