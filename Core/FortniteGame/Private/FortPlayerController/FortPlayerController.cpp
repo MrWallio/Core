@@ -47,7 +47,7 @@ void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
 		return;
 	}
 
-	if (Version::Fortnite_Version < 3.0 && (This->_HasQuickBars() && !This->QuickBars))
+	if (This->_HasQuickBars() && !This->QuickBars)
 	{
 		This->SpawnQuickBars();
 		This->SetupQuickBars();
@@ -72,21 +72,10 @@ void AFortPlayerController::SpawnQuickBars()
 		if (IsUsingOldQuickBars()) {
 			if (!QuickBars)
 			{
-				AActor* NewQuickBars = World->SpawnActor(QuickBarsClass, FVector(), FRotator(), this);
+				AActor* NewQuickBars = World->SpawnActor(QuickBarsClass, FVector(-280, 400, 3000), FRotator(), this);
 				if (NewQuickBars && NewQuickBars->Cast<AFortQuickBars>()) {
 					QuickBars = NewQuickBars->Cast<AFortQuickBars>();
-
-					QuickBars->SetOwner(this);
-					QuickBars->bReplicates = true;
-					QuickBars->bOnlyRelevantToOwner = true;
-					QuickBars->SetReplicateMovement(false);
-
-					QuickBars->FlushNetDormancy();
-					QuickBars->ForceNetUpdate();
-					ForceNetUpdate();
-
-					QuickBars->OnRep_PrimaryQuickBar();
-					QuickBars->OnRep_SecondaryQuickBar();	
+					OnRep_QuickBar();
 
 					Log("Spawned QuickBars: " + QuickBars->GetName().ToString());
 				}
@@ -98,8 +87,7 @@ void AFortPlayerController::SpawnQuickBars()
 				AActor* NewQuickBars = World->SpawnActor(QuickBarsClass, FVector(), FRotator(), this);
 				if (NewQuickBars && NewQuickBars->Cast<AFortQuickBars>()) {
 					ClientQuickBars = NewQuickBars->Cast<AFortQuickBars>();
-					ClientQuickBars->ForceNetUpdate();
-					ForceNetUpdate();
+
 					Log("Spawned ClientQuickBars: " + ClientQuickBars->GetName().ToString());
 				}
 			}

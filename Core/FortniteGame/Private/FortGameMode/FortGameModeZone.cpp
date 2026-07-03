@@ -26,6 +26,12 @@ void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPl
 		NewPlayer->PlayerCameraManager->ViewRollMax = 0.0f;
 	}
 
+	if (NewPlayer->_HasQuickBars() && !NewPlayer->QuickBars)
+	{
+		NewPlayer->SpawnQuickBars();
+		NewPlayer->SetupQuickBars();
+	}
+
 	return HandleStartingNewPlayerOG(This, NewPlayer);
 }
 
