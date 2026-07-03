@@ -880,11 +880,14 @@ bool AFortInventory::CanAddItemWithStacking(UFortItemDefinition* Def, int32 Coun
 		return false;
 	}
 
-	if (!IsInventoryFull()) {
+	if (Def->GetQuickBarForItem() == EFortQuickBars::GetPrimary() && IsInventoryFull()) {
 		return true;
 	}
 
 	TArray<FFortItemEntry*> ExistingEntries = FindItemEntries(Def);
+	if (ExistingEntries.Num() == 0)
+		return true;
+
 	for (FFortItemEntry* Entry : ExistingEntries)
 	{
 		if (!Entry)
