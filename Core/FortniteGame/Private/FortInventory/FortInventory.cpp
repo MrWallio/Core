@@ -880,7 +880,7 @@ bool AFortInventory::CanAddItemWithStacking(UFortItemDefinition* Def, int32 Coun
 		return false;
 	}
 
-	if (Def->GetQuickBarForItem() == EFortQuickBars::GetPrimary() && IsInventoryFull()) {
+	if (!IsInventoryFull()) {
 		return true;
 	}
 

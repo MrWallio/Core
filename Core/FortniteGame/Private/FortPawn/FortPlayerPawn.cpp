@@ -150,19 +150,30 @@ void AFortPlayerPawn::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 	if (OtherActor && OtherActor->Cast<AFortPickup>()) {
 		TryToAutoPickup(OtherActor);
 	}
+
+	/*if (OtherActor) {
+		Log("OnCapsuleBeginOverlap: Overlapped with: " + OtherActor->GetName().ToString());
+	}
+	else {
+		Log("OnCapsuleBeginOverlap: Overlapped with null actor!");
+	}*/
 }
 
 void AFortPlayerPawn::TryToAutoPickup(AFortPickup* Pickup) {
 	if (!Pickup) {
+		Log("TryToAutoPickup: Pickup is null!");
 		return;
 	}
 
 	if (Pickup->IsPendingKillPending()) {
+		//Log("TryToAutoPickup: Pickup is pending kill!");
 		return;
 	}
 
-	if (!Pickup->CheckForRePickup(this))
+	if (!Pickup->CheckForRePickup(this)) {
+		//Log("TryToAutoPickup: CheckForRePickup failed!");
 		return;
+	}
 
 	TryToAutoPickupWeapon(Pickup);
 }
@@ -182,8 +193,10 @@ void AFortPlayerPawn::TryToAutoPickupWeapon(AFortPickup* Pickup) {
 	uint8 ItemType = ItemDefinition->ItemType;
 	bool isAutoPickupType = ItemType >= EFortItemType::GetWorldResource() || ItemType <= EFortItemType::GetTrap()
 		|| ItemType == EFortItemType::GetConsumable();
-	if (!isAutoPickupType)
+	if (!isAutoPickupType) {
+		//Log("TryToAutoPickupWeapon: ItemType is not auto pickup type!");
 		return;
+	}
 
 	AFortPlayerController* FortPlayerController = Controller->Cast<AFortPlayerController>();
 	if (!FortPlayerController)
@@ -196,14 +209,17 @@ void AFortPlayerPawn::TryToAutoPickupWeapon(AFortPickup* Pickup) {
 	if (ItemDefinition->GetQuickBarForItem() == EFortQuickBars::GetPrimary()) {
 		FFortItemEntry* ItemEntry = Inventory->FindItemEntry(ItemDefinition);
 		if (!ItemEntry) {
+			//Log("TryToAutoPickupWeapon: No ItemEntry for Primary QuickBars");
 			return;
 		}
 	}
 
 	if (!Inventory->CanAddItemWithStacking(ItemDefinition)) {
+		//Log("TryToAutoPickupWeapon: Cannot add item with stacking");
 		return;
 	}
 
+	//Log("TryToAutoPickupWeapon: Auto-picking up item: " + ItemDefinition->GetName().ToString());
 	FVector ZeroVector(0, 0, 0);
 	ServerHandlePickup(this, Pickup, 1.0f, ZeroVector, true);
 }

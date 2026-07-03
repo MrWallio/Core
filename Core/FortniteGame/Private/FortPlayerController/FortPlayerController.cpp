@@ -738,7 +738,7 @@ void AFortPlayerController::ServerExecuteInventoryItem(AFortPlayerController* Th
 		return;
 	}
 
-	Log("ServerExecuteInventoryItem: " + ItemDef->GetName().ToString() + " (GUID: " + ItemGuid.FormatGuid() + ")");
+	//Log("ServerExecuteInventoryItem: " + ItemDef->GetName().ToString() + " (GUID: " + ItemGuid.FormatGuid() + ")");
 	ItemDef->ServerExecute(ItemInstance, This);
 }
 
