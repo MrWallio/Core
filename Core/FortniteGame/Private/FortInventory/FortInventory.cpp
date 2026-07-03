@@ -57,8 +57,14 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 }
 
 void AFortInventory::InitializeExistingItem(UFortWorldItem* ExistingItem) {
-	void (*InitializeExistingItemInternal)(AFortInventory * This, UFortWorldItem * ExistingItem) = decltype(InitializeExistingItemInternal)(ImageBase + Finder::FindAFortInventory_InitializeExistingItem());
-	return InitializeExistingItemInternal(this, ExistingItem);
+	if (Finder::FindAFortInventory_InitializeExistingItem()) {
+		void (*InitializeExistingItemInternal)(AFortInventory * This, UFortWorldItem * ExistingItem) = decltype(InitializeExistingItemInternal)(ImageBase + Finder::FindAFortInventory_InitializeExistingItem());
+		return InitializeExistingItemInternal(this, ExistingItem);
+	}
+	else {
+		Inventory.ReplicatedEntries.Add(ExistingItem->ItemEntry);
+		Inventory.ItemInstances.Add(ExistingItem);
+	}
 }
 
 FFortItemEntry* AFortInventory::FindItemEntry(FGuid Guid)
