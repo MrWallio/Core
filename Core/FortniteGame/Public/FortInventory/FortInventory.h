@@ -63,6 +63,8 @@ public:
 	FFortItemEntry* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0, bool bDeferUpdate = false);
 	FFortItemEntry* AddItem(const FFortItemEntry& ItemEntry, bool bDeferUpdate = false);
 
+	FFortItemEntry* AddItemPreserveGuid(const FFortItemEntry& ItemEntry);
+
 	int32 GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry);
 
 	bool RemoveItem(FGuid Guid, int32 Count = INT_MAX, bool bDeferUpdate = false);

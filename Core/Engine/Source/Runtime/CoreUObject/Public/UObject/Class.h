@@ -451,6 +451,10 @@ Ret UObject::Call(UFunction* Function, Args&&... args)
         if (Mem) memset(Mem, 0, GetSize()); \
         return (__Class*)Mem; \
     } \
+    static void Copy(__Class* Dest, const __Class* Src) \
+    { \
+        memcpy(Dest, Src, GetSize()); \
+    } \
 
 #define DefineUnrealStructPath(FullName) \
     static UStruct* StaticStruct() \

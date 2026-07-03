@@ -125,8 +125,6 @@ void AFortPickup::SetPickupItems(FFortItemEntry* PrimaryEntry, TArray<FFortItemE
 }
 
 void AFortPickup::GivePickupTo(AFortPickup* This, IFortInventoryOwnerInterface* InventoryOwner, bool DestroyAfterPickup) {
-	GivePickupToOG(This, InventoryOwner, DestroyAfterPickup);
-
 	AFortInventory* Inventory = nullptr;
 
 	if (This->PickupLocationData.PickupTarget || This->PickupLocationData.ItemOwner) {
@@ -144,6 +142,8 @@ void AFortPickup::GivePickupTo(AFortPickup* This, IFortInventoryOwnerInterface* 
 	else {
 		Log("AFortPickup::GivePickupTo: No valid inventory owner found for pickup!");
 	}
+
+	return GivePickupToOG(This, InventoryOwner, DestroyAfterPickup);
 }
 
 bool AFortPickup::CheckForRePickup(AFortPlayerPawn* FortPlayerPawn) {

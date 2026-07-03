@@ -351,6 +351,46 @@ FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry, bool bD
 	return nullptr;
 }
 
+FFortItemEntry* AFortInventory::AddItemPreserveGuid(const FFortItemEntry& ItemEntry)
+{
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC)
+		return nullptr;
+
+	UFortItemDefinition* Def = ItemEntry.ItemDefinition;
+	if (!Def)
+		return nullptr;
+
+	if (FindItemEntry(ItemEntry.ItemGuid))
+	{
+		Log("AddItemPreserveGuid: guid already exists in inventory!");
+		return nullptr;
+	}
+
+	UFortWorldItem* Item = (UFortWorldItem*)Def->CreateTemporaryItemInstanceBP(ItemEntry.Count, ItemEntry.Level);
+	if (!Item)
+		return nullptr;
+
+	FFortItemEntry::Copy(&Item->ItemEntry, &ItemEntry);
+
+	Item->SetOwningControllerForTemporaryItem(PC);
+	SetStateValues(&Item->ItemEntry);
+
+	InitializeExistingItem(Item);
+
+	if (PC->IsUsingOldQuickBars())
+		PC->QuickBars->AddItemToQuickBar(ItemEntry.ItemGuid, Def->GetQuickBarForItem());
+
+	FFortItemEntry* RepEntry = FindItemEntry(ItemEntry.ItemGuid);
+	if (!RepEntry)
+		return nullptr;
+
+	if (Update(RepEntry))
+		return RepEntry;
+
+	return nullptr;
+}
+
 int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 {
 	AFortPlayerController* PC = GetOwnerPlayerController();
@@ -689,10 +729,10 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 	if (!RemoveItem(CurrentGuid, CurrentCount, true))
 		return nullptr;
 
-	FFortItemEntry* AddedEntry = AddItem(NewItemEntry, true);
+	FFortItemEntry* AddedEntry = AddItemPreserveGuid(NewItemEntry);
 	if (!AddedEntry)
 	{
-		AddItem(OldItemEntry);
+		AddItemPreserveGuid(OldItemEntry);
 		return nullptr;
 	}
 

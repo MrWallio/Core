@@ -24,10 +24,6 @@ void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPl
 	if (NewPlayer->PlayerCameraManager) {
 		NewPlayer->PlayerCameraManager->ViewRollMin = 0.0f;
 		NewPlayer->PlayerCameraManager->ViewRollMax = 0.0f;
-		Log("Set PlayerCameraManager ViewRollMin and ViewRollMax to 0.0f");
-	}
-	else {
-		Log("PlayerCameraManager is null!");
 	}
 
 	return HandleStartingNewPlayerOG(This, NewPlayer);
