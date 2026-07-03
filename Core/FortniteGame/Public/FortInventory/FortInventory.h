@@ -59,14 +59,14 @@ public:
 	// Inventory Mutation
 	// =================================================================
 
-	FFortItemEntry* AddItem(UFortWorldItem* Item);
-	FFortItemEntry* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0);
-	FFortItemEntry* AddItem(const FFortItemEntry& ItemEntry);
+	FFortItemEntry* AddItem(UFortWorldItem* Item, bool bDeferUpdate = false);
+	FFortItemEntry* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0, bool bDeferUpdate = false);
+	FFortItemEntry* AddItem(const FFortItemEntry& ItemEntry, bool bDeferUpdate = false);
 
 	int32 GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry);
 
-	bool RemoveItem(FGuid Guid, int32 Count = INT_MAX);
-	bool RemoveItem(UFortItemDefinition* Def, int32 Count = INT_MAX);
+	bool RemoveItem(FGuid Guid, int32 Count = INT_MAX, bool bDeferUpdate = false);
+	bool RemoveItem(UFortItemDefinition* Def, int32 Count = INT_MAX, bool bDeferUpdate = false);
 
 	void RemoveEntryAndInstance(FGuid Guid);
 

@@ -19,14 +19,18 @@
 #include "FortniteGame/Public/BuildingActor/BuildingItemCollectorActor.h"
 
 void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer) {
-	HandleStartingNewPlayerOG(This, NewPlayer);
-
 	Log("HandleStartingNewPlayer Called!");
-	UWorld* World = UWorld::GetWorld();
-	if (!World) {
-		Log("HandleStartingNewPlayer: World is null!");
-		return;
+
+	if (NewPlayer->PlayerCameraManager) {
+		NewPlayer->PlayerCameraManager->ViewRollMin = 0.0f;
+		NewPlayer->PlayerCameraManager->ViewRollMax = 0.0f;
+		Log("Set PlayerCameraManager ViewRollMin and ViewRollMax to 0.0f");
 	}
+	else {
+		Log("PlayerCameraManager is null!");
+	}
+
+	return HandleStartingNewPlayerOG(This, NewPlayer);
 }
 
 void AFortGameModeZone::CreateAIDirector() {

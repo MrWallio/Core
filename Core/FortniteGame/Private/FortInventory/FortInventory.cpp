@@ -271,7 +271,7 @@ AFortPlayerController* AFortInventory::GetOwnerPlayerController() const
 	return Owner ? Owner->Cast<AFortPlayerController>() : nullptr;
 }
 
-FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
+FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item, bool bDeferUpdate)
 {
 	if (!Item)
 		return nullptr;
@@ -299,7 +299,7 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
 	}
 
 	SetStateValues(RepEntry);
-	if (Update(RepEntry))
+	if (bDeferUpdate ? true : Update(RepEntry))
 	{
 		return RepEntry;
 	}
@@ -307,7 +307,7 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item)
 	return nullptr;
 }
 
-FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, int32 Level)
+FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, int32 Level, bool bDeferUpdate)
 {
 	if (!CanAddItem(Def, Count))
 		return nullptr;
@@ -322,7 +322,7 @@ FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, i
 	return AddItem(Item);
 }
 
-FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
+FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry, bool bDeferUpdate)
 {
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC)
@@ -343,7 +343,7 @@ FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry)
 	RepEntry->Durability = ItemEntry.Durability;
 	RepEntry->bIsDirty = true;
 
-	if (Update(RepEntry))
+	if (bDeferUpdate ? true : Update(RepEntry))
 	{
 		return RepEntry;
 	}
@@ -476,7 +476,7 @@ int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 	return Remaining;
 }
 
-bool AFortInventory::RemoveItem(FGuid Guid, int32 Count)
+bool AFortInventory::RemoveItem(FGuid Guid, int32 Count, bool bDeferUpdate)
 {
 	if (!CanRemoveItem(Guid, Count))
 		return false;
@@ -492,7 +492,7 @@ bool AFortInventory::RemoveItem(FGuid Guid, int32 Count)
 	if (Entry->Count > Count)
 	{
 		Entry->Count -= Count;
-		return Update(Entry);
+		return bDeferUpdate ? true : Update(Entry);
 	}
 
 	if (PC->IsUsingOldQuickBars())
@@ -501,10 +501,10 @@ bool AFortInventory::RemoveItem(FGuid Guid, int32 Count)
 	}
 
 	RemoveEntryAndInstance(Guid);
-	return Update();
+	return bDeferUpdate ? true : Update();
 }
 
-bool AFortInventory::RemoveItem(UFortItemDefinition* Def, int32 Count)
+bool AFortInventory::RemoveItem(UFortItemDefinition* Def, int32 Count, bool bDeferUpdate)
 {
 	if (!Def)
 	{
@@ -525,7 +525,7 @@ bool AFortInventory::RemoveItem(UFortItemDefinition* Def, int32 Count)
 		return false;
 	}
 
-	return RemoveItem(ItemEntry->ItemGuid, Count);
+	return RemoveItem(ItemEntry->ItemGuid, Count, bDeferUpdate);
 }
 
 void AFortInventory::RemoveEntryAndInstance(FGuid Guid)
@@ -686,21 +686,17 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 	const FGuid CurrentGuid = CurrentItemEntry->ItemGuid;
 	const int32 CurrentCount = CurrentItemEntry->Count;
 
-	if (!RemoveItem(CurrentGuid, CurrentCount))
+	if (!RemoveItem(CurrentGuid, CurrentCount, true))
 		return nullptr;
 
-	FFortItemEntry* AddedEntry = AddItem(NewItemEntry);
+	FFortItemEntry* AddedEntry = AddItem(NewItemEntry, true);
 	if (!AddedEntry)
 	{
 		AddItem(OldItemEntry);
 		return nullptr;
 	}
 
-	PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
-	if (PC->IsUsingOldQuickBars())
-	{
-		PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
-	}
+	Update();
 
 	if (bSpawnPickup)
 	{

@@ -795,6 +795,9 @@
     <ClInclude Include="FortniteGame\Public\QuickChat\AthenaQuickChatLeafEntry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\PlayerCameraManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\dllmain.cpp">

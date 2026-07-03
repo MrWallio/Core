@@ -155,10 +155,8 @@ void AFortPlayerControllerZone::ClientOnPawnDied(AFortPlayerControllerZone* This
 	if (AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>()) {
 		FortPCAthena->ClientOnPawnDied_Implementation(DeathReport);
 	}
-	else {
-		This->ClientOnPawnDied_Implementation(DeathReport);
-	}
 
+	This->ClientOnPawnDied_Implementation(DeathReport);
 	ClientOnPawnDiedOG(This, DeathReport);
 }
 

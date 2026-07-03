@@ -174,6 +174,7 @@
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Logging\LogMacros.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Logging\LogVerbosity.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\AI\Navigation\NavigationSystem.h" />
+    <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Camera\PlayerCameraManager.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\AssetManager.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\DemoNetDriver.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\NavigationObjectBase.h" />

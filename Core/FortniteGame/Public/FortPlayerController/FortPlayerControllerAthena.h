@@ -3,6 +3,7 @@
 
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/Templates/SubclassOf.h"
+#include "Engine/Source/Runtime/Engine/Classes/Camera/PlayerCameraManager.h"
 
 #include "FortPlayerControllerZone.h"
 #include "FortniteGame/Public/FortLoadout/FortAthenaLoadout.h"
