@@ -26,6 +26,7 @@ void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPl
 		NewPlayer->PlayerCameraManager->ViewRollMax = 0.0f;
 	}
 
+	// genuinely fuck yourself game, this is the most retarded shit i've ever seen in my life
 	if (NewPlayer->_HasQuickBars() && !NewPlayer->QuickBars)
 	{
 		NewPlayer->SpawnQuickBars();
