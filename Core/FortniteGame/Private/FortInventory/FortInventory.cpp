@@ -672,9 +672,6 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 		return nullptr;
 	}
 
-	if (!CanSwapForItem(NewItemEntry.ItemDefinition))
-		return nullptr;
-
 	FFortItemEntry* CurrentItemEntry = GetCurrentItemEntry();
 	if (!CurrentItemEntry)
 		return nullptr;
