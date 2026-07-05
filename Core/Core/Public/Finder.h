@@ -1098,6 +1098,10 @@ public:
 	static uintptr_t FindAActor_PreInitializeComponents();
 
 	static uintptr_t FindAActor_PreInitializeComponentsVFT();
+
+	static uintptr_t FindAFortGameModeAthena_PlacePlayerOnTeam();
+
+	static uintptr_t FindAFortGameMode_PlacePlayerOnTeamVFT();
 public:
 	static void SetupCoreOffsets();
 

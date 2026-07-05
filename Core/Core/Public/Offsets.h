@@ -354,6 +354,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameMode_ProcessServerTravelPatch1 = 0;
 	inline uintptr_t AFortGameMode_InitializeTeams = 0;
 	inline uintptr_t AFortGameMode_InitializeTeamsVFT = 0;
+	inline uintptr_t AFortGameMode_PlacePlayerOnTeamVFT = 0;
 
 	inline uintptr_t AFortWorldManager_HandleWorldQueryComplete = 0;
 
@@ -410,6 +411,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameModeAthena_FinishWorldInitialization = 0;
 	inline uintptr_t AFortGameModeAthena_AddToAlivePlayers = 0;
 	inline uintptr_t AFortGameModeAthena_RemoveFromAlivePlayers = 0;
+	inline uintptr_t AFortGameModeAthena_PlacePlayerOnTeam = 0;
 
 	inline uintptr_t AFortGameStateAthena_OnRep_CurrentPlaylistInfo = 0;
 	inline uintptr_t AFortGameStateAthena_OnPlaylistDataLoadCompleted = 0;

@@ -240,3 +240,21 @@ UClass* AFortGameModeAthena::GetSupplyDropClass() {
 
 	return SupplyDropClass;
 }
+
+void AFortGameModeAthena::PlacePlayerOnTeam(AFortGameModeAthena* This, AFortPlayerController* FortPC) {
+	PlacePlayerOnTeamOG(This, FortPC);
+	if (!FortPC) {
+		return;
+	}
+
+	AFortPlayerStateAthena* FortPS = FortPC->PlayerState->Cast<AFortPlayerStateAthena>();
+	if (!FortPS) {
+		return;
+	}
+
+	FCoreConfig& Config = ConfigurationManager::GetConfig();
+	if (!Config.bUseGameSessions) {
+		FortPS->SquadId = FortPS->TeamIndex - 3;
+		FortPS->OnRep_SquadId();
+	}
+}

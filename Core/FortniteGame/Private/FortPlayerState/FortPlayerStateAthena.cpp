@@ -273,3 +273,17 @@ void AFortPlayerStateAthena::OnRep_ReplicatedTeamMemberState()
 
 	ProcessEvent(Func, nullptr);
 }
+
+void AFortPlayerStateAthena::OnRep_SquadId()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_SquadId");
+
+	if (!Func) {
+		return;
+	}
+
+	ProcessEvent(Func, nullptr);
+}

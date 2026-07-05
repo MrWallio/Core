@@ -10952,6 +10952,46 @@ uintptr_t Finder::FindAActor_PreInitializeComponentsVFT() {
 	return ServerOffsets::AActor_PreInitializeComponentsVFT;
 }
 
+uintptr_t Finder::FindAFortGameModeAthena_PlacePlayerOnTeam() {
+	if (ServerOffsets::AFortGameModeAthena_PlacePlayerOnTeam)
+		return ServerOffsets::AFortGameModeAthena_PlacePlayerOnTeam;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortGameModeAthena_PlacePlayerOnTeam;
+	
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"PlacePlayerOnTeam for %s Current: %s Actual: %s");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameModeAthena_PlacePlayerOnTeam = Addr - ImageBase;
+	}
+
+	bInitialized = true;
+	Log("AFortGameModeAthena_PlacePlayerOnTeam found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeAthena_PlacePlayerOnTeam));
+	return ServerOffsets::AFortGameModeAthena_PlacePlayerOnTeam;
+}
+
+uintptr_t Finder::FindAFortGameMode_PlacePlayerOnTeamVFT() {
+	if (ServerOffsets::AFortGameMode_PlacePlayerOnTeamVFT)
+		return ServerOffsets::AFortGameMode_PlacePlayerOnTeamVFT;
+	void** VFT = AFortGameMode::StaticClass()->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortGameModeAthena_PlacePlayerOnTeam() + ImageBase))
+		{
+			ServerOffsets::AFortGameMode_PlacePlayerOnTeamVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortGameMode_PlacePlayerOnTeamVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_PlacePlayerOnTeamVFT));
+	return ServerOffsets::AFortGameMode_PlacePlayerOnTeamVFT;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -11351,6 +11391,10 @@ void Finder::SetupOffsets() {
 
 	FindAActor_PreInitializeComponents();
 	FindAActor_PreInitializeComponentsVFT();
+
+	FindAFortGameModeAthena_PlacePlayerOnTeam();
+
+	FindAFortGameMode_PlacePlayerOnTeamVFT();
 
 	return;
 }

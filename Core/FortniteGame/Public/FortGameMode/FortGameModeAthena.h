@@ -56,6 +56,9 @@ public:
 
 	static UClass* GetSupplyDropClass();
 
+	static inline void (*PlacePlayerOnTeamOG)(AFortGameModeAthena* This, AFortPlayerController* FortPC);
+	static void PlacePlayerOnTeam(AFortGameModeAthena* This, AFortPlayerController* FortPC);
+
 	static void Hook() {
 		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
 		HookEveryVTable(
@@ -101,6 +104,13 @@ public:
 			Finder::FindAGameModeBase_InitGameStateVFT(),
 			InitGameState,
 			(LPVOID*)&InitGameStateOG
+		);
+
+		HookEveryVTableIdx(
+			AFortGameModeAthena::StaticClass(),
+			Finder::FindAFortGameMode_PlacePlayerOnTeamVFT(),
+			PlacePlayerOnTeam,
+			(LPVOID*)&PlacePlayerOnTeamOG
 		);
 
 		Log("Hooked AFortGameModeAthena");
