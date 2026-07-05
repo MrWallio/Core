@@ -723,7 +723,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		return;
 	}
 
-	if (Version::Fortnite_Version <= 2.2) {
+	if (Version::Fortnite_Version >= 2.2) {
 		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), Msg, This);
 	}
 }

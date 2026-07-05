@@ -160,6 +160,19 @@ void AFortPlayerControllerZone::ClientOnPawnDied(AFortPlayerControllerZone* This
 	ClientOnPawnDiedOG(This, DeathReport);
 }
 
+void AFortPlayerControllerZone::ClientOnPawnRevived(AController* EventInstigator) {
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ClientOnPawnRevived");
+
+	if (!Func) {
+		return;
+	}
+
+	Call(Func, EventInstigator);
+}
+
 void AFortPlayerControllerZone::Hook() {
 	HookEveryVTable(AFortPlayerControllerZone::StaticClass(), AFortPlayerControllerZone::StaticClass()->GetFunction("Function /Script/Engine.PlayerController.ServerAcknowledgePossession"), ServerAcknowledgePossession, nullptr);
 	

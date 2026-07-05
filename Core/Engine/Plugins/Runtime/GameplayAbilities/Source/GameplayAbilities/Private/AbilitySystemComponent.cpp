@@ -210,20 +210,7 @@ void UAbilitySystemComponent::ClientCancelAbility(const FGameplayAbilitySpecHand
 		return;
 	}
 
-	struct AbilitySystemComponent_ClientCancelAbility
-	{
-	public:
-		FGameplayAbilitySpecHandle AbilityToCancel;
-		uint8 Pad_4[0x4];
-		FGameplayAbilityActivationInfo ActivationInfo;
-	};
-
-	AbilitySystemComponent_ClientCancelAbility Parms{};
-
-	Parms.AbilityToCancel = std::move(AbilityToCancel);
-	Parms.ActivationInfo = std::move(ActivationInfo);
-
-	ProcessEvent(Func, &Parms);
+	Call(Func, AbilityToCancel, ActivationInfo);
 }
 
 void UAbilitySystemComponent::ClientEndAbility(const struct FGameplayAbilitySpecHandle& AbilityToEnd, const struct FGameplayAbilityActivationInfo& ActivationInfo)
@@ -237,20 +224,7 @@ void UAbilitySystemComponent::ClientEndAbility(const struct FGameplayAbilitySpec
 		return;
 	}
 
-	struct AbilitySystemComponent_ClientEndAbility
-	{
-	public:
-		FGameplayAbilitySpecHandle AbilityToEnd;
-		uint8 Pad_4[0x4];
-		FGameplayAbilityActivationInfo ActivationInfo;
-	};
-
-	AbilitySystemComponent_ClientEndAbility Parms{};
-
-	Parms.AbilityToEnd = std::move(AbilityToEnd);
-	Parms.ActivationInfo = std::move(ActivationInfo);
-
-	ProcessEvent(Func, &Parms);
+	Call(Func, AbilityToEnd, ActivationInfo);
 }
 
 void UAbilitySystemComponent::ServerEndAbility(const FGameplayAbilitySpecHandle& AbilityToEnd, const FGameplayAbilityActivationInfo& ActivationInfo, const FPredictionKey& PredictionKey)
@@ -264,20 +238,5 @@ void UAbilitySystemComponent::ServerEndAbility(const FGameplayAbilitySpecHandle&
 		return;
 	}
 
-	struct AbilitySystemComponent_ServerEndAbility
-	{
-	public:
-		FGameplayAbilitySpecHandle AbilityToEnd;
-		uint8 Pad_4[0x4];
-		FGameplayAbilityActivationInfo ActivationInfo;
-		FPredictionKey PredictionKey;
-	};
-
-	AbilitySystemComponent_ServerEndAbility Parms{};
-
-	Parms.AbilityToEnd = std::move(AbilityToEnd);
-	Parms.ActivationInfo = std::move(ActivationInfo);
-	Parms.PredictionKey = std::move(PredictionKey);
-
-	ProcessEvent(Func, &Parms);
+	Call(Func, AbilityToEnd, ActivationInfo, PredictionKey);
 }

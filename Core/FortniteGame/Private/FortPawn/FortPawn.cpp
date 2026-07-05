@@ -263,3 +263,17 @@ void AFortPawn::OnRep_IsDBNO()
 
 	ProcessEvent(Func, nullptr);
 }
+
+bool AFortPawn::IsDBNO() const
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("IsDBNO");
+
+	if (!Func) {
+		return bIsDBNO;
+	}
+
+	return const_cast<AFortPawn*>(this)->Call<bool>(Func);
+}

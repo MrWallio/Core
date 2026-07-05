@@ -9,6 +9,8 @@
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
+#include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
+#include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 
 void AFortPlayerPawn::BeginSkydiving(bool bFromBus)
 {
@@ -70,11 +72,39 @@ void AFortPlayerPawn::RandomizeCharacter(const FString& GenderString)
 void AFortPlayerPawn::ServerReviveFromDBNO(AFortPlayerPawn* This, AController* EventInstigator)
 {
 	ServerReviveFromDBNOOG(This, EventInstigator);
-	if (!This->bIsDBNO) {
+	if (!This->IsDBNO()) {
 		return; // ServerReviveFromDBNO was probably not stripped in this version
 	}
 
-	Log("ServerReviveFromDBNO Called!");
+	AFortPlayerController* FortPlayerController = This->Controller->Cast<AFortPlayerController>();
+	if (!FortPlayerController) {
+		Log("ServerReviveFromDBNO: FortPlayerController is null!");
+		return;
+	}
+
+	AFortPlayerControllerZone* FortPlayerControllerZone = FortPlayerController->Cast<AFortPlayerControllerZone>();
+
+	AFortPlayerState* FortPlayerState = FortPlayerController->PlayerState->Cast<AFortPlayerState>();
+	if (!FortPlayerState) {
+		Log("ServerReviveFromDBNO: FortPlayerState is null!");
+		return;
+	}
+
+	FortPlayerState->AbilitySystemComponent->EndDBNOAbilities();
+
+	This->bIsDBNO = false;
+	This->bPlayedDying = false;
+
+	int32 ReviveHealth = 30;
+	// change revive health variable to more proper value (datatables?)
+
+	This->SetHealth(ReviveHealth);
+
+	This->OnRep_IsDBNO();
+
+	if (FortPlayerControllerZone) {
+		FortPlayerControllerZone->ClientOnPawnRevived(EventInstigator);
+	}
 }
 
 void AFortPlayerPawn::ServerHandlePickup(AFortPlayerPawn* This, AFortPickup* Pickup, float InFlyTime, FVector& InStartDirection, bool bPlayPickupSound) {
