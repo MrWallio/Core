@@ -729,10 +729,10 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 	if (!RemoveItem(CurrentGuid, CurrentCount, true))
 		return nullptr;
 
-	FFortItemEntry* AddedEntry = AddItemPreserveGuid(NewItemEntry);
+	FFortItemEntry* AddedEntry = AddItem(NewItemEntry);
 	if (!AddedEntry)
 	{
-		AddItemPreserveGuid(OldItemEntry);
+		AddItem(OldItemEntry);
 		return nullptr;
 	}
 
