@@ -66,8 +66,8 @@ public:
 
 	void SetupQuickBars();
 
-	static inline void (*ServerCheatOG)(AFortPlayerController* This, FString* Msg);
-	static void ServerCheat(AFortPlayerController* This, FString* Msg);
+	static inline void (*ServerCheatOG)(AFortPlayerController* This, FString& Msg);
+	static void ServerCheat(AFortPlayerController* This, FString& Msg);
 
 	static inline void (*ServerExecuteInventoryItemOG)(AFortPlayerController* This, FGuid& ItemGuid);
 	static void ServerExecuteInventoryItem(AFortPlayerController* This, FGuid& ItemGuid);

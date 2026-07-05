@@ -70,6 +70,9 @@ void AFortPlayerPawn::RandomizeCharacter(const FString& GenderString)
 void AFortPlayerPawn::ServerReviveFromDBNO(AFortPlayerPawn* This, AController* EventInstigator)
 {
 	ServerReviveFromDBNOOG(This, EventInstigator);
+	if (!This->bIsDBNO) {
+		return; // ServerReviveFromDBNO was probably not stripped in this version
+	}
 
 	Log("ServerReviveFromDBNO Called!");
 }

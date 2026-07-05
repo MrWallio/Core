@@ -12,6 +12,7 @@ class UFortPlaylistAthena;
 class AFortWorldManager;
 class UFortWeaponItemDefinition;
 class AFortAthenaPlaylistBase;
+class UAthenaBattleBusItemDefinition;
 
 class AFortGameModeAthena : public AFortGamePvPBase {
 public:
@@ -50,6 +51,10 @@ public:
 
 	static inline void (*InitGameStateOG)(AFortGameModeAthena* This);
 	static void InitGameState(AFortGameModeAthena* This);
+
+	static UAthenaBattleBusItemDefinition* GetBattleBusItemDefinition();
+
+	static UClass* GetSupplyDropClass();
 
 	static void Hook() {
 		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);

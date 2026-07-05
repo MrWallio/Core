@@ -28,6 +28,7 @@
 #include "FortniteGame/Public/FortPlaylist/FortPlaylistAthena.h"
 #include "FortniteGame/Public/FortPlaylist/FortPlaylistManager.h"
 #include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
+#include "FortniteGame/Public/FortSupplyDrop/FortSupplyDropInfo.h"
 
 bool AFortGameModeAthena::ReadyToStartMatch(AFortGameModeAthena* This) {
 	if (This->bWorldIsReady
@@ -78,6 +79,20 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	}
 	else {
 		Log("AFortGameModeAthena::FinishWorldInitialization: MapInfo is null");
+	}
+
+	if (UAthenaBattleBusItemDefinition* BBID = GetBattleBusItemDefinition()) {
+		GameState->DefaultBattleBus = BBID;
+		Log("Set Custom Battle Bus: " + BBID->GetName().ToString());
+	}
+	if (UClass* SupplyDropClass = GetSupplyDropClass()) {
+		GameState->MapInfo->SupplyDropClass = SupplyDropClass;
+
+		for (UFortSupplyDropInfo* SupplyDropInfo : GameState->MapInfo->SupplyDropInfoList) {
+			SupplyDropInfo->SupplyDropClass = SupplyDropClass;
+		}
+
+		Log("Set Custom Supply Drop Class: " + SupplyDropClass->GetName().ToString());
 	}
 }
 
@@ -149,7 +164,6 @@ void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 		return;
 	}
 
-	GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
 	if (UFortPlaylistManager::StaticClass()) {
 		UFortPlaylistManager* PlaylistManager = UFortPlaylistManager::Get();
 		UFortPlaylistAthena* Playlist = nullptr;
@@ -179,8 +193,16 @@ void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 				GameState->CurrentPlaylistInfo.MarkArrayDirty();
 			}
 
+			This->CurrentPlaylistName = Playlist->GetPlaylistName();
+			This->CurrentPlaylistId = Playlist->GetPlaylistId();
+			GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
+
+			GameState->TeamSize = Playlist->MaxSquadSize;
+
 			This->GameSession->MaxPlayers = Playlist->MaxPlayers;
 			This->GameSession->MaxPartySize = Playlist->MaxSquadSize;
+
+			This->MaxPlayerCount = Playlist->MaxPlayers;
 
 			Log("AFortGameModeAthena::InitGameState: Applied playlist " + Playlist->GetFName().ToString().ToString());
 		}
@@ -189,7 +211,31 @@ void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 		}
 	}
 	else {
+		GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
+
 		This->GameSession->MaxPlayers = 100;
+		This->GameSession->MaxPartySize = GameState->TeamSize;
+
 		This->MaxPlayerCount = 100;
 	}
+}
+
+UAthenaBattleBusItemDefinition* AFortGameModeAthena::GetBattleBusItemDefinition() {
+	UAthenaBattleBusItemDefinition* BBID = nullptr;
+	if (Version::Fortnite_Version == 1.11
+		|| (Version::Fortnite_Version <= 2.1 || Version::Fortnite_Version >= 2.42)) {
+		BBID = (UAthenaBattleBusItemDefinition*)StaticLoadObject("/Game/Athena/Items/Cosmetics/BattleBuses/BBID_WinterBus.BBID_WinterBus");
+	}
+
+	return BBID;
+}
+
+UClass* AFortGameModeAthena::GetSupplyDropClass() {
+	UClass* SupplyDropClass = nullptr;
+	if (Version::Fortnite_Version == 1.11
+		|| (Version::Fortnite_Version <= 2.1 || Version::Fortnite_Version >= 2.42)) {
+		SupplyDropClass = (UClass*)StaticLoadObject("/Game/Athena/SupplyDrops/B_AthenaSupplyDrop_Gift.B_AthenaSupplyDrop_Gift_C");
+	}
+
+	return SupplyDropClass;
 }

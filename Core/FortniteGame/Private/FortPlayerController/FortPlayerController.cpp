@@ -103,8 +103,8 @@ void AFortPlayerController::SetupQuickBars()
 	}
 }
 
-void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Msg) {
-	std::string Command = Msg->ToString();
+void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Msg) {
+	std::string Command = Msg.ToString();
 	Log("ServerCheat (" + This->GetName().ToString() + "): [" + Command + "]");
 
 	FCoreConfig& Config = ConfigurationManager::GetConfig();
@@ -723,7 +723,9 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString* Ms
 		return;
 	}
 
-	UKismetSystemLibrary::ExecuteConsoleCommand(*GWorld, *Msg, This);
+	if (Version::Fortnite_Version <= 2.2) {
+		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), Msg, This);
+	}
 }
 
 void AFortPlayerController::ServerExecuteInventoryItem(AFortPlayerController* This, FGuid& ItemGuid) {
