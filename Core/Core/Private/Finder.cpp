@@ -10881,6 +10881,77 @@ uintptr_t Finder::FindAFortDecoTool_SpawnDecoVFT() {
 	return ServerOffsets::AFortDecoTool_SpawnDecoVFT;
 }
 
+uintptr_t Finder::FindAFortGameMode_InitializeTeams() {
+	if (ServerOffsets::AFortGameMode_InitializeTeams)
+		return ServerOffsets::AFortGameMode_InitializeTeams;
+	uintptr_t Addr = 0;
+	
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"InitializeTeams()");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameMode_InitializeTeams = Addr - ImageBase;
+	}
+
+	Log("AFortGameMode_InitializeTeams found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_InitializeTeams));
+	return ServerOffsets::AFortGameMode_InitializeTeams;
+}
+
+uintptr_t Finder::FindAFortGameMode_InitializeTeamsVFT() {
+	if (ServerOffsets::AFortGameMode_InitializeTeamsVFT)
+		return ServerOffsets::AFortGameMode_InitializeTeamsVFT;
+
+	void** VFT = AFortGameMode::StaticClass()->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAFortGameMode_InitializeTeams() + ImageBase))
+		{
+			ServerOffsets::AFortGameMode_InitializeTeamsVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortGameMode_InitializeTeamsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_InitializeTeamsVFT));
+	return ServerOffsets::AFortGameMode_InitializeTeamsVFT;
+}
+
+uintptr_t Finder::FindAActor_PreInitializeComponents() {
+	if (ServerOffsets::AActor_PreInitializeComponents)
+		return ServerOffsets::AActor_PreInitializeComponents;
+	uintptr_t Addr = 0;
+	
+	Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 0F B6 81 ? ? ? ? 48 8B D9 84 C0 74 ? 48 89 7C 24").Get();
+	
+	if (Addr) {
+		ServerOffsets::AActor_PreInitializeComponents = Addr - ImageBase;
+	}
+
+	Log("AActor_PreInitializeComponents found at: 0x" + std::format("{:X}", ServerOffsets::AActor_PreInitializeComponents));
+	return ServerOffsets::AActor_PreInitializeComponents;
+}
+
+uintptr_t Finder::FindAActor_PreInitializeComponentsVFT() {
+	if (ServerOffsets::AActor_PreInitializeComponentsVFT)
+		return ServerOffsets::AActor_PreInitializeComponentsVFT;
+	
+	void** VFT = AActor::StaticClass()->GetDefaultObject()->VTable;
+	
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(FindAActor_PreInitializeComponents() + ImageBase))
+		{
+			ServerOffsets::AActor_PreInitializeComponentsVFT = i;
+			break;
+		}
+	}
+
+	Log("AActor_PreInitializeComponentsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AActor_PreInitializeComponentsVFT));
+	return ServerOffsets::AActor_PreInitializeComponentsVFT;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -11274,6 +11345,12 @@ void Finder::SetupOffsets() {
 
 	FindAFortDecoTool_ShouldAllowServerSpawnDecoVFT();
 	FindAFortDecoTool_SpawnDecoVFT();
+
+	FindAFortGameMode_InitializeTeams();
+	FindAFortGameMode_InitializeTeamsVFT();
+
+	FindAActor_PreInitializeComponents();
+	FindAActor_PreInitializeComponentsVFT();
 
 	return;
 }

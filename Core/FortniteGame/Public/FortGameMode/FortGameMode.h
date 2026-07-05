@@ -47,6 +47,11 @@ public:
 	static inline bool (*ReadyToStartMatchOG)(AFortGameMode* This);
 	static bool ReadyToStartMatch(AFortGameMode* This);
 
+	static inline void (*PreInitializeComponentsOG)(AFortGameMode* This);
+	static void PreInitializeComponents(AFortGameMode* This);
+
+	void InitializeTeams();
+
 	static void Hook() {
 		//CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
 		HookVTable(
@@ -87,6 +92,12 @@ public:
 			AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameMode.ReadyToStartMatch"),
 			ReadyToStartMatch,
 			(LPVOID*)&ReadyToStartMatchOG
+		);
+
+		MH_CreateHook(
+			(LPVOID)(GetOffsetFromVTable(AFortGameMode::GetDefaultObj(), Finder::FindAActor_PreInitializeComponentsVFT())),
+			PreInitializeComponents,
+			(LPVOID*)&PreInitializeComponentsOG
 		);
 
 		Log("AFortGameMode Hooked!");

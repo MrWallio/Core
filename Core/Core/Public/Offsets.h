@@ -352,6 +352,8 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameMode_PickTeam = 0;
 	inline uintptr_t AFortGameMode_PickTeamVFT = 0;
 	inline uintptr_t AFortGameMode_ProcessServerTravelPatch1 = 0;
+	inline uintptr_t AFortGameMode_InitializeTeams = 0;
+	inline uintptr_t AFortGameMode_InitializeTeamsVFT = 0;
 
 	inline uintptr_t AFortWorldManager_HandleWorldQueryComplete = 0;
 
@@ -546,6 +548,8 @@ namespace ServerOffsets {
 	inline uintptr_t AActor_IsNetRelevantForVFT = 0;
 	inline uintptr_t AActor_GetWorld = 0;
 	inline uintptr_t AActor__CreationTime = 0;
+	inline uintptr_t AActor_PreInitializeComponents = 0;
+	inline uintptr_t AActor_PreInitializeComponentsVFT = 0;
 
 	inline uintptr_t FDebug_AssertFailed = 0;
 

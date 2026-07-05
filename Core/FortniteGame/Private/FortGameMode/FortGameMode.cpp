@@ -244,3 +244,12 @@ void AFortGameMode::AddInactivePlayerHK(AFortGameMode* This, APlayerState* Playe
 bool AFortGameMode::ReadyToStartMatch(AFortGameMode* This) {
 	return ReadyToStartMatchOG(This);
 }
+
+void AFortGameMode::PreInitializeComponents(AFortGameMode* This) {
+	PreInitializeComponentsOG(This);
+}
+
+void AFortGameMode::InitializeTeams() {
+	void (*&InitializeTeamsInternal)(AFortGameMode* This) = decltype(InitializeTeamsInternal)(VTable[Finder::FindAFortGameMode_InitializeTeamsVFT()]);
+	InitializeTeamsInternal(this);
+}

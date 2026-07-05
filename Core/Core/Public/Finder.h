@@ -1090,6 +1090,14 @@ public:
 	static uintptr_t FindAFortDecoTool_ShouldAllowServerSpawnDecoVFT();
 
 	static uintptr_t FindAFortDecoTool_SpawnDecoVFT();
+
+	static uintptr_t FindAFortGameMode_InitializeTeams();
+
+	static uintptr_t FindAFortGameMode_InitializeTeamsVFT();
+
+	static uintptr_t FindAActor_PreInitializeComponents();
+
+	static uintptr_t FindAActor_PreInitializeComponentsVFT();
 public:
 	static void SetupCoreOffsets();
 
