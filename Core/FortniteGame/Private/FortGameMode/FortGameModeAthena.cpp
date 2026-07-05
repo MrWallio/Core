@@ -197,10 +197,11 @@ void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 			This->CurrentPlaylistId = Playlist->GetPlaylistId();
 			GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
 
-			GameState->TeamSize = Playlist->MaxSquadSize;
+			GameState->TeamCount = Playlist->MaxTeamCount;
+			GameState->TeamSize = Playlist->MaxTeamSize;
 
 			This->GameSession->MaxPlayers = Playlist->MaxPlayers;
-			This->GameSession->MaxPartySize = Playlist->MaxSquadSize;
+			This->GameSession->MaxPartySize = Playlist->MaxTeamSize;
 
 			This->MaxPlayerCount = Playlist->MaxPlayers;
 
