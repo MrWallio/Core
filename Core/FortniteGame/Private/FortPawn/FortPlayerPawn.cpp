@@ -35,7 +35,7 @@ void AFortPlayerPawn::ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart
 	if (Func == nullptr)
 		Func = FindFunction("ServerChoosePart");
 
-	return Call(Func, ChosenCharacterPart, Part);
+	return Call(Func, Part, ChosenCharacterPart);
 }
 
 void AFortPlayerPawn::RandomizeCharacter(const FString& GenderString)

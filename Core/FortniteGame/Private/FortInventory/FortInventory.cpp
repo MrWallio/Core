@@ -535,12 +535,13 @@ bool AFortInventory::RemoveItem(FGuid Guid, int32 Count, bool bDeferUpdate)
 		return bDeferUpdate ? true : Update(Entry);
 	}
 
-	if (PC->IsUsingOldQuickBars())
+	if (PC->IsUsingOldQuickBars() && floor(Version::Fortnite_Version) < 3)
 	{
 		PC->QuickBars->EmptyQuickbarSlot(Guid);
 	}
 
 	RemoveEntryAndInstance(Guid);
+
 	return bDeferUpdate ? true : Update();
 }
 
@@ -726,7 +727,12 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 	const FGuid CurrentGuid = CurrentItemEntry->ItemGuid;
 	const int32 CurrentCount = CurrentItemEntry->Count;
 
-	if (!RemoveItem(CurrentGuid, CurrentCount, true))
+	if (PC->IsUsingOldQuickBars())
+	{
+		PC->QuickBars->EmptyQuickbarSlot(CurrentGuid);
+	}
+
+	if (!RemoveItem(CurrentGuid))
 		return nullptr;
 
 	FFortItemEntry* AddedEntry = AddItem(NewItemEntry);
