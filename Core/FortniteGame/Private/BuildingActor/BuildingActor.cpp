@@ -46,17 +46,7 @@ float ABuildingActor::GetMaxHealth() const
 		return 0.0f;
 	}
 
-	struct BuildingActor_GetMaxHealth
-	{
-	public:
-		float ReturnValue;
-	};
-
-	BuildingActor_GetMaxHealth Parms{};
-
-	const_cast<ABuildingActor*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<ABuildingActor*>(this)->Call<float>(Func);
 }
 
 void ABuildingActor::OnDamageServer(ABuildingActor* This, float Damage, const FGameplayTagContainer& DamageTags, const FVector& Momentum, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser, const FGameplayEffectContextHandle& EffectContext) {
@@ -161,17 +151,7 @@ float ABuildingActor::GetHealth() const
 	if (Func == nullptr)
 		Func = FindFunction("GetHealth");
 
-	struct BuildingActor_GetHealth final
-	{
-	public:
-		float ReturnValue;
-	};
-
-	BuildingActor_GetHealth Parms{};
-
-	const_cast<ABuildingActor*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<ABuildingActor*>(this)->Call<float>(Func);
 }
 
 void ABuildingActor::OnRep_CurrentBuildingLevel()
@@ -181,5 +161,5 @@ void ABuildingActor::OnRep_CurrentBuildingLevel()
 	if (Func == nullptr)
 		Func = FindFunction("OnRep_CurrentBuildingLevel");
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }

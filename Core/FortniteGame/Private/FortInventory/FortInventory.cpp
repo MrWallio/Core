@@ -28,7 +28,7 @@ void AFortInventory::HandleInventoryLocalUpdate()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 bool AFortInventory::Update(FFortItemEntry* ItemEntry)

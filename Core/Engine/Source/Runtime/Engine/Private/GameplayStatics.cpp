@@ -36,22 +36,7 @@ UObject* UGameplayStatics::SpawnObject(TSubclassOf<UObject> ObjectClass, UObject
 	if (Func == nullptr)
 		Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.SpawnObject");
 
-	struct GameplayStatics_SpawnObject final
-	{
-	public:
-		TSubclassOf<UObject> ObjectClass;
-		UObject* Outer;
-		UObject* ReturnValue;
-	};
-
-	GameplayStatics_SpawnObject Parms{};
-
-	Parms.ObjectClass = ObjectClass;
-	Parms.Outer = Outer;
-
-	GetDefaultObj()->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return GetDefaultObj()->Call<UObject*>(Func, ObjectClass, Outer);
 }
 
 float UGameplayStatics::GetTimeSeconds(const class UObject* WorldContextObject)
@@ -62,20 +47,7 @@ float UGameplayStatics::GetTimeSeconds(const class UObject* WorldContextObject)
 	if (Func == nullptr)
 		Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.GetTimeSeconds");
 
-	struct GameplayStatics_GetTimeSeconds final
-	{
-	public:
-		const UObject* WorldContextObject;
-		float ReturnValue;
-	};
-
-	GameplayStatics_GetTimeSeconds Parms{};
-
-	Parms.WorldContextObject = WorldContextObject;
-
-	GetDefaultObj()->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return DefaultObj->Call<float>(Func, WorldContextObject);
 }
 
 void UGameplayStatics::GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>* OutActors)
@@ -85,23 +57,7 @@ void UGameplayStatics::GetAllActorsOfClass(const UObject* WorldContextObject, TS
 	if (Func == nullptr)
 		Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.GetAllActorsOfClass");
 
-	struct GameplayStatics_GetAllActorsOfClass
-	{
-	public:
-		const UObject* WorldContextObject;
-		TSubclassOf<AActor> ActorClass;
-		TArray<AActor*> OutActors;
-	};
-
-	GameplayStatics_GetAllActorsOfClass Parms{};
-
-	Parms.WorldContextObject = WorldContextObject;
-	Parms.ActorClass = ActorClass;
-
-	GetDefaultObj()->ProcessEvent(Func, &Parms);
-
-	if (OutActors != nullptr)
-		*OutActors = std::move(Parms.OutActors);
+	return GetDefaultObj()->Call<void>(Func, WorldContextObject, ActorClass, OutActors);
 }
 
 APlayerController* UGameplayStatics::GetPlayerController(const UObject* WorldContextObject, int32 PlayerIndex)
@@ -111,21 +67,5 @@ APlayerController* UGameplayStatics::GetPlayerController(const UObject* WorldCon
 	if (Func == nullptr)
 		Func = StaticClass()->GetFunction("Function /Script/Engine.GameplayStatics.GetPlayerController");
 
-	struct GameplayStatics_GetPlayerController
-	{
-	public:
-		const UObject* WorldContextObject;
-		int32 PlayerIndex;
-		uint8 Pad_C[0x4];
-		APlayerController* ReturnValue;
-	};
-
-	GameplayStatics_GetPlayerController Parms{};
-
-	Parms.WorldContextObject = WorldContextObject;
-	Parms.PlayerIndex = PlayerIndex;
-
-	GetDefaultObj()->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return GetDefaultObj()->Call<APlayerController*>(Func, WorldContextObject, PlayerIndex);
 }

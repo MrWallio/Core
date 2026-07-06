@@ -8,17 +8,7 @@ void UFortItem::SetOwningControllerForTemporaryItem(AFortPlayerController* InCon
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"SetOwningControllerForTemporaryItem"));
 
-	struct FortItem_SetOwningControllerForTemporaryItem final
-	{
-	public:
-		AFortPlayerController* InController;
-	};
-
-	FortItem_SetOwningControllerForTemporaryItem Parms{};
-
-	Parms.InController = InController;
-
-	ProcessEvent(Func, &Parms);
+	return const_cast<UFortItem*>(this)->Call<void>(Func, InController);
 }
 
 FGuid UFortItem::GetItemGuid() const

@@ -14,7 +14,7 @@ void AFortPlayerState::OnRep_bHasStartedPlaying()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_bHasStartedPlaying"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortPlayerState::OnRep_CharacterParts()
@@ -24,7 +24,7 @@ void AFortPlayerState::OnRep_CharacterParts()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_CharacterParts"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortPlayerState::OnRep_HeroType()

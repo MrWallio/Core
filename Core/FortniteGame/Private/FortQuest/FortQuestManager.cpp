@@ -281,7 +281,7 @@ void UFortQuestManager::ForceTriggerQuestsUpdated()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void UFortQuestManager::GetSourceAndContextTags(FGameplayTagContainer* OutSourceTags, FGameplayTagContainer* OutContextTags) const
@@ -291,20 +291,5 @@ void UFortQuestManager::GetSourceAndContextTags(FGameplayTagContainer* OutSource
 	if (Func == nullptr)
 		Func = FindFunction("GetSourceAndContextTags");
 
-	struct FortQuestManager_GetSourceAndContextTags
-	{
-	public:
-		FGameplayTagContainer OutSourceTags;
-		FGameplayTagContainer OutContextTags;
-	};
-
-	FortQuestManager_GetSourceAndContextTags Parms{};
-
-	const_cast<UFortQuestManager*>(this)->ProcessEvent(Func, &Parms);
-
-	if (OutSourceTags != nullptr)
-		*OutSourceTags = std::move(Parms.OutSourceTags);
-
-	if (OutContextTags != nullptr)
-		*OutContextTags = std::move(Parms.OutContextTags);
+	return const_cast<UFortQuestManager*>(this)->Call<void>(Func, OutSourceTags, OutContextTags);
 }

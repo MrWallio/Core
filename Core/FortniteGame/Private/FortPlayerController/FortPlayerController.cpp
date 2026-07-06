@@ -805,25 +805,7 @@ void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor
 	if (Func == nullptr)
 		Func = FindFunction("ClientReportDamagedResourceBuilding");
 
-	struct FortPlayerController_ClientReportDamagedResourceBuilding
-	{
-	public:
-		ABuildingSMActor* BuildingSMActor;
-		uint8 PotentialResourceType;
-		int32 PotentialResourceCount;
-		bool bDestroyed;
-		bool bJustHitWeakspot;
-	};
-
-	FortPlayerController_ClientReportDamagedResourceBuilding Parms{};
-
-	Parms.BuildingSMActor = BuildingSMActor;
-	Parms.PotentialResourceType = PotentialResourceType;
-	Parms.PotentialResourceCount = PotentialResourceCount;
-	Parms.bDestroyed = bDestroyed;
-	Parms.bJustHitWeakspot = bJustHitWeakspot;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, BuildingSMActor, PotentialResourceType, PotentialResourceCount, bDestroyed, bJustHitWeakspot);
 }
 
 void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* This, FGuid& ItemGuid, int Count, bool bTrash) {
@@ -887,17 +869,7 @@ void AFortPlayerController::ClientForceUpdateQuickbar(uint8 QuickbarToRefresh)
 	if (Func == nullptr)
 		Func = FindFunction("ClientForceUpdateQuickbar");
 
-	struct FortPlayerController_ClientForceUpdateQuickbar
-	{
-	public:
-		uint8 QuickbarToRefresh;
-	};
-
-	FortPlayerController_ClientForceUpdateQuickbar Parms{};
-
-	Parms.QuickbarToRefresh = QuickbarToRefresh;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, QuickbarToRefresh);
 }
 
 void AFortPlayerController::OnRep_QuickBar()
@@ -907,7 +879,7 @@ void AFortPlayerController::OnRep_QuickBar()
 	if (Func == nullptr)
 		Func = FindFunction("OnRep_QuickBar");
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 bool AFortPlayerController::IsUsingOldQuickBars() {
@@ -1236,17 +1208,7 @@ UFortRegisteredPlayerInfo* AFortPlayerController::GetRegisteredPlayerInfo() cons
 	if (Func == nullptr)
 		Func = FindFunction("GetRegisteredPlayerInfo");
 
-	struct FortPlayerController_GetRegisteredPlayerInfo
-	{
-	public:
-		UFortRegisteredPlayerInfo* ReturnValue;
-	};
-
-	FortPlayerController_GetRegisteredPlayerInfo Parms{};
-
-	const_cast<AFortPlayerController*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<AFortPlayerController*>(this)->Call<UFortRegisteredPlayerInfo*>(Func);
 }
 
 UFortQuestManager* AFortPlayerController::GetQuestManager(uint8 SubGame) const
@@ -1256,21 +1218,7 @@ UFortQuestManager* AFortPlayerController::GetQuestManager(uint8 SubGame) const
 	if (Func == nullptr)
 		Func = FindFunction("GetQuestManager");
 
-	struct FortPlayerController_GetQuestManager
-	{
-	public:
-		uint8 SubGame;
-		uint8 Pad_1[0x7];
-		UFortQuestManager* ReturnValue;
-	};
-
-	FortPlayerController_GetQuestManager Parms{};
-
-	Parms.SubGame = SubGame;
-
-	const_cast<AFortPlayerController*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<AFortPlayerController*>(this)->Call<UFortQuestManager*>(Func, SubGame);
 }
 
 void AFortPlayerController::ServerRepairBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair) {
@@ -1359,17 +1307,7 @@ FUniqueNetIdRepl AFortPlayerController::GetGameAccountId() const
 	if (Func == nullptr)
 		Func = FindFunction("GetGameAccountId");
 
-	struct FortPlayerController_GetGameAccountId
-	{
-	public:
-		FUniqueNetIdRepl ReturnValue;
-	};
-
-	FortPlayerController_GetGameAccountId Parms{};
-
-	const_cast<AFortPlayerController*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<AFortPlayerController*>(this)->Call<FUniqueNetIdRepl>(Func);
 }
 
 void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, uint8 InteractType, UObject* OptionalObjectData) {

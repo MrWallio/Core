@@ -131,15 +131,5 @@ FVector AFortAthenaMapInfo::GetMapCenter() const
 		return FVector(0, 0, 0);
 	}
 
-	struct FortAthenaMapInfo_GetMapCenter
-	{
-	public:
-		FVector ReturnValue;
-	};
-
-	FortAthenaMapInfo_GetMapCenter Parms{};
-
-	const_cast<AFortAthenaMapInfo*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<AFortAthenaMapInfo*>(this)->Call<FVector>(Func);
 }

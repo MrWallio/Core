@@ -290,7 +290,7 @@ Ret UObject::Call(UFunction* Function, Args&&... args)
         return ProcessEvent(Function, nullptr);
 
     if constexpr (sizeof...(args) == 1 && std::is_void_v<Ret>)
-        return ProcessEvent(Function, &args...);
+        return ProcessEvent(Function, (void*)&args...);
 
     if constexpr (sizeof...(args) == 0 && !std::is_void_v<Ret>)
     {

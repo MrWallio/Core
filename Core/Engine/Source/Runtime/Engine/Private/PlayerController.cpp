@@ -25,21 +25,7 @@ void APlayerController::ClientMessage(const FString& S, FName Type, float MsgLif
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName("ClientMessage"));
 
-	struct PlayerController_ClientMessage final
-	{
-	public:
-		FString S;
-		FName Type;
-		float MsgLifeTime;
-	};
-
-	PlayerController_ClientMessage Parms{};
-
-	Parms.S = std::move(S);
-	Parms.Type = Type;
-	Parms.MsgLifeTime = MsgLifeTime;
-
-	ProcessEvent(Func, &Parms);
+	Call(Func, S, Type, MsgLifeTime);
 }
 
 void APlayerController::ClientMessage(const FString& S)
@@ -54,21 +40,5 @@ void APlayerController::ClientTeamMessage(APlayerState* SenderPlayerState, const
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName("ClientTeamMessage"));
 
-	struct PlayerController_ClientTeamMessage final
-	{
-	public:
-		APlayerState* SenderPlayerState;
-		FString S;
-		FName Type;
-		float MsgLifeTime;
-	};
-
-	PlayerController_ClientTeamMessage Parms{};
-
-	Parms.SenderPlayerState = SenderPlayerState;
-	Parms.S = std::move(S);
-	Parms.Type = Type;
-	Parms.MsgLifeTime = MsgLifeTime;
-
-	ProcessEvent(Func, &Parms);
+	Call(Func, SenderPlayerState, S, Type, MsgLifeTime);
 }

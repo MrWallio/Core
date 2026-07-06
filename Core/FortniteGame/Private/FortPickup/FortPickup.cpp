@@ -23,7 +23,7 @@ void AFortPickup::OnRep_PrimaryPickupItemEntry()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortPickup::OnRep_TossedFromContainer()
@@ -33,7 +33,7 @@ void AFortPickup::OnRep_TossedFromContainer()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_TossedFromContainer"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortPickup::TossPickup(const struct FVector& FinalLocation, class AFortPawn* ItemOwner, int32 OverrideMaxStackCount, bool bToss, bool bShouldCombinePickupsWhenTossCompletes, const uint8 InPickupSourceTypeFlags, const uint8 InPickupSpawnSource)
@@ -43,29 +43,7 @@ void AFortPickup::TossPickup(const struct FVector& FinalLocation, class AFortPaw
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"TossPickup"));
 
-	struct FortPickup_TossPickup final
-	{
-	public:
-		FVector FinalLocation;
-		AFortPawn* ItemOwner;
-		int32 OverrideMaxStackCount;
-		bool bToss;
-		bool bShouldCombinePickupsWhenTossCompletes;
-		uint8 InPickupSourceTypeFlags;
-		uint8 InPickupSpawnSource;
-	};
-
-	FortPickup_TossPickup Parms{};
-
-	Parms.FinalLocation = FinalLocation;
-	Parms.ItemOwner = ItemOwner;
-	Parms.OverrideMaxStackCount = OverrideMaxStackCount;
-	Parms.bToss = bToss;
-	Parms.bShouldCombinePickupsWhenTossCompletes = bShouldCombinePickupsWhenTossCompletes;
-	Parms.InPickupSourceTypeFlags = InPickupSourceTypeFlags;
-	Parms.InPickupSpawnSource = InPickupSpawnSource;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, FinalLocation, ItemOwner, OverrideMaxStackCount, bToss, bShouldCombinePickupsWhenTossCompletes, InPickupSourceTypeFlags, InPickupSpawnSource);
 }
 
 void AFortPickup::OnRep_bPickedUp()
@@ -75,7 +53,7 @@ void AFortPickup::OnRep_bPickedUp()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_bPickedUp"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortPickup::OnRep_PickupLocationData()
@@ -85,7 +63,7 @@ void AFortPickup::OnRep_PickupLocationData()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_PickupLocationData"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortPickup::ForceFinishedTargetSpline()

@@ -21,21 +21,7 @@ void AFortQuickBars::ServerAddItemInternal(const FGuid& Item, uint8 InQuickBar, 
 		return;
 	}
 
-	struct FortQuickBars_ServerAddItemInternal
-	{
-	public:
-		FGuid Item;
-		uint8 InQuickBar;
-		int32 Slot;
-	};
-
-	FortQuickBars_ServerAddItemInternal Parms{};
-
-	Parms.Item = std::move(Item);
-	Parms.InQuickBar = InQuickBar;
-	Parms.Slot = Slot;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, Item, InQuickBar, Slot);
 }
 
 void AFortQuickBars::ServerRemoveItemInternal(const FGuid& Item, bool bFindReplacement, bool bForce)
@@ -50,21 +36,7 @@ void AFortQuickBars::ServerRemoveItemInternal(const FGuid& Item, bool bFindRepla
 		return;
 	}
 
-	struct FortQuickBars_ServerRemoveItemInternal final
-	{
-	public:
-		FGuid Item;
-		bool bFindReplacement;
-		bool bForce;
-	};
-
-	FortQuickBars_ServerRemoveItemInternal Parms{};
-
-	Parms.Item = std::move(Item);
-	Parms.bFindReplacement = bFindReplacement;
-	Parms.bForce = bForce;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, Item, bFindReplacement, bForce);
 }
 
 void AFortQuickBars::EmptySlot(uint8 InQuickBar, int32 SlotIndex)
@@ -79,20 +51,7 @@ void AFortQuickBars::EmptySlot(uint8 InQuickBar, int32 SlotIndex)
 		return;
 	}
 
-	struct FortQuickBars_EmptySlot final
-	{
-	public:
-		uint8 InQuickBar;
-		uint8 Pad_1[0x3];
-		int32 SlotIndex;
-	};
-
-	FortQuickBars_EmptySlot Parms{};
-
-	Parms.InQuickBar = InQuickBar;
-	Parms.SlotIndex = SlotIndex;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, InQuickBar, SlotIndex);
 }
 
 void AFortQuickBars::ServerActivateSlotInternal(uint8 InQuickBar, int32 Slot, float ActivateDelay, bool bUpdatePreviousFocusedSlot)
@@ -107,25 +66,7 @@ void AFortQuickBars::ServerActivateSlotInternal(uint8 InQuickBar, int32 Slot, fl
 		return;
 	}
 
-	struct FortQuickBars_ServerActivateSlotInternal final
-	{
-	public:
-		uint8 InQuickBar;
-		uint8 Pad_1[0x3];
-		int32 Slot;
-		float ActivateDelay;
-		bool bUpdatePreviousFocusedSlot;
-		uint8 Pad_D[0x3];
-	};
-
-	FortQuickBars_ServerActivateSlotInternal Parms{};
-
-	Parms.InQuickBar = InQuickBar;
-	Parms.Slot = Slot;
-	Parms.ActivateDelay = ActivateDelay;
-	Parms.bUpdatePreviousFocusedSlot = bUpdatePreviousFocusedSlot;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, InQuickBar, Slot, ActivateDelay, bUpdatePreviousFocusedSlot);
 }
 
 void AFortQuickBars::EnableSlot(uint8 InQuickBar, int32 SlotIndex)
@@ -140,20 +81,7 @@ void AFortQuickBars::EnableSlot(uint8 InQuickBar, int32 SlotIndex)
 		return;
 	}
 
-	struct FortQuickBars_EnableSlot final
-	{
-	public:
-		uint8 InQuickBar;
-		uint8 Pad_1[0x3];
-		int32 SlotIndex;
-	};
-
-	FortQuickBars_EnableSlot Parms{};
-
-	Parms.InQuickBar = InQuickBar;
-	Parms.SlotIndex = SlotIndex;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, InQuickBar, SlotIndex);
 }
 
 int32 AFortQuickBars::FindQuickBarSlotForItem(uint8 QuickBar, FGuid Guid) const
@@ -253,7 +181,7 @@ void AFortQuickBars::OnRep_PrimaryQuickBar()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortQuickBars::OnRep_SecondaryQuickBar()
@@ -268,7 +196,7 @@ void AFortQuickBars::OnRep_SecondaryQuickBar()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 bool AFortQuickBars::EquipItem(FGuid Guid) {

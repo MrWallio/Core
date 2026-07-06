@@ -90,7 +90,7 @@ void ABuildingContainer::OnRep_bAlreadySearched()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_bAlreadySearched"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void ABuildingContainer::BounceContainer()
@@ -100,7 +100,7 @@ void ABuildingContainer::BounceContainer()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"BounceContainer"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void ABuildingContainer::PostUpdate(ABuildingContainer* This, uint8 PersistantState, void* ReservedRandomValues)
@@ -199,5 +199,5 @@ void ABuildingContainer::OnSetSearched()
 	if (Func == nullptr)
 		Func = FindFunction("OnSetSearched");
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }

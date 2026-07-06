@@ -28,23 +28,7 @@ APawn* AGameModeBase::SpawnDefaultPawnAtTransform(AController* NewPlayer, const 
 	if (Func == nullptr)
 		Func = FindFunction("SpawnDefaultPawnAtTransform");
 
-	struct GameModeBase_SpawnDefaultPawnAtTransform
-	{
-	public:
-		AController* NewPlayer;
-		uint8 Pad_8[0x8];
-		FTransform SpawnTransform;
-		APawn* ReturnValue;
-	};
-
-	GameModeBase_SpawnDefaultPawnAtTransform Parms{};
-
-	Parms.NewPlayer = NewPlayer;
-	Parms.SpawnTransform = std::move(SpawnTransform);
-
-	ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<AGameModeBase*>(this)->Call<APawn*>(Func, NewPlayer, SpawnTransform);
 }
 
 void AGameModeBase::RestartPlayer(AController* NewPlayer)

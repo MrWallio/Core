@@ -19,17 +19,7 @@ APawn* AController::K2_GetPawn() const
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"K2_GetPawn"));
 
-	struct Controller_K2_GetPawn
-	{
-	public:
-		APawn* ReturnValue;
-	};
-
-	Controller_K2_GetPawn Parms{};
-
-	const_cast<AController*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<AController*>(this)->Call<APawn*>(Func);
 }
 
 AActor* AController::GetViewTarget() const
@@ -56,7 +46,7 @@ void AController::OnRep_Pawn()
 	if (Func == nullptr)
 		Func = FindFunction("OnRep_Pawn");
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AController::OnRep_PlayerState()
@@ -66,7 +56,7 @@ void AController::OnRep_PlayerState()
 	if (Func == nullptr)
 		Func = FindFunction("OnRep_PlayerState");
 	
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 FRotator AController::GetControlRotation() const
@@ -76,15 +66,5 @@ FRotator AController::GetControlRotation() const
 	if (Func == nullptr)
 		Func = FindFunction("GetControlRotation");
 
-	struct Controller_GetControlRotation
-	{
-	public:
-		FRotator ReturnValue;
-	};
-
-	Controller_GetControlRotation Parms{};
-
-	const_cast<AController*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<AController*>(this)->Call<FRotator>(Func);
 }

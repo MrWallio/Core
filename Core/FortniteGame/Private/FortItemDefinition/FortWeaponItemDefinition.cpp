@@ -78,15 +78,5 @@ TSubclassOf<AFortWeapon> UFortWeaponItemDefinition::GetWeaponActorClass() const
 	if (Func == nullptr)
 		Func = FindFunction("GetWeaponActorClass");
 
-	struct FortWeaponItemDefinition_GetWeaponActorClass
-	{
-	public:
-		TSubclassOf<AFortWeapon> ReturnValue;
-	};
-
-	FortWeaponItemDefinition_GetWeaponActorClass Parms{};
-
-	const_cast<UFortWeaponItemDefinition*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<UFortWeaponItemDefinition*>(this)->Call<TSubclassOf<AFortWeapon>>(Func);
 }

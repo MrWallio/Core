@@ -4,29 +4,14 @@
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 #include "FortniteGame/Public/FortWeapon/FortWeaponStats.h"
 
-class UFortItem* UFortItemDefinition::CreateTemporaryItemInstanceBP(int32 Count, int32 Level) const
+UFortItem* UFortItemDefinition::CreateTemporaryItemInstanceBP(int32 Count, int32 Level) const
 {
-	static class UFunction* Func = nullptr;
+	static UFunction* Func = nullptr;
 
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"CreateTemporaryItemInstanceBP"));
 
-	struct FortItemDefinition_CreateTemporaryItemInstanceBP
-	{
-	public:
-		int32 Count;
-		int32 Level;
-		UFortItem* ReturnValue;
-	};
-
-	FortItemDefinition_CreateTemporaryItemInstanceBP Parms{};
-
-	Parms.Count = Count;
-	Parms.Level = Level;
-
-	const_cast<UFortItemDefinition*>(this)->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<UFortItemDefinition*>(this)->Call<UFortItem*>(Func, Count, Level);
 }
 
 int32 UFortItemDefinition::GetMaxStackSize() const
@@ -64,17 +49,7 @@ bool UFortItemDefinition::IsStackable() const
 		if (Func == nullptr)
 			Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"IsStackable"));
 
-		struct FortItemDefinition_IsStackable final
-		{
-		public:
-			bool ReturnValue;
-		};
-
-		FortItemDefinition_IsStackable Parms{};
-
-		const_cast<UFortItemDefinition*>(this)->ProcessEvent(Func, &Parms);
-
-		return Parms.ReturnValue;
+		return const_cast<UFortItemDefinition*>(this)->Call<bool>(Func);
 	}
 	else {
 		if (GetMaxStackSize() > 1)

@@ -336,21 +336,7 @@ void AFortPlayerControllerAthena::ClientNotifyTeamWon(APawn* FinisherPawn, const
 	if (Func == nullptr)
 		Func = FindFunction("ClientNotifyTeamWon");
 
-	struct FortPlayerControllerAthena_ClientNotifyTeamWon
-	{
-	public:
-		APawn* FinisherPawn;
-		const UFortWeaponItemDefinition* FinishingWeapon;
-		uint8 DeathCause;
-	};
-
-	FortPlayerControllerAthena_ClientNotifyTeamWon Parms{};
-
-	Parms.FinisherPawn = FinisherPawn;
-	Parms.FinishingWeapon = FinishingWeapon;
-	Parms.DeathCause = DeathCause;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, FinisherPawn, FinishingWeapon, DeathCause);
 }
 
 void AFortPlayerControllerAthena::ClientNotifyWon(APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause)
@@ -360,21 +346,7 @@ void AFortPlayerControllerAthena::ClientNotifyWon(APawn* FinisherPawn, const UFo
 	if (Func == nullptr)
 		Func = FindFunction("ClientNotifyWon");
 
-	struct FortPlayerControllerAthena_ClientNotifyWon
-	{
-	public:
-		APawn* FinisherPawn;
-		const UFortWeaponItemDefinition* FinishingWeapon;
-		uint8 DeathCause;
-	};
-
-	FortPlayerControllerAthena_ClientNotifyWon Parms{};
-
-	Parms.FinisherPawn = FinisherPawn;
-	Parms.FinishingWeapon = FinishingWeapon;
-	Parms.DeathCause = DeathCause;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, FinisherPawn, FinishingWeapon, DeathCause);
 }
 
 void AFortPlayerControllerAthena::ClientSendEndBattleRoyaleMatchForPlayer(bool bSuccess, const FAthenaRewardResult& Result)
@@ -388,20 +360,7 @@ void AFortPlayerControllerAthena::ClientSendEndBattleRoyaleMatchForPlayer(bool b
 		return;
 	}
 
-	struct FortPlayerControllerAthena_ClientSendEndBattleRoyaleMatchForPlayer
-	{
-	public:
-		bool bSuccess;
-		uint8 Pad_1[0x7];
-		FAthenaRewardResult Result;
-	};
-
-	FortPlayerControllerAthena_ClientSendEndBattleRoyaleMatchForPlayer Parms{};
-
-	Parms.bSuccess = bSuccess;
-	Parms.Result = std::move(Result);
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, bSuccess, Result);
 }
 
 void AFortPlayerControllerAthena::ClientSendMatchStatsForPlayer(const FAthenaMatchStats& Stats)
@@ -415,17 +374,7 @@ void AFortPlayerControllerAthena::ClientSendMatchStatsForPlayer(const FAthenaMat
 		return;
 	}
 
-	struct FortPlayerControllerAthena_ClientSendMatchStatsForPlayer
-	{
-	public:
-		FAthenaMatchStats Stats;
-	};
-
-	FortPlayerControllerAthena_ClientSendMatchStatsForPlayer Parms{};
-
-	Parms.Stats = std::move(Stats);
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, Stats);
 }
 
 void AFortPlayerControllerAthena::ClientSendTeamStatsForPlayer(const FAthenaMatchTeamStats& TeamStats)
@@ -439,17 +388,7 @@ void AFortPlayerControllerAthena::ClientSendTeamStatsForPlayer(const FAthenaMatc
 		return;
 	}
 
-	struct FortPlayerControllerAthena_ClientSendTeamStatsForPlayer
-	{
-	public:
-		FAthenaMatchTeamStats TeamStats;
-	};
-
-	FortPlayerControllerAthena_ClientSendTeamStatsForPlayer Parms{};
-
-	Parms.TeamStats = std::move(TeamStats);
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, TeamStats);
 }
 
 FAthenaRewardResult& AFortPlayerControllerAthena::ConstructAthenaRewardResult() {

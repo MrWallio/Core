@@ -10,5 +10,5 @@ void UCheatManager::DestroyTarget()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"DestroyTarget"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }

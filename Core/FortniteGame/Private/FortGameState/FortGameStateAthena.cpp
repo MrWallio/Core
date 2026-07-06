@@ -12,7 +12,7 @@ void AFortGameStateAthena::OnRep_CurrentPlaylistId()
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"OnRep_CurrentPlaylistId"));
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortGameStateAthena::OnPlaylistDataLoadCompleted() {
@@ -70,7 +70,7 @@ void AFortGameStateAthena::OnRep_WinningPlayerName()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortGameStateAthena::OnRep_WinningTeam()
@@ -84,7 +84,7 @@ void AFortGameStateAthena::OnRep_WinningTeam()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortGameStateAthena::OnRep_WinningPlayerList()
@@ -98,7 +98,7 @@ void AFortGameStateAthena::OnRep_WinningPlayerList()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortGameStateAthena::OnRep_WinningPlayerState()
@@ -112,7 +112,7 @@ void AFortGameStateAthena::OnRep_WinningPlayerState()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortGameStateAthena::OnRep_CurrentPlaylistData()
@@ -122,7 +122,7 @@ void AFortGameStateAthena::OnRep_CurrentPlaylistData()
 	if (Func == nullptr)
 		Func = FindFunction("OnRep_CurrentPlaylistData");
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortGameStateAthena::OnRep_CurrentPlaylistInfo()
@@ -132,7 +132,7 @@ void AFortGameStateAthena::OnRep_CurrentPlaylistInfo()
 	if (Func == nullptr)
 		Func = FindFunction("OnRep_CurrentPlaylistInfo");
 
-	ProcessEvent(Func, nullptr);
+	Call(Func);
 }
 
 void AFortGameStateAthena::Hook() {

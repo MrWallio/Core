@@ -19,17 +19,7 @@ void AFortPlayerPawn::BeginSkydiving(bool bFromBus)
 	if (Func == nullptr)
 		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"BeginSkydiving"));
 
-	struct FortPlayerPawn_BeginSkydiving final
-	{
-	public:
-		bool bFromBus;
-	};
-
-	FortPlayerPawn_BeginSkydiving Parms{};
-
-	Parms.bFromBus = bFromBus;
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, bFromBus);
 }
 
 void AFortPlayerPawn::ForceFinishIncomingPickups()
@@ -56,17 +46,7 @@ void AFortPlayerPawn::RandomizeCharacter(const FString& GenderString)
 	if (Func == nullptr)
 		Func = FindFunction("RandomizeCharacter");
 
-	struct FortPlayerPawn_RandomizeCharacter
-	{
-	public:
-		FString GenderString;
-	};
-
-	FortPlayerPawn_RandomizeCharacter Parms{};
-
-	Parms.GenderString = std::move(GenderString);
-
-	ProcessEvent(Func, &Parms);
+	return Call(Func, GenderString);
 }
 
 void AFortPlayerPawn::ServerReviveFromDBNO(AFortPlayerPawn* This, AController* EventInstigator)
@@ -268,5 +248,5 @@ void AFortPlayerPawn::OnRep_IsDBNO()
 		return;
 	}
 
-	ProcessEvent(Func, nullptr);
+	return const_cast<AFortPlayerPawn*>(this)->Call<void>(Func);
 }

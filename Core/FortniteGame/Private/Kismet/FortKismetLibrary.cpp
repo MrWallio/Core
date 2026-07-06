@@ -17,7 +17,7 @@
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
 #include "FortniteGame/Public/FortWeapon/FortWeaponStats.h"
 
-class UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinition(const uint8 ResourceType)
+UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinition(const uint8 ResourceType)
 {
 	if (Version::Fortnite_Version > 3.4) {
 		static UFunction* Func = nullptr;
@@ -25,20 +25,7 @@ class UFortResourceItemDefinition* UFortKismetLibrary::K2_GetResourceItemDefinit
 		if (Func == nullptr)
 			Func = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.K2_GetResourceItemDefinition");
 
-		struct FortKismetLibrary_K2_GetResourceItemDefinition final
-		{
-		public:
-			uint8 ResourceType;
-			UFortResourceItemDefinition* ReturnValue;
-		};
-
-		FortKismetLibrary_K2_GetResourceItemDefinition Parms{};
-
-		Parms.ResourceType = ResourceType;
-
-		GetDefaultObj()->ProcessEvent(Func, &Parms);
-
-		return Parms.ReturnValue;
+		return GetDefaultObj()->Call<UFortResourceItemDefinition*>(Func, ResourceType);
 	}
 	else {
 		UObject* ItemDefinition = nullptr;
@@ -107,24 +94,7 @@ FFortAbilitySetHandle UFortKismetLibrary::EquipFortAbilitySet(TScriptInterface<I
 		return FFortAbilitySetHandle();
 	}
 
-	struct FortKismetLibrary_EquipFortAbilitySet
-	{
-	public:
-		TScriptInterface<IAbilitySystemInterface> AbilitySystemInterfaceActor;
-		UFortAbilitySet* AbilitySet;
-		UObject* OverrideSourceObject;
-		FFortAbilitySetHandle ReturnValue;
-	};
-
-	FortKismetLibrary_EquipFortAbilitySet Parms{};
-
-	Parms.AbilitySystemInterfaceActor = AbilitySystemInterfaceActor;
-	Parms.AbilitySet = AbilitySet;
-	Parms.OverrideSourceObject = OverrideSourceObject;
-
-	GetDefaultObj()->ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return GetDefaultObj()->Call<FFortAbilitySetHandle>(Func, AbilitySystemInterfaceActor, AbilitySet, OverrideSourceObject);
 }
 
 AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(

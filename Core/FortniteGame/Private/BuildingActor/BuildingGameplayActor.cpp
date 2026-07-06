@@ -71,18 +71,5 @@ FVector AFortAthenaSupplyDrop::FindGroundLocationAt(const FVector& InLocation)
 		return FVector(0, 0, 0);
 	}
 
-	struct FortAthenaSupplyDrop_FindGroundLocationAt
-	{
-	public:
-		FVector InLocation;
-		FVector ReturnValue;
-	};
-
-	FortAthenaSupplyDrop_FindGroundLocationAt Parms{};
-
-	Parms.InLocation = std::move(InLocation);
-
-	ProcessEvent(Func, &Parms);
-
-	return Parms.ReturnValue;
+	return const_cast<AFortAthenaSupplyDrop*>(this)->Call<FVector>(Func, InLocation);
 }
