@@ -247,13 +247,19 @@ void AFortGameModeAthena::PlacePlayerOnTeam(AFortGameModeAthena* This, AFortPlay
 		return;
 	}
 
+	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
+	if (!GameState) {
+		Log("AFortGameModeAthena::PlacePlayerOnTeam: GameState is null or not AFortGameStateAthena");
+		return;
+	}
+
 	AFortPlayerStateAthena* FortPS = FortPC->PlayerState->Cast<AFortPlayerStateAthena>();
 	if (!FortPS) {
 		return;
 	}
 
 	FCoreConfig& Config = ConfigurationManager::GetConfig();
-	if (!Config.bUseGameSessions) {
+	if (GameState->TeamSize > 1 && !Config.bUseGameSessions) {
 		FortPS->SquadId = FortPS->TeamIndex - 3;
 		FortPS->OnRep_SquadId();
 	}
