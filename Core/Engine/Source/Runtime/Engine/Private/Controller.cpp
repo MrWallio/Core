@@ -3,13 +3,12 @@
 
 void AController::Possess(APawn* InPawn)
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"Possess"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		void (*&PossessInternal)(AController*, APawn*) = decltype(PossessInternal)(VTable[VTableIdx]);
-		PossessInternal(this, InPawn);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("Possess");
+
+	return Call(Func, InPawn);
 }
 
 APawn* AController::K2_GetPawn() const
@@ -24,13 +23,12 @@ APawn* AController::K2_GetPawn() const
 
 AActor* AController::GetViewTarget() const
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetViewTarget"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		AActor* (*&GetViewTargetInternal)(const AController*) = decltype(GetViewTargetInternal)(VTable[VTableIdx]);
-		return GetViewTargetInternal(this);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("GetViewTarget");
+
+	return const_cast<AController*>(this)->Call<AActor*>(Func);
 }
 
 void AController::InitPlayerState()

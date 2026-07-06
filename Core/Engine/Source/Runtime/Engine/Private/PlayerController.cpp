@@ -3,13 +3,12 @@
 
 void APlayerController::ServerAcknowledgePossession(APawn* P)
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ServerAcknowledgePossession"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		void (*&ServerAcknowledgePossessionInternal)(APlayerController*, APawn*) = decltype(ServerAcknowledgePossessionInternal)(VTable[VTableIdx]);
-		ServerAcknowledgePossessionInternal(this, P);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("ServerAcknowledgePossession");
+
+	Call(Func, P);
 }
 
 void APlayerController::SendClientAdjustment()

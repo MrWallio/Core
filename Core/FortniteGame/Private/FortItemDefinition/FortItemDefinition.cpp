@@ -29,15 +29,12 @@ int32 UFortItemDefinition::GetMaxStackSize() const
 	}
 	else
 	{
-		static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetMaxStackSize"));
-		if (Function) {
-			static uintptr_t VTableIdx = GetVTableIndex(Function);
+		static UFunction* Func = nullptr;
 
-			int32 (*&GetMaxStackSizeInternal)(const UFortItemDefinition*) = decltype(GetMaxStackSizeInternal)(VTable[VTableIdx]);
-			return GetMaxStackSizeInternal(this);
-		}
+		if (Func == nullptr)
+			Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetMaxStackSize"));
 
-		return -1;
+		return const_cast<UFortItemDefinition*>(this)->Call<int32>(Func);
 	}
 }
 

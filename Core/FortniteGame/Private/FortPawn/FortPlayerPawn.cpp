@@ -30,13 +30,12 @@ void AFortPlayerPawn::ForceFinishIncomingPickups()
 
 void AFortPlayerPawn::ServerChoosePart(UCustomCharacterPart* ChosenCharacterPart, uint8 Part)
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName(L"ServerChoosePart"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static class UFunction* Func = nullptr;
 
-		void (*&ServerChoosePartInternal)(AFortPlayerPawn*, uint8, UCustomCharacterPart*) = decltype(ServerChoosePartInternal)(VTable[VTableIdx]);
-		return ServerChoosePartInternal(this, Part, ChosenCharacterPart);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("ServerChoosePart");
+
+	return Call(Func, ChosenCharacterPart, Part);
 }
 
 void AFortPlayerPawn::RandomizeCharacter(const FString& GenderString)

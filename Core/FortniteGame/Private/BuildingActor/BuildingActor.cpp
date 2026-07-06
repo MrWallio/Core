@@ -15,24 +15,22 @@
 
 void ABuildingActor::InitializeKismetSpawnedBuildingActor(ABuildingActor* BuildingOwner, AFortPlayerController* SpawningController, bool bUsePlayerBuildAnimations, ABuildingActor* ReplacedBuilding)
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName("InitializeKismetSpawnedBuildingActor"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		void (*&InitializeKismetSpawnedBuildingActorInternal)(ABuildingActor*, ABuildingActor*, AFortPlayerController*, bool, ABuildingActor*) = decltype(InitializeKismetSpawnedBuildingActorInternal)(VTable[VTableIdx]);
-		return InitializeKismetSpawnedBuildingActorInternal(this, BuildingOwner, SpawningController, bUsePlayerBuildAnimations, ReplacedBuilding);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("InitializeKismetSpawnedBuildingActor");
+
+	return const_cast<ABuildingActor*>(this)->Call<void>(Func, BuildingOwner, SpawningController, bUsePlayerBuildAnimations, ReplacedBuilding);
 }
 
 float ABuildingActor::GetHealthPercent() const
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName("GetHealthPercent"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static UFunction* Func = nullptr;
 
-		float (*&GetHealthPercentInternal)(const ABuildingActor*) = decltype(GetHealthPercentInternal)(VTable[VTableIdx]);
-		return GetHealthPercentInternal(this);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("GetHealthPercent");
+
+	return const_cast<ABuildingActor*>(this)->Call<float>(Func);
 }
 
 float ABuildingActor::GetMaxHealth() const

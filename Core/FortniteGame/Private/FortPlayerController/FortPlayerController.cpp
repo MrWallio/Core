@@ -29,13 +29,12 @@
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
-	static UFunction* Function = FindFunction(UKismetStringLibrary::Conv_StringToName("ClientForceProfileQuery"));
-	if (Function) {
-		static uintptr_t VTableIdx = GetVTableIndex(Function);
+	static class UFunction* Func = nullptr;
 
-		void (*&ClientForceProfileQueryInternal)(AFortPlayerController*) = decltype(ClientForceProfileQueryInternal)(VTable[VTableIdx]);
-		return ClientForceProfileQueryInternal(this);
-	}
+	if (Func == nullptr)
+		Func = FindFunction("ClientForceProfileQuery");
+
+	return Call(Func);
 }
 
 void AFortPlayerController::OnReadyToStartMatch(AFortPlayerController* This) {
