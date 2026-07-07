@@ -26,6 +26,7 @@ public:
 	DefineUProperty(bool, bPlaylistHotfixChangedGCDisabling);
 
 	DefineUProperty(TArray<AFortPlayerControllerAthena*>, AlivePlayers);
+	DefineUProperty(int32, TeamAlivePlayers);
 	DefineUProperty(bool, bAllowSpectateAfterDeath);
 	DefineUProperty(bool, bAlwaysDBNO);
 	DefineUProperty(AFortAthenaPlaylistBase*, FortAthenaPlaylist);
