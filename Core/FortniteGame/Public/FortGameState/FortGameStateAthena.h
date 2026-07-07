@@ -29,6 +29,9 @@ public:
 	DefineUProperty(int32, CurrentPlaylistId);
 	DefineUProperty(UAthenaBattleBusItemDefinition*, DefaultBattleBus);
 	DefineUProperty(AFortAthenaPlaylistBase*, FortAthenaPlaylistCDO);
+	DefineUProperty(uint8, AirCraftBehavior);
+	DefineUProperty(uint8, CachedSafeZoneStartUp);
+	DefineUProperty(bool, bIsLargeTeamGame);
 public:
 	void OnRep_CurrentPlaylistId();
 

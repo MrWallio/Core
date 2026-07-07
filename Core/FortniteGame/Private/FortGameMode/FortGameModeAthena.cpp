@@ -199,13 +199,29 @@ void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 
 			GameState->TeamCount = Playlist->MaxTeamCount;
 			GameState->TeamSize = Playlist->MaxTeamSize;
+			GameState->bIsLargeTeamGame = Playlist->bIsLargeTeamGame;
 
 			This->GameSession->MaxPlayers = Playlist->MaxPlayers;
 			This->GameSession->MaxPartySize = Playlist->MaxTeamSize;
 
 			This->MaxPlayerCount = Playlist->MaxPlayers;
 
+			GameState->CachedSafeZoneStartUp = Playlist->SafeZoneStartUp;
+
 			Log("AFortGameModeAthena::InitGameState: Applied playlist " + Playlist->GetFName().ToString().ToString());
+
+			// Start Playlist Dump
+			Log("====== Playlist Dump ======");
+			Log("Playlist: " + Playlist->GetFName().ToString().ToString());
+			Log("PlaylistName: " + Playlist->GetPlaylistName().ToString().ToString());
+			Log("PlaylistId: " + std::to_string(Playlist->GetPlaylistId()));
+			Log("MaxTeamCount: " + std::to_string(Playlist->MaxTeamCount));
+			Log("MaxTeamSize: " + std::to_string(Playlist->MaxTeamSize));
+			Log("MaxSquadSize: " + std::to_string(Playlist->MaxSquadSize));
+			Log("MaxPlayers: " + std::to_string(Playlist->MaxPlayers));
+			Log("SafeZoneStartUp: " + std::to_string(Playlist->SafeZoneStartUp));
+			Log("bIsLargeTeamGame: " + std::string(Playlist->bIsLargeTeamGame ? "true" : "false"));
+			Log("====== End Playlist Dump ======");
 		}
 		else {
 			Log("AFortGameModeAthena::InitGameState: Failed to get Playlist");
