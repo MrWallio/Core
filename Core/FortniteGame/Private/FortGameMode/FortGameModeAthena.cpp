@@ -278,5 +278,7 @@ void AFortGameModeAthena::PlacePlayerOnTeam(AFortGameModeAthena* This, AFortPlay
 	if (GameState->TeamSize > 1 && !Config.bUseGameSessions) {
 		FortPS->SquadId = FortPS->TeamIndex - 3;
 		FortPS->OnRep_SquadId();
+
+		Log("AFortGameModeAthena::PlacePlayerOnTeam: Set SquadId for PlayerState: " + FortPS->GetName().ToString() + " to " + std::to_string(FortPS->SquadId));
 	}
 }
