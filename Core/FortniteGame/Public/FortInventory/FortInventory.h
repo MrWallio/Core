@@ -107,7 +107,7 @@ public:
 
 	void EquipHarvestingTool();
 
-	bool DropAllItems(bool bSpawnPickups = true);
+	bool DropAllItems(bool bSpawnPickups = true, bool bUseTossDirection = false);
 
 	// =================================================================
 	// Internal Helpers

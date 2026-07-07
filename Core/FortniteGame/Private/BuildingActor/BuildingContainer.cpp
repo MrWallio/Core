@@ -45,7 +45,7 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 			ItemEntry.ItemDefinition,
 			ItemEntry.Count,
 			FinalSpawnLocation,
-			LootFinalLocation,
+			*FVector::Allocate(),
 			-1,
 			true,
 			true,

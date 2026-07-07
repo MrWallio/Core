@@ -885,8 +885,12 @@ void AFortInventory::EquipHarvestingTool()
 	}
 }
 
-bool AFortInventory::DropAllItems(bool bSpawnPickups)
+bool AFortInventory::DropAllItems(bool bSpawnPickups, bool bUseTossDirection)
 {
+	UWorld* World = UWorld::GetWorld();
+	if (!World)
+		return false;
+
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC)
 		return false;
@@ -917,7 +921,29 @@ bool AFortInventory::DropAllItems(bool bSpawnPickups)
 		auto& Entry = EntriesToRemove.GetWithSize(i, FFortItemEntry::GetSize());
 		if (bSpawnPickups)
 		{
-			SpawnPickupFromEntry(Entry);
+			AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+				World,
+				Entry.ItemDefinition,
+				Entry.Count,
+				PC->Pawn->K2_GetActorLocation(),
+				bUseTossDirection ? PC->GetDropFinalLocation() : *FVector::Allocate(),
+				-1,
+				true,
+				true,
+				true,
+				-1,
+				EFortPickupSourceTypeFlag::GetPlayer(),
+				EFortPickupSpawnSource::GetUnset(),
+				PC,
+				false
+			);
+
+			Pickup->PrimaryPickupItemEntry.LoadedAmmo = Entry.LoadedAmmo;
+			Pickup->PrimaryPickupItemEntry.Durability = Entry.Durability;
+			Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+
+			Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+			Pickup->OnRep_PrimaryPickupItemEntry();
 		}
 		RemoveItem(Entry.ItemGuid, Entry.Count);
 	}
