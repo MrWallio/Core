@@ -1220,11 +1220,7 @@ UFortQuestManager* AFortPlayerController::GetQuestManager(uint8 SubGame) const
 	return const_cast<AFortPlayerController*>(this)->Call<UFortQuestManager*>(Func, SubGame);
 }
 
-void AFortPlayerController::ServerRepairBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair) {
-	if (Version::Fortnite_Version <= 1.8 && Version::Fortnite_Version != 1.10 && Version::Fortnite_Version != 1.11) {
-		return ServerRepairBuildingActorOG(This, BuildingActorToRepair);
-	}
-
+void AFortPlayerController::ServerRepairBuildingActor(ABuildingSMActor* BuildingActorToRepair) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerRepairBuildingActor: World is null!");
@@ -1235,8 +1231,22 @@ void AFortPlayerController::ServerRepairBuildingActor(AFortPlayerController* Thi
 		return;
 	}
 
-	if (int32 RepairCost = This->PayBuildingRepairCost(BuildingActorToRepair)) {
-		BuildingActorToRepair->RepairBuilding(This, RepairCost);
+	if (int32 RepairCost = PayBuildingRepairCost(BuildingActorToRepair)) {
+		BuildingActorToRepair->RepairBuilding(this, RepairCost);
+	}
+}
+
+void AFortPlayerController::execServerRepairBuildingActor(AFortPlayerController* Context, FFrame& Stack) {
+	struct FortPlayerController_ServerRepairBuildingActor
+	{
+	public:
+		ABuildingSMActor* BuildingActorToRepair;
+	};
+	FortPlayerController_ServerRepairBuildingActor* Parms = (FortPlayerController_ServerRepairBuildingActor*)Stack.Locals;
+
+	execServerRepairBuildingActorOG(Context, Stack);
+	if (Version::Fortnite_Version >= 1.8 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+		Context->ServerRepairBuildingActor(Parms->BuildingActorToRepair);
 	}
 }
 

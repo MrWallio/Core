@@ -118,8 +118,9 @@ public:
 
 	UFortQuestManager* GetQuestManager(uint8 SubGame) const;
 
-	static inline void (*ServerRepairBuildingActorOG)(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair);
-	static void ServerRepairBuildingActor(AFortPlayerController* This, ABuildingSMActor* BuildingActorToRepair);
+	void ServerRepairBuildingActor(ABuildingSMActor* BuildingActorToRepair);
+	static inline void (*execServerRepairBuildingActorOG)(AFortPlayerController* Context, FFrame& Stack);
+	static void execServerRepairBuildingActor(AFortPlayerController* Context, FFrame& Stack);
 
 	int32 PayBuildingRepairCost(ABuildingSMActor* BuildingToRepair);
 
@@ -244,12 +245,13 @@ public:
 			ServerSetInventoryStateValue
 		);
 
-		HookEveryVTableIdx(
+		/*HookEveryVTableIdx(
 			AFortPlayerController::StaticClass(),
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerRepairBuildingActor")->GetVTableIndex(),
 			ServerRepairBuildingActor,
 			(LPVOID*)&ServerRepairBuildingActorOG
-		);
+		);*/
+		ExecHook(AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerRepairBuildingActor"), execServerRepairBuildingActor, execServerRepairBuildingActorOG);
 
 		HookEveryVTable(
 			AFortPlayerController::StaticClass(),

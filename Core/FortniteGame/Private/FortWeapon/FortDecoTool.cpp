@@ -7,10 +7,10 @@
 #include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 
-void AFortDecoTool::ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType) {
+void AFortDecoTool::ServerSpawnDeco(FVector& Location, FRotator& Rotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType) {
 	Log("ServerSpawnDeco Called!");
 
-	AFortPawn* Pawn = This->Owner->Cast<AFortPawn>();
+	AFortPawn* Pawn = Owner->Cast<AFortPawn>();
 	if (!Pawn) {
         Log("ServerSpawnDeco: Failed to get Pawn from Owner!");
         return;
@@ -21,8 +21,6 @@ void AFortDecoTool::ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRot
         Log("ServerSpawnDeco: Failed to get PlayerController from Pawn!");
         return;
 	}
-
-    ServerSpawnDecoOG(This, Location, Rotation, AttachedActor, InBuildingAttachmentType);
 
 	AFortPlayerStateAthena* FortPlayerStateAthena = PlayerController->PlayerState->Cast<AFortPlayerStateAthena>();
     if (FortPlayerStateAthena) {
@@ -42,6 +40,21 @@ void AFortDecoTool::ServerSpawnDeco(AFortDecoTool* This, FVector& Location, FRot
 			Log("ServerSpawnDeco: Updated trap team to " + std::to_string(TrapActor->Team));
         }
     }
+}
+
+void AFortDecoTool::execServerSpawnDeco(AFortDecoTool* Context, FFrame& Stack) {
+    struct FortDecoTool_ServerSpawnDeco
+    {
+    public:
+        FVector Location;
+        FRotator Rotation;
+        ABuildingSMActor* AttachedActor;
+		uint8 InBuildingAttachmentType;
+    };
+    FortDecoTool_ServerSpawnDeco* Params = (FortDecoTool_ServerSpawnDeco*)Stack.Locals;
+
+	execServerSpawnDecoOG(Context, Stack);
+	Context->ServerSpawnDeco(Params->Location, Params->Rotation, Params->AttachedActor, Params->InBuildingAttachmentType);
 }
 
 bool AFortDecoTool::ShouldAllowServerSpawnDeco(FVector& InLocation, FRotator& InRotation, ABuildingSMActor* AttachedActor, uint8 InBuildingAttachmentType) {
