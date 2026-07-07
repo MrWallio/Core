@@ -305,9 +305,9 @@ void Utils::SetLogVerbosity() {
 		return;
 	}
 
-    UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogGarbage VeryVerbose", nullptr);
-    UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAbilitySystem VeryVerbose", nullptr);
-    UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAbilitySystemPrediction VeryVerbose", nullptr);
+    //UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogGarbage VeryVerbose", nullptr);
+    //UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAbilitySystem VeryVerbose", nullptr);
+    //UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAbilitySystemPrediction VeryVerbose", nullptr);
 
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortAIDebug VeryVerbose", nullptr);
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortBotMission VeryVerbose", nullptr);
