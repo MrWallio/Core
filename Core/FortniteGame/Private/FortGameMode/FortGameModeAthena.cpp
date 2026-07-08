@@ -74,9 +74,6 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 
 	This->bDisableGCOnServerDuringMatch = true;
 
-	GameState->OnRep_CurrentPlaylistData();
-	GameState->OnRep_CurrentPlaylistInfo();
-
 	if (GameState->MapInfo) {
 		GameState->MapInfo->SpawnLlamas();
 	}
@@ -97,6 +94,9 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 
 		Log("Set Custom Supply Drop Class: " + SupplyDropClass->GetName().ToString());
 	}
+
+	GameState->OnRep_CurrentPlaylistData();
+	GameState->OnRep_CurrentPlaylistInfo();
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
