@@ -769,6 +769,8 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 		{
 			PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
 		}
+
+		PC->ClientExecuteInventoryItem(AddedEntry->ItemGuid, 0.f, true, true);
 	}
 
 	if (bSpawnPickup)

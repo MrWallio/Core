@@ -221,7 +221,11 @@ bool AFortQuickBars::EquipItem(FGuid Guid) {
 	}
 
 	uint8 ItemDefQuickBar = ItemDef->GetQuickBarForItem();
-	ServerActivateSlotInternal(ItemDefQuickBar, FindQuickBarSlotForItem(ItemDefQuickBar, Guid), 0.f, true);
+	int32 ResolvedSlot = FindQuickBarSlotForItem(ItemDefQuickBar, Guid);
+	if (ResolvedSlot == -1) {
+		return true;
+	}
+	ServerActivateSlotInternal(ItemDefQuickBar, ResolvedSlot, 0.f, true);
 
 	return true;
 }
