@@ -708,7 +708,7 @@ bool AFortInventory::CanSwapForItem(UFortItemDefinition* Def)
 	return true;
 }
 
-FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEntry, bool bSpawnPickup)
+FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEntry, bool bSpawnPickup, bool bExecuteItem)
 {
 	UWorld* World = UWorld::GetWorld();
 	if (!World)
@@ -726,14 +726,35 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 	const FFortItemEntry OldItemEntry = *CurrentItemEntry;
 	const FGuid CurrentGuid = CurrentItemEntry->ItemGuid;
 	const int32 CurrentCount = CurrentItemEntry->Count;
+	const uint8 CurrentQuickBar = CurrentItemEntry->ItemDefinition->GetQuickBarForItem();
+	const int32 CurrentSlot = PC->IsUsingOldQuickBars()
+		? PC->QuickBars->FindQuickBarSlotForItem(CurrentQuickBar, CurrentGuid)
+		: PC->ClientQuickBars->FindQuickBarSlotForItem(CurrentQuickBar, CurrentGuid);
 
 	if (PC->IsUsingOldQuickBars())
 	{
 		PC->QuickBars->EmptyQuickbarSlot(CurrentGuid);
 	}
 
-	if (!RemoveItem(CurrentGuid))
-		return nullptr;
+	for (int32 i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
+	{
+		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
+		if (Entry.ItemGuid == CurrentGuid)
+		{
+			Inventory.ReplicatedEntries.RemoveAt(i, FFortItemEntry::GetSize());
+			break;
+		}
+	}
+
+	for (int32 i = 0; i < Inventory.ItemInstances.Num(); i++)
+	{
+		UFortWorldItem* Item = Inventory.ItemInstances[i];
+		if (Item && Item->ItemEntry.ItemGuid == CurrentGuid)
+		{
+			Inventory.ItemInstances.RemoveAt(i);
+			break;
+		}
+	}
 
 	FFortItemEntry* AddedEntry = AddItem(NewItemEntry);
 	if (!AddedEntry)
@@ -742,7 +763,13 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 		return nullptr;
 	}
 
-	Update();
+	if (bExecuteItem) {
+		PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
+		if (PC->IsUsingOldQuickBars())
+		{
+			PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
+		}
+	}
 
 	if (bSpawnPickup)
 	{
@@ -771,7 +798,7 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 		Pickup->OnRep_PrimaryPickupItemEntry();
 	}
 
-	return AddedEntry;
+	return Update(AddedEntry) ? AddedEntry : nullptr;
 }
 
 bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, bool bAllowSwap, bool bSpawnOverflowPickup)
@@ -799,12 +826,6 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 			if (AddedEntry)
 			{
 				//Log("AFortInventory::AddItemAndHandleOverflow: Swapped current item for new item: " + AddedEntry->ItemDefinition->GetName().ToString());
-				
-				PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
-				if (PC->IsUsingOldQuickBars())
-				{
-					PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
-				}
 				
 				return true;
 			}

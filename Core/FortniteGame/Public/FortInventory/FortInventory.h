@@ -88,7 +88,8 @@ public:
 
 	FFortItemEntry* SwapCurrentItem(
 		const FFortItemEntry& NewItemEntry,
-		bool bSpawnPickup = true
+		bool bSpawnPickup = true,
+		bool bExecuteItem = true
 	);
 
 	bool AddItemAndHandleOverflow(
