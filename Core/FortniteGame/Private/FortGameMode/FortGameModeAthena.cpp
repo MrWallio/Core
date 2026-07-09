@@ -97,6 +97,8 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 
 	GameState->OnRep_CurrentPlaylistData();
 	GameState->OnRep_CurrentPlaylistInfo();
+
+	This->bWorldIsReady = true;
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
@@ -111,10 +113,6 @@ void AFortGameModeAthena::RemoveFromAlivePlayers(AFortPlayerControllerAthena* PC
 
 int32 AFortGameModeAthena::StartAircraftPhase(AFortGameModeAthena* This, bool bGoStraightToSafeZone) {
 	for (AFortPlayerControllerAthena* PC : This->AlivePlayers) {
-		if (PC->WorldInventory) {
-			PC->WorldInventory->DropAllItems(false);
-		}
-
 		if (PC->MyFortPawn || PC->Pawn->Cast<AFortPlayerPawn>()) {
 			AFortPlayerPawn* MyFortPawn = PC->MyFortPawn ? PC->MyFortPawn : PC->Pawn->Cast<AFortPlayerPawn>();
 
