@@ -57,17 +57,14 @@ APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, ACont
 }
 
 void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager) {
+	FinishWorldInitializationOG(This, WorldManager);
+	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
+
 	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
 	if (!GameState) {
 		Log("AFortGameModeAthena::FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
 		return FinishWorldInitializationOG(This, WorldManager);
 	}
-	
-	GameState->OnRep_CurrentPlaylistData();
-	GameState->OnRep_CurrentPlaylistInfo();
-	
-	FinishWorldInitializationOG(This, WorldManager);
-	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
 
 	This->DefaultPawnClass = (UClass*)StaticLoadObject("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
 	//This->PlayerControllerClass = (UClass*)StaticLoadObject("/Game/Athena/Athena_PlayerController.Athena_PlayerController_C");
@@ -276,10 +273,24 @@ void AFortGameModeAthena::PlacePlayerOnTeam(AFortGameModeAthena* This, AFortPlay
 	}
 
 	FCoreConfig& Config = ConfigurationManager::GetConfig();
-	if (GameState->TeamSize > 1 && !Config.bUseGameSessions) {
-		FortPS->SquadId = FortPS->TeamIndex - 3;
-		FortPS->OnRep_SquadId();
+	if (FortPS->_HasSquadId()) {
+		if (GameState->TeamSize > 1 && !Config.bUseGameSessions) {
+			FortPS->SquadId = FortPS->TeamIndex - 3;
+		}
 
-		Log("AFortGameModeAthena::PlacePlayerOnTeam: Set SquadId for PlayerState: " + FortPS->GetName().ToString() + " to " + std::to_string(FortPS->SquadId));
+		FortPS->OnRep_SquadId();
+		Log("AFortGameModeAthena::PlacePlayerOnTeam: SquadId for PlayerState: " + FortPS->GetName().ToString() + " is " + std::to_string(FortPS->SquadId));
+	}
+}
+
+void AFortGameModeAthena::PreInitializeComponents(AFortGameModeAthena* This) {
+	PreInitializeComponentsOG(This);
+
+	Log("AFortGameModeAthena::PreInitializeComponents");
+
+	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
+	if (!GameState) {
+		Log("AFortGameModeAthena::PreInitializeComponents: GameState is null or not AFortGameStateAthena");
+		return;
 	}
 }

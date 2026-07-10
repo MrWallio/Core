@@ -28,7 +28,7 @@ static float ServerReplicateActorsTimeMs = 1.f;
 FActorPriority::FActorPriority(UNetConnection* InConnection, UActorChannel* InChannel, FNetworkObjectInfo* InActorInfo, const TArray<struct FNetViewer>& Viewers, bool bLowBandwidth)
 	: ActorInfo(InActorInfo), Channel(InChannel), DestructionInfo(NULL)
 {
-	if (!ActorInfo || !InConnection || !InChannel)
+	if (!ActorInfo || !InConnection)
 	{
 		Priority = 0;
 		return;
