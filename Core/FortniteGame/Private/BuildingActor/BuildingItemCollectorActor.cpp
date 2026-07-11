@@ -115,16 +115,18 @@ bool ABuildingItemCollectorActor::Setup() {
 		return false;
 	}
 
+	AFortGameModeAthena* GameModeAthena = GameMode->Cast<AFortGameModeAthena>();
+	AFortGameStateAthena* GameStateAthena = GameState->Cast<AFortGameStateAthena>();
+
 	int32 Rarity = -1;
 
-	UClass* VendingMachineClass = (UClass*)StaticLoadObject(
-		"/Game/Athena/Items/Gameplay/VendingMachine/B_Athena_VendingMachine.B_Athena_VendingMachine_C"
-	);
+	UClass* VendingMachineClass = nullptr;
+	if (GameStateAthena && GameStateAthena->MapInfo) {
+		VendingMachineClass = GameStateAthena->MapInfo->VendingMachineClass.Class;
+	}
 
 	if (VendingMachineClass && IsA(VendingMachineClass))
 	{
-		AFortGameModeAthena* GameModeAthena = GameMode->Cast<AFortGameModeAthena>();
-		AFortGameStateAthena* GameStateAthena = GameState->Cast<AFortGameStateAthena>();
 		if (!GameModeAthena || !GameStateAthena) {
 			Log("ABuildingItemCollectorActor::BeginPlay: GameModeAthena or GameStateAthena is null!");
 			return false;
