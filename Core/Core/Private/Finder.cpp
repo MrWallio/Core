@@ -22,6 +22,7 @@
 #include "FortniteGame/Public/BuildingActor/BuildingSMActor.h"
 #include "FortniteGame/Public/FortGameSession/FortGameSessionDedicated.h"
 #include "FortniteGame/Public/FortWeapon/FortDecoTool.h"
+#include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 
 uintptr_t Finder::FindGUObjectArray() {
 	static uintptr_t Addr = 0;
@@ -4446,17 +4447,32 @@ uintptr_t Finder::FindUWorld__NextSwitchCountdown() {
 	return ServerOffsets::UWorld__NextSwitchCountdown;
 }
 
-uintptr_t Finder::FindAFortGameMode_SetCurrentPlaylistName() {
+uintptr_t Finder::FindAFortGameMode_SetCurrentPlaylistNameVFT() {
 	static uintptr_t Addr = 0;
-	if (ServerOffsets::AFortGameMode_SetCurrentPlaylistName)
-		return ServerOffsets::AFortGameMode_SetCurrentPlaylistName;
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 54 24 ? 57 48 83 EC ? 48 8B D9 E8").Get();
-	if (Addr) {
-		ServerOffsets::AFortGameMode_SetCurrentPlaylistName = Addr - ImageBase;
-		Log("AFortGameMode_SetCurrentPlaylistName found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_SetCurrentPlaylistName));
-		return ServerOffsets::AFortGameMode_SetCurrentPlaylistName;
+	if (ServerOffsets::AFortGameMode_SetCurrentPlaylistNameVFT)
+		return ServerOffsets::AFortGameMode_SetCurrentPlaylistNameVFT;
+
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameMode::SetCurrentPlaylistName can only be used in Athena currently");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
-	return 0;
+	else {
+		return 0;
+	}
+
+	void** VFT = AFortGameMode::StaticClass()->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(Addr))
+		{
+			ServerOffsets::AFortGameMode_SetCurrentPlaylistNameVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortGameMode_SetCurrentPlaylistNameVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_SetCurrentPlaylistNameVFT));
+	return ServerOffsets::AFortGameMode_SetCurrentPlaylistNameVFT;
 }
 
 uintptr_t Finder::FindAFortGameMode_OnEndOfDay() {
@@ -7997,19 +8013,35 @@ uintptr_t Finder::FindUKismetSystemLibrary_ExecuteConsoleCommand() {
 	return ServerOffsets::UKismetSystemLibrary_ExecuteConsoleCommand;
 }
 
-uintptr_t Finder::FindAFortGameMode_SetCurrentPlaylistId() {
+uintptr_t Finder::FindAFortGameMode_SetCurrentPlaylistIdVFT() {
 	static uintptr_t Addr = 0;
-	if (ServerOffsets::AFortGameMode_SetCurrentPlaylistId)
-		return ServerOffsets::AFortGameMode_SetCurrentPlaylistId;
+	if (ServerOffsets::AFortGameMode_SetCurrentPlaylistIdVFT)
+		return ServerOffsets::AFortGameMode_SetCurrentPlaylistIdVFT;
 
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 48 83 EC ? 8B DA 48 8B F9 83 FA ? 76").Get();
-
-	if (Addr) {
-		ServerOffsets::AFortGameMode_SetCurrentPlaylistId = Addr - ImageBase;
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameModeAthena::SetCurrentPlaylistId(%d) set playlist to (NAME_None, ID: %d)");
+	if (!StringAddr.IsValid()) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameMode::SetCurrentPlaylistId(%d) failed to find specified playlist");
+	}
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
+	}
+	else {
+		return 0;
 	}
 
-	Log("AFortGameMode_SetCurrentPlaylistId found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_SetCurrentPlaylistId));
-	return ServerOffsets::AFortGameMode_SetCurrentPlaylistId;
+	void** VFT = AFortGameMode::StaticClass()->GetDefaultObject()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(Addr))
+		{
+			ServerOffsets::AFortGameMode_SetCurrentPlaylistIdVFT = i;
+			break;
+		}
+	}
+
+	Log("AFortGameMode_SetCurrentPlaylistIdVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_SetCurrentPlaylistIdVFT));
+	return ServerOffsets::AFortGameMode_SetCurrentPlaylistIdVFT;
 }
 
 uintptr_t Finder::FindCollectGarbage() {
@@ -8346,8 +8378,17 @@ uintptr_t Finder::FindAFortGameStateAthena_SetCurrentPlaylistId() {
 	if (bInitialized)
 		return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
 	
-	//Addr = Memcury::Scanner::FindPattern("").Get(); // Dont have anything for this yet
-	
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"PLAYLIST: Playlist Object found in AFortGameStateAthena::SetCurrentPlaylistId() PlaylistName is %s (Server Only)");
+	if (!StringAddr.IsValid()) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"PLAYLIST: Playlist name was already set, Applying property overrides.");
+	}
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
+	}
+	else {
+		return 0;
+	}
+
 	if (Addr) {
 		ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId = Addr - ImageBase;
 	}
@@ -11002,8 +11043,7 @@ uintptr_t Finder::FindAActor_PostInitializeComponentsVFT() {
 	if (StringAddr.IsValid()) {
 		Addr = StringAddr.FindFunctionStart().Get();
 	}
-
-	if (!Addr) {
+	else {
 		return 0;
 	}
 	
@@ -11020,6 +11060,56 @@ uintptr_t Finder::FindAActor_PostInitializeComponentsVFT() {
 
 	Log("AActor_PostInitializeComponentsVFT found at: 0x" + std::format("{:X}", ServerOffsets::AActor_PostInitializeComponentsVFT));
 	return ServerOffsets::AActor_PostInitializeComponentsVFT;
+}
+
+uintptr_t Finder::FindAFortGameModeAthena_OnGivenMatchAssignmentVFT() {
+	if (ServerOffsets::AFortGameModeAthena_OnGivenMatchAssignmentVFT)
+		return ServerOffsets::AFortGameModeAthena_OnGivenMatchAssignmentVFT;
+
+	uintptr_t Addr = 0;
+
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"PLAYLIST: Assignment Received in AFortGameModeAthena::OnGivenMatchAssignment() PlaylistId is %d (Server-Only)");
+	if (!StringAddr.IsValid()) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameModeAthena::OnGivenMatchAssignment: MaxPlayerCount: %i, NumTeams: %i, WarmupRequiredPlayerCount: %i, Timeout: %.2f");
+	}
+
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
+
+		void** VFT = AFortGameModeAthena::StaticClass()->GetDefaultObject()->VTable;
+
+		for (int i = 0; i < 2048; i++)
+		{
+			if (VFT[i] == (void*)(Addr))
+			{
+				ServerOffsets::AFortGameModeAthena_OnGivenMatchAssignmentVFT = i;
+				break;
+			}
+		}
+	}
+	else {
+		StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameMode: Got match assignment for LinkCode [%s] without a LinkType!");
+		if (!StringAddr.IsValid()) {
+			StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameMode: Got match assignment for LinkCode (%s) [%s].");
+		}
+		if (StringAddr.IsValid()) {
+			Addr = StringAddr.FindFunctionStart().Get();
+
+			void** VFT = AFortGameMode::StaticClass()->GetDefaultObject()->VTable;
+
+			for (int i = 0; i < 2048; i++)
+			{
+				if (VFT[i] == (void*)(Addr))
+				{
+					ServerOffsets::AFortGameModeAthena_OnGivenMatchAssignmentVFT = i;
+					break;
+				}
+			}
+		}
+	}
+
+	Log("AFortGameModeAthena_OnGivenMatchAssignmentVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeAthena_OnGivenMatchAssignmentVFT));
+	return ServerOffsets::AFortGameModeAthena_OnGivenMatchAssignmentVFT;
 }
 
 void Finder::SetupCoreOffsets() {
@@ -11181,8 +11271,6 @@ void Finder::SetupOffsets() {
 
 	FindAFortGameState_ApplyHomebaseEffectsOnPlayerSetupVFT();
 
-	FindAFortGameStateAthena_SetCurrentPlaylistId();
-
 	FindUFortControllerComponent_Aircraft_EnterAircraft();
 
 	FindUMcpProfileGroup_SendRequestNow();
@@ -11275,8 +11363,6 @@ void Finder::SetupOffsets() {
 	FindAActor_BeginPlayVFT();
 
 	FindAFortPlayerController_OnReadyToStartMatch();
-
-	FindAFortGameStateAthena_SetCurrentPlaylistId();
 
 	FindAFortGameModeZone_CreateAIDirectorVFT();
 
@@ -11427,6 +11513,13 @@ void Finder::SetupOffsets() {
 	FindAFortGameMode_PlacePlayerOnTeamVFT();
 
 	FindAActor_PostInitializeComponentsVFT();
+
+	FindAFortGameMode_SetCurrentPlaylistNameVFT();
+	FindAFortGameMode_SetCurrentPlaylistIdVFT();
+
+	FindAFortGameStateAthena_SetCurrentPlaylistId();
+
+	FindAFortGameModeAthena_OnGivenMatchAssignmentVFT();
 
 	return;
 }

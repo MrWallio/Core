@@ -342,12 +342,12 @@ namespace ServerOffsets {
 
 	inline uintptr_t AFortGameMode_OnInitWorldRecordComplete = 0;
 	inline uintptr_t AFortGameMode_OnEndOfDay = 0;
-	inline uintptr_t AFortGameMode_SetCurrentPlaylistName = 0;
+	inline uintptr_t AFortGameMode_SetCurrentPlaylistNameVFT = 0;
 	inline uintptr_t AFortGameMode_InitGame = 0;
 	inline uintptr_t AFortGameMode_RestartPlayer = 0;
 	inline uintptr_t AFortGameMode_FinishRestartPlayer = 0;
 	inline uintptr_t AFortGameMode_SpawnDefaultPawnFor = 0;
-	inline uintptr_t AFortGameMode_SetCurrentPlaylistId = 0;
+	inline uintptr_t AFortGameMode_SetCurrentPlaylistIdVFT = 0;
 	inline uintptr_t AFortGameMode_FinishWorldInitializationVFT = 0;
 	inline uintptr_t AFortGameMode_PickTeam = 0;
 	inline uintptr_t AFortGameMode_PickTeamVFT = 0;
@@ -412,6 +412,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameModeAthena_AddToAlivePlayers = 0;
 	inline uintptr_t AFortGameModeAthena_RemoveFromAlivePlayers = 0;
 	inline uintptr_t AFortGameModeAthena_PlacePlayerOnTeam = 0;
+	inline uintptr_t AFortGameModeAthena_OnGivenMatchAssignmentVFT = 0;
 
 	inline uintptr_t AFortGameStateAthena_OnRep_CurrentPlaylistInfo = 0;
 	inline uintptr_t AFortGameStateAthena_OnPlaylistDataLoadCompleted = 0;
@@ -422,6 +423,8 @@ namespace ServerOffsets {
 
 	inline uintptr_t UReplicationDriver_ServerReplicateActors = 0;
 	inline uintptr_t UReplicationDriver_ServerReplicateActorsVFT = 0;
+
+	inline uintptr_t UFortReplicationGraph_Enabled = 0;
 
 	inline uintptr_t UAbilitySystemComponent_ClientActivateAbilityFailed = 0;
 	inline uintptr_t UAbilitySystemComponent_InternalTryActivateAbility = 0;

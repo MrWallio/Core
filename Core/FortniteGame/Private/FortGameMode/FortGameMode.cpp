@@ -234,7 +234,8 @@ void AFortGameMode::FinishWorldInitialization(AFortGameMode* This, AFortWorldMan
 
 	Log("MissionManager: " + (FortGameState->MissionManager ? FortGameState->MissionManager->GetName().ToString() : "None"));
 
-	This->bWorldIsReady = true;
+	// AFortGameMode::FinishWorldInitialization already sets bWorldIsReady to true, so we don't need to set it here.
+	// This->bWorldIsReady = true;
 }
 
 void AFortGameMode::AddInactivePlayerHK(AFortGameMode* This, APlayerState* PlayerState, APlayerController* PC) {
@@ -252,4 +253,24 @@ void AFortGameMode::PreInitializeComponents(AFortGameMode* This) {
 void AFortGameMode::InitializeTeams() {
 	void (*&InitializeTeamsInternal)(AFortGameMode* This) = decltype(InitializeTeamsInternal)(VTable[Finder::FindAFortGameMode_InitializeTeamsVFT()]);
 	InitializeTeamsInternal(this);
+}
+
+void AFortGameMode::SetCurrentPlaylistName(FName NewPlaylistName) {
+	if (Finder::FindAFortGameMode_SetCurrentPlaylistNameVFT()) {
+		void (*&SetCurrentPlaylistNameInternal)(AFortGameMode* This, FName NewPlaylistName) = decltype(SetCurrentPlaylistNameInternal)(VTable[Finder::FindAFortGameMode_SetCurrentPlaylistNameVFT()]);
+		SetCurrentPlaylistNameInternal(this, NewPlaylistName);
+	}
+	else {
+		CurrentPlaylistName = NewPlaylistName;
+	}
+}
+
+void AFortGameMode::SetCurrentPlaylistId(int32 NewPlaylistID) {
+	if (Finder::FindAFortGameMode_SetCurrentPlaylistIdVFT()) {
+		void (*&SetCurrentPlaylistIdInternal)(AFortGameMode* This, int32 NewPlaylistID) = decltype(SetCurrentPlaylistIdInternal)(VTable[Finder::FindAFortGameMode_SetCurrentPlaylistIdVFT()]);
+		SetCurrentPlaylistIdInternal(this, NewPlaylistID);
+	}
+	else {
+		CurrentPlaylistId = NewPlaylistID;
+	}
 }

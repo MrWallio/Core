@@ -37,6 +37,8 @@ public:
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot);
 	static APawn* SpawnDefaultPawnFor(AFortGameModeAthena* This, AController* NewPlayer, AActor* StartSpot);
 
+	bool SetupPlaylist();
+
 	static inline void (*FinishWorldInitializationOG)(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
 	static void FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager);
 

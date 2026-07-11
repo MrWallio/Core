@@ -56,6 +56,97 @@ APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, ACont
 	return Pawn;
 }
 
+bool AFortGameModeAthena::SetupPlaylist() {
+	FCoreConfig& Config = ConfigurationManager::GetConfig();
+
+	AFortGameStateAthena* FortGameState = GameState->Cast<AFortGameStateAthena>();
+	if (!FortGameState) {
+		Log("AFortGameModeAthena::SetupPlaylist: GameState is null or not AFortGameStateAthena");
+		return false;
+	}
+
+	UFortPlaylistAthena* Playlist = nullptr;
+	if (UFortPlaylistManager::StaticClass()) {
+		UFortPlaylistManager* PlaylistManager = UFortPlaylistManager::Get();
+		if (PlaylistManager) {
+			// We need to check if Config.Playlist is a number or a string and thats how we will find the playlist
+			if (Config.Playlist.find_first_not_of("0123456789") == std::string::npos) {
+				int32 PlaylistId = std::stoi(Config.Playlist);
+				Playlist = PlaylistManager->GetPlaylist(PlaylistId);
+			}
+			else {
+				FName PlaylistName = UKismetStringLibrary::Conv_StringToName(Config.Playlist);
+				Playlist = PlaylistManager->GetPlaylist(PlaylistName);
+			}
+		}
+		else {
+			Log("AFortGameModeAthena::InitGameState: Failed to get PlaylistManager");
+		}
+	}
+
+	int32 MaxPlayerCount = Playlist ? Playlist->MaxPlayers : 100;
+	int32 TeamSize = Playlist ? Playlist->MaxTeamSize : FortGameState->TeamSize;
+
+	GameSession->MaxPlayers = MaxPlayerCount;
+	GameSession->MaxPartySize = TeamSize;
+
+	MaxPlayerCount = MaxPlayerCount;
+
+	if (Playlist) {
+		if (FortGameState->_HasCurrentPlaylistData()) {
+			FortGameState->CurrentPlaylistData = Playlist;
+			FortGameState->OnRep_CurrentPlaylistData();
+		}
+		if (FortGameState->_HasCurrentPlaylistInfo()) {
+			FortGameState->CurrentPlaylistInfo.BasePlaylist = Playlist;
+			FortGameState->CurrentPlaylistInfo.OverridePlaylist = Playlist;
+			FortGameState->CurrentPlaylistInfo.PlaylistReplicationKey++;
+			FortGameState->CurrentPlaylistInfo.MarkArrayDirty();
+			FortGameState->OnRep_CurrentPlaylistInfo();
+		}
+
+		SetCurrentPlaylistName(Playlist->GetPlaylistName());
+		SetCurrentPlaylistId(Playlist->GetPlaylistId());
+	}
+
+	FortGameState->SetCurrentPlaylistId(CurrentPlaylistId);
+
+	Log("AFortGameModeAthena::SetupPlaylist: Applied playlist " + (Playlist ? Playlist->GetFName().ToString().ToString() : std::to_string(CurrentPlaylistId)));
+
+	// Start Playlist Dump
+	Log("====== Playlist Dump ======");
+	if (_HasCurrentPlaylistName()) {
+		Log("CurrentPlaylistName: " + CurrentPlaylistName.ToString().ToString());
+	}
+	if (_HasCurrentPlaylistId()) {
+		Log("CurrentPlaylistId: " + std::to_string(CurrentPlaylistId));
+	}
+	if (FortGameState->_HasCurrentPlaylistId()) {
+		Log("GameState CurrentPlaylistId: " + std::to_string(FortGameState->CurrentPlaylistId));
+	}
+	if (FortGameState->_HasTeamCount()) {
+		Log("TeamCount: " + std::to_string(FortGameState->TeamCount));
+	}
+	if (FortGameState->_HasTeamSize()) {
+		Log("TeamSize: " + std::to_string(FortGameState->TeamSize));
+	}
+	if (MaxPlayerCount) {
+		Log("MaxPlayerCount: " + std::to_string(MaxPlayerCount));
+	}
+	if (FortGameState->_HasCachedSafeZoneStartUp()) {
+		Log("CachedSafeZoneStartUp: " + std::to_string(FortGameState->CachedSafeZoneStartUp));
+	}
+	if (FortGameState->_HasbIsLargeTeamGame()) {
+		Log("bIsLargeTeamGame: " + std::string(FortGameState->bIsLargeTeamGame ? "true" : "false"));
+	}
+	if (FortGameState->_HasAirCraftBehavior()) {
+		Log("AirCraftBehavior: " + std::to_string(FortGameState->AirCraftBehavior));
+	}
+	Log("====== End Playlist Dump ======");
+
+	return true;
+}
+
 void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager) {
 	FinishWorldInitializationOG(This, WorldManager);
 	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
@@ -63,7 +154,7 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
 	if (!GameState) {
 		Log("AFortGameModeAthena::FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
-		return FinishWorldInitializationOG(This, WorldManager);
+		return;
 	}
 
 	This->DefaultPawnClass = (UClass*)StaticLoadObject("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
@@ -91,11 +182,6 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 
 		Log("Set Custom Supply Drop Class: " + SupplyDropClass->GetName().ToString());
 	}
-
-	GameState->OnRep_CurrentPlaylistData();
-	GameState->OnRep_CurrentPlaylistInfo();
-
-	This->bWorldIsReady = true;
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {
@@ -153,85 +239,30 @@ uint8 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 
 void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 	InitGameStateOG(This);
-	
-	FCoreConfig& Config = ConfigurationManager::GetConfig();
 
-	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
-	if (!GameState) {
-		Log("AFortGameModeAthena::InitGameState: GameState is null or not AFortGameStateAthena");
-		return;
-	}
+	if (Version::Fortnite_Version == 3.5 || Version::Fortnite_Version == 3.6 || Version::Fortnite_Version == 4.0) {
+		std::thread([This]() {
+			while (true) {
+				UWorld* World = UWorld::GetWorld();
+				if (World && World->AuthorityGameMode) {
+					AGameMode* GameMode = World->AuthorityGameMode->Cast<AGameMode>();
+					if (GameMode && GameMode->MatchState == MatchState::WaitingToStart) {
+						break;
+					}
+				}
 
-	if (UFortPlaylistManager::StaticClass()) {
-		UFortPlaylistManager* PlaylistManager = UFortPlaylistManager::Get();
-		UFortPlaylistAthena* Playlist = nullptr;
-		if (PlaylistManager) {
-			// We need to check if Config.Playlist is a number or a string and thats how we will find the playlist
-			if (Config.Playlist.find_first_not_of("0123456789") == std::string::npos) {
-				int32 PlaylistId = std::stoi(Config.Playlist);
-				Playlist = PlaylistManager->GetPlaylist(PlaylistId);
-			}
-			else {
-				FName PlaylistName = UKismetStringLibrary::Conv_StringToName(Config.Playlist);
-				Playlist = PlaylistManager->GetPlaylist(PlaylistName);
-			}
-		}
-		else {
-			Log("AFortGameModeAthena::InitGameState: Failed to get PlaylistManager");
-		}
-
-		if (Playlist) {
-			if (GameState->_HasCurrentPlaylistData()) {
-				GameState->CurrentPlaylistData = Playlist;
-			}
-			if (GameState->_HasCurrentPlaylistInfo()) {
-				GameState->CurrentPlaylistInfo.BasePlaylist = Playlist;
-				GameState->CurrentPlaylistInfo.OverridePlaylist = Playlist;
-				GameState->CurrentPlaylistInfo.PlaylistReplicationKey++;
-				GameState->CurrentPlaylistInfo.MarkArrayDirty();
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
 
-			This->CurrentPlaylistName = Playlist->GetPlaylistName();
-			This->CurrentPlaylistId = Playlist->GetPlaylistId();
-			GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
-
-			GameState->TeamCount = Playlist->MaxTeamCount;
-			GameState->TeamSize = Playlist->MaxTeamSize;
-			GameState->bIsLargeTeamGame = Playlist->bIsLargeTeamGame;
-
-			This->GameSession->MaxPlayers = Playlist->MaxPlayers;
-			This->GameSession->MaxPartySize = Playlist->MaxTeamSize;
-
-			This->MaxPlayerCount = Playlist->MaxPlayers;
-
-			GameState->CachedSafeZoneStartUp = Playlist->SafeZoneStartUp;
-
-			Log("AFortGameModeAthena::InitGameState: Applied playlist " + Playlist->GetFName().ToString().ToString());
-
-			// Start Playlist Dump
-			Log("====== Playlist Dump ======");
-			Log("Playlist: " + Playlist->GetFName().ToString().ToString());
-			Log("PlaylistName: " + Playlist->GetPlaylistName().ToString().ToString());
-			Log("PlaylistId: " + std::to_string(Playlist->GetPlaylistId()));
-			Log("MaxTeamCount: " + std::to_string(Playlist->MaxTeamCount));
-			Log("MaxTeamSize: " + std::to_string(Playlist->MaxTeamSize));
-			Log("MaxSquadSize: " + std::to_string(Playlist->MaxSquadSize));
-			Log("MaxPlayers: " + std::to_string(Playlist->MaxPlayers));
-			Log("SafeZoneStartUp: " + std::to_string(Playlist->SafeZoneStartUp));
-			Log("bIsLargeTeamGame: " + std::string(Playlist->bIsLargeTeamGame ? "true" : "false"));
-			Log("====== End Playlist Dump ======");
-		}
-		else {
-			Log("AFortGameModeAthena::InitGameState: Failed to get Playlist");
-		}
+			if (!This || !This->SetupPlaylist()) {
+				Log("Failed to setup playlist!");
+			}
+		}).detach();
 	}
 	else {
-		GameState->SetCurrentPlaylistId(This->CurrentPlaylistId);
-
-		This->GameSession->MaxPlayers = 100;
-		This->GameSession->MaxPartySize = GameState->TeamSize;
-
-		This->MaxPlayerCount = 100;
+		if (!This->SetupPlaylist()) {
+			Log("AFortGameModeAthena::InitGameState: Failed to setup playlist");
+		}
 	}
 }
 

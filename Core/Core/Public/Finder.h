@@ -503,7 +503,7 @@ public:
 
 	static uintptr_t FindUWorld__NextSwitchCountdown();
 
-	static uintptr_t FindAFortGameMode_SetCurrentPlaylistName();
+	static uintptr_t FindAFortGameMode_SetCurrentPlaylistNameVFT();
 
 	static uintptr_t FindAFortGameMode_OnEndOfDay();
 
@@ -855,7 +855,7 @@ public:
 
 	static uintptr_t FindUKismetSystemLibrary_ExecuteConsoleCommand();
 
-	static uintptr_t FindAFortGameMode_SetCurrentPlaylistId();
+	static uintptr_t FindAFortGameMode_SetCurrentPlaylistIdVFT();
 
 	static uintptr_t FindCollectGarbage();
 
@@ -1104,6 +1104,8 @@ public:
 	static uintptr_t FindAFortGameMode_PlacePlayerOnTeamVFT();
 
 	static uintptr_t FindAActor_PostInitializeComponentsVFT();
+
+	static uintptr_t FindAFortGameModeAthena_OnGivenMatchAssignmentVFT();
 public:
 	static void SetupCoreOffsets();
 
