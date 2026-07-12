@@ -198,7 +198,10 @@
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\WeakObjectPtr.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\Array.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\BitArray.h" />
-    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\ContainerIterator.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\ContainerAllocationPolicies.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\EnumAsByte.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Internationalization\Text.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\ScriptDelegates.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\Map.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\Set.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\SparseArray.h" />
@@ -221,7 +224,9 @@
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Serialization\Archive.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Serialization\BitWriter.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\SharedPointer.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\Tuple.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\TypeCompatibleBytes.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\TypeHash.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\UObject\NameTypes.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\ActorComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\ActorChannel.h" />

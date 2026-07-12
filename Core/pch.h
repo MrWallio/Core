@@ -30,6 +30,7 @@
 #include <psapi.h>
 #include <unordered_map>
 #include <numeric>
+#include <cwctype>
 
 #include "../includes/memcury.h"
 #include "../includes/MinHook/MinHook.h"

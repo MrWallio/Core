@@ -1,45 +1,8 @@
 #pragma once
 #include "pch.h"
 
+#include "Engine/Source/Runtime/Core/Public/Containers/ContainerAllocationPolicies.h"
 #include "Engine/Source/Runtime/Core/Public/Templates/TypeCompatibleBytes.h"
-
-template<uint32 NumInlineElements>
-class TInlineAllocator
-{
-public:
-    template<typename ElementType>
-    class ForElementType
-    {
-    private:
-        static constexpr int32 ElementSize = sizeof(ElementType);
-        static constexpr int32 ElementAlign = alignof(ElementType);
-
-        static constexpr int32 InlineDataSizeBytes = NumInlineElements * ElementSize;
-
-    private:
-        TAlignedBytes<ElementSize, ElementAlign> InlineData[NumInlineElements];
-        ElementType* SecondaryData;
-
-    public:
-        ForElementType()
-            : InlineData{ 0x0 }, SecondaryData(nullptr)
-        {
-        }
-
-        ForElementType(ForElementType&&) = default;
-        ForElementType(const ForElementType&) = default;
-
-    public:
-        ForElementType& operator=(ForElementType&&) = default;
-        ForElementType& operator=(const ForElementType&) = default;
-
-    public:
-        inline const ElementType* GetAllocation() const { return SecondaryData ? SecondaryData : reinterpret_cast<const ElementType*>(&InlineData); }
-        inline ElementType* GetAllocation() { return SecondaryData ? SecondaryData : reinterpret_cast<ElementType*>(&InlineData); }
-
-        inline uint32 GetNumInlineBytes() const { return NumInlineElements; }
-    };
-};
 
 class FBitArray
 {
@@ -54,7 +17,7 @@ private:
 
 public:
     FBitArray()
-        : NumBits(0), MaxBits(Data.GetNumInlineBytes()* NumBitsPerDWORD)
+        : NumBits(0), MaxBits(Data.GetNumInlineElements() * NumBitsPerDWORD)
     {
     }
 
@@ -95,6 +58,31 @@ public:
         Value ? GetData()[DWORDIndex] |= Mask : GetData()[DWORDIndex] &= ~Mask;
     }
 
+    int32 Add(const bool Value)
+    {
+        const int32 Index = NumBits;
+
+        if (NumBits + 1 > MaxBits)
+        {
+            const int32 PrevWords = MaxBits / NumBitsPerDWORD;
+            const int32 NeededWords = (NumBits + 1 + NumBitsPerDWORD - 1) / NumBitsPerDWORD;
+            const int32 NewWords = DefaultCalculateSlackGrow(NeededWords, PrevWords);
+
+            Data.ResizeAllocation(PrevWords, NewWords, sizeof(uint32));
+            std::memset(GetData() + PrevWords, 0, (size_t)(NewWords - PrevWords) * sizeof(uint32));
+            MaxBits = NewWords * NumBitsPerDWORD;
+        }
+
+        ++NumBits;
+        Set(Index, Value, true);
+        return Index;
+    }
+
+    inline void Reset()
+    {
+        NumBits = 0;
+    }
+
 public:
     class FRelativeBitReference
     {
@@ -112,23 +100,23 @@ public:
         int32  WordIndex;
         uint32 Mask;
     public:
-        inline uint32 FloorLog2()
+        static inline uint32 FloorLog2(uint32 Value)
         {
             uint32 pos = 0;
-            if (Mask >= 1 << 16) { Mask >>= 16; pos += 16; }
-            if (Mask >= 1 << 8) { Mask >>= 8; pos += 8; }
-            if (Mask >= 1 << 4) { Mask >>= 4; pos += 4; }
-            if (Mask >= 1 << 2) { Mask >>= 2; pos += 2; }
-            if (Mask >= 1 << 1) { pos += 1; }
+            if (Value >= 1 << 16) { Value >>= 16; pos += 16; }
+            if (Value >= 1 << 8) { Value >>= 8; pos += 8; }
+            if (Value >= 1 << 4) { Value >>= 4; pos += 4; }
+            if (Value >= 1 << 2) { Value >>= 2; pos += 2; }
+            if (Value >= 1 << 1) { pos += 1; }
             return pos;
         }
 
-        inline uint32 CountLeadingZeros()
+        static inline uint32 CountLeadingZeros(uint32 Value)
         {
-            if (Mask == 0)
+            if (Value == 0)
                 return 32;
 
-            return 31 - FloorLog2();
+            return 31 - FloorLog2(Value);
         }
     };
 
@@ -196,7 +184,7 @@ public:
 
             this->Mask = NewRemainingBitMask ^ RemainingBitMask;
 
-            CurrentBitIndex = BaseBitIndex + NumBitsPerDWORD - 1 - CountLeadingZeros();
+            CurrentBitIndex = BaseBitIndex + NumBitsPerDWORD - 1 - CountLeadingZeros(this->Mask);
 
             if (CurrentBitIndex > ArrayNum)
                 CurrentBitIndex = ArrayNum;
@@ -206,3 +194,5 @@ public:
     inline FSetBitIterator begin() { return FSetBitIterator(*this, 0); }
     inline FSetBitIterator end() { return FSetBitIterator(*this, Num()); }
 };
+
+static_assert(sizeof(FBitArray) == 0x20, "FBitArray layout broke: UE 4.0-5.x expects inline-4 allocator/NumBits/MaxBits = 0x20 on x64");

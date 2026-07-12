@@ -1,28 +1,8 @@
 #pragma once
 #include "pch.h"
 
+#include "Engine/Source/Runtime/Core/Public/Templates/Tuple.h"
 #include "Set.h"
-
-template <typename KeyType, typename ValueType>
-class TPair
-{
-public:
-	KeyType First;
-	ValueType Second;
-
-public:
-	TPair(KeyType Key, ValueType Value)
-		: First(Key), Second(Value)
-	{
-	}
-
-public:
-	inline       KeyType& Key() { return First; }
-	inline const KeyType& Key() const { return First; }
-
-	inline       ValueType& Value() { return Second; }
-	inline const ValueType& Value() const { return Second; }
-};
 
 template<typename KeyElementType, typename ValueElementType>
 class TMap
@@ -35,6 +15,12 @@ public:
 
 private:
 	inline void VerifyIndex(int32 Index) const { if (!IsValidIndex(Index)) throw std::out_of_range("Index was out of range!"); }
+
+protected:
+	static uint32 GetPairKeyHash(const ElementType& Pair)
+	{
+		return GetTypeHash(Pair.Key());
+	}
 
 public:
 	inline int32 NumAllocated() const { return Elements.NumAllocated(); }
@@ -51,13 +37,10 @@ public:
 public:
     ValueElementType* Find(const KeyElementType& Key)
     {
-        const FBitArray& AllocationFlags = Elements.Elements.GetAllocationFlags();
-
-        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
         {
             int32 Index = It.GetIndex();
-            auto& SetElement = Elements.Elements[Index];
-            ElementType& Pair = SetElement.Value;
+            ElementType& Pair = Elements[Index];
 
             if (Pair.Key() == Key)
             {
@@ -70,21 +53,7 @@ public:
 
     const ValueElementType* Find(const KeyElementType& Key) const
     {
-        const FBitArray& AllocationFlags = Elements.Elements.GetAllocationFlags();
-
-        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
-        {
-            int32 Index = It.GetIndex();
-            const auto& SetElement = Elements.Elements[Index];
-            const ElementType& Pair = SetElement.Value;
-
-            if (Pair.Key() == Key)
-            {
-                return &Pair.Value();
-            }
-        }
-
-        return nullptr;
+        return const_cast<TMap*>(this)->Find(Key);
     }
 
     ValueElementType FindRef(const KeyElementType& Key) const
@@ -97,12 +66,54 @@ public:
         return *Found;
     }
 
+    bool Contains(const KeyElementType& Key) const
+    {
+        return Find(Key) != nullptr;
+    }
+
     template <class PT>
     ValueElementType* Search(PT Predicate) {
         for (auto& [k, v] : *this) {
             if (Predicate(k, v)) return &v;
         }
         return nullptr;
+    }
+
+    ValueElementType& Add(const KeyElementType& Key, const ValueElementType& Value)
+    {
+        if (ValueElementType* Existing = Find(Key))
+        {
+            std::memcpy((void*)Existing, (const void*)&Value, sizeof(ValueElementType));
+            return *Existing;
+        }
+
+        const int32 Index = Elements.AddWithKeyHashFunc(ElementType(Key, Value), &TMap::GetPairKeyHash);
+        return Elements[Index].Value();
+    }
+
+    ValueElementType& FindOrAdd(const KeyElementType& Key)
+    {
+        if (ValueElementType* Existing = Find(Key))
+        {
+            return *Existing;
+        }
+
+        return Add(Key, ValueElementType{});
+    }
+
+    bool Remove(const KeyElementType& Key)
+    {
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            int32 Index = It.GetIndex();
+            if (Elements[Index].Key() == Key)
+            {
+                Elements.RemoveAt(Index);
+                return true;
+            }
+        }
+
+        return false;
     }
 
 public:
@@ -113,9 +124,85 @@ public:
 	inline bool operator!=(const TMap<KeyElementType, ValueElementType>& Other) const { return Elements != Other.Elements; }
 
 public:
-	template<typename KeyType, typename ValueType> friend ContainerIterators::TMapIterator<KeyType, ValueType> begin(const TMap& Map);
-	template<typename KeyType, typename ValueType> friend ContainerIterators::TMapIterator<KeyType, ValueType> end(const TMap& Map);
+	class TIterator
+	{
+	private:
+		TMap& Map;
+		FBitArray::FSetBitIterator BitIt;
+
+	public:
+		TIterator(const TMap& InMap, int32 StartIndex = 0)
+			: Map(const_cast<TMap&>(InMap))
+			, BitIt(InMap.GetAllocationFlags(), StartIndex)
+		{
+		}
+
+	public:
+		inline int32 GetIndex() { return BitIt.GetIndex(); }
+
+		inline TIterator& operator++() { ++BitIt; return *this; }
+
+		inline explicit operator bool() const { return (bool)BitIt; }
+
+		inline ElementType& operator*() { return Map.Elements[BitIt.GetIndex()]; }
+		inline ElementType* operator->() { return &Map.Elements[BitIt.GetIndex()]; }
+
+		inline bool operator==(const TIterator& Other) const { return BitIt == Other.BitIt; }
+		inline bool operator!=(const TIterator& Other) const { return BitIt != Other.BitIt; }
+	};
+
+	inline TIterator begin() { return TIterator(*this, 0); }
+	inline TIterator end() { return TIterator(*this, NumAllocated()); }
+	inline TIterator begin() const { return TIterator(*this, 0); }
+	inline TIterator end() const { return TIterator(*this, NumAllocated()); }
 };
 
-template<typename T0, typename T1> inline ContainerIterators::TMapIterator<T0, T1> begin(const TMap<T0, T1>& Map) { return ContainerIterators::TMapIterator<T0, T1>(Map, Map.GetAllocationFlags(), 0); }
-template<typename T0, typename T1> inline ContainerIterators::TMapIterator<T0, T1> end(const TMap<T0, T1>& Map) { return ContainerIterators::TMapIterator<T0, T1>(Map, Map.GetAllocationFlags(), Map.NumAllocated()); }
+template<typename KeyElementType, typename ValueElementType>
+class TMultiMap : public TMap<KeyElementType, ValueElementType>
+{
+public:
+	using ElementType = typename TMap<KeyElementType, ValueElementType>::ElementType;
+
+public:
+	ValueElementType& Add(const KeyElementType& Key, const ValueElementType& Value)
+	{
+		const int32 Index = this->Elements.AddWithKeyHashFunc(
+			ElementType(Key, Value),
+			[](const ElementType& Pair) { return GetTypeHash(Pair.Key()); });
+
+		return this->Elements[Index].Value();
+	}
+
+	void MultiFind(const KeyElementType& Key, TArray<ValueElementType>& OutValues) const
+	{
+		for (FBitArray::FSetBitIterator It(this->Elements.GetAllocationFlags()); It; ++It)
+		{
+			int32 Index = It.GetIndex();
+			const ElementType& Pair = this->Elements[Index];
+
+			if (Pair.Key() == Key)
+			{
+				OutValues.Add(Pair.Value());
+			}
+		}
+	}
+
+	int32 RemoveAll(const KeyElementType& Key)
+	{
+		int32 NumRemoved = 0;
+
+		for (int32 Index = this->Elements.NumAllocated() - 1; Index >= 0; --Index)
+		{
+			if (this->Elements.IsValidIndex(Index) && this->Elements[Index].Key() == Key)
+			{
+				this->Elements.RemoveAt(Index);
+				++NumRemoved;
+			}
+		}
+
+		return NumRemoved;
+	}
+};
+
+static_assert(sizeof(TMap<int32, int32>) == 0x50, "TMap layout broke: UE 4.0-5.x expects a single TSet member = 0x50 on x64");
+static_assert(sizeof(TMultiMap<int32, int32>) == 0x50, "TMultiMap layout broke: must add no members over TMap");

@@ -3,9 +3,10 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
 #include "Engine/Source/Runtime/Core/Public/Templates/TypeCompatibleBytes.h"
+#include "Engine/Source/Runtime/Core/Public/Templates/TypeHash.h"
+#include "Engine/Source/Runtime/Core/Public/Containers/ContainerAllocationPolicies.h"
 #include "SparseArray.h"
 #include "BitArray.h"
-#include "ContainerIterator.h"
 
 template <typename SetType>
 class SetElement
@@ -55,6 +56,94 @@ public:
 private:
     inline void VerifyIndex(int32 Index) const { if (!IsValidIndex(Index)) throw std::out_of_range("Index was out of range!"); }
 
+    inline int32_t* GetHashBucket(int32 HashIndex)
+    {
+        return Hash.GetAllocation() + (HashIndex & (HashSize - 1));
+    }
+
+    void UnlinkFromHashChain(int32 ElementIndex)
+    {
+        if (HashSize <= 0)
+            return;
+
+        SetDataType& ElementBeingRemoved = Elements[ElementIndex];
+
+        int32_t* NextElementIdPtr = GetHashBucket(ElementBeingRemoved.HashIndex);
+        for (int32 Guard = Elements.NumAllocated(); Guard >= 0 && *NextElementIdPtr != -1; --Guard)
+        {
+            if (*NextElementIdPtr == ElementIndex)
+            {
+                *NextElementIdPtr = ElementBeingRemoved.HashNextId;
+                break;
+            }
+
+            if (!Elements.IsAllocated(*NextElementIdPtr))
+                break;
+
+            NextElementIdPtr = &Elements[*NextElementIdPtr].HashNextId;
+        }
+
+        ElementBeingRemoved.HashNextId = -1;
+        ElementBeingRemoved.HashIndex = -1;
+    }
+
+    void LinkElement(int32 ElementIndex, uint32 KeyHash)
+    {
+        SetDataType& Element = Elements[ElementIndex];
+
+        Element.HashIndex = (int32)(KeyHash & (uint32)(HashSize - 1));
+
+        int32_t* Bucket = Hash.GetAllocation() + Element.HashIndex;
+        Element.HashNextId = *Bucket;
+        *Bucket = ElementIndex;
+    }
+
+    static uint32 GetNumberOfHashBuckets(uint32 NumHashedElements)
+    {
+        const uint32 ElementsPerBucket = 2;
+        const uint32 BaseNumberOfBuckets = 8;
+        const uint32 MinNumberOfHashedElements = 4;
+
+        if (NumHashedElements >= MinNumberOfHashedElements)
+        {
+            return RoundUpToPowerOfTwo(NumHashedElements / ElementsPerBucket + BaseNumberOfBuckets);
+        }
+
+        return 1;
+    }
+
+    template<typename KeyHashFuncType>
+    void Rehash(KeyHashFuncType GetKeyHash)
+    {
+        Hash.ResizeAllocation(0, HashSize, sizeof(int32_t));
+
+        int32_t* Buckets = Hash.GetAllocation();
+        for (int32 i = 0; i < HashSize; ++i)
+        {
+            Buckets[i] = -1;
+        }
+
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            LinkElement(It.GetIndex(), GetKeyHash(Elements[It.GetIndex()].Value));
+        }
+    }
+
+    template<typename KeyHashFuncType>
+    bool ConditionalRehash(int32 NumHashedElements, KeyHashFuncType GetKeyHash)
+    {
+        const uint32 DesiredHashSize = GetNumberOfHashBuckets((uint32)NumHashedElements);
+
+        if (NumHashedElements > 0 && (HashSize <= 0 || (uint32)HashSize < DesiredHashSize))
+        {
+            HashSize = (int32)DesiredHashSize;
+            Rehash(GetKeyHash);
+            return true;
+        }
+
+        return false;
+    }
+
 public:
     inline int32 NumAllocated() const { return Elements.NumAllocated(); }
 
@@ -75,11 +164,32 @@ public:
     inline bool operator!=(const TSet<SetElementType>& Other) const { return Elements != Other.Elements; }
 
 public:
+    int32 Add(const SetElementType& Item)
+    {
+        return AddWithKeyHashFunc(Item, [](const SetElementType& Value) { return GetTypeHash(Value); });
+    }
+
+    template<typename KeyHashFuncType>
+    int32 AddWithKeyHashFunc(const SetElementType& Item, KeyHashFuncType GetKeyHash)
+    {
+        const int32 Index = Elements.AddUninitializedIndex();
+
+        SetDataType& Element = Elements[Index];
+        std::memcpy((void*)&Element.Value, (const void*)&Item, sizeof(SetElementType));
+        Element.HashNextId = -1;
+        Element.HashIndex = -1;
+
+        if (!ConditionalRehash(Elements.Num(), GetKeyHash))
+        {
+            LinkElement(Index, GetKeyHash(Element.Value));
+        }
+
+        return Index;
+    }
+
     const SetElementType* Find(const SetElementType& Item) const
     {
-        const FBitArray& AllocationFlags = Elements.GetAllocationFlags();
-
-        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
         {
             int32 Index = It.GetIndex();
             if (Elements[Index].Value == Item)
@@ -93,9 +203,7 @@ public:
 
     SetElementType* Find(const SetElementType& Item)
     {
-        const FBitArray& AllocationFlags = Elements.GetAllocationFlags();
-
-        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
         {
             int32 Index = It.GetIndex();
             if (Elements[Index].Value == Item)
@@ -107,12 +215,24 @@ public:
         return nullptr;
     }
 
+    int32 FindId(const SetElementType& Item) const
+    {
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            int32 Index = It.GetIndex();
+            if (Elements[Index].Value == Item)
+            {
+                return Index;
+            }
+        }
+
+        return -1;
+    }
+
     template <typename ComparisonType>
     bool Contains(ComparisonType Item) const
     {
-        const FBitArray& AllocationFlags = Elements.GetAllocationFlags();
-
-        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
         {
             int32 Index = It.GetIndex();
             if (Elements[Index].Value == Item)
@@ -126,14 +246,12 @@ public:
 
     bool Remove(const SetElementType& Item)
     {
-        const FBitArray& AllocationFlags = Elements.GetAllocationFlags();
-
-        for (ContainerIterators::FSetBitIterator It(AllocationFlags); It; ++It)
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
         {
             int32 Index = It.GetIndex();
             if (Elements[Index].Value == Item)
             {
-                Elements.RemoveAt(Index);
+                RemoveAt(Index);
                 return true;
             }
         }
@@ -144,13 +262,57 @@ public:
     {
         if (Elements.IsValidIndex(Index))
         {
+            UnlinkFromHashChain(Index);
             Elements.RemoveAt(Index);
         }
     }
+
+    void Reset()
+    {
+        Elements.Reset();
+
+        int32_t* Buckets = Hash.GetAllocation();
+        for (int32 i = 0; i < HashSize; ++i)
+        {
+            Buckets[i] = -1;
+        }
+    }
+
 public:
-    template<typename T> friend ContainerIterators::TSetIterator<T> begin(const TSet& Set);
-    template<typename T> friend ContainerIterators::TSetIterator<T> end(const TSet& Set);
+    class TIterator
+    {
+    private:
+        TSet& Set;
+        FBitArray::FSetBitIterator BitIt;
+
+    public:
+        TIterator(const TSet& InSet, int32 StartIndex = 0)
+            : Set(const_cast<TSet&>(InSet))
+            , BitIt(InSet.GetAllocationFlags(), StartIndex)
+        {
+        }
+
+    public:
+        inline int32 GetIndex() { return BitIt.GetIndex(); }
+
+        inline TIterator& operator++() { ++BitIt; return *this; }
+
+        inline explicit operator bool() const { return (bool)BitIt; }
+
+        inline SetElementType& operator*() { return Set.Elements[BitIt.GetIndex()].Value; }
+        inline SetElementType* operator->() { return &Set.Elements[BitIt.GetIndex()].Value; }
+
+        inline bool operator==(const TIterator& Other) const { return BitIt == Other.BitIt; }
+        inline bool operator!=(const TIterator& Other) const { return BitIt != Other.BitIt; }
+    };
+
+    inline TIterator begin() { return TIterator(*this, 0); }
+    inline TIterator end() { return TIterator(*this, NumAllocated()); }
+    inline TIterator begin() const { return TIterator(*this, 0); }
+    inline TIterator end() const { return TIterator(*this, NumAllocated()); }
 };
 
-template<typename T> inline ContainerIterators::TSetIterator<T> begin(const TSet<T>& Set) { return ContainerIterators::TSetIterator<T>(Set, Set.GetAllocationFlags(), 0); }
-template<typename T> inline ContainerIterators::TSetIterator<T> end(const TSet<T>& Set) { return ContainerIterators::TSetIterator<T>(Set, Set.GetAllocationFlags(), Set.NumAllocated()); }
+static_assert(sizeof(SetElement<int32>) == 0xC, "SetElement layout broke: Value/HashNextId/HashIndex expected");
+static_assert(sizeof(TSet<int32>) == 0x50, "TSet layout broke: UE 4.0-5.x expects sparse array + inline-1 hash + HashSize = 0x50 on x64");
+static_assert(offsetof(TSet<int32>, Hash) == 0x38, "TSet::Hash must sit at 0x38 to match the engine");
+static_assert(offsetof(TSet<int32>, HashSize) == 0x48, "TSet::HashSize must sit at 0x48 to match the engine");

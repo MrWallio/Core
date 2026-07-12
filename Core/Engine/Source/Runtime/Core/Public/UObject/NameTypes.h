@@ -86,3 +86,8 @@ public:
 public:
 	FName(const char* Str);
 };
+
+FORCEINLINE uint32 GetTypeHash(const FName N)
+{
+	return (uint32)N.ComparisonIndex + N.Number;
+}

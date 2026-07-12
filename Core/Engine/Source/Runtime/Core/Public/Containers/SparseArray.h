@@ -3,7 +3,6 @@
 
 #include "BitArray.h"
 #include "Array.h"
-#include "ContainerIterator.h"
 
 template<typename SparseArrayType>
 union TSparseArrayElementOrFreeListLink
@@ -55,6 +54,8 @@ public:
 	inline int32 Num() const { return NumAllocated() - NumFreeIndices; }
 	inline int32 Max() const { return Data.Max(); }
 
+	inline int32 GetMaxIndex() const { return Data.Num(); }
+
 	inline bool IsValidIndex(int32 Index) const { return Data.IsValidIndex(Index) && AllocationFlags[Index]; }
 
 	inline bool IsValid() const { return Data.IsValid() && AllocationFlags.IsValid(); }
@@ -69,6 +70,39 @@ public:
 public:
 	const FBitArray& GetAllocationFlags() const { return AllocationFlags; }
 public:
+	int32 AddUninitializedIndex()
+	{
+		int32 Index;
+
+		if (NumFreeIndices)
+		{
+			Index = FirstFreeIndex;
+			FirstFreeIndex = Data.GetUnsafe(Index).NextFreeIndex;
+			--NumFreeIndices;
+
+			if (NumFreeIndices)
+			{
+				Data.GetUnsafe(FirstFreeIndex).PrevFreeIndex = -1;
+			}
+
+			AllocationFlags.Set(Index, true);
+		}
+		else
+		{
+			Index = Data.AddUninitialized();
+			AllocationFlags.Add(true);
+		}
+
+		return Index;
+	}
+
+	int32 Add(const SparseArrayElementType& Element)
+	{
+		const int32 Index = AddUninitializedIndex();
+		std::memcpy((void*)&Data.GetUnsafe(Index).ElementData, (const void*)&Element, sizeof(SparseArrayElementType));
+		return Index;
+	}
+
 	inline void RemoveAt(int32 Index, int32 Count = 1)
 	{
 		for (; Count; --Count)
@@ -85,6 +119,14 @@ public:
 		}
 	}
 
+	void Reset()
+	{
+		Data.Reset();
+		AllocationFlags.Reset();
+		FirstFreeIndex = -1;
+		NumFreeIndices = 0;
+	}
+
 public:
 	inline       SparseArrayElementType& operator[](int32 Index) { VerifyIndex(Index); return *reinterpret_cast<SparseArrayElementType*>(&Data.GetUnsafe(Index).ElementData); }
 	inline const SparseArrayElementType& operator[](int32 Index) const { VerifyIndex(Index); return *reinterpret_cast<const SparseArrayElementType*>(&Data.GetUnsafe(Index).ElementData); }
@@ -93,9 +135,40 @@ public:
 	inline bool operator!=(const TSparseArray<SparseArrayElementType>& Other) const { return Data != Other.Data; }
 
 public:
-	template<typename T> friend ContainerIterators::TSparseArrayIterator<T> begin(const TSparseArray& Array);
-	template<typename T> friend ContainerIterators::TSparseArrayIterator<T> end(const TSparseArray& Array);
+	class TIterator
+	{
+	private:
+		TSparseArray& Array;
+		FBitArray::FSetBitIterator BitIt;
+
+	public:
+		TIterator(const TSparseArray& InArray, int32 StartIndex = 0)
+			: Array(const_cast<TSparseArray&>(InArray))
+			, BitIt(InArray.GetAllocationFlags(), StartIndex)
+		{
+		}
+
+	public:
+		inline int32 GetIndex() { return BitIt.GetIndex(); }
+
+		inline TIterator& operator++() { ++BitIt; return *this; }
+
+		inline explicit operator bool() const { return (bool)BitIt; }
+
+		inline SparseArrayElementType& operator*() { return Array[GetIndex()]; }
+		inline SparseArrayElementType* operator->() { return &Array[GetIndex()]; }
+
+		inline bool operator==(const TIterator& Other) const { return BitIt == Other.BitIt; }
+		inline bool operator!=(const TIterator& Other) const { return BitIt != Other.BitIt; }
+	};
+
+	inline TIterator begin() { return TIterator(*this, 0); }
+	inline TIterator end() { return TIterator(*this, NumAllocated()); }
+	inline TIterator begin() const { return TIterator(*this, 0); }
+	inline TIterator end() const { return TIterator(*this, NumAllocated()); }
 };
 
-template<typename T> inline ContainerIterators::TSparseArrayIterator<T> begin(const TSparseArray<T>& Array) { return ContainerIterators::TSparseArrayIterator<T>(Array, Array.GetAllocationFlags(), 0); }
-template<typename T> inline ContainerIterators::TSparseArrayIterator<T> end(const TSparseArray<T>& Array) { return ContainerIterators::TSparseArrayIterator<T>(Array, Array.GetAllocationFlags(), Array.NumAllocated()); }
+static_assert(sizeof(TSparseArray<int32>) == 0x38, "TSparseArray layout broke: UE 4.0-5.x expects 0x38 on x64");
+static_assert(offsetof(TSparseArray<int32>, AllocationFlags) == 0x10, "TSparseArray::AllocationFlags must sit at 0x10 to match the engine");
+static_assert(offsetof(TSparseArray<int32>, FirstFreeIndex) == 0x30, "TSparseArray::FirstFreeIndex must sit at 0x30 to match the engine");
+static_assert(offsetof(TSparseArray<int32>, NumFreeIndices) == 0x34, "TSparseArray::NumFreeIndices must sit at 0x34 to match the engine");
