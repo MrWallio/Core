@@ -69,6 +69,8 @@ public:
 	static inline void (*ServerPlaySquadQuickChatMessageOG)(AFortPlayerControllerAthena* This, FAthenaQuickChatActiveEntry& ChatEntry, FUniqueNetIdRepl& SenderID);
 	static void ServerPlaySquadQuickChatMessage(AFortPlayerControllerAthena* This, FAthenaQuickChatActiveEntry& ChatEntry, FUniqueNetIdRepl& SenderID);
 
+	void TogglePersonalVehicle(bool bOn);
+
 	static void Hook() {
 		UObject* AircraftComp = FUObjectArray::FindObject("Class FortniteGame.FortControllerComponent_Aircraft");
 		if (!AircraftComp) {

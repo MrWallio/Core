@@ -1545,3 +1545,47 @@ void AFortPlayerController::ClientExecuteInventoryItem(FGuid& ItemGuid, float De
 
 	Call(Func, ItemGuid, Delay, bForceExecute, bActivateSlotAfterSettingFocused);
 }
+
+void AFortPlayerController::TogglePersonalVehicle(bool bOn) {
+	Log("AFortPlayerController::TogglePersonalVehicle called with bOn = " + std::to_string(bOn));
+}
+
+void AFortPlayerController::TogglePersonalVehicleHook(AFortPlayerController* This, bool bOn) {
+	if (!This) {
+		Log("TogglePersonalVehicleHook: This is null!");
+		return;
+	}
+
+	if (AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>()) {
+		FortPCAthena->TogglePersonalVehicle(bOn);
+	}
+
+	This->TogglePersonalVehicle(bOn);
+}
+
+bool AFortPlayerController::IsPersonalVehicleActive() const {
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("IsPersonalVehicleActive");
+
+	return const_cast<AFortPlayerController*>(this)->Call<bool>(Func);
+}
+
+bool AFortPlayerController::IsPersonalVehicleAvailable() const {
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("IsPersonalVehicleAvailable");
+
+	return const_cast<AFortPlayerController*>(this)->Call<bool>(Func);
+}
+
+bool AFortPlayerController::IsUsingPersonalVehicle() const {
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("IsUsingPersonalVehicle");
+
+	return const_cast<AFortPlayerController*>(this)->Call<bool>(Func);
+}

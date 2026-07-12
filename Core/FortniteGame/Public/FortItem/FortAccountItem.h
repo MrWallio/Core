@@ -12,3 +12,8 @@ public:
 	DefineUProperty(UFortAccountItemDefinition*, ItemDefinition);
 	DefineUProperty(FString, TemplateId);
 };
+
+class UFortPersonalVehicleItem : public UFortAccountItem {
+public:
+	DefineUnrealClass(UFortPersonalVehicleItem);
+};

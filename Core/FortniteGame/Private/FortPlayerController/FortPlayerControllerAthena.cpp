@@ -512,3 +512,7 @@ void AFortPlayerControllerAthena::ServerPlaySquadQuickChatMessage(AFortPlayerCon
 	PlayerStateAthena->ReplicatedTeamMemberState = LeafEntry.TeamCommType;
 	PlayerStateAthena->OnRep_ReplicatedTeamMemberState();
 }
+
+void AFortPlayerControllerAthena::TogglePersonalVehicle(bool bOn) {
+	Log("AFortPlayerControllerAthena::TogglePersonalVehicle called with bOn = " + std::to_string(bOn));
+}

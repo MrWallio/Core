@@ -23,6 +23,9 @@
 #include "FortniteGame/Public/Mcp/FortMcpQuestObjectiveInfo.h"
 
 class UFortWeaponMeleeItemDefinition;
+class USkeletalMesh;
+class UAnimInstance;
+class USoundBase;
 
 class UFortItemDefinition : public UMcpItemDefinitionBase {
 public:
@@ -47,6 +50,18 @@ public:
 class UFortAccountItemDefinition : public UFortItemDefinition {
 public:
 	DefineUnrealClass(UFortAccountItemDefinition);
+};
+
+class UFortPersonalVehicleItemDefinition : public UFortAccountItemDefinition {
+public:
+	DefineUnrealClass(UFortPersonalVehicleItemDefinition);
+
+	DefineUProperty(TSoftClassPtr<UClass>, PersonalVehicleAbility);
+	DefineUProperty(float, MountTime);
+	DefineUProperty(TSoftObjectPtr<USkeletalMesh>, SkeletalMesh);
+	DefineUProperty(TSubclassOf<UAnimInstance>, AnimClass);
+	DefineUProperty(TSoftObjectPtr<USoundBase>, ActivateSound);
+	DefineUProperty(TSoftObjectPtr<USoundBase>, DeactivateSound);
 };
 
 class UFortMontageItemDefinitionBase : public UFortAccountItemDefinition {
