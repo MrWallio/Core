@@ -148,7 +148,16 @@ void AFortPlayerControllerZone::ServerReturnToMainMenu(AFortPlayerControllerZone
 }
 
 void AFortPlayerControllerZone::ClientOnPawnDied_Implementation(FFortPlayerDeathReport& DeathReport) {
-	
+	AFortPlayerStateZone* PlayerStateZone = PlayerState->Cast<AFortPlayerStateZone>();
+	if (!PlayerStateZone) {
+		Log("AFortPlayerControllerZone::ClientOnPawnDied_Implementation: PlayerState is null or not a FortPlayerStateZone!");
+		return;
+	}
+
+	UFortAbilitySystemComponent* AbilitySystemComponent = PlayerStateZone->AbilitySystemComponent;
+	if (AbilitySystemComponent) {
+		AbilitySystemComponent->EndDBNOAbilities();
+	}
 }
 
 void AFortPlayerControllerZone::ClientOnPawnDied(AFortPlayerControllerZone* This, FFortPlayerDeathReport& DeathReport) {
