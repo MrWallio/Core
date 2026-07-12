@@ -15,6 +15,21 @@ inline int32 DefaultCalculateSlackGrow(int32 NumElements, int32 NumAllocatedElem
     return Grow;
 }
 
+inline int32 DefaultCalculateSlackShrink(int32 NumElements, int32 NumAllocatedElements, size_t BytesPerElement)
+{
+    const int32 CurrentSlackElements = NumAllocatedElements - NumElements;
+    const size_t CurrentSlackBytes = (size_t)CurrentSlackElements * BytesPerElement;
+    const bool bTooManySlackBytes = CurrentSlackBytes >= 16384;
+    const bool bTooManySlackElements = 3 * NumElements < 2 * NumAllocatedElements;
+
+    if ((bTooManySlackBytes || bTooManySlackElements) && (CurrentSlackElements > 64 || !NumElements))
+    {
+        return NumElements;
+    }
+
+    return NumAllocatedElements;
+}
+
 inline uint32 RoundUpToPowerOfTwo(uint32 Value)
 {
     if (Value == 0)

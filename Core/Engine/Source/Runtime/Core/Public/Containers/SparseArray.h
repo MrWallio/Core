@@ -131,8 +131,8 @@ public:
 	inline       SparseArrayElementType& operator[](int32 Index) { VerifyIndex(Index); return *reinterpret_cast<SparseArrayElementType*>(&Data.GetUnsafe(Index).ElementData); }
 	inline const SparseArrayElementType& operator[](int32 Index) const { VerifyIndex(Index); return *reinterpret_cast<const SparseArrayElementType*>(&Data.GetUnsafe(Index).ElementData); }
 
-	inline bool operator==(const TSparseArray<SparseArrayElementType>& Other) const { return Data == Other.Data; }
-	inline bool operator!=(const TSparseArray<SparseArrayElementType>& Other) const { return Data != Other.Data; }
+	inline bool operator==(const TSparseArray<SparseArrayElementType>& Other) const { return Data.GetData() == Other.Data.GetData(); }
+	inline bool operator!=(const TSparseArray<SparseArrayElementType>& Other) const { return Data.GetData() != Other.Data.GetData(); }
 
 public:
 	class TIterator

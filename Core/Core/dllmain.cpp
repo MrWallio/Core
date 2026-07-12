@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include "Engine/Source/Runtime/Core/Public/CoreMinimal.h"
+
 #include "Public/Utils.h"
 #include "Public/Configuration.h"
 #include "Public/Finder.h"

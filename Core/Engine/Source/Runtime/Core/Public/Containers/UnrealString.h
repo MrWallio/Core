@@ -670,14 +670,23 @@ public:
 
 	static FString Printf(const TCHAR* Fmt, ...)
 	{
-		wchar_t Buffer[4096];
-
 		va_list Args;
 		va_start(Args, Fmt);
-		_vsnwprintf_s(Buffer, 4096, _TRUNCATE, Fmt, Args);
+		const int32 NeededLen = _vscwprintf(Fmt, Args);
 		va_end(Args);
 
-		return FString(Buffer);
+		if (NeededLen <= 0)
+		{
+			return FString();
+		}
+
+		std::wstring Buffer((size_t)NeededLen, L'\0');
+
+		va_start(Args, Fmt);
+		_vsnwprintf_s(Buffer.data(), (size_t)NeededLen + 1, _TRUNCATE, Fmt, Args);
+		va_end(Args);
+
+		return FString(Buffer.c_str());
 	}
 
 	int32 ParseIntoArray(TArray<FString>& OutArray, const TCHAR* pchDelim, bool InCullEmpty = true) const

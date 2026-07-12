@@ -258,6 +258,15 @@ public:
 		}
 
 		ArrayNum -= Count;
+
+		if (bAllowShrinking)
+		{
+			const int32 NewMax = DefaultCalculateSlackShrink(ArrayNum, ArrayMax, Size);
+			if (NewMax != ArrayMax)
+			{
+				ResizeTo(NewMax, Size);
+			}
+		}
 	}
 
 	void RemoveAt(int32 Index, int32 Size = ElementSize)
@@ -289,9 +298,33 @@ public:
 
 	void RemoveAtSwap(int32 Index, int32 Count, bool bAllowShrinking = true, int32 Size = ElementSize)
 	{
-		for (; Count > 0 && IsValidIndex(Index); --Count)
+		if (Count <= 0 || !IsValidIndex(Index))
+			return;
+
+		if (Index + Count > ArrayNum)
+			Count = ArrayNum - Index;
+
+		const int32 NumElementsInHole = Count;
+		const int32 NumElementsAfterHole = ArrayNum - (Index + Count);
+		const int32 NumElementsToMoveIntoHole = NumElementsInHole < NumElementsAfterHole ? NumElementsInHole : NumElementsAfterHole;
+
+		if (NumElementsToMoveIntoHole > 0)
 		{
-			RemoveAtSwap(Index, Size);
+			std::memcpy(
+				(uint8*)Data + ((size_t)Index * Size),
+				(uint8*)Data + ((size_t)(ArrayNum - NumElementsToMoveIntoHole) * Size),
+				(size_t)NumElementsToMoveIntoHole * Size);
+		}
+
+		ArrayNum -= Count;
+
+		if (bAllowShrinking)
+		{
+			const int32 NewMax = DefaultCalculateSlackShrink(ArrayNum, ArrayMax, Size);
+			if (NewMax != ArrayMax)
+			{
+				ResizeTo(NewMax, Size);
+			}
 		}
 	}
 
@@ -645,8 +678,23 @@ public:
 	inline       ArrayElementType& operator[](int32 Index) { VerifyIndex(Index); return Data[Index]; }
 	inline const ArrayElementType& operator[](int32 Index) const { VerifyIndex(Index); return Data[Index]; }
 
-	inline bool operator==(const TArray<ArrayElementType>& Other) const { return Data == Other.Data; }
-	inline bool operator!=(const TArray<ArrayElementType>& Other) const { return Data != Other.Data; }
+	bool operator==(const TArray<ArrayElementType>& Other) const
+	{
+		if (ArrayNum != Other.ArrayNum)
+			return false;
+
+		for (int32 Index = 0; Index < ArrayNum; ++Index)
+		{
+			if (!(Data[Index] == Other.Data[Index]))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	inline bool operator!=(const TArray<ArrayElementType>& Other) const { return !(*this == Other); }
 
 	inline explicit operator bool() const { return IsValid(); };
 
