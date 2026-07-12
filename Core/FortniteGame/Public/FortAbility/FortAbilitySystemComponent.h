@@ -17,6 +17,10 @@ public:
 	void EndDBNOAbilities();
 
 	void PrintAllAbilities();
+
+	void EndAllAbilitiesFromAbilitySet(UFortAbilitySet* AbilitySet);
+
+	void EndAbility(UGameplayAbility* Ability);
 };
 
 class UFortAbilitySystemComponentAthena : public UFortAbilitySystemComponent {

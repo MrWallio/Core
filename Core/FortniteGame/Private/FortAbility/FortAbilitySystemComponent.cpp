@@ -80,3 +80,43 @@ void UFortAbilitySystemComponent::PrintAllAbilities() {
 		}
 	}
 }
+
+void UFortAbilitySystemComponent::EndAllAbilitiesFromAbilitySet(UFortAbilitySet* AbilitySet) {
+	if (!AbilitySet) {
+		Log("UFortAbilitySystemComponent::EndAllAbilitiesFromAbilitySet: AbilitySet is null!");
+		return;
+	}
+
+	for (int32 i = 0; i < ActivatableAbilities.Items.Num(); i++) {
+		FGameplayAbilitySpec& AbilitySpec = ActivatableAbilities.Items.GetWithSize(i, FGameplayAbilitySpec::GetSize());
+		if (AbilitySpec.Ability) {
+			UFortGameplayAbility* Ability = AbilitySpec.Ability->Cast<UFortGameplayAbility>();
+			for (int32 j = 0; j < AbilitySet->GameplayAbilities.Num(); j++) {
+				TSubclassOf<UFortGameplayAbility> GameplayAbility = AbilitySet->GameplayAbilities.GetWithSize(j, sizeof(TSubclassOf<UFortGameplayAbility>));
+				if (GameplayAbility.Get() == Ability->GetClass()) {
+					ClientCancelAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+					ClientEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+					ServerEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo, FPredictionKey());
+					break;
+				}
+			}
+		}
+	}
+}
+
+void UFortAbilitySystemComponent::EndAbility(UGameplayAbility* Ability) {
+	if (!Ability) {
+		Log("UFortAbilitySystemComponent::EndAbility: Ability is null!");
+		return;
+	}
+
+	for (int32 i = 0; i < ActivatableAbilities.Items.Num(); i++) {
+		FGameplayAbilitySpec& AbilitySpec = ActivatableAbilities.Items.GetWithSize(i, FGameplayAbilitySpec::GetSize());
+		if (AbilitySpec.Ability == Ability) {
+			ClientCancelAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+			ClientEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+			ServerEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo, FPredictionKey());
+			break;
+		}
+	}
+}

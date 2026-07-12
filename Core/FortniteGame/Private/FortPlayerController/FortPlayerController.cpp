@@ -1546,8 +1546,49 @@ void AFortPlayerController::ClientExecuteInventoryItem(FGuid& ItemGuid, float De
 	Call(Func, ItemGuid, Delay, bForceExecute, bActivateSlotAfterSettingFocused);
 }
 
+// gotta make this proper at some point
 void AFortPlayerController::TogglePersonalVehicle(bool bOn) {
 	Log("AFortPlayerController::TogglePersonalVehicle called with bOn = " + std::to_string(bOn));
+
+	AFortPlayerState* PlayerState = this->PlayerState->Cast<AFortPlayerState>();
+	if (!PlayerState) {
+		Log("TogglePersonalVehicle: PlayerState is null or not AFortPlayerState!");
+		return;
+	}
+
+	UFortAbilitySystemComponent* ASC = PlayerState->AbilitySystemComponent;
+	if (!ASC) {
+		Log("TogglePersonalVehicle: AbilitySystemComponent is null!");
+		return;
+	}
+
+	UFortPersonalVehicleItemDefinition* PersonalVehicleDef = (UFortPersonalVehicleItemDefinition*)StaticLoadObject("/Game/Items/Hoverboard/VID_Hoverboard.VID_Hoverboard");
+	if (!PersonalVehicleDef) {
+		Log("TogglePersonalVehicle: Failed to load personal vehicle definition!");
+		return;
+	}
+
+	UClass* PersonalVehicleAbilityClass = PersonalVehicleDef->PersonalVehicleAbility.Get();
+	if (!PersonalVehicleAbilityClass) {
+		Log("TogglePersonalVehicle: PersonalVehicleAbility is null!");
+		return;
+	}
+
+	UFortGameplayAbility* PersonalVehicleAbility = PersonalVehicleAbilityClass->GetDefaultObj()->Cast<UFortGameplayAbility>();
+	if (!PersonalVehicleAbility) {
+		Log("TogglePersonalVehicle: Failed to get default object for personal vehicle ability!");
+		return;
+	}
+
+	if (PersonalVehicleAbility) {
+		if (bOn) {
+			FGameplayAbilitySpec* PersonalVehicleAbilitySpec = FGameplayAbilitySpec::ConstructAbilitySpec(PersonalVehicleAbility, 1, -1, nullptr);
+			ASC->GiveAbilityAndActivateOnce(PersonalVehicleAbilitySpec, nullptr);
+		}
+		else {
+			ASC->EndAbility(PersonalVehicleAbility);
+		}
+	}
 }
 
 void AFortPlayerController::TogglePersonalVehicleHook(AFortPlayerController* This, bool bOn) {
@@ -1561,6 +1602,14 @@ void AFortPlayerController::TogglePersonalVehicleHook(AFortPlayerController* Thi
 	}
 
 	This->TogglePersonalVehicle(bOn);
+}
+
+void AFortPlayerController::execTogglePersonalVehicle(AFortPlayerController* Context, FFrame& Stack) {
+	bool bOn = false;
+	Stack.StepCompiledIn(&bOn);
+	Stack.IncrementCode();
+
+	TogglePersonalVehicleHook(Context, bOn);
 }
 
 bool AFortPlayerController::IsPersonalVehicleActive() const {

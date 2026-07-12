@@ -141,8 +141,8 @@ public:
 	void ClientExecuteInventoryItem(FGuid& ItemGuid, float Delay, bool bForceExecute, bool bActivateSlotAfterSettingFocused);
 
 	void TogglePersonalVehicle(bool bOn);
-
 	static void TogglePersonalVehicleHook(AFortPlayerController* This, bool bOn);
+	static void execTogglePersonalVehicle(AFortPlayerController* Context, FFrame& Stack);
 
 	bool IsPersonalVehicleActive() const;
 
@@ -283,11 +283,12 @@ public:
 			ExecHook(ServerAttemptInteractFunc, execServerAttemptInteract, execServerAttemptInteractOG);
 		}
 
-		HookEveryVTable(
+		/*HookEveryVTable(
 			AFortPlayerController::StaticClass(),
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.TogglePersonalVehicle"),
 			TogglePersonalVehicleHook
-		);
+		);*/
+		ExecHook(AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.TogglePersonalVehicle"), execTogglePersonalVehicle);
 
 		Log("Hooked AFortPlayerController");
 	}
