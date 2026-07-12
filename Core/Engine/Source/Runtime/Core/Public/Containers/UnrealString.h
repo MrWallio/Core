@@ -4,6 +4,7 @@
 #include "Array.h"
 #include "Engine/Source/Runtime/Core/Public/HAL/Platform.h"
 #include "Engine/Source/Runtime/Core/Public/Misc/AssertionMacros.h"
+#include "Engine/Source/Runtime/Core/Public/Misc/Crc.h"
 
 namespace ESearchCase
 {
@@ -435,6 +436,61 @@ public:
 		return FString(Result.c_str());
 	}
 
+	void ReplaceInline(const FString& From, const FString& To, ESearchCase::Type SearchCase = ESearchCase::IgnoreCase)
+	{
+		*this = Replace(From, To, SearchCase);
+	}
+
+	void ToUpperInline()
+	{
+		TCHAR* Buffer = Data.GetData();
+		const int32 ThisLen = Len();
+
+		for (int32 i = 0; i < ThisLen; ++i)
+		{
+			Buffer[i] = (TCHAR)::towupper(Buffer[i]);
+		}
+	}
+
+	void ToLowerInline()
+	{
+		TCHAR* Buffer = Data.GetData();
+		const int32 ThisLen = Len();
+
+		for (int32 i = 0; i < ThisLen; ++i)
+		{
+			Buffer[i] = (TCHAR)::towlower(Buffer[i]);
+		}
+	}
+
+	FString TrimStart() const
+	{
+		const int32 ThisLen = Len();
+		const TCHAR* Buffer = **this;
+
+		int32 Start = 0;
+		while (Start < ThisLen && ::iswspace(Buffer[Start]))
+		{
+			++Start;
+		}
+
+		return Mid(Start, ThisLen - Start);
+	}
+
+	FString TrimEnd() const
+	{
+		const int32 ThisLen = Len();
+		const TCHAR* Buffer = **this;
+
+		int32 End = ThisLen;
+		while (End > 0 && ::iswspace(Buffer[End - 1]))
+		{
+			--End;
+		}
+
+		return Mid(0, End);
+	}
+
 	FString TrimStartAndEnd() const
 	{
 		const int32 ThisLen = Len();
@@ -453,6 +509,85 @@ public:
 		}
 
 		return Mid(Start, End - Start);
+	}
+
+	void TrimStartAndEndInline()
+	{
+		*this = TrimStartAndEnd();
+	}
+
+	bool FindChar(TCHAR InChar, int32& OutIndex) const
+	{
+		const TCHAR* Buffer = **this;
+		const int32 ThisLen = Len();
+
+		for (int32 i = 0; i < ThisLen; ++i)
+		{
+			if (Buffer[i] == InChar)
+			{
+				OutIndex = i;
+				return true;
+			}
+		}
+
+		OutIndex = -1;
+		return false;
+	}
+
+	bool FindLastChar(TCHAR InChar, int32& OutIndex) const
+	{
+		const TCHAR* Buffer = **this;
+
+		for (int32 i = Len() - 1; i >= 0; --i)
+		{
+			if (Buffer[i] == InChar)
+			{
+				OutIndex = i;
+				return true;
+			}
+		}
+
+		OutIndex = -1;
+		return false;
+	}
+
+	void InsertAt(int32 Index, TCHAR Character)
+	{
+		if (Index < 0 || Index > Len())
+			return;
+
+		if (Data.Num() == 0)
+		{
+			AppendChar(Character);
+			return;
+		}
+
+		Data.Insert(Character, Index);
+	}
+
+	void InsertAt(int32 Index, const FString& Characters)
+	{
+		if (Index < 0 || Index > Len())
+			return;
+
+		const TCHAR* Buffer = *Characters;
+		for (int32 i = 0; i < Characters.Len(); ++i)
+		{
+			InsertAt(Index + i, Buffer[i]);
+		}
+	}
+
+	void RemoveAt(int32 Index, int32 Count = 1)
+	{
+		if (Index < 0 || Count <= 0 || Index >= Len())
+			return;
+
+		if (Index + Count > Len())
+		{
+			Count = Len() - Index;
+		}
+
+		Data.RemoveAt(Index, Count, true);
 	}
 
 	bool Split(const FString& InS, FString* LeftS, FString* RightS, ESearchCase::Type SearchCase = ESearchCase::IgnoreCase, ESearchDir::Type SearchDir = ESearchDir::FromStart) const
@@ -511,6 +646,82 @@ public:
 		return FString(std::to_wstring(Num).c_str());
 	}
 
+	static FString SanitizeFloat(double InFloat)
+	{
+		wchar_t Buffer[64];
+		swprintf_s(Buffer, 64, L"%f", InFloat);
+
+		FString Result(Buffer);
+
+		// Trim trailing zeros but keep at least one decimal digit, like UE.
+		int32 DotIndex = -1;
+		if (Result.FindChar(L'.', DotIndex))
+		{
+			int32 End = Result.Len();
+			while (End > DotIndex + 2 && Result[End - 1] == L'0')
+			{
+				--End;
+			}
+			Result = Result.Left(End);
+		}
+
+		return Result;
+	}
+
+	static FString Printf(const TCHAR* Fmt, ...)
+	{
+		wchar_t Buffer[4096];
+
+		va_list Args;
+		va_start(Args, Fmt);
+		_vsnwprintf_s(Buffer, 4096, _TRUNCATE, Fmt, Args);
+		va_end(Args);
+
+		return FString(Buffer);
+	}
+
+	int32 ParseIntoArray(TArray<FString>& OutArray, const TCHAR* pchDelim, bool InCullEmpty = true) const
+	{
+		OutArray.Empty();
+
+		const FString Delim(pchDelim);
+		const int32 DelimLen = Delim.Len();
+
+		if (DelimLen == 0)
+		{
+			if (!InCullEmpty || Len() > 0)
+			{
+				OutArray.Add(*this);
+			}
+			return OutArray.Num();
+		}
+
+		int32 Start = 0;
+		while (true)
+		{
+			const int32 FoundIndex = Find(Delim, ESearchCase::CaseSensitive, ESearchDir::FromStart, Start);
+			if (FoundIndex == -1)
+			{
+				FString Piece = Mid(Start, Len() - Start);
+				if (!InCullEmpty || Piece.Len() > 0)
+				{
+					OutArray.Add(Piece);
+				}
+				break;
+			}
+
+			FString Piece = Mid(Start, FoundIndex - Start);
+			if (!InCullEmpty || Piece.Len() > 0)
+			{
+				OutArray.Add(Piece);
+			}
+
+			Start = FoundIndex + DelimLen;
+		}
+
+		return OutArray.Num();
+	}
+
 	void AppendChar(TCHAR InChar)
 	{
 		if (Data.Num() == 0)
@@ -554,6 +765,25 @@ public:
 		Result.Append(Other);
 		return Result;
 	}
+
+	FString operator+(const TCHAR* Str) const
+	{
+		FString Result(*this);
+		Result.Append(FString(Str));
+		return Result;
+	}
+
+	friend FString operator+(const TCHAR* Lhs, const FString& Rhs)
+	{
+		FString Result(Lhs);
+		Result.Append(Rhs);
+		return Result;
+	}
 };
+
+FORCEINLINE uint32 GetTypeHash(const FString& S)
+{
+	return FCrc::Strihash_DEPRECATED(*S);
+}
 
 static_assert(sizeof(FString) == 0x10, "FString layout broke: UE 4.0-5.x expects a single TArray<TCHAR> = 0x10 on x64");

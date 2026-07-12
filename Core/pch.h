@@ -31,6 +31,7 @@
 #include <unordered_map>
 #include <numeric>
 #include <cwctype>
+#include <cstdarg>
 
 #include "../includes/memcury.h"
 #include "../includes/MinHook/MinHook.h"

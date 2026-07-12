@@ -23,6 +23,16 @@ public:
 	{
 	}
 
+	TArray(std::initializer_list<ArrayElementType> InitList)
+		: Data(nullptr), ArrayNum(0), ArrayMax(0)
+	{
+		Reserve((int32)InitList.size());
+		for (const ArrayElementType& Item : InitList)
+		{
+			Add(Item);
+		}
+	}
+
 	TArray(const TArray&) = default;
 
 	TArray(TArray&&) = default;
@@ -75,6 +85,16 @@ public:
 			check(ArrayMax >= ArrayNum);
 			ResizeTo(ArrayMax, Size);
 		}
+	}
+
+	inline void Shrink(int32 Size = ElementSize)
+	{
+		ResizeShrink(Size);
+	}
+
+	inline size_t GetAllocatedSize(int32 Size = ElementSize) const
+	{
+		return (size_t)ArrayMax * Size;
 	}
 
 	void ResizeTo(int32 NewMax, int32 Size = ElementSize)
@@ -161,6 +181,20 @@ public:
 		return Add(Item, Size);
 	}
 
+	template <typename... ArgsType>
+	int32 Emplace(ArgsType&&... Args)
+	{
+		ArrayElementType Temp(std::forward<ArgsType>(Args)...);
+		return Add(Temp);
+	}
+
+	template <typename... ArgsType>
+	void EmplaceAt(int32 Index, ArgsType&&... Args)
+	{
+		ArrayElementType Temp(std::forward<ArgsType>(Args)...);
+		Insert(Temp, Index);
+	}
+
 	void Insert(const ArrayElementType& Item, int32 Index, int32 Size = ElementSize)
 	{
 		if (Index < 0 || Index > ArrayNum)
@@ -180,12 +214,20 @@ public:
 		std::memcpy((uint8*)Data + ((size_t)Index * Size), (const uint8*)&Item, Size);
 	}
 
+	void Insert(const TArray<ArrayElementType>& Items, int32 InIndex, int32 Size = ElementSize)
+	{
+		for (int32 i = 0; i < Items.Num(); ++i)
+		{
+			Insert(Items[i], InIndex + i, Size);
+		}
+	}
+
 	int32 Push(const ArrayElementType& Item, int32 Size = ElementSize)
 	{
 		return Add(Item, Size);
 	}
 
-	ArrayElementType Pop()
+	ArrayElementType Pop(bool bAllowShrinking = true)
 	{
 		ArrayElementType Result = (*this)[ArrayNum - 1];
 		--ArrayNum;
@@ -243,6 +285,29 @@ public:
 		}
 
 		--ArrayNum;
+	}
+
+	void RemoveAtSwap(int32 Index, int32 Count, bool bAllowShrinking = true, int32 Size = ElementSize)
+	{
+		for (; Count > 0 && IsValidIndex(Index); --Count)
+		{
+			RemoveAtSwap(Index, Size);
+		}
+	}
+
+	template <typename PredicateType>
+	int32 RemoveAllSwap(PredicateType Predicate, int32 Size = ElementSize)
+	{
+		int32 NumRemoved = 0;
+		for (int32 Index = ArrayNum - 1; Index >= 0; --Index)
+		{
+			if (Predicate((const ArrayElementType&)GetWithSize(Index, Size)))
+			{
+				RemoveAtSwap(Index, Size);
+				++NumRemoved;
+			}
+		}
+		return NumRemoved;
 	}
 
 	int32 Remove(const ArrayElementType& Item, int32 Size = ElementSize)
@@ -460,6 +525,100 @@ public:
 			}
 		}
 		return -1;
+	}
+
+	bool FindLast(const ArrayElementType& Item, int32& OutIndex) const
+	{
+		const ArrayElementType* DataPtr = GetData();
+		for (int32 Index = ArrayNum - 1; Index >= 0; --Index)
+		{
+			if (DataPtr[Index] == Item)
+			{
+				OutIndex = Index;
+				return true;
+			}
+		}
+
+		OutIndex = -1;
+		return false;
+	}
+
+	template <typename PredicateType>
+	int32 FindLastByPredicate(PredicateType Predicate) const
+	{
+		const ArrayElementType* DataPtr = GetData();
+		for (int32 Index = ArrayNum - 1; Index >= 0; --Index)
+		{
+			if (Predicate(DataPtr[Index]))
+			{
+				return Index;
+			}
+		}
+		return -1;
+	}
+
+	template <typename KeyType>
+	int32 IndexOfByKey(const KeyType& Key) const
+	{
+		const ArrayElementType* DataPtr = GetData();
+		for (int32 Index = 0; Index < ArrayNum; ++Index)
+		{
+			if (DataPtr[Index] == Key)
+			{
+				return Index;
+			}
+		}
+		return -1;
+	}
+
+	template <typename KeyType>
+	ArrayElementType* FindByKey(const KeyType& Key)
+	{
+		const int32 Index = IndexOfByKey(Key);
+		return Index != -1 ? &GetData()[Index] : nullptr;
+	}
+
+	template <typename KeyType>
+	const ArrayElementType* FindByKey(const KeyType& Key) const
+	{
+		return const_cast<TArray*>(this)->FindByKey(Key);
+	}
+
+	template <typename PredicateType>
+	TArray<ArrayElementType> FilterByPredicate(PredicateType Predicate) const
+	{
+		TArray<ArrayElementType> FilterResults;
+		const ArrayElementType* DataPtr = GetData();
+		for (int32 Index = 0; Index < ArrayNum; ++Index)
+		{
+			if (Predicate(DataPtr[Index]))
+			{
+				FilterResults.Add(DataPtr[Index]);
+			}
+		}
+		return FilterResults;
+	}
+
+	void Sort()
+	{
+		std::sort(begin(), end());
+	}
+
+	template <typename PredicateType>
+	void Sort(PredicateType Predicate)
+	{
+		std::sort(begin(), end(), Predicate);
+	}
+
+	void StableSort()
+	{
+		std::stable_sort(begin(), end());
+	}
+
+	template <typename PredicateType>
+	void StableSort(PredicateType Predicate)
+	{
+		std::stable_sort(begin(), end(), Predicate);
 	}
 
 public:

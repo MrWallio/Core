@@ -116,6 +116,79 @@ public:
         return false;
     }
 
+    template <typename... ArgsType>
+    ValueElementType& Emplace(const KeyElementType& Key, ArgsType&&... Args)
+    {
+        ValueElementType Temp(std::forward<ArgsType>(Args)...);
+        return Add(Key, Temp);
+    }
+
+    ValueElementType& FindChecked(const KeyElementType& Key)
+    {
+        ValueElementType* Found = Find(Key);
+        if (!Found)
+        {
+            throw std::out_of_range("TMap::FindChecked: key not found!");
+        }
+        return *Found;
+    }
+
+    const ValueElementType& FindChecked(const KeyElementType& Key) const
+    {
+        return const_cast<TMap*>(this)->FindChecked(Key);
+    }
+
+    const KeyElementType* FindKey(const ValueElementType& Value) const
+    {
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            const ElementType& Pair = Elements[It.GetIndex()];
+            if (Pair.Value() == Value)
+            {
+                return &Pair.Key();
+            }
+        }
+
+        return nullptr;
+    }
+
+    void GenerateKeyArray(TArray<KeyElementType>& OutArray) const
+    {
+        OutArray.Empty(Num());
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            OutArray.Add(Elements[It.GetIndex()].Key());
+        }
+    }
+
+    void GenerateValueArray(TArray<ValueElementType>& OutArray) const
+    {
+        OutArray.Empty(Num());
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            OutArray.Add(Elements[It.GetIndex()].Value());
+        }
+    }
+
+    void Append(const TMap<KeyElementType, ValueElementType>& OtherMap)
+    {
+        for (FBitArray::FSetBitIterator It(OtherMap.Elements.GetAllocationFlags()); It; ++It)
+        {
+            const ElementType& Pair = OtherMap.Elements[It.GetIndex()];
+            Add(Pair.Key(), Pair.Value());
+        }
+    }
+
+    void Reset()
+    {
+        Elements.Reset();
+    }
+
+    void Empty(int32 ExpectedNumElements = 0)
+    {
+        Elements.Empty(ExpectedNumElements);
+    }
+
 public:
 	inline       ElementType& operator[] (int32 Index) { return Elements[Index]; }
 	inline const ElementType& operator[] (int32 Index) const { return Elements[Index]; }
@@ -155,6 +228,9 @@ public:
 	inline TIterator end() { return TIterator(*this, NumAllocated()); }
 	inline TIterator begin() const { return TIterator(*this, 0); }
 	inline TIterator end() const { return TIterator(*this, NumAllocated()); }
+
+	inline TIterator CreateIterator() { return TIterator(*this, 0); }
+	inline TIterator CreateConstIterator() const { return TIterator(*this, 0); }
 };
 
 template<typename KeyElementType, typename ValueElementType>

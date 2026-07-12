@@ -223,10 +223,12 @@
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Misc\Parse.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Serialization\Archive.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Serialization\BitWriter.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Misc\Crc.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\SharedPointer.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\Tuple.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\TypeCompatibleBytes.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\TypeHash.h" />
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\UnrealTemplate.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\UObject\NameTypes.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Components\ActorComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\ActorChannel.h" />

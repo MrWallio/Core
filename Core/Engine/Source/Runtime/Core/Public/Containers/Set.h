@@ -9,7 +9,7 @@
 #include "BitArray.h"
 
 template <typename SetType>
-class SetElement
+class TSetElement
 {
 private:
     template <typename SetDataType>
@@ -21,15 +21,18 @@ public:
     int32_t HashIndex;
 
 public:
-    SetElement() : Value(), HashNextId(-1), HashIndex(-1) {}
+    TSetElement() : Value(), HashNextId(-1), HashIndex(-1) {}
 
-    SetElement(const SetType& InValue)
+    TSetElement(const SetType& InValue)
         : Value(InValue)
         , HashNextId(-1)
         , HashIndex(-1)
     {
     }
 };
+
+template <typename SetType>
+using SetElement = TSetElement<SetType>;
 
 template <typename SetElementType>
 class TSet
@@ -39,7 +42,7 @@ private:
     static constexpr uint32_t ElementSize = sizeof(SetElementType);
 
 private:
-    using SetDataType = SetElement<SetElementType>;
+    using SetDataType = TSetElement<SetElementType>;
     using HashType = TInlineAllocator<1>::ForElementType<int32_t>;
 
 public:
@@ -278,6 +281,96 @@ public:
         }
     }
 
+    void Empty(int32 ExpectedNumElements = 0)
+    {
+        Reset();
+    }
+
+    template <typename... ArgsType>
+    int32 Emplace(ArgsType&&... Args)
+    {
+        SetElementType Temp(std::forward<ArgsType>(Args)...);
+        return Add(Temp);
+    }
+
+    TArray<SetElementType> Array() const
+    {
+        TArray<SetElementType> Result;
+        Result.Reserve(Num());
+
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            Result.Add(Elements[It.GetIndex()].Value);
+        }
+
+        return Result;
+    }
+
+    TSet<SetElementType> Union(const TSet<SetElementType>& OtherSet) const
+    {
+        TSet<SetElementType> Result;
+
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            Result.Add(Elements[It.GetIndex()].Value);
+        }
+        for (FBitArray::FSetBitIterator It(OtherSet.Elements.GetAllocationFlags()); It; ++It)
+        {
+            const SetElementType& Value = OtherSet.Elements[It.GetIndex()].Value;
+            if (!Result.Contains(Value))
+            {
+                Result.Add(Value);
+            }
+        }
+
+        return Result;
+    }
+
+    TSet<SetElementType> Intersect(const TSet<SetElementType>& OtherSet) const
+    {
+        TSet<SetElementType> Result;
+
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            const SetElementType& Value = Elements[It.GetIndex()].Value;
+            if (OtherSet.Contains(Value))
+            {
+                Result.Add(Value);
+            }
+        }
+
+        return Result;
+    }
+
+    TSet<SetElementType> Difference(const TSet<SetElementType>& OtherSet) const
+    {
+        TSet<SetElementType> Result;
+
+        for (FBitArray::FSetBitIterator It(Elements.GetAllocationFlags()); It; ++It)
+        {
+            const SetElementType& Value = Elements[It.GetIndex()].Value;
+            if (!OtherSet.Contains(Value))
+            {
+                Result.Add(Value);
+            }
+        }
+
+        return Result;
+    }
+
+    bool Includes(const TSet<SetElementType>& OtherSet) const
+    {
+        for (FBitArray::FSetBitIterator It(OtherSet.Elements.GetAllocationFlags()); It; ++It)
+        {
+            if (!Contains(OtherSet.Elements[It.GetIndex()].Value))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 public:
     class TIterator
     {
@@ -310,9 +403,12 @@ public:
     inline TIterator end() { return TIterator(*this, NumAllocated()); }
     inline TIterator begin() const { return TIterator(*this, 0); }
     inline TIterator end() const { return TIterator(*this, NumAllocated()); }
+
+    inline TIterator CreateIterator() { return TIterator(*this, 0); }
+    inline TIterator CreateConstIterator() const { return TIterator(*this, 0); }
 };
 
-static_assert(sizeof(SetElement<int32>) == 0xC, "SetElement layout broke: Value/HashNextId/HashIndex expected");
+static_assert(sizeof(TSetElement<int32>) == 0xC, "TSetElement layout broke: Value/HashNextId/HashIndex expected");
 static_assert(sizeof(TSet<int32>) == 0x50, "TSet layout broke: UE 4.0-5.x expects sparse array + inline-1 hash + HashSize = 0x50 on x64");
 static_assert(offsetof(TSet<int32>, Hash) == 0x38, "TSet::Hash must sit at 0x38 to match the engine");
 static_assert(offsetof(TSet<int32>, HashSize) == 0x48, "TSet::HashSize must sit at 0x48 to match the engine");

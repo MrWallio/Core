@@ -4,7 +4,47 @@
 #include "Engine/Source/Runtime/Core/Public/Containers/ContainerAllocationPolicies.h"
 #include "Engine/Source/Runtime/Core/Public/Templates/TypeCompatibleBytes.h"
 
-class FBitArray
+class FBitReference
+{
+private:
+    uint32& Data;
+    uint32 Mask;
+
+public:
+    FORCEINLINE FBitReference(uint32& InData, uint32 InMask)
+        : Data(InData), Mask(InMask)
+    {
+    }
+
+    FORCEINLINE operator bool() const { return (Data & Mask) != 0; }
+
+    FORCEINLINE void operator=(const bool NewValue)
+    {
+        NewValue ? Data |= Mask : Data &= ~Mask;
+    }
+
+    FORCEINLINE void operator|=(const bool NewValue) { if (NewValue) Data |= Mask; }
+    FORCEINLINE void operator&=(const bool NewValue) { if (!NewValue) Data &= ~Mask; }
+
+    FORCEINLINE void AtomicSet(const bool NewValue) { operator=(NewValue); }
+};
+
+class FConstBitReference
+{
+private:
+    const uint32& Data;
+    uint32 Mask;
+
+public:
+    FORCEINLINE FConstBitReference(const uint32& InData, uint32 InMask)
+        : Data(InData), Mask(InMask)
+    {
+    }
+
+    FORCEINLINE operator bool() const { return (Data & Mask) != 0; }
+};
+
+class TBitArray
 {
 protected:
     static constexpr int32 NumBitsPerDWORD = 32;
@@ -16,19 +56,40 @@ private:
     int32 MaxBits;
 
 public:
-    FBitArray()
+    TBitArray()
         : NumBits(0), MaxBits(Data.GetNumInlineElements() * NumBitsPerDWORD)
     {
     }
 
-    FBitArray(const FBitArray&) = default;
+    explicit TBitArray(bool bValue, int32 InNumBits)
+        : NumBits(0), MaxBits(Data.GetNumInlineElements() * NumBitsPerDWORD)
+    {
+        Init(bValue, InNumBits);
+    }
 
-    FBitArray(FBitArray&&) = default;
+    TBitArray(const TBitArray&) = default;
+
+    TBitArray(TBitArray&&) = default;
 
 public:
-    FBitArray& operator=(FBitArray&&) = default;
+    TBitArray& operator=(TBitArray&&) = default;
 
-    FBitArray& operator=(const FBitArray& Other) = default;
+    TBitArray& operator=(const TBitArray& Other) = default;
+
+private:
+    void GrowStorageTo(int32 InNumBits)
+    {
+        if (InNumBits <= MaxBits)
+            return;
+
+        const int32 PrevWords = MaxBits / NumBitsPerDWORD;
+        const int32 NeededWords = (InNumBits + NumBitsPerDWORD - 1) / NumBitsPerDWORD;
+        const int32 NewWords = DefaultCalculateSlackGrow(NeededWords, PrevWords);
+
+        Data.ResizeAllocation(PrevWords, NewWords, sizeof(uint32));
+        std::memset(GetData() + PrevWords, 0, (size_t)(NewWords - PrevWords) * sizeof(uint32));
+        MaxBits = NewWords * NumBitsPerDWORD;
+    }
 
 public:
     inline int32 Num() const { return NumBits; }
@@ -42,11 +103,20 @@ public:
     inline bool IsValid() const { return GetData() && NumBits > 0; }
 
 public:
-    inline bool operator[](int32 Index) const { return GetData()[Index / NumBitsPerDWORD] & (1 << (Index & (NumBitsPerDWORD - 1))); }
+    inline FBitReference operator[](int32 Index)
+    {
+        return FBitReference(GetData()[Index >> NumBitsPerDWORDLogTwo], 1u << (Index & (NumBitsPerDWORD - 1)));
+    }
 
-    inline bool operator==(const FBitArray& Other) const { return NumBits == Other.NumBits && GetData() == Other.GetData(); }
-    inline bool operator!=(const FBitArray& Other) const { return NumBits != Other.NumBits || GetData() != Other.GetData(); }
+    inline FConstBitReference operator[](int32 Index) const
+    {
+        return FConstBitReference(GetData()[Index >> NumBitsPerDWORDLogTwo], 1u << (Index & (NumBitsPerDWORD - 1)));
+    }
 
+    inline bool operator==(const TBitArray& Other) const { return NumBits == Other.NumBits && GetData() == Other.GetData(); }
+    inline bool operator!=(const TBitArray& Other) const { return NumBits != Other.NumBits || GetData() != Other.GetData(); }
+
+public:
     inline void Set(const int32 Index, const bool Value, bool bIsSettingAllZero = false)
     {
         const int32 DWORDIndex = (Index >> ((int32)5));
@@ -62,25 +132,44 @@ public:
     {
         const int32 Index = NumBits;
 
-        if (NumBits + 1 > MaxBits)
-        {
-            const int32 PrevWords = MaxBits / NumBitsPerDWORD;
-            const int32 NeededWords = (NumBits + 1 + NumBitsPerDWORD - 1) / NumBitsPerDWORD;
-            const int32 NewWords = DefaultCalculateSlackGrow(NeededWords, PrevWords);
-
-            Data.ResizeAllocation(PrevWords, NewWords, sizeof(uint32));
-            std::memset(GetData() + PrevWords, 0, (size_t)(NewWords - PrevWords) * sizeof(uint32));
-            MaxBits = NewWords * NumBitsPerDWORD;
-        }
+        GrowStorageTo(NumBits + 1);
 
         ++NumBits;
         Set(Index, Value, true);
         return Index;
     }
 
+    void Init(bool bValue, int32 InNumBits)
+    {
+        NumBits = 0;
+
+        if (InNumBits > 0)
+        {
+            GrowStorageTo(InNumBits);
+            NumBits = InNumBits;
+
+            const int32 NumWords = (InNumBits + NumBitsPerDWORD - 1) / NumBitsPerDWORD;
+            std::memset(GetData(), bValue ? 0xFF : 0x00, (size_t)NumWords * sizeof(uint32));
+        }
+    }
+
+    void SetRange(int32 Index, int32 NumBitsToSet, bool Value)
+    {
+        for (int32 i = 0; i < NumBitsToSet; ++i)
+        {
+            Set(Index + i, Value, true);
+        }
+    }
+
     inline void Reset()
     {
         NumBits = 0;
+    }
+
+    inline void Empty()
+    {
+        NumBits = 0;
+        std::memset(GetData(), 0, (size_t)(MaxBits / NumBitsPerDWORD) * sizeof(uint32));
     }
 
 public:
@@ -123,14 +212,14 @@ public:
     class FSetBitIterator : public FRelativeBitReference
     {
     private:
-        const FBitArray& Array;
+        const TBitArray& Array;
 
         uint32 UnvisitedBitMask;
         int32 CurrentBitIndex;
         int32 BaseBitIndex;
 
     public:
-        explicit FSetBitIterator(const FBitArray& InArray, int32 StartIndex = 0)
+        explicit FSetBitIterator(const TBitArray& InArray, int32 StartIndex = 0)
             : FRelativeBitReference(StartIndex)
             , Array(InArray)
             , UnvisitedBitMask((~0U) << (StartIndex & (NumBitsPerDWORD - 1)))
@@ -195,4 +284,7 @@ public:
     inline FSetBitIterator end() { return FSetBitIterator(*this, Num()); }
 };
 
-static_assert(sizeof(FBitArray) == 0x20, "FBitArray layout broke: UE 4.0-5.x expects inline-4 allocator/NumBits/MaxBits = 0x20 on x64");
+using FBitArray = TBitArray;
+using FConstSetBitIterator = TBitArray::FSetBitIterator;
+
+static_assert(sizeof(TBitArray) == 0x20, "TBitArray layout broke: UE 4.0-5.x expects inline-4 allocator/NumBits/MaxBits = 0x20 on x64");

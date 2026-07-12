@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
+#include "Engine/Source/Runtime/Core/Public/Misc/Crc.h"
 
 class FArchive;
 class FOutputDevice;
@@ -273,5 +274,10 @@ public:
 		Guid.D = d;
 
 		return Guid;
+	}
+
+	friend uint32 GetTypeHash(const FGuid& Guid)
+	{
+		return FCrc::MemCrc_DEPRECATED(&Guid, sizeof(FGuid));
 	}
 };

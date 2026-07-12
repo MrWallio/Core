@@ -273,6 +273,12 @@
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\ScriptDelegates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Misc\Crc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\UnrealTemplate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Templates\Tuple.h">
       <Filter>Header Files</Filter>
     </ClInclude>
