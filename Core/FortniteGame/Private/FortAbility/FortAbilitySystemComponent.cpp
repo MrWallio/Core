@@ -120,3 +120,30 @@ void UFortAbilitySystemComponent::EndAbility(UGameplayAbility* Ability) {
 		}
 	}
 }
+
+void UFortAbilitySystemComponent::EndAbilitiesExcluding(TArray<TSubclassOf<UFortGameplayAbility>> AbilitiesToKeep) {
+	for (int32 i = 0; i < ActivatableAbilities.Items.Num(); i++) {
+		FGameplayAbilitySpec& AbilitySpec = ActivatableAbilities.Items.GetWithSize(i, FGameplayAbilitySpec::GetSize());
+
+		if (AbilitySpec.Ability) {
+			UFortGameplayAbility* Ability = AbilitySpec.Ability->Cast<UFortGameplayAbility>();
+
+			bool bShouldKeep = false;
+
+			for (int32 j = 0; j < AbilitiesToKeep.Num(); j++) {
+				TSubclassOf<UFortGameplayAbility> GameplayAbility = AbilitiesToKeep.GetWithSize(j, sizeof(TSubclassOf<UFortGameplayAbility>));
+
+				if (GameplayAbility.Get() == Ability->GetClass()) {
+					bShouldKeep = true;
+					break;
+				}
+			}
+
+			if (!bShouldKeep) {
+				ClientCancelAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+				ClientEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo);
+				ServerEndAbility(AbilitySpec.Handle, AbilitySpec.ActivationInfo, FPredictionKey());
+			}
+		}
+	}
+}

@@ -5,6 +5,7 @@
 #include "Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/AbilitySystemComponent.h"
 
 class UFortAbilitySet;
+class UFortGameplayAbility;
 
 class UFortAbilitySystemComponent : public UAbilitySystemComponent {
 public:
@@ -21,6 +22,8 @@ public:
 	void EndAllAbilitiesFromAbilitySet(UFortAbilitySet* AbilitySet);
 
 	void EndAbility(UGameplayAbility* Ability);
+
+	void EndAbilitiesExcluding(TArray<TSubclassOf<UFortGameplayAbility>> AbilitiesToKeep);
 };
 
 class UFortAbilitySystemComponentAthena : public UFortAbilitySystemComponent {

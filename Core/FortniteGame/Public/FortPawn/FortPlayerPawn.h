@@ -21,14 +21,15 @@
 #include "FortPawn.h"
 
 class UFortHero;
+class UFortAbilitySystemComponent;
 
 class AFortPlayerPawn : public AFortPawn {
 public:
 	DefineUnrealClass(AFortPlayerPawn);
 
 	DefineUProperty(float, PickupSpeedMultiplier);
-
 	DefineUProperty(TWeakObjectPtr<UFortHero>, Hero);
+	DefineUProperty(UFortAbilitySystemComponent*, AbilitySystemComponent);
 public:
 	void BeginSkydiving(bool bFromBus);
 

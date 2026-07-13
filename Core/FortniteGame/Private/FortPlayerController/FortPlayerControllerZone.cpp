@@ -42,10 +42,10 @@ void AFortPlayerControllerZone::ServerAcknowledgePossession(AFortPlayerControlle
 	auto PlayerState = (AFortPlayerStateZone*)This->PlayerState;
 	if (PlayerState) {
 		if (PlayerState->AbilitySystemComponent) {
-			UFortAbilitySet* FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer");
+			static UFortAbilitySet* FortAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer");
 
 			if (FortGameModeAthena) {
-				UFortAbilitySet* AthenaPlayerAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer");
+				static UFortAbilitySet* AthenaPlayerAbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer");
 				if (AthenaPlayerAbilitySet) {
 					FortAbilitySet = AthenaPlayerAbilitySet;
 				}

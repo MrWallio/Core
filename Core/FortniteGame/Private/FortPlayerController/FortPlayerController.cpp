@@ -1550,13 +1550,7 @@ void AFortPlayerController::ClientExecuteInventoryItem(FGuid& ItemGuid, float De
 void AFortPlayerController::TogglePersonalVehicle(bool bOn) {
 	Log("AFortPlayerController::TogglePersonalVehicle called with bOn = " + std::to_string(bOn));
 
-	AFortPlayerState* PlayerState = this->PlayerState->Cast<AFortPlayerState>();
-	if (!PlayerState) {
-		Log("TogglePersonalVehicle: PlayerState is null or not AFortPlayerState!");
-		return;
-	}
-
-	UFortAbilitySystemComponent* ASC = PlayerState->AbilitySystemComponent;
+	UFortAbilitySystemComponent* ASC = MyFortPawn ? MyFortPawn->AbilitySystemComponent : nullptr;
 	if (!ASC) {
 		Log("TogglePersonalVehicle: AbilitySystemComponent is null!");
 		return;
