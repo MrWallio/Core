@@ -168,6 +168,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("PossessPawnByIndex <PawnIndex> - Possesses a pawn by its index in the array.");
 		This->ClientMessage("PossessPawnByName <PawnName> - Possesses a pawn by its name.");
 		This->ClientMessage("DumpAllPawns - Dumps all the pawns in the world.");
+		This->ClientMessage("SetKillScore <NewScore> - Sets the player's kill score.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -876,6 +877,26 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 
 		return;
 	}
+	else if (Parser.IsCommand("SetKillScore")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SetKillScore <NewScore>");
+			return;
+		}
+
+		int32 NewScore = Parser.GetArgInt(0, 0);
+
+		AFortPlayerStateAthena* PlayerState = This->PlayerState->Cast<AFortPlayerStateAthena>();
+		if (!PlayerState) {
+			This->ClientMessage("PlayerState is null or not AFortPlayerStateAthena!");
+			return;
+		}
+
+		PlayerState->SetKillScore(NewScore);
+		This->ClientMessage("Set kill score to " + std::to_string(NewScore));
+
+		return;
+	}
 
 	if (Version::Fortnite_Version >= 2.2) {
 		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), Msg, This);
@@ -1060,10 +1081,7 @@ void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, 
 		FortPlayerState->ApplyCharacterCustomization(MyFortPawn);
 
 		if (FortPSAthena) {
-			if (auto KillScore = FortPSAthena->KillScore)
-			{
-				FortPCAthena->ServerModifyStat("AthenaKills", FortPSAthena->KillScore, EStatMod::GetSet(), true);
-			}
+			FortPSAthena->SetKillScore(FortPSAthena->KillScore);
 		}
 	}
 }

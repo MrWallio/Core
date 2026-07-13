@@ -64,6 +64,8 @@ public:
 
 	void OnRep_SquadId();
 
+	void SetKillScore(int32 NewScore);
+
 	static void Hook() {
 		Log("AFortPlayerStateAthena Hooked!");
 	}

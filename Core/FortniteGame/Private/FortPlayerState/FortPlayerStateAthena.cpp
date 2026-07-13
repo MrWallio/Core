@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
 
+#include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
+
 void AFortPlayerStateAthena::OnRep_TeamKillScore()
 {
 	static UFunction* Func = nullptr;
@@ -221,4 +223,15 @@ void AFortPlayerStateAthena::OnRep_SquadId()
 	}
 
 	Call(Func);
+}
+
+void AFortPlayerStateAthena::SetKillScore(int32 NewScore)
+{
+	KillScore = NewScore;
+	OnRep_Kills();
+
+	AFortPlayerController* PC = Owner->Cast<AFortPlayerController>();
+	if (PC) {
+		PC->ServerModifyStat("AthenaKills", KillScore, EStatMod::GetSet(), true);
+	}
 }

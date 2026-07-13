@@ -106,12 +106,10 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDea
 
 	if (Version::Fortnite_Version >= 1.8 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 		if (KillerPlayerStateAthena && KillerPlayerStateAthena != PlayerStateAthena) {
-			KillerPlayerStateAthena->KillScore++;
-
+			KillerPlayerStateAthena->SetKillScore(KillerPlayerStateAthena->KillScore + 1);
 			if (Version::Fortnite_Version >= 1.8 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 				KillerPlayerStateAthena->ClientReportKill(PlayerStateAthena);
 			}
-			KillerPlayerStateAthena->OnRep_Kills();
 
 			if (KillerPlayerStateAthena->PlayerTeam) {
 				for (AController* TeamMember : KillerPlayerStateAthena->PlayerTeam->TeamMembers) {
@@ -126,8 +124,6 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDea
 					}
 				}
 			}
-
-			KillerPCAthena->ServerModifyStat("AthenaKills", KillerPlayerStateAthena->KillScore, EStatMod::GetSet(), true);
 		}
 	}
 
