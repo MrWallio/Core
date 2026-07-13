@@ -222,6 +222,16 @@ uint8 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 		return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
 	}
 
+	/*for (int32 i = 0; i < GameState->Teams.Num(); i++) {
+		AFortTeamInfo* TeamInfo = GameState->Teams[i];
+		if (!TeamInfo) {
+			continue;
+		}
+		
+		Log("AFortGameModeAthena::PickTeam: Team " + TeamInfo->GetName().ToString());
+		Log("AFortGameModeAthena::PickTeam: Team " + std::to_string(TeamInfo->Team) + " has " + std::to_string(TeamInfo->TeamMembers.Num()) + " members.");
+	}*/
+
 	for (AFortTeamInfo* TeamInfo : GameState->Teams) {
 		if (!TeamInfo) {
 			continue;
@@ -234,6 +244,7 @@ uint8 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 		}
 	}
 
+	Log("AFortGameModeAthena::PickTeam: Failed to find a team!");
 	return PickTeamOG(This, PreferredTeam, ControllerToPickFor);
 }
 
