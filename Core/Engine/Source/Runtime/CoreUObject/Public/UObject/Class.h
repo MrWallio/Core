@@ -6,7 +6,6 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h"
 
 class UStruct;
-class FField;
 class UProperty;
 class UClass;
 struct FCustomPropertyListNode;

@@ -1054,9 +1054,17 @@ void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, 
 	AFortPlayerPawn* MyFortPawn = This->MyFortPawn;
 
 	AFortPlayerControllerAthena* FortPCAthena = This->Cast<AFortPlayerControllerAthena>();
+	AFortPlayerStateAthena* FortPSAthena = FortPlayerState->Cast<AFortPlayerStateAthena>();
 
 	if (bIsPawnLoaded) {
 		FortPlayerState->ApplyCharacterCustomization(MyFortPawn);
+
+		if (FortPSAthena) {
+			if (auto KillScore = FortPSAthena->KillScore)
+			{
+				FortPCAthena->ServerModifyStat("AthenaKills", FortPSAthena->KillScore, EStatMod::GetSet(), true);
+			}
+		}
 	}
 }
 
@@ -1631,4 +1639,13 @@ bool AFortPlayerController::IsUsingPersonalVehicle() const {
 		Func = FindFunction("IsUsingPersonalVehicle");
 
 	return const_cast<AFortPlayerController*>(this)->Call<bool>(Func);
+}
+
+void AFortPlayerController::ServerModifyStat(FName StatName, int32 Amount, uint8 ModType, bool bForceStatSave) {
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ServerModifyStat");
+
+	return Call(Func, StatName, Amount, ModType, bForceStatSave);
 }

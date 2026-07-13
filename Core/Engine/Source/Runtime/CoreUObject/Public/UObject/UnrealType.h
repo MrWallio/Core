@@ -7,11 +7,68 @@
 
 class UProperty : public UField {
 public:
+	DefineCustomProperty(int32, ArrayDim, ServerOffsets::UProperty__ElementSize - 4);
+
 	DefineCustomProperty(int32, ElementSize, ServerOffsets::UProperty__ElementSize);
 
 	DefineCustomProperty(EPropertyFlags, PropertyFlags, ServerOffsets::UProperty__PropertyFlags);
 
 	DefineCustomProperty(int32, Offset_Internal, ServerOffsets::UProperty__Offset_Internal);
+public:
+	FORCEINLINE int32 GetSize() const { return ElementSize * ArrayDim; }
+	FORCEINLINE int32 GetOffset() const { return Offset_Internal; }
+
+	FORCEINLINE bool HasAnyPropertyFlags(EPropertyFlags FlagsToCheck) const { return (PropertyFlags & FlagsToCheck) != 0; }
+	FORCEINLINE bool HasAllPropertyFlags(EPropertyFlags FlagsToCheck) const { return (PropertyFlags & FlagsToCheck) == FlagsToCheck; }
+
+	template<typename T>
+	FORCEINLINE T* ContainerPtrToValuePtr(void* ContainerPtr, int32 ArrayIndex = 0) const
+	{
+		return (T*)((uint8*)ContainerPtr + Offset_Internal + (int64)ElementSize * ArrayIndex);
+	}
+
+	template<typename T>
+	FORCEINLINE const T* ContainerPtrToValuePtr(const void* ContainerPtr, int32 ArrayIndex = 0) const
+	{
+		return (const T*)((const uint8*)ContainerPtr + Offset_Internal + (int64)ElementSize * ArrayIndex);
+	}
+
+	template<typename T>
+	FORCEINLINE T& GetPropertyValue(void* ContainerPtr, int32 ArrayIndex = 0) const
+	{
+		return *ContainerPtrToValuePtr<T>(ContainerPtr, ArrayIndex);
+	}
+
+	template<typename T>
+	FORCEINLINE void SetPropertyValue(void* ContainerPtr, const T& Value, int32 ArrayIndex = 0) const
+	{
+		*ContainerPtrToValuePtr<T>(ContainerPtr, ArrayIndex) = Value;
+	}
+
+protected:
+	UObject* FindDerivedObjectMember(EClassCastFlags ExpectedFlags, int32 SecondMatch = 0) const
+	{
+		if (!this)
+			return nullptr;
+
+		int32 Matches = 0;
+		
+		for (uintptr_t Off = 0x38; Off <= 0xA0; Off += sizeof(void*))
+		{
+			UObject* Candidate = *reinterpret_cast<UObject**>((uintptr_t)this + Off);
+			if (!Candidate)
+				continue;
+
+			if (Candidate->IsValidLowLevelFast() && Candidate->IsA(ExpectedFlags))
+			{
+				if (Matches == SecondMatch)
+					return Candidate;
+				++Matches;
+			}
+		}
+
+		return nullptr;
+	}
 };
 
 class UNumericProperty : public UProperty {
@@ -21,7 +78,7 @@ public:
 
 class UByteProperty : public UNumericProperty {
 public:
-
+	UEnum* GetEnum() const { return (UEnum*)FindDerivedObjectMember(CASTCLASS_UEnum); }
 };
 
 class UInt8Property : public UNumericProperty {
@@ -76,7 +133,7 @@ public:
 
 class UObjectPropertyBase : public UProperty {
 public:
-
+	UClass* GetPropertyClass() const { return (UClass*)FindDerivedObjectMember(CASTCLASS_UClass); }
 };
 
 class UObjectProperty : public UObjectPropertyBase {
@@ -101,7 +158,7 @@ public:
 
 class UClassProperty : public UObjectProperty {
 public:
-
+	UClass* GetMetaClass() const { return (UClass*)FindDerivedObjectMember(CASTCLASS_UClass, 1); }
 };
 
 class UAssetClassProperty : public UAssetObjectProperty {
@@ -111,7 +168,7 @@ public:
 
 class UInterfaceProperty : public UProperty {
 public:
-
+	UClass* GetInterfaceClass() const { return (UClass*)FindDerivedObjectMember(CASTCLASS_UClass); }
 };
 
 class UNameProperty : public UProperty {
@@ -141,7 +198,7 @@ public:
 
 class UStructProperty : public UProperty {
 public:
-
+	UScriptStruct* GetStruct() const { return (UScriptStruct*)FindDerivedObjectMember(CASTCLASS_UScriptStruct); }
 };
 
 class UDelegateProperty : public UProperty {
@@ -153,6 +210,88 @@ class UMulticastDelegateProperty : public UDelegateProperty {
 public:
 
 };
+
+class UEnumProperty : public UProperty {
+public:
+	// The UEnum this property represents.
+	UEnum* GetEnum() const { return (UEnum*)FindDerivedObjectMember(CASTCLASS_UEnum); }
+};
+
+using FField = UField;
+using FProperty = UProperty;
+using FNumericProperty = UNumericProperty;
+using FByteProperty = UByteProperty;
+using FInt8Property = UInt8Property;
+using FInt16Property = UInt16Property;
+using FIntProperty = UIntProperty;
+using FInt64Property = UInt64Property;
+using FUInt16Property = UUInt16Property;
+using FUInt32Property = UUInt32Property;
+using FUInt64Property = UUInt64Property;
+using FFloatProperty = UFloatProperty;
+using FDoubleProperty = UDoubleProperty;
+using FBoolProperty = UBoolProperty;
+using FObjectPropertyBase = UObjectPropertyBase;
+using FObjectProperty = UObjectProperty;
+using FWeakObjectProperty = UWeakObjectProperty;
+using FLazyObjectProperty = ULazyObjectProperty;
+using FSoftObjectProperty = UAssetObjectProperty;
+using FClassProperty = UClassProperty;
+using FSoftClassProperty = UAssetClassProperty;
+using FInterfaceProperty = UInterfaceProperty;
+using FNameProperty = UNameProperty;
+using FStrProperty = UStrProperty;
+using FArrayProperty = UArrayProperty;
+using FMapProperty = UMapProperty;
+using FSetProperty = USetProperty;
+using FStructProperty = UStructProperty;
+using FDelegateProperty = UDelegateProperty;
+using FMulticastDelegateProperty = UMulticastDelegateProperty;
+using FEnumProperty = UEnumProperty;
+
+template<typename T> struct TPropertyCastFlags { static constexpr EClassCastFlags Value = CASTCLASS_None; };
+template<> struct TPropertyCastFlags<UProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FProperty; };
+template<> struct TPropertyCastFlags<UNumericProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FNumericProperty; };
+template<> struct TPropertyCastFlags<UByteProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FByteProperty; };
+template<> struct TPropertyCastFlags<UInt8Property> { static constexpr EClassCastFlags Value = CASTCLASS_FInt8Property; };
+template<> struct TPropertyCastFlags<UInt16Property> { static constexpr EClassCastFlags Value = CASTCLASS_FInt16Property; };
+template<> struct TPropertyCastFlags<UIntProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FIntProperty; };
+template<> struct TPropertyCastFlags<UInt64Property> { static constexpr EClassCastFlags Value = CASTCLASS_FInt64Property; };
+template<> struct TPropertyCastFlags<UUInt16Property> { static constexpr EClassCastFlags Value = CASTCLASS_FUInt16Property; };
+template<> struct TPropertyCastFlags<UUInt32Property> { static constexpr EClassCastFlags Value = CASTCLASS_FUInt32Property; };
+template<> struct TPropertyCastFlags<UUInt64Property> { static constexpr EClassCastFlags Value = CASTCLASS_FUInt64Property; };
+template<> struct TPropertyCastFlags<UFloatProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FFloatProperty; };
+template<> struct TPropertyCastFlags<UDoubleProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FDoubleProperty; };
+template<> struct TPropertyCastFlags<UBoolProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FBoolProperty; };
+template<> struct TPropertyCastFlags<UObjectPropertyBase> { static constexpr EClassCastFlags Value = CASTCLASS_FObjectPropertyBase; };
+template<> struct TPropertyCastFlags<UObjectProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FObjectProperty; };
+template<> struct TPropertyCastFlags<UWeakObjectProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FWeakObjectProperty; };
+template<> struct TPropertyCastFlags<ULazyObjectProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FLazyObjectProperty; };
+template<> struct TPropertyCastFlags<UAssetObjectProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FSoftObjectProperty; };
+template<> struct TPropertyCastFlags<UClassProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FClassProperty; };
+template<> struct TPropertyCastFlags<UAssetClassProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FSoftClassProperty; };
+template<> struct TPropertyCastFlags<UInterfaceProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FInterfaceProperty; };
+template<> struct TPropertyCastFlags<UNameProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FNameProperty; };
+template<> struct TPropertyCastFlags<UStrProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FStrProperty; };
+template<> struct TPropertyCastFlags<UArrayProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FArrayProperty; };
+template<> struct TPropertyCastFlags<UMapProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FMapProperty; };
+template<> struct TPropertyCastFlags<USetProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FSetProperty; };
+template<> struct TPropertyCastFlags<UStructProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FStructProperty; };
+template<> struct TPropertyCastFlags<UDelegateProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FDelegateProperty; };
+template<> struct TPropertyCastFlags<UMulticastDelegateProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FMulticastDelegateProperty; };
+template<> struct TPropertyCastFlags<UEnumProperty> { static constexpr EClassCastFlags Value = CASTCLASS_FEnumProperty; };
+
+template<typename To>
+FORCEINLINE To* CastField(UField* Field)
+{
+	return (Field && Field->IsA(TPropertyCastFlags<To>::Value)) ? (To*)Field : nullptr;
+}
+
+template<typename To>
+FORCEINLINE const To* CastField(const UField* Field)
+{
+	return (Field && Field->IsA(TPropertyCastFlags<To>::Value)) ? (const To*)Field : nullptr;
+}
 
 #define DefineUProperty(Type, Name) \
 private: \

@@ -126,6 +126,8 @@ void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDea
 					}
 				}
 			}
+
+			KillerPCAthena->ServerModifyStat("AthenaKills", KillerPlayerStateAthena->KillScore, EStatMod::GetSet(), true);
 		}
 	}
 

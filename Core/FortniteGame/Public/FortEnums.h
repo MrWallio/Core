@@ -389,3 +389,13 @@ public:
 	DefineEnumProperty(Unspecified);
 	DefineEnumProperty(EDeathCause_MAX);
 };
+
+class EStatMod {
+public:
+	DefineUnrealEnum(EStatMod);
+
+	DefineEnumProperty(Delta);
+	DefineEnumProperty(Set);
+	DefineEnumProperty(Maximum);
+	DefineEnumProperty(EStatMod_MAX);
+};

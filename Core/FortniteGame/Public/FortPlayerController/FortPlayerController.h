@@ -150,6 +150,8 @@ public:
 
 	bool IsUsingPersonalVehicle() const;
 
+	void ServerModifyStat(FName StatName, int32 Amount, uint8 ModType, bool bForceStatSave);
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),

@@ -9,7 +9,6 @@ class FLinkerInstancingContext;
 class FObjectPreSaveContext;
 class FOutputDevice;
 class FPackagePath;
-class FProperty;
 class ITargetPlatform;
 class UClass;
 class UEnum;
