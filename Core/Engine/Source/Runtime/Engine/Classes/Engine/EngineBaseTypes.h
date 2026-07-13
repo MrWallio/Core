@@ -115,18 +115,3 @@ public:
 	 */
 	FString GetHostPortString() const;
 };
-
-struct FURLUE416
-{
-public:
-	FString Protocol;
-	FString Host;
-	int32 Port;
-	uint8 Padding1[0x4];
-	FString Map;
-	FString RedirectUrl;
-	TArray<FString> Op;
-	FString Portal;
-	int32 Valid;
-	uint8 Padding2[0x4];
-};
