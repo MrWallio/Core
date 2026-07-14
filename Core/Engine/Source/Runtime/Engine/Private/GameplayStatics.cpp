@@ -5,6 +5,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Pawn.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 #include "Engine/Source/Runtime/Engine/Classes/Components/ActorComponent.h"
+#include "Engine/Source/Runtime/Engine/Classes/Components/StaticMeshComponent.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/Level.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h"

@@ -2,6 +2,8 @@
 #include "pch.h"
 
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Controller.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/HUD.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/SpectatorPawn.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/Templates/SubclassOf.h"
 
 #include "Engine/Source/Runtime/Core/Public/Math/Vector.h"

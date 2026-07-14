@@ -2,6 +2,8 @@
 #include "pch.h"
 
 #include "Pawn.h"
+#include "Engine/Source/Runtime/Engine/Classes/Components/CapsuleComponent.h"
+#include "Engine/Source/Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
 
 class AController;
 class FDebugDisplayInfo;

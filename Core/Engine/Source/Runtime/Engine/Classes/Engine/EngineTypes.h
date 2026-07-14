@@ -101,3 +101,24 @@ enum EMovementMode
 	MOVE_Custom,
 	MOVE_MAX,
 };
+
+namespace EComponentMobility
+{
+	enum Type
+	{
+		Static,
+		Stationary,
+		Movable,
+	};
+}
+
+namespace ECollisionEnabled
+{
+	enum Type
+	{
+		NoCollision,
+		QueryOnly,
+		PhysicsOnly,
+		QueryAndPhysics,
+	};
+}
