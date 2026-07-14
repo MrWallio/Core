@@ -5413,53 +5413,6 @@ uintptr_t Finder::FindAFortGameStateAthena_UpdatePlaylistDependentData() {
 	return ServerOffsets::AFortGameStateAthena_UpdatePlaylistDependentData;
 }
 
-uintptr_t Finder::FindUGameplayStatics_BeginDeferredActorSpawnFromClass() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::UGameplayStatics_BeginDeferredActorSpawnFromClass)
-		return ServerOffsets::UGameplayStatics_BeginDeferredActorSpawnFromClass;
-
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UGameplayStatics::BeginSpawningActorFromClass: can not spawn an actor from a NULL class").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 512; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
-				Addr = reinterpret_cast<uintptr_t>(Ptr);
-				break;
-			}
-			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
-				Addr = reinterpret_cast<uintptr_t>(Ptr);
-				break;
-			}
-		}
-	}
-
-	if (Addr) {
-		ServerOffsets::UGameplayStatics_BeginDeferredActorSpawnFromClass = Addr - ImageBase;
-	}
-
-	Log("UGameplayStatics_BeginDeferredActorSpawnFromClass found at: 0x" + std::format("{:X}", ServerOffsets::UGameplayStatics_BeginDeferredActorSpawnFromClass));
-	return ServerOffsets::UGameplayStatics_BeginDeferredActorSpawnFromClass;
-}
-
-uintptr_t Finder::FindAActor_FinishSpawning() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::AActor_FinishSpawning)
-		return ServerOffsets::AActor_FinishSpawning;
-
-	Addr = Memcury::Scanner::FindPattern("40 55 53 56 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 0F B6 81").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("40 55 53 56 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 0F B6 81").Get();
-	}
-
-	if (Addr) {
-		ServerOffsets::AActor_FinishSpawning = Addr - ImageBase;
-	}
-
-	Log("AActor_FinishSpawning found at: 0x" + std::format("{:X}", ServerOffsets::AActor_FinishSpawning));
-	return ServerOffsets::AActor_FinishSpawning;
-}
-
 uintptr_t Finder::FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid)
@@ -11103,7 +11056,6 @@ void Finder::SetupOffsets() {
 	FindUEngine_CreateNetDriver_Local();
 
 	FindAActor_InternalGetNetMode();
-	FindAActor_FinishSpawning();
 
 	FindFWorldContext__ThisCurrentWorld();
 
@@ -11221,8 +11173,6 @@ void Finder::SetupOffsets() {
 	FindStaticLoadObject();
 
 	FindFRotator_Quaternion();
-
-	FindUGameplayStatics_BeginDeferredActorSpawnFromClass();
 
 	FindAFortGameModeZone_CreateAIDirectorVFT();
 	FindAFortGameModeZone_CreateAIGoalManagerVFT();

@@ -42,6 +42,7 @@ public:
 	FORCEINLINE ASpectatorPawn* GetSpectatorPawn() const { return SpectatorPawn; }
 	FORCEINLINE AHUD* GetHUD() const { return MyHUD; }
 	FORCEINLINE APawn* GetAcknowledgedPawn() const { return AcknowledgedPawn; }
+	FORCEINLINE APawn* GetPawnOrSpectator() const { return Pawn ? Pawn : reinterpret_cast<APawn*>(GetSpectatorPawn()); }
 public:
 	static inline void (*ServerAcknowledgePossessionOG)(APlayerController* This, APawn* P);
 	void ServerAcknowledgePossession(APawn* P);

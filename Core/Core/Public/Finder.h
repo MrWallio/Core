@@ -623,10 +623,6 @@ public:
 
 	static uintptr_t FindAFortGameStateAthena_UpdatePlaylistDependentData();
 
-	static uintptr_t FindUGameplayStatics_BeginDeferredActorSpawnFromClass();
-
-	static uintptr_t FindAActor_FinishSpawning();
-
 	static uintptr_t FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid();
 
 	static uintptr_t FindAFortGameMode_SpawnDefaultPawnFor();

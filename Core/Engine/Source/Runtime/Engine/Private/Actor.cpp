@@ -8,6 +8,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Pawn.h"
 #include "Engine/Plugins/Online/OnlineSubsystemUtils/Source/OnlineSubsystemUtils/Public/OnlineBeaconClient.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/HitResult.h"
+#include "Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 ENetMode AActor::InternalGetNetMode(AActor* This)
 {
@@ -21,8 +22,10 @@ ENetMode AActor::InternalGetNetMode(AActor* This)
 
 void AActor::FinishSpawning(const FTransform& UserTransform, bool bIsDefaultTransform, const FComponentInstanceDataCache* InstanceDataCache)
 {
-	void (*FinishSpawningInternal)(AActor*, const FTransform&, bool, const FComponentInstanceDataCache*) = decltype(FinishSpawningInternal)(ImageBase + Finder::FindAActor_FinishSpawning());
-	FinishSpawningInternal(this, UserTransform, bIsDefaultTransform, InstanceDataCache);
+	if (bIsDefaultTransform || InstanceDataCache)
+		Log("AActor::FinishSpawning: bIsDefaultTransform/InstanceDataCache are not forwarded (routed through GameplayStatics.FinishSpawningActor)");
+
+	UGameplayStatics::FinishSpawningActor(this, UserTransform);
 }
 
 bool AActor::IsNetStartupActor() const

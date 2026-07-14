@@ -197,7 +197,6 @@ namespace ServerOffsets {
 	inline uintptr_t AActor_IsPendingKillPending = 0;
 	inline uintptr_t AActor_HasNetOwner = 0;
 	inline uintptr_t AActor_HasLocalNetOwner = 0;
-	inline uintptr_t AActor_FinishSpawning = 0;
 	inline uintptr_t AActor_SetNetDormancy = 0;
 	inline uintptr_t AActor_BeginPlay = 0;
 	inline uintptr_t AActor_BeginPlayVFT = 0;
@@ -428,7 +427,6 @@ namespace ServerOffsets {
 	inline uintptr_t ULevelStreamingDynamic_LoadLevelInstance = 0;
 	inline uintptr_t ULevelStreamingDynamic_LoadLevelInstanceBySoftObjectPtr = 0;
 
-	inline uintptr_t UGameplayStatics_BeginDeferredActorSpawnFromClass = 0;
 
 	inline uintptr_t UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid = 0;
 	inline uintptr_t UFortKismetLibrary_GetWeaponStatsRow = 0;

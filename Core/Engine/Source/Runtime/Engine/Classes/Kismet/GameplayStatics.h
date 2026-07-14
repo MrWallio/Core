@@ -21,6 +21,10 @@ class USoundConcurrency;
 class UStaticMesh;
 class FMemoryReader;
 class APlayerController;
+class AGameModeBase;
+class AGameStateBase;
+class APawn;
+class UWorld;
 
 struct FDialogueContext;
 
@@ -38,5 +42,13 @@ public:
 
 	static void GetAllActorsOfClass(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>* OutActors);
 
+	static void GetAllActorsWithTag(const UObject* WorldContextObject, FName Tag, TArray<AActor*>* OutActors);
+
 	static APlayerController* GetPlayerController(const UObject* WorldContextObject, int32 PlayerIndex);
+
+	static APawn* GetPlayerPawn(const UObject* WorldContextObject, int32 PlayerIndex);
+
+	static AGameModeBase* GetGameMode(const UObject* WorldContextObject);
+
+	static AGameStateBase* GetGameState(const UObject* WorldContextObject);
 };

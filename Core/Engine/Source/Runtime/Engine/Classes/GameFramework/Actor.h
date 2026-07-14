@@ -61,6 +61,8 @@ public:
 	FORCEINLINE USceneComponent* GetRootComponent() const { return RootComponent; }
 	FORCEINLINE APawn* GetInstigator() const { return Instigator; }
 	FORCEINLINE bool IsHidden() const { return bHidden; }
+
+	FORCEINLINE bool ActorHasTag(FName Tag) const { return Tag != FName() && const_cast<AActor*>(this)->Tags.Contains(Tag); }
 public:
 	static inline ENetMode(*InternalGetNetModeOG)(AActor* This);
 	static ENetMode InternalGetNetMode(AActor* This);
