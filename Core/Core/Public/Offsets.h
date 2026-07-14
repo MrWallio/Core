@@ -19,6 +19,7 @@ namespace ServerOffsets {
 
 	inline uintptr_t StaticFindObject = 0;
 	inline uintptr_t StaticLoadObject = 0;
+	inline uintptr_t StaticConstructObject_Internal = 0;
 
 	inline uintptr_t TickFlush = 0;
 
@@ -69,8 +70,6 @@ namespace ServerOffsets {
 	inline uintptr_t UObjectBaseUtility_GetLinker = 0;
 	inline uintptr_t UObjectBaseUtility_GetLinkerIndex = 0;
 	inline uintptr_t UObjectBaseUtility_GetNativeInterfaceAddress = 0;
-	inline uintptr_t UObjectBaseUtility_GetOutermost = 0;
-	inline uintptr_t UObjectBaseUtility_GetPathName = 0;
 	inline uintptr_t UObjectBaseUtility_IsDefaultSubobject = 0;
 
 	inline uintptr_t UObject_BeginDestroy = 0;

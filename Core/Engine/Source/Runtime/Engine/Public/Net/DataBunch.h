@@ -6,10 +6,14 @@
 class UChannel;
 class UNetConnection;
 
-class FOutBunch : public FNetBitWriter
+class alignas(16) FOutBunch : public FNetBitWriter
 {
+private:
+	uint8 Padding[0x300];
+
 public:
 	FOutBunch(class UChannel* InChannel, bool bClose);
+
 public:
 	bool GetbDormant() {
 		if (Version::Engine_Version == 4.16) {

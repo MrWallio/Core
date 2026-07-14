@@ -102,6 +102,49 @@ int64 UEnum::GetValue(const char* EnumMemberName) const
 	return -1;
 }
 
+int32 UEnum::NumEnums() const
+{
+	if (!this)
+		return 0;
+
+	auto Names = *(TArray<TPair<FName, int64>>*)(__int64(this) + 0x40);
+	return Names.Num();
+}
+
+std::string UEnum::GetNameStringByValue(int64 Value) const
+{
+	if (!this)
+		return "None";
+
+	auto Names = *(TArray<TPair<FName, int64>>*)(__int64(this) + 0x40);
+
+	for (int i = 0; i < Names.Num(); i++)
+	{
+		auto& Pair = Names[i];
+		if (Pair.Value() != Value)
+			continue;
+
+		auto str = Pair.Key().ToString().ToString();
+		auto colcolIdx = str.find_last_of("::");
+		return colcolIdx == -1 ? str : str.substr(colcolIdx + 1);
+	}
+
+	return "None";
+}
+
+int64 UEnum::GetValueByIndex(int32 Index) const
+{
+	if (!this)
+		return -1;
+
+	auto Names = *(TArray<TPair<FName, int64>>*)(__int64(this) + 0x40);
+
+	if (Index < 0 || Index >= Names.Num())
+		return -1;
+
+	return Names[Index].Value();
+}
+
 UFunction* UClass::FindFunctionByName(FName InName, EIncludeSuperFlag::Type IncludeSuper) const
 {
 	UFunction* (*FindFunctionByNameInternal)(const UClass*, FName, EIncludeSuperFlag::Type) = decltype(FindFunctionByNameInternal)(ImageBase + Finder::FindUClass_FindFunctionByName());

@@ -114,7 +114,7 @@ public:
 
 class UScriptStruct : public UStruct {
 public:
-
+	int32 GetStructureSize() const { return PropertiesSize; }
 };
 
 class UFunction : public UStruct {
@@ -189,6 +189,12 @@ public:
 class UEnum : public UField {
 public:
     int64 GetValue(const char* EnumMemberName) const;
+
+    int32 NumEnums() const;
+
+    std::string GetNameStringByValue(int64 Value) const;
+
+    int64 GetValueByIndex(int32 Index) const;
 };
 
 namespace EIncludeSuperFlag
@@ -202,31 +208,9 @@ namespace EIncludeSuperFlag
 
 enum class EGetSparseClassDataMethod : uint8
 {
-    /**
-     * If not yet created, store and return a new instance, whether or not the class can use its archetype's instance.
-     */
     CreateIfNull,
-    /**
-     * If not yet created, return the archetype instance (if possible to use for this class). If not possible to use
-     * the archetype's instance, store and return a new instance.
-     */
     ArchetypeIfNull,
-    /**
-     * This is an advanced flag and should usually be avoided. Callers should instead call with ArchetypeIfNull if they
-     * are currently allowed to create an instance, or with DeferIfNull if not. Callers that want to know whether the
-     * class has sparse data of its own beyond what the archetype has should compare
-     * GetSparseClassDataStruct() != GetSparseClassDataArchetypeStruct().
-     *
-     * If not yet created, return null. An instance might still be created later when called with ArchetypeIfNull.
-     * This call never creates an instance.
-     */
     ReturnIfNull,
-    /**
-     * If not yet created, return the archetype's instance (if possible to use for this class). If not possible to use
-     * the archetype's instance, return null. User should call later with ArchetypeIfNull when they are allowed to
-     * create an instance.
-     * This call never creates an instance.
-     */
     DeferIfNull,
 };
 
@@ -291,12 +275,47 @@ public:
 	{
 		return GetDefaultObject();
 	}
+
+	template<typename T>
+	inline T* GetDefaultObject() const
+	{
+		return (T*)GetDefaultObject();
+	}
+
+	inline UClass* GetSuperClass() const
+	{
+		return (UClass*)SuperStruct;
+	}
 };
 
 class UDynamicClass : public UClass {
 public:
 
 };
+
+template<typename T>
+FORCEINLINE T* Cast(UObjectBase* Object)
+{
+	return (Object && Object->IsA(T::StaticClass())) ? (T*)Object : nullptr;
+}
+
+template<typename T>
+FORCEINLINE const T* Cast(const UObjectBase* Object)
+{
+	return (Object && Object->IsA(T::StaticClass())) ? (const T*)Object : nullptr;
+}
+
+template<typename T>
+FORCEINLINE T* ExactCast(UObjectBase* Object)
+{
+	return (Object && Object->GetClass() == T::StaticClass()) ? (T*)Object : nullptr;
+}
+
+template<typename T>
+FORCEINLINE T* CastChecked(UObjectBase* Object)
+{
+	return Cast<T>(Object);
+}
 
 template <typename Ret, typename... Args>
 Ret UObject::Call(UFunction* Function, Args&&... args)

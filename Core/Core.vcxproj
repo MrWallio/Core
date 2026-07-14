@@ -196,6 +196,7 @@
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UObjectBase.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\UObjectBaseUtility.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\WeakObjectPtr.h" />
+    <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\ObjectPtr.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\Array.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\ArrayBuilder.h" />
     <ClInclude Include="Engine\Source\Runtime\Core\Public\Containers\ArrayView.h" />

@@ -3,5 +3,8 @@
 
 class FArchive {
 public:
+	void** VTable;
 
+public:
+	FArchive() : VTable(nullptr) {}
 };

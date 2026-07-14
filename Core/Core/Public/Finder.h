@@ -21,6 +21,8 @@ public:
 
 	static uintptr_t FindStaticLoadObject();
 
+	static uintptr_t FindStaticConstructObject_Internal();
+
 	static uintptr_t FindUEngine_CreateNetDriver();
 
 	static uintptr_t FindUNetDriver_SetWorldVFT();
@@ -100,10 +102,6 @@ public:
 	static uintptr_t FindUObjectBaseUtility_GetLinkerIndex();
 
 	static uintptr_t FindUObjectBaseUtility_GetNativeInterfaceAddress();
-
-	static uintptr_t FindUObjectBaseUtility_GetOutermost();
-
-	static uintptr_t FindUObjectBaseUtility_GetPathName();
 
 	static uintptr_t FindUObjectBaseUtility_IsDefaultSubobject();
 

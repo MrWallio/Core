@@ -300,3 +300,68 @@ public:
 };
 
 inline FUObjectArray GUObjectArray;
+
+FORCEINLINE FUObjectItem* GetUObjectItem(const UObjectBase* Object)
+{
+	return Object ? FUObjectArray::IndexToObject(Object->GetInternalIndex()) : nullptr;
+}
+
+template<typename T>
+class TObjectIterator
+{
+private:
+	int32 Index;
+	int32 MaxIndex;
+	T* Current;
+
+public:
+	TObjectIterator()
+		: Index(-1), MaxIndex(FUObjectArray::Num()), Current(nullptr)
+	{
+		Advance();
+	}
+
+	FORCEINLINE void operator++() { Advance(); }
+	FORCEINLINE explicit operator bool() const { return Current != nullptr; }
+	FORCEINLINE T* operator*() const { return Current; }
+	FORCEINLINE T* operator->() const { return Current; }
+
+	FORCEINLINE int32 GetIndex() const { return Index; }
+
+private:
+	void Advance()
+	{
+		Current = nullptr;
+		while (++Index < MaxIndex)
+		{
+			FUObjectItem* Item = FUObjectArray::IndexToObject(Index);
+			if (!Item || !Item->Object)
+				continue;
+
+			if (Item->Object->IsA(T::StaticClass()))
+			{
+				Current = (T*)Item->Object;
+				return;
+			}
+		}
+	}
+};
+
+template<typename T>
+class TObjectRange
+{
+public:
+	struct FSentinel {};
+
+	struct FRangeIterator
+	{
+		TObjectIterator<T> It;
+
+		FORCEINLINE T* operator*() const { return *It; }
+		FORCEINLINE void operator++() { ++It; }
+		FORCEINLINE bool operator!=(FSentinel) const { return (bool)It; }
+	};
+
+	FORCEINLINE FRangeIterator begin() const { return FRangeIterator{}; }
+	FORCEINLINE FSentinel end() const { return FSentinel{}; }
+};

@@ -14,9 +14,14 @@ public:
 	{
 	}
 
-	inline const UClass* Get()
+	inline UClass* Get() const
 	{
 		return Class;
+	}
+
+	inline TClass* GetDefaultObject() const
+	{
+		return Class ? (TClass*)Class->GetDefaultObject() : nullptr;
 	}
 
 	inline operator const UClass* () const
@@ -35,9 +40,9 @@ public:
 		return Class;
 	}
 
-	inline TSubclassOf& operator=(const UClass* Class)
+	inline TSubclassOf& operator=(const UClass* InClass)
 	{
-		Class = Class;
+		Class = const_cast<UClass*>(InClass);
 
 		return *this;
 	}
@@ -65,3 +70,5 @@ public:
 public:
 	UClass* Class;
 };
+
+static_assert(sizeof(TSubclassOf<UObject>) == 0x8, "TSubclassOf layout broke: must be a single UClass* (0x8 on x64)");

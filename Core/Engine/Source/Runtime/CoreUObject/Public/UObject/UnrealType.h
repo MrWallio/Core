@@ -45,6 +45,47 @@ public:
 		*ContainerPtrToValuePtr<T>(ContainerPtr, ArrayIndex) = Value;
 	}
 
+public:
+	FORCEINLINE bool IsPODProperty() const { return HasAnyPropertyFlags(CPF_IsPlainOldData); }
+
+	FORCEINLINE void InitializeValue(void* Dest) const
+	{
+		if (Dest)
+			std::memset(Dest, 0, GetSize());
+	}
+
+	FORCEINLINE void ClearValue(void* Data) const
+	{
+		if (Data)
+			std::memset(Data, 0, ElementSize);
+	}
+
+	FORCEINLINE void CopySingleValue(void* Dest, const void* Src) const
+	{
+		if (Dest && Src)
+			std::memcpy(Dest, Src, ElementSize);
+	}
+
+	FORCEINLINE void CopyCompleteValue(void* Dest, const void* Src) const
+	{
+		if (Dest && Src)
+			std::memcpy(Dest, Src, GetSize());
+	}
+
+	FORCEINLINE bool Identical(const void* A, const void* B) const
+	{
+		if (!A || !B)
+			return A == B;
+		return std::memcmp(A, B, ElementSize) == 0;
+	}
+
+	FORCEINLINE void InitializeValue_InContainer(void* Container) const { InitializeValue(ContainerPtrToValuePtr<void>(Container)); }
+	FORCEINLINE void ClearValue_InContainer(void* Container, int32 ArrayIndex = 0) const { ClearValue(ContainerPtrToValuePtr<void>(Container, ArrayIndex)); }
+	FORCEINLINE void CopyCompleteValue_InContainer(void* DestContainer, const void* SrcContainer) const
+	{
+		CopyCompleteValue(ContainerPtrToValuePtr<void>(DestContainer), ContainerPtrToValuePtr<void>(SrcContainer));
+	}
+
 protected:
 	UObject* FindDerivedObjectMember(EClassCastFlags ExpectedFlags, int32 SecondMatch = 0) const
 	{
@@ -52,7 +93,7 @@ protected:
 			return nullptr;
 
 		int32 Matches = 0;
-		
+
 		for (uintptr_t Off = 0x38; Off <= 0xA0; Off += sizeof(void*))
 		{
 			UObject* Candidate = *reinterpret_cast<UObject**>((uintptr_t)this + Off);
@@ -62,6 +103,30 @@ protected:
 			if (Candidate->IsValidLowLevelFast() && Candidate->IsA(ExpectedFlags))
 			{
 				if (Matches == SecondMatch)
+					return Candidate;
+				++Matches;
+			}
+		}
+
+		return nullptr;
+	}
+
+	UProperty* FindChildProperty(int32 WhichMatch = 0) const
+	{
+		if (!this)
+			return nullptr;
+
+		int32 Matches = 0;
+
+		for (uintptr_t Off = 0x38; Off <= 0xA0; Off += sizeof(void*))
+		{
+			UProperty* Candidate = *reinterpret_cast<UProperty**>((uintptr_t)this + Off);
+			if (!Candidate)
+				continue;
+
+			if (Candidate->IsValidLowLevelFast() && Candidate->IsA(CASTCLASS_FProperty) && Candidate->GetOuter() == (UObject*)this)
+			{
+				if (Matches == WhichMatch)
 					return Candidate;
 				++Matches;
 			}
@@ -183,17 +248,18 @@ public:
 
 class UArrayProperty : public UProperty {
 public:
-
+	UProperty* GetInner() const { return FindChildProperty(0); }
 };
 
 class UMapProperty : public UProperty {
 public:
-
+	UProperty* GetKeyProp() const { return FindChildProperty(0); }
+	UProperty* GetValueProp() const { return FindChildProperty(1); }
 };
 
 class USetProperty : public UProperty {
 public:
-
+	UProperty* GetElementProp() const { return FindChildProperty(0); }
 };
 
 class UStructProperty : public UProperty {
@@ -213,8 +279,9 @@ public:
 
 class UEnumProperty : public UProperty {
 public:
-	// The UEnum this property represents.
 	UEnum* GetEnum() const { return (UEnum*)FindDerivedObjectMember(CASTCLASS_UEnum); }
+
+	UProperty* GetUnderlyingProp() const { return FindChildProperty(0); }
 };
 
 using FField = UField;

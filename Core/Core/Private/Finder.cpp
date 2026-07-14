@@ -312,6 +312,29 @@ uintptr_t Finder::FindStaticLoadObject() {
 	return ServerOffsets::StaticLoadObject;
 }
 
+uintptr_t Finder::FindStaticConstructObject_Internal() {
+	if (ServerOffsets::StaticConstructObject_Internal)
+		return ServerOffsets::StaticConstructObject_Internal;
+	uintptr_t Addr = 0;
+
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"STAT_ConstructObject");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
+	}
+
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("4C 89 44 24 ? 53 55 56 57 41 54 41 56 41 57 48 81 EC").Get();
+	}
+
+	if (Addr)
+	{
+		ServerOffsets::StaticConstructObject_Internal = Addr - ImageBase;
+	}
+
+	Log("StaticConstructObject_Internal found at: 0x" + std::format("{:X}", ServerOffsets::StaticConstructObject_Internal));
+	return ServerOffsets::StaticConstructObject_Internal;
+}
+
 uintptr_t Finder::FindUEngine_CreateNetDriver() {
 	if (ServerOffsets::UEngine_CreateNetDriver)
 		return ServerOffsets::UEngine_CreateNetDriver;
@@ -1284,36 +1307,6 @@ uintptr_t Finder::FindUObjectBaseUtility_GetNativeInterfaceAddress() {
 
 	Log("UObjectBaseUtility::GetNativeInterfaceAddress found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_GetNativeInterfaceAddress));
 	return ServerOffsets::UObjectBaseUtility_GetNativeInterfaceAddress;
-}
-
-uintptr_t Finder::FindUObjectBaseUtility_GetOutermost() {
-	if (ServerOffsets::UObjectBaseUtility_GetOutermost)
-		return ServerOffsets::UObjectBaseUtility_GetOutermost;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 8B 41 ? 48 85 C0 74 ? 0F 1F 80 ? ? ? ? 48 8B C8").Get();
-
-	if (Addr) {
-		ServerOffsets::UObjectBaseUtility_GetOutermost = Addr - ImageBase;
-	}
-
-	Log("UObjectBaseUtility::GetOutermost found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_GetOutermost));
-	return ServerOffsets::UObjectBaseUtility_GetOutermost;
-}
-
-uintptr_t Finder::FindUObjectBaseUtility_GetPathName() {
-	if (ServerOffsets::UObjectBaseUtility_GetPathName)
-		return ServerOffsets::UObjectBaseUtility_GetPathName;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 57 48 83 EC ? 49 8B F8").Get();
-
-	if (Addr) {
-		ServerOffsets::UObjectBaseUtility_GetPathName = Addr - ImageBase;
-	}
-
-	Log("UObjectBaseUtility::GetPathName found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_GetPathName));
-	return ServerOffsets::UObjectBaseUtility_GetPathName;
 }
 
 uintptr_t Finder::FindUObjectBaseUtility_IsDefaultSubobject() {
@@ -11294,7 +11287,6 @@ void Finder::SetupOffsets() {
 	FindAFortInventory_GetInventoryUsed();
 	FindAFortInventory_GetInventoryCapacity();
 
-	FindUObjectBaseUtility_GetPathName();
 
 	FindUFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid();
 	FindUFortKismetLibrary_GetWeaponStatsRow();
@@ -11445,6 +11437,8 @@ void Finder::SetupOffsets() {
 	FindAFortGameStateAthena_SetCurrentPlaylistId();
 
 	FindAFortGameModeAthena_OnGivenMatchAssignmentVFT();
+
+	FindStaticConstructObject_Internal();
 
 	return;
 }

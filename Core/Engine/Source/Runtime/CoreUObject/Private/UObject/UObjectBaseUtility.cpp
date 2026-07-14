@@ -2,6 +2,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectBaseUtility.h"
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/Package.h"
 
 FString UObjectBaseUtility::GetPathName(const UObject* StopOuter) const
 {
@@ -12,14 +13,43 @@ FString UObjectBaseUtility::GetPathName(const UObject* StopOuter) const
 
 void UObjectBaseUtility::GetPathName(const UObject* StopOuter, FString& ResultString) const
 {
-	void (*GetPathNameInternal)(const UObjectBaseUtility*, const UObject*, FString&) = decltype(GetPathNameInternal)(ImageBase + Finder::FindUObjectBaseUtility_GetPathName());
-	GetPathNameInternal(this, StopOuter, ResultString);
+	if (this != (const UObjectBaseUtility*)StopOuter && this != nullptr)
+	{
+		UObject* ObjOuter = GetOuter();
+		if (ObjOuter && ObjOuter != StopOuter)
+		{
+			ObjOuter->GetPathName(StopOuter, ResultString);
+
+			if (ObjOuter->GetClass() != UPackage::StaticClass()
+				&& ObjOuter->GetOuter()
+				&& ObjOuter->GetOuter()->GetClass() == UPackage::StaticClass())
+			{
+				ResultString += FString(":");
+			}
+			else
+			{
+				ResultString += FString(".");
+			}
+		}
+
+		ResultString += GetName();
+	}
+	else
+	{
+		ResultString += FString("None");
+	}
 }
 
 UPackage* UObjectBaseUtility::GetOutermost() const
 {
-	UPackage* (*GetOutermostInternal)(const UObjectBaseUtility*) = decltype(GetOutermostInternal)(ImageBase + Finder::FindUObjectBaseUtility_GetOutermost());
-	return GetOutermostInternal(this);
+	UObject* Top = (UObject*)this;
+
+	while (Top && Top->GetOuter())
+	{
+		Top = Top->GetOuter();
+	}
+
+	return (UPackage*)Top;
 }
 
 UObject* UObjectBaseUtility::GetTypedOuter(UClass* Target) const

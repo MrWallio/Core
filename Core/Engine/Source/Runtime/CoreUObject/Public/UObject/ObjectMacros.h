@@ -190,6 +190,84 @@ enum class EInternalObjectFlags : int32
 	RootSet = 1 << 30,
 };
 
+enum EFunctionFlags : uint32
+{
+	FUNC_None = 0x00000000,
+
+	FUNC_Final = 0x00000001,
+	FUNC_RequiredAPI = 0x00000002,
+	FUNC_BlueprintAuthorityOnly = 0x00000004,
+	FUNC_BlueprintCosmetic = 0x00000008,
+	FUNC_Net = 0x00000040,
+	FUNC_NetReliable = 0x00000080,
+	FUNC_NetRequest = 0x00000100,
+	FUNC_Exec = 0x00000200,
+	FUNC_Native = 0x00000400,
+	FUNC_Event = 0x00000800,
+	FUNC_NetResponse = 0x00001000,
+	FUNC_Static = 0x00002000,
+	FUNC_NetMulticast = 0x00004000,
+	FUNC_UbergraphFunction = 0x00008000,
+	FUNC_MulticastDelegate = 0x00010000,
+	FUNC_Public = 0x00020000,
+	FUNC_Private = 0x00040000,
+	FUNC_Protected = 0x00080000,
+	FUNC_Delegate = 0x00100000,
+	FUNC_NetServer = 0x00200000,
+	FUNC_HasOutParms = 0x00400000,
+	FUNC_HasDefaults = 0x00800000,
+	FUNC_NetClient = 0x01000000,
+	FUNC_DLLImport = 0x02000000,
+	FUNC_BlueprintCallable = 0x04000000,
+	FUNC_BlueprintEvent = 0x08000000,
+	FUNC_BlueprintPure = 0x10000000,
+	FUNC_EditorOnly = 0x20000000,
+	FUNC_Const = 0x40000000,
+	FUNC_NetValidate = 0x80000000,
+};
+
+inline EFunctionFlags operator|(EFunctionFlags A, EFunctionFlags B) { return (EFunctionFlags)((uint32)A | (uint32)B); }
+
+enum EClassFlags : uint32
+{
+	CLASS_None = 0x00000000,
+
+	CLASS_Abstract = 0x00000001,
+	CLASS_DefaultConfig = 0x00000002,
+	CLASS_Config = 0x00000004,
+	CLASS_Transient = 0x00000008,
+	CLASS_Parsed = 0x00000010,
+	CLASS_MatchedSerializers = 0x00000020,
+	CLASS_ProjectUserConfig = 0x00000040,
+	CLASS_Native = 0x00000080,
+	CLASS_NoExport = 0x00000100,
+	CLASS_NotPlaceable = 0x00000200,
+	CLASS_PerObjectConfig = 0x00000400,
+	CLASS_ReplicationDataIsSetUp = 0x00000800,
+	CLASS_EditInlineNew = 0x00001000,
+	CLASS_CollapseCategories = 0x00002000,
+	CLASS_Interface = 0x00004000,
+	CLASS_CustomConstructor = 0x00008000,
+	CLASS_Const = 0x00010000,
+	CLASS_LayoutChanging = 0x00020000,
+	CLASS_CompiledFromBlueprint = 0x00040000,
+	CLASS_MinimalAPI = 0x00080000,
+	CLASS_RequiredAPI = 0x00100000,
+	CLASS_DefaultToInstanced = 0x00200000,
+	CLASS_TokenStreamAssembled = 0x00400000,
+	CLASS_HasInstancedReference = 0x00800000,
+	CLASS_Hidden = 0x01000000,
+	CLASS_Deprecated = 0x02000000,
+	CLASS_HideDropDown = 0x04000000,
+	CLASS_GlobalUserConfig = 0x08000000,
+	CLASS_Intrinsic = 0x10000000,
+	CLASS_Constructed = 0x20000000,
+	CLASS_NeedsDeferredDependencyLoading = 0x40000000,
+	CLASS_NewerVersionExists = 0x80000000,
+};
+
+inline EClassFlags operator|(EClassFlags A, EClassFlags B) { return (EClassFlags)((uint32)A | (uint32)B); }
+
 #define DefineCustomProperty(PropertyType, PropertyName, Offset) \
 public: \
     FORCEINLINE PropertyType& _Get##PropertyName() { \
