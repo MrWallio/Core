@@ -130,6 +130,10 @@ public:
 
 	DefineUProperty(AGameStateBase*, GameState);
 
+	DefineUProperty(TArray<ULevel*>, Levels);
+
+	DefineUProperty(UDemoNetDriver*, DemoNetDriver);
+
 	DefineUProperty(TArray<FLevelCollection>, LevelCollections);
 
 	DefineUProperty(AGameNetworkManager*, NetworkManager);
@@ -161,6 +165,15 @@ public:
 
 	class AWorldSettings* K2_GetWorldSettings();
 	class AWorldSettings* GetWorldSettings(bool bCheckStreamingPersistent = false, bool bChecked = true) const;
+
+	FORCEINLINE TArray<ULevel*> GetLevels() const { return Levels; }
+
+	template<class T>
+	FORCEINLINE T* GetGameState() const { return Cast<T>(GameState); }
+
+	FORCEINLINE AGameStateBase* GetGameState() const { return GameState; }
+
+	FORCEINLINE UDemoNetDriver* GetDemoNetDriver() const { return DemoNetDriver; }
 
 	ULevel* GetCurrentLevelPendingVisibility() const { return CurrentLevelPendingVisibility; }
 

@@ -82,6 +82,14 @@ public:
 
 	DefineUProperty(int32, MaxClientRate);
 
+	DefineUProperty(int32, NetServerMaxTickRate);
+
+	DefineUProperty(float, ConnectionTimeout);
+
+	DefineUProperty(float, InitialConnectTimeout);
+
+	DefineUProperty(float, KeepAliveTime);
+
 	/** Amount of time a server will wait before traveling to next map, gives clients time to receive final RPCs on existing level @see NextSwitchCountdown */
 	DefineUProperty(float, ServerTravelPause);
 

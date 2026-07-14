@@ -3,6 +3,7 @@
 #include "Core/Public/Finder.h"
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
 #include "Engine/Source/Runtime/Core/Public/Serialization/BitWriter.h"
 #include "Engine/Source/Runtime/Core/Public/Misc/NetworkGuid.h"
 
@@ -12,6 +13,8 @@ struct FStringAssetReference;
 class FNetworkGUID;
 
 class UPackageMap : public UObject {
+public:
+	DefineUnrealClass(UPackageMap);
 public:
 	bool WriteObject(FArchive& Ar, UObject* InOuter, FNetworkGUID NetGUID, FString ObjName)
 	{

@@ -21,7 +21,7 @@ public:
 
 	DefineUProperty(uint8, MaxSplitscreensPerConnection);
 
-	DefineUProperty(bool, bRequiresPushToTalk);
+	DefineBitfieldUProperty(bRequiresPushToTalk);
 
 	DefineUProperty(FName, SessionName);
 public:

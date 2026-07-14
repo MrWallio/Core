@@ -63,6 +63,8 @@ public:
 
 	DefineUProperty(UPackageMap*, PackageMap);
 
+	DefineUProperty(int32, MaxPacket);
+
 	DefineCustomProperty(float, LastRecvAckTime, ServerOffsets::UNetConnection__LastRecvAckTime);
 
 	DefineUProperty(TArray<UChannel*>, OpenChannels);

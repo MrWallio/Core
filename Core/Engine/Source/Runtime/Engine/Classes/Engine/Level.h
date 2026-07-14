@@ -37,9 +37,6 @@ class ULevel : public UObject {
 public:
 	DefineUnrealClass(ULevel);
 
-	/** Array of all actors in this level, used by FActorIteratorBase and derived classes */
-	DefineUProperty(TArray<AActor*>, Actors);
-
 	/**
 	 * The World that has this level in its Levels array.
 	 * This is not the same as GetOuter(), because GetOuter() for a streaming level is a vestigial world that is not used.
@@ -57,6 +54,8 @@ public:
 
 	DefineBitfieldUProperty(bLocked);
 public:
+	TArray<AActor*> GetActors() const;
+
 	bool IsPersistentLevel() const;
 
 	bool HasVisibilityChangeRequestPending() const;

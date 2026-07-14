@@ -3,6 +3,20 @@
 
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h"
+
+TArray<AActor*> ULevel::GetActors() const
+{
+	TArray<AActor*> Result;
+	for (AActor* Actor : TObjectRange<AActor>())
+	{
+		if (Actor->GetOuter() == this)
+		{
+			Result.Add(Actor);
+		}
+	}
+	return Result;
+}
 
 bool ULevel::IsPersistentLevel() const
 {
