@@ -2,7 +2,7 @@
 #include "pch.h"
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
-#include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
 
 class AActor;
 class UActorComponent;
@@ -14,16 +14,14 @@ class UPrimitiveComponent;
 class UActorComponent : public UObject {
 public:
 	DefineUnrealClass(UActorComponent);
+
+	DefineUProperty(TArray<FName>, ComponentTags);
+	DefineBitfieldUProperty(bReplicates);
+	DefineBitfieldUProperty(bAutoActivate);
+	DefineBitfieldUProperty(bIsActive);
 public:
-	AActor* GetOwner() const;
+	FORCEINLINE AActor* GetOwner() const { return GetTypedOuter<AActor>(); }
+
+	FORCEINLINE bool IsActive() const { return bIsActive; }
+	FORCEINLINE bool GetIsReplicated() const { return bReplicates; }
 };
-
-FORCEINLINE AActor* UActorComponent::GetOwner() const
-{
-	static UFunction* Func = nullptr;
-
-	if (Func == nullptr)
-		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetOwner"));
-
-	return const_cast<UActorComponent*>(this)->Call<AActor*>(Func);
-}

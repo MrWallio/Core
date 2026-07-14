@@ -6,4 +6,6 @@
 class APlayerStart : public ANavigationObjectBase {
 public:
 	DefineUnrealClass(APlayerStart);
+
+	DefineUProperty(FName, PlayerStartTag);
 };

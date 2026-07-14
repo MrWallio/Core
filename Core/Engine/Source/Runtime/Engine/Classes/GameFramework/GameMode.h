@@ -42,14 +42,10 @@ public:
 
 	void Say(const FString& Msg);
 
-	FName GetMatchState() const {
-		static UFunction* Func = nullptr;
+	FORCEINLINE FName GetMatchState() const { return MatchState; }
 
-		if (Func == nullptr)
-			Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"GetMatchState"));
-
-		return const_cast<AGameMode*>(this)->Call<FName>(Func);
-	}
+	FORCEINLINE int32 GetNumPlayers() const { return NumPlayers; }
+	FORCEINLINE int32 GetNumSpectators() const { return NumSpectators; }
 
 	bool IsMatchInProgress() const;
 

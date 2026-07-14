@@ -25,8 +25,17 @@ public:
 	DefineUProperty(TSubclassOf<APawn>, DefaultPawnClass);
 	DefineUProperty(TSubclassOf<APlayerController>, PlayerControllerClass);
 	DefineUProperty(TSubclassOf<APlayerState>, PlayerStateClass);
+	DefineUProperty(TSubclassOf<AGameStateBase>, GameStateClass);
+	DefineUProperty(TSubclassOf<AHUD>, HUDClass);
+	DefineUProperty(TSubclassOf<ASpectatorPawn>, SpectatorClass);
+	DefineUProperty(FString, OptionsString);
 
 	DefineBitfieldUProperty(bUseSeamlessTravel);
+	DefineBitfieldUProperty(bStartPlayersAsSpectators);
+	DefineBitfieldUProperty(bPauseable);
+public:
+	template<class T>
+	FORCEINLINE T* GetGameState() const { return Cast<T>(GameState); }
 public:
 	APawn* SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot);
 

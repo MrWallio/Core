@@ -17,4 +17,15 @@ struct FAnimMontageInstance;
 class ACharacter : public APawn {
 public:
 	DefineUnrealClass(ACharacter);
+
+	DefineUProperty(USkeletalMeshComponent*, Mesh);
+	DefineUProperty(UCharacterMovementComponent*, CharacterMovement);
+	DefineUProperty(UCapsuleComponent*, CapsuleComponent);
+	DefineUProperty(float, CrouchedEyeHeight);
+	DefineUProperty(uint8, ReplicatedMovementMode);
+	DefineBitfieldUProperty(bIsCrouched);
+public:
+	FORCEINLINE USkeletalMeshComponent* GetMesh() const { return Mesh; }
+	FORCEINLINE UCharacterMovementComponent* GetCharacterMovement() const { return CharacterMovement; }
+	FORCEINLINE UCapsuleComponent* GetCapsuleComponent() const { return CapsuleComponent; }
 };

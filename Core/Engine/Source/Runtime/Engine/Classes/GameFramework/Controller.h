@@ -19,7 +19,10 @@ public:
 public:
 	DefineUProperty(APlayerState*, PlayerState);
 	DefineUProperty(APawn*, Pawn);
+	DefineUProperty(ACharacter*, Character);
 	DefineUProperty(FName, StateName);
+	DefineUProperty(FRotator, ControlRotation);
+	DefineBitfieldUProperty(bAttachToPawn);
 public:
 	void Possess(APawn* InPawn);
 	void PossessVFT(APawn* InPawn);
@@ -27,7 +30,16 @@ public:
 	void UnPossess();
 	void UnPossessVFT();
 
-	APawn* K2_GetPawn() const;
+	FORCEINLINE APawn* GetPawn() const { return Pawn; }
+	template<class T>
+	FORCEINLINE T* GetPawn() const { return Cast<T>(Pawn); }
+
+	FORCEINLINE APawn* K2_GetPawn() const { return Pawn; }
+
+	template<class T>
+	FORCEINLINE T* GetPlayerState() const { return Cast<T>(PlayerState); }
+
+	bool IsPlayerController() const;
 
 	AActor* GetViewTarget() const;
 

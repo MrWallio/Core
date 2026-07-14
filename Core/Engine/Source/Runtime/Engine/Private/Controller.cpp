@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Controller.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 
 void AController::Possess(APawn* InPawn)
 {
@@ -51,14 +52,9 @@ void AController::UnPossessVFT()
 	UnPossessInternal(this);
 }
 
-APawn* AController::K2_GetPawn() const
+bool AController::IsPlayerController() const
 {
-	static UFunction* Func = nullptr;
-
-	if (Func == nullptr)
-		Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"K2_GetPawn"));
-
-	return const_cast<AController*>(this)->Call<APawn*>(Func);
+	return IsA<APlayerController>();
 }
 
 AActor* AController::GetViewTarget() const

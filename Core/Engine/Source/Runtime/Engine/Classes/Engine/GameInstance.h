@@ -16,7 +16,7 @@ public:
 
 	DefineUProperty(TArray<ULocalPlayer*>, LocalPlayers);
 	DefineUProperty(UOnlineSession*, OnlineSession);
-	DefineUProperty(TArray<UObject>, ReferencedObjects);
+	DefineUProperty(TArray<UObject*>, ReferencedObjects);
 public:
 	APlayerController* GetFirstLocalPlayerController(const UWorld* World = nullptr) const;
 

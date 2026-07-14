@@ -34,6 +34,14 @@ public:
 	DefineUProperty(FVector, LastSpectatorSyncLocation);
 	DefineUProperty(FRotator, LastSpectatorSyncRotation);
 	DefineUProperty(APlayerCameraManager*, PlayerCameraManager);
+	DefineUProperty(UPlayer*, Player);
+	DefineUProperty(APawn*, AcknowledgedPawn);
+	DefineUProperty(ASpectatorPawn*, SpectatorPawn);
+	DefineUProperty(AHUD*, MyHUD);
+public:
+	FORCEINLINE ASpectatorPawn* GetSpectatorPawn() const { return SpectatorPawn; }
+	FORCEINLINE AHUD* GetHUD() const { return MyHUD; }
+	FORCEINLINE APawn* GetAcknowledgedPawn() const { return AcknowledgedPawn; }
 public:
 	static inline void (*ServerAcknowledgePossessionOG)(APlayerController* This, APawn* P);
 	void ServerAcknowledgePossession(APawn* P);

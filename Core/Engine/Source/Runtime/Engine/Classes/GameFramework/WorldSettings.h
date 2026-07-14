@@ -47,4 +47,14 @@ public:
 	DefineUnrealClass(AWorldSettings);
 
 	DefineUProperty(TArray<FNetViewer>, ReplicationViewers);
+	DefineUProperty(float, KillZ);
+	DefineUProperty(float, WorldGravityZ);
+	DefineUProperty(float, GlobalGravityZ);
+	DefineUProperty(float, TimeDilation);
+	DefineUProperty(float, MatineeTimeDilation);
+	DefineBitfieldUProperty(bGlobalGravitySet);
+	DefineBitfieldUProperty(bHighPriorityLoading);
+public:
+	FORCEINLINE float GetGravityZ() const { return bGlobalGravitySet ? GlobalGravityZ : WorldGravityZ; }
+	FORCEINLINE float GetEffectiveTimeDilation() const { return TimeDilation * (_HasMatineeTimeDilation() ? MatineeTimeDilation : 1.f); }
 };

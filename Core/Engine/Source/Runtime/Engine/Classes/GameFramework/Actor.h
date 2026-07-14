@@ -20,6 +20,8 @@ class UActorChannel;
 class UChildActorComponent;
 class UNetDriver;
 class UPrimitiveComponent;
+class USceneComponent;
+class UActorComponent;
 struct FAttachedActorInfo;
 struct FNetViewer;
 struct FNetworkObjectInfo;
@@ -32,39 +34,33 @@ class AActor : public UObject {
 public:
 	DefineUnrealClass(AActor);
 
-	/** Set when actor is about to be deleted. */
 	DefineBitfieldUProperty(bActorIsBeingDestroyed);
-
 	DefineBitfieldUProperty(bTearOff);
-
 	DefineUProperty(AActor*, Owner);
-
 	DefineUProperty(FName, NetDriverName);
-
 	DefineUProperty(ENetDormancy, NetDormancy);
-
 	DefineBitfieldUProperty(bNetStartup);
-
 	DefineUProperty(float, NetUpdateFrequency);
-
 	DefineUProperty(float, MinNetUpdateFrequency);
-
 	DefineUProperty(int32, NetTag);
-
 	DefineBitfieldUProperty(bOnlyRelevantToOwner);
-
 	DefineBitfieldUProperty(bAlwaysRelevant);
-
 	DefineBitfieldUProperty(bAllowReceiveTickEventOnDedicatedServer);
-
 	DefineCustomProperty(float, CreationTime, ServerOffsets::AActor__CreationTime);
-
 	DefineBitfieldUProperty(bReplicates);
-
 	DefineUProperty(TArray<FName>, Tags);
-
 	DefineUProperty(FGameplayTagContainer, StaticGameplayTags);
 	DefineUProperty(uint8, Role);
+	DefineUProperty(USceneComponent*, RootComponent);
+	DefineUProperty(APawn*, Instigator);
+	DefineBitfieldUProperty(bHidden);
+public:
+	FORCEINLINE bool HasAuthority() const { return Role == ROLE_Authority; }
+	FORCEINLINE ENetRole GetLocalRole() const { return (ENetRole)Role; }
+
+	FORCEINLINE USceneComponent* GetRootComponent() const { return RootComponent; }
+	FORCEINLINE APawn* GetInstigator() const { return Instigator; }
+	FORCEINLINE bool IsHidden() const { return bHidden; }
 public:
 	static inline ENetMode(*InternalGetNetModeOG)(AActor* This);
 	static ENetMode InternalGetNetMode(AActor* This);
