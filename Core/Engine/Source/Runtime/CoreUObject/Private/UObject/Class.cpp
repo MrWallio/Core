@@ -60,6 +60,20 @@ uintptr_t UStruct::GetPropertyOffset(std::string InName) const
 	return Prop->Offset_Internal;
 }
 
+bool UStruct::IsChildOf(const UStruct* SomeBase) const
+{
+	if (!SomeBase)
+		return false;
+
+	for (const UStruct* Struct = this; Struct; Struct = Struct->SuperStruct)
+	{
+		if (Struct == SomeBase)
+			return true;
+	}
+
+	return false;
+}
+
 int64 UEnum::GetValue(const char* EnumMemberName) const
 {
 	if (!this)

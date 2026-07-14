@@ -105,17 +105,7 @@ public:
 
 	static uintptr_t FindUObjectBaseUtility_GetPathName();
 
-	static uintptr_t FindUObjectBaseUtility_GetTypedOuter();
-
 	static uintptr_t FindUObjectBaseUtility_IsDefaultSubobject();
-
-	static uintptr_t FindUObjectBaseUtility_IsIn();
-
-	static uintptr_t FindUObjectBaseUtility_IsInA();
-
-	static uintptr_t FindUObjectBaseUtility_IsTemplate();
-
-	static uintptr_t FindUObjectBaseUtility_MarkPackageDirty();
 
 	static uintptr_t FindUObject_BeginDestroy();
 
@@ -138,8 +128,6 @@ public:
 	static uintptr_t FindUField_GetOwnerStruct();
 
 	static uintptr_t FindUStruct_FindPropertyByName();
-
-	static uintptr_t FindUStruct_IsChildOf();
 
 	static uintptr_t FindUClass_FindFunctionByName();
 

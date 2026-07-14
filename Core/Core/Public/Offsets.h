@@ -71,12 +71,7 @@ namespace ServerOffsets {
 	inline uintptr_t UObjectBaseUtility_GetNativeInterfaceAddress = 0;
 	inline uintptr_t UObjectBaseUtility_GetOutermost = 0;
 	inline uintptr_t UObjectBaseUtility_GetPathName = 0;
-	inline uintptr_t UObjectBaseUtility_GetTypedOuter = 0;
 	inline uintptr_t UObjectBaseUtility_IsDefaultSubobject = 0;
-	inline uintptr_t UObjectBaseUtility_IsIn = 0;
-	inline uintptr_t UObjectBaseUtility_IsInA = 0;
-	inline uintptr_t UObjectBaseUtility_IsTemplate = 0;
-	inline uintptr_t UObjectBaseUtility_MarkPackageDirty = 0;
 
 	inline uintptr_t UObject_BeginDestroy = 0;
 	inline uintptr_t UObject_FinishDestroy = 0;
@@ -94,7 +89,6 @@ namespace ServerOffsets {
 	inline uintptr_t UField_GetOwnerStruct = 0;
 
 	inline uintptr_t UStruct_FindPropertyByName = 0;
-	inline uintptr_t UStruct_IsChildOf = 0;
 
 	inline uintptr_t UStruct__SuperStruct = 0;
 	inline uintptr_t UStruct__Children = 0;

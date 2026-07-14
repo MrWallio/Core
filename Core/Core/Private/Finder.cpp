@@ -1316,21 +1316,6 @@ uintptr_t Finder::FindUObjectBaseUtility_GetPathName() {
 	return ServerOffsets::UObjectBaseUtility_GetPathName;
 }
 
-uintptr_t Finder::FindUObjectBaseUtility_GetTypedOuter() {
-	if (ServerOffsets::UObjectBaseUtility_GetTypedOuter)
-		return ServerOffsets::UObjectBaseUtility_GetTypedOuter;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 8B 49 ? 4C 8B D2 33 C0").Get();
-
-	if (Addr) {
-		ServerOffsets::UObjectBaseUtility_GetTypedOuter = Addr - ImageBase;
-	}
-
-	Log("UObjectBaseUtility::GetTypedOuter found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_GetTypedOuter));
-	return ServerOffsets::UObjectBaseUtility_GetTypedOuter;
-}
-
 uintptr_t Finder::FindUObjectBaseUtility_IsDefaultSubobject() {
 	if (ServerOffsets::UObjectBaseUtility_IsDefaultSubobject)
 		return ServerOffsets::UObjectBaseUtility_IsDefaultSubobject;
@@ -1344,66 +1329,6 @@ uintptr_t Finder::FindUObjectBaseUtility_IsDefaultSubobject() {
 
 	Log("UObjectBaseUtility::IsDefaultSubobject found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_IsDefaultSubobject));
 	return ServerOffsets::UObjectBaseUtility_IsDefaultSubobject;
-}
-
-uintptr_t Finder::FindUObjectBaseUtility_IsIn() {
-	if (ServerOffsets::UObjectBaseUtility_IsIn)
-		return ServerOffsets::UObjectBaseUtility_IsIn;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 8B 41 ? 48 85 C0 74 ? 0F 1F 80 ? ? ? ? 48 3B C2").Get();
-
-	if (Addr) {
-		ServerOffsets::UObjectBaseUtility_IsIn = Addr - ImageBase;
-	}
-
-	Log("UObjectBaseUtility::IsIn found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_IsIn));
-	return ServerOffsets::UObjectBaseUtility_IsIn;
-}
-
-uintptr_t Finder::FindUObjectBaseUtility_IsInA() {
-	if (ServerOffsets::UObjectBaseUtility_IsInA)
-		return ServerOffsets::UObjectBaseUtility_IsInA;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 85 C9 74 ? 4C 63 42").Get();
-
-	if (Addr) {
-		ServerOffsets::UObjectBaseUtility_IsInA = Addr - ImageBase;
-	}
-
-	Log("UObjectBaseUtility::IsInA found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_IsInA));
-	return ServerOffsets::UObjectBaseUtility_IsInA;
-}
-
-uintptr_t Finder::FindUObjectBaseUtility_IsTemplate() {
-	if (ServerOffsets::UObjectBaseUtility_IsTemplate)
-		return ServerOffsets::UObjectBaseUtility_IsTemplate;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 85 C9 74 ? 85 51").Get();
-
-	if (Addr) {
-		ServerOffsets::UObjectBaseUtility_IsTemplate = Addr - ImageBase;
-	}
-
-	Log("UObjectBaseUtility::IsTemplate found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_IsTemplate));
-	return ServerOffsets::UObjectBaseUtility_IsTemplate;
-}
-
-uintptr_t Finder::FindUObjectBaseUtility_MarkPackageDirty() {
-	if (ServerOffsets::UObjectBaseUtility_MarkPackageDirty)
-		return ServerOffsets::UObjectBaseUtility_MarkPackageDirty;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("40 56 48 83 EC ? 8B 41 ? 48 8B F1 C1 E8 ? A8 ? 0F 85 ? ? ? ? 48 8B 41").Get();
-
-	if (Addr) {
-		ServerOffsets::UObjectBaseUtility_MarkPackageDirty = Addr - ImageBase;
-	}
-
-	Log("UObjectBaseUtility::MarkPackageDirty found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBaseUtility_MarkPackageDirty));
-	return ServerOffsets::UObjectBaseUtility_MarkPackageDirty;
 }
 
 uintptr_t Finder::FindUObject_BeginDestroy() {

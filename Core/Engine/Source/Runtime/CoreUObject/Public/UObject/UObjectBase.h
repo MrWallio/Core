@@ -31,6 +31,32 @@ public:
 	{
 		return NamePrivate;
 	}
+	FORCEINLINE int32 GetInternalIndex() const
+	{
+		return InternalIndex;
+	}
+
+public:
+	FORCEINLINE EObjectFlags GetFlags() const
+	{
+		return ObjectFlags;
+	}
+	FORCEINLINE void SetFlags(EObjectFlags NewFlags)
+	{
+		ObjectFlags |= NewFlags;
+	}
+	FORCEINLINE void ClearFlags(EObjectFlags FlagsToClear)
+	{
+		ObjectFlags &= ~FlagsToClear;
+	}
+	FORCEINLINE bool HasAnyFlags(EObjectFlags FlagsToCheck) const
+	{
+		return (ObjectFlags & FlagsToCheck) != 0;
+	}
+	FORCEINLINE bool HasAllFlags(EObjectFlags FlagsToCheck) const
+	{
+		return (ObjectFlags & FlagsToCheck) == FlagsToCheck;
+	}
 public:
 	void** VTable;
 
@@ -70,6 +96,12 @@ public:
 		return IsA(T::StaticClass()) ? (T*)this : nullptr;
 	}
 
+	template<typename T>
+	inline bool IsA() const
+	{
+		return IsA(T::StaticClass());
+	}
+
 	bool IsDefaultObject() const
 	{
 		return (ObjectFlags & EObjectFlags::RF_ClassDefaultObject);
@@ -77,3 +109,9 @@ public:
 
 	UProperty* FindPropertyByName(FName InName) const;
 };
+
+static_assert(offsetof(UObjectBase, ObjectFlags) == 0x8, "UObjectBase::ObjectFlags must sit at 0x8 to match the engine");
+static_assert(offsetof(UObjectBase, InternalIndex) == 0xC, "UObjectBase::InternalIndex must sit at 0xC to match the engine");
+static_assert(offsetof(UObjectBase, ClassPrivate) == 0x10, "UObjectBase::ClassPrivate must sit at 0x10 to match the engine");
+static_assert(offsetof(UObjectBase, NamePrivate) == 0x18, "UObjectBase::NamePrivate must sit at 0x18 to match the engine");
+static_assert(offsetof(UObjectBase, OuterPrivate) == 0x20, "UObjectBase::OuterPrivate must sit at 0x20 to match the engine");

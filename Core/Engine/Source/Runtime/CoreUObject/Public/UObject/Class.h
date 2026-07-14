@@ -65,6 +65,8 @@ public:
 public:
     UProperty* FindPropertyByName(FName InName) const;
     uintptr_t GetPropertyOffset(std::string InName) const;
+
+    bool IsChildOf(const UStruct* SomeBase) const;
 public:
     UField* GetChildrenOrChildProperties() const
     {
@@ -78,7 +80,7 @@ public:
 	{
 		if (!Base)
 			return false;
-        if (!SuperStruct) 
+        if (!SuperStruct)
 			return false;
 
 		for (const UStruct* Struct = this; Struct; Struct = Struct->SuperStruct)
@@ -88,6 +90,25 @@ public:
 		}
 
 		return false;
+	}
+
+	template<typename FuncType>
+	void ForEachProperty(FuncType Fn) const
+	{
+		for (const UStruct* Struct = this; Struct; Struct = Struct->SuperStruct)
+		{
+			for (UField* Field = Struct->GetChildrenOrChildProperties(); Field; Field = Field->Next)
+			{
+				Fn((UProperty*)Field);
+			}
+		}
+	}
+
+	int32 GetPropertiesCount() const
+	{
+		int32 Count = 0;
+		ForEachProperty([&Count](UProperty*) { ++Count; });
+		return Count;
 	}
 };
 
