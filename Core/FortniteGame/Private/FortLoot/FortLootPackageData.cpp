@@ -76,9 +76,8 @@ TArray<FFortLootPackageData*> FFortLootPackageData::GetLootPackages(
 
 		auto& LPRowMap = LP->RowMap;
 
-		for (int i = 0; i < LPRowMap.Elements.Num(); i++)
+		for (auto& CurrentLP : LPRowMap)
 		{
-			auto& CurrentLP = LPRowMap.Elements[i];
 			auto LootPackage = (FFortLootPackageData*)CurrentLP.Value();
 
 			if (!LootPackage)
@@ -155,9 +154,8 @@ TArray<FFortLootPackageData*> FFortLootPackageData::GetCandidateLootPackages(
 
 			auto& LPRowMap = LootPackageDataTables[i]->RowMap;
 
-			for (int j = 0; j < LPRowMap.Elements.Num(); j++)
+			for (auto& CurrentLP : LPRowMap)
 			{
-				auto& CurrentLP = LPRowMap.Elements[j];
 				auto* LootPackage = (FFortLootPackageData*)CurrentLP.Value();
 
 				if (!LootPackage || LootPackage->Weight == 0)

@@ -43,25 +43,14 @@ void UFortQuestManager::SendCustomStatEvent(UFortQuestManager* This, FDataTableR
 			if (!Objective.ObjectiveStatHandle.RowName.IsNone()
 				&& ObjectiveStatTable == ObjectiveStatHandle.DataTable
 				&& ObjectiveStatRowName == ObjectiveStatHandle.RowName) {
-				for (int32 j = 0; j < ObjectiveStatHandle.DataTable->RowMap.Num(); j++) {
-					auto& Row = ObjectiveStatHandle.DataTable->RowMap[j];
+				uint8* const* RowPtr = ObjectiveStatHandle.DataTable->RowMap.Find(ObjectiveStatHandle.RowName);
+				if (RowPtr && *RowPtr) {
+					FFortQuestObjectiveStatTableRow* Value = (FFortQuestObjectiveStatTableRow*)*RowPtr;
 
-					FName& Key = Row.Key();
-					if (Key != ObjectiveStatHandle.RowName) {
-						continue;
+					if (SourceTags.HasAll(Value->SourceTagContainer)
+						&& ContextTags.HasAll(Value->ContextTagContainer)) {
+						This->ProgressQuest(QuestItem, Objective.BackendName, Count);
 					}
-
-					FFortQuestObjectiveStatTableRow* Value = (FFortQuestObjectiveStatTableRow*)Row.Value();
-
-					if (!SourceTags.HasAll(Value->SourceTagContainer)) {
-						continue;
-					}
-
-					if (!ContextTags.HasAll(Value->ContextTagContainer)) {
-						continue;
-					}
-
-					This->ProgressQuest(QuestItem, Objective.BackendName, Count);
 				}
 			}
 		}
@@ -120,34 +109,16 @@ void UFortQuestManager::SendStatEvent(
 
 			FDataTableRowHandle ObjectiveStatHandle = Objective.ObjectiveStatHandle;
 			if (!Objective.ObjectiveStatHandle.RowName.IsNone() && ObjectiveStatHandle.DataTable) {
-				for (int32 j = 0; j < ObjectiveStatHandle.DataTable->RowMap.Num(); j++) {
-					auto& Row = ObjectiveStatHandle.DataTable->RowMap[j];
+				uint8* const* RowPtr = ObjectiveStatHandle.DataTable->RowMap.Find(ObjectiveStatHandle.RowName);
+				if (RowPtr && *RowPtr) {
+					FFortQuestObjectiveStatTableRow* Value = (FFortQuestObjectiveStatTableRow*)*RowPtr;
 
-					FName& Key = Row.Key();
-
-					if (Key != ObjectiveStatHandle.RowName) {
-						continue;
+					if (Value->Type == InType
+						&& InTargetTags->HasAll(Value->TargetTagContainer)
+						&& InSourceTags->HasAll(Value->SourceTagContainer)) {
+						/* InContextTags->HasAll(Value->ContextTagContainer) intentionally not checked */
+						This->ProgressQuest(QuestItem, Objective.BackendName, InCount);
 					}
-
-					FFortQuestObjectiveStatTableRow* Value = (FFortQuestObjectiveStatTableRow*)Row.Value();
-
-					if (Value->Type != InType) {
-						continue;
-					}
-
-					if (!InTargetTags->HasAll(Value->TargetTagContainer)) {
-						continue;
-					}
-
-					if (!InSourceTags->HasAll(Value->SourceTagContainer)) {
-						continue;
-					}
-
-					/*if (!InContextTags->HasAll(Value->ContextTagContainer)) {
-						continue;
-					}*/
-
-					This->ProgressQuest(QuestItem, Objective.BackendName, InCount);
 				}
 			}
 		}

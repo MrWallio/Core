@@ -13,19 +13,10 @@ FFortBaseWeaponStats* UFortWeaponItemDefinition::GetWeaponStats() const {
 	auto DataTable = WeaponStatHandle.DataTable;
 	auto RowName = WeaponStatHandle.RowName;
 
-	auto& RowMap = DataTable->RowMap;
-
-	for (int i = 0; i < RowMap.Num(); i++)
+	uint8* const* RowPtr = DataTable->RowMap.Find(RowName);
+	if (RowPtr && *RowPtr)
 	{
-		auto& Pair = RowMap[i];
-
-		FName CurrentRowName = Pair.Key();
-		FFortRangedWeaponStats* PackageData = (FFortRangedWeaponStats*)Pair.Value();
-
-		if (CurrentRowName == RowName && PackageData)
-		{
-			return PackageData;
-		}
+		return (FFortBaseWeaponStats*)*RowPtr;
 	}
 
 	Log("UFortWeaponItemDefinition::GetWeaponStats: Row not found in DataTable or PackageData is null.");
