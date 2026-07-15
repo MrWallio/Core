@@ -59,6 +59,14 @@ public:
 
 	DefineUProperty(FGameplayAbilitySpecContainer, ActivatableAbilities);
 	DefineUProperty(AActor*, AvatarActor);
+	DefineUProperty(AActor*, OwnerActor);
+public:
+	FORCEINLINE AActor* GetAvatarActor_Direct() const { return AvatarActor; }
+	FORCEINLINE AActor* GetOwnerActor() const { return OwnerActor; }
+
+	FORCEINLINE FGameplayAbilitySpecContainer& GetActivatableAbilities() { return ActivatableAbilities; }
+
+	static UAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool bLookForComponent = true);
 public:
 	void ClientActivateAbilityFailed(FGameplayAbilitySpecHandle AbilityToActivate, int16 PredictionKey);
 

@@ -13,5 +13,11 @@ struct FGameplayEffectContextHandle {
 public:
 	DefineUnrealStruct(FGameplayEffectContextHandle);
 public:
+	FGameplayEffectContextHandle() {}
+
+	bool IsValid() const { return Data.IsValid(); }
+
+	FGameplayEffectContext* Get() const { return Data.Get(); }
+public:
 	TSharedPtr<FGameplayEffectContext> Data;
 };

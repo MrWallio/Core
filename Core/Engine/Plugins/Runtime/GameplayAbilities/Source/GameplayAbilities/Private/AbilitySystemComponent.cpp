@@ -4,6 +4,17 @@
 #include "../Public/Abilities/GameplayAbility.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 
+UAbilitySystemComponent* UAbilitySystemComponent::GetAbilitySystemComponentFromActor(const AActor* Actor, bool bLookForComponent)
+{
+	if (!Actor)
+		return nullptr;
+
+	if (bLookForComponent)
+		return Actor->FindComponentByClass<UAbilitySystemComponent>();
+
+	return nullptr;
+}
+
 void UAbilitySystemComponent::ClientActivateAbilityFailed(FGameplayAbilitySpecHandle AbilityToActivate, int16 PredictionKey) {
 	static UFunction* Func = nullptr;
 

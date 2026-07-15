@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/Actor.h"
 
 struct FGameplayAttributeData {
 public:
@@ -30,4 +31,6 @@ public:
 class UAttributeSet : public UObject {
 public:
 	DefineUnrealClass(UAttributeSet);
+public:
+	FORCEINLINE AActor* GetOwningActor() const { return GetTypedOuter<AActor>(); }
 };

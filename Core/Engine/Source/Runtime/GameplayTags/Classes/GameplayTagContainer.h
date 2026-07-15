@@ -4,12 +4,11 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
 
+struct FGameplayTagContainer;
+
 enum class EGameplayContainerMatchType : uint8
 {
-	//	Means the filter is populated by any tag matches in this container.
 	Any,
-
-	//	Means the filter is only populated if all of the tags in this container match.
 	All
 };
 
@@ -17,12 +16,15 @@ struct FGameplayTag {
 public:
 	DefineUnrealStruct(FGameplayTag);
 public:
-	/** Constructors */
 	FGameplayTag()
 	{
 	}
 
-	/** Operators */
+	explicit FGameplayTag(FName InTagName)
+		: TagName(InTagName)
+	{
+	}
+
 	inline bool operator==(FGameplayTag const& Other) const
 	{
 		return TagName == Other.TagName;
@@ -33,36 +35,49 @@ public:
 		return TagName != Other.TagName;
 	}
 
-	/**
-	 * Determine if TagToCheck is valid and exactly matches this tag
-	 * "A.1".MatchesTagExact("A") will return False
-	 * If TagToCheck is not Valid it will always return False
-	 *
-	 * @return True if TagToCheck is Valid and is exactly this tag
-	 */
 	inline bool MatchesTagExact(const FGameplayTag& TagToCheck) const
 	{
 		if (!TagToCheck.IsValid())
 		{
 			return false;
 		}
-		// Only check explicit tag list
 		return TagName == TagToCheck.TagName;
 	}
 
-	/** Returns whether the tag is valid or not; Invalid tags are set to NAME_None and do not exist in the game-specific global dictionary */
-	inline bool IsValid() const
+	bool MatchesTag(const FGameplayTag& TagToCheck) const
 	{
-		return (TagName.ToString().ToString() != "None");
+		if (!TagToCheck.IsValid() || !IsValid())
+		{
+			return false;
+		}
+
+		if (TagName == TagToCheck.TagName)
+		{
+			return true;
+		}
+
+		FString ThisName = TagName.ToString();
+		FString ParentName = TagToCheck.TagName.ToString();
+
+		return ThisName.Len() > ParentName.Len()
+			&& ThisName[ParentName.Len()] == L'.'
+			&& ThisName.StartsWith(ParentName, ESearchCase::IgnoreCase);
 	}
 
-	/** Displays gameplay tag as a string for blueprint graph usage */
+	bool MatchesAny(const FGameplayTagContainer& ContainerToCheck) const;
+
+	bool MatchesAnyExact(const FGameplayTagContainer& ContainerToCheck) const;
+
+	inline bool IsValid() const
+	{
+		return TagName != FName();
+	}
+
 	inline FString ToString() const
 	{
 		return TagName.ToString();
 	}
 
-	/** Get the tag represented as a name */
 	inline FName GetTagName() const
 	{
 		return TagName;
@@ -75,7 +90,6 @@ struct FGameplayTagContainer {
 public:
 	DefineUnrealStruct(FGameplayTagContainer);
 public:
-	/** Constructors */
 	FGameplayTagContainer()
 	{
 	}
@@ -85,23 +99,25 @@ public:
 		*this = Other;
 	}
 
+	explicit FGameplayTagContainer(const FGameplayTag& Tag)
+	{
+		AddTag(Tag);
+	}
+
 	~FGameplayTagContainer()
 	{
 	}
 
-	/** Returns the number of explicitly added tags */
 	inline int32 Num() const
 	{
 		return GameplayTags.Num();
 	}
 
-	/** Returns whether the container has any valid tags */
 	inline bool IsValid() const
 	{
 		return GameplayTags.Num() > 0;
 	}
 
-	/** Returns true if container is empty */
 	inline bool IsEmpty() const
 	{
 		return GameplayTags.Num() == 0;
@@ -136,6 +152,26 @@ public:
 		ParentTags.Reset();
 	}
 
+	bool HasTag(const FGameplayTag& TagToCheck) const
+	{
+		if (!TagToCheck.IsValid())
+		{
+			return false;
+		}
+
+		return GameplayTags.Contains(TagToCheck) || ParentTags.Contains(TagToCheck);
+	}
+
+	bool HasTagExact(const FGameplayTag& TagToCheck) const
+	{
+		if (!TagToCheck.IsValid())
+		{
+			return false;
+		}
+
+		return GameplayTags.Contains(TagToCheck);
+	}
+
 	bool HasAny(const FGameplayTagContainer& ContainerToCheck) const
 	{
 		if (ContainerToCheck.IsEmpty())
@@ -145,6 +181,22 @@ public:
 		for (const FGameplayTag& OtherTag : ContainerToCheck.GameplayTags)
 		{
 			if (GameplayTags.Contains(OtherTag) || ParentTags.Contains(OtherTag))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool HasAnyExact(const FGameplayTagContainer& ContainerToCheck) const
+	{
+		if (ContainerToCheck.IsEmpty())
+		{
+			return false;
+		}
+		for (const FGameplayTag& OtherTag : ContainerToCheck.GameplayTags)
+		{
+			if (GameplayTags.Contains(OtherTag))
 			{
 				return true;
 			}
@@ -183,8 +235,102 @@ public:
 		}
 		return true;
 	}
+
+	void AddTag(const FGameplayTag& TagToAdd)
+	{
+		if (TagToAdd.IsValid())
+		{
+			GameplayTags.AddUnique(TagToAdd);
+			AddParentsForTag(TagToAdd);
+		}
+	}
+
+	void AddTagFast(const FGameplayTag& TagToAdd)
+	{
+		GameplayTags.Add(TagToAdd);
+		AddParentsForTag(TagToAdd);
+	}
+
+	bool RemoveTag(const FGameplayTag& TagToRemove)
+	{
+		for (int32 Index = 0; Index < GameplayTags.Num(); ++Index)
+		{
+			if (GameplayTags[Index] == TagToRemove)
+			{
+				GameplayTags.RemoveAt(Index);
+				FillParentTags();
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void AppendTags(const FGameplayTagContainer& Other)
+	{
+		for (const FGameplayTag& OtherTag : Other.GameplayTags)
+		{
+			GameplayTags.AddUnique(OtherTag);
+		}
+		for (const FGameplayTag& OtherParentTag : Other.ParentTags)
+		{
+			ParentTags.AddUnique(OtherParentTag);
+		}
+	}
+protected:
+	void AddParentsForTag(const FGameplayTag& Tag)
+	{
+		std::string TagString = Tag.TagName.ToString().ToString();
+
+		size_t DotPos = TagString.rfind('.');
+		while (DotPos != std::string::npos)
+		{
+			TagString = TagString.substr(0, DotPos);
+
+			std::wstring WideTagString(TagString.begin(), TagString.end());
+			FGameplayTag ParentTag(UKismetStringLibrary::Conv_StringToName(WideTagString.c_str()));
+			ParentTags.AddUnique(ParentTag);
+
+			DotPos = TagString.rfind('.');
+		}
+	}
+
+	void FillParentTags()
+	{
+		ParentTags.Reset();
+		for (const FGameplayTag& Tag : GameplayTags)
+		{
+			AddParentsForTag(Tag);
+		}
+	}
 public:
 	TArray<FGameplayTag> GameplayTags;
 
 	TArray<FGameplayTag> ParentTags;
 };
+
+inline bool FGameplayTag::MatchesAny(const FGameplayTagContainer& ContainerToCheck) const
+{
+	for (const FGameplayTag& OtherTag : ContainerToCheck.GameplayTags)
+	{
+		if (MatchesTag(OtherTag))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+inline bool FGameplayTag::MatchesAnyExact(const FGameplayTagContainer& ContainerToCheck) const
+{
+	if (!IsValid())
+	{
+		return false;
+	}
+
+	return ContainerToCheck.GameplayTags.Contains(*this);
+}
+
+static_assert(sizeof(FGameplayTag) == 0x8, "FGameplayTag layout broke: single FName expected (0x8)");
+static_assert(sizeof(FGameplayTagContainer) == 0x20, "FGameplayTagContainer layout broke: GameplayTags + ParentTags arrays expected (0x20)");
