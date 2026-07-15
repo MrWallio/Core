@@ -11,6 +11,10 @@ public:
 
 	DefineUProperty(APlayerController*, PCOwner);
 	DefineUProperty(float, DefaultFOV);
+	DefineUProperty(float, ViewPitchMin);
+	DefineUProperty(float, ViewPitchMax);
+	DefineUProperty(float, ViewYawMin);
+	DefineUProperty(float, ViewYawMax);
 	DefineUProperty(float, ViewRollMin);
 	DefineUProperty(float, ViewRollMax);
 public:

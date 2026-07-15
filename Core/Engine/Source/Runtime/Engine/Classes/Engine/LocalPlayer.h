@@ -7,6 +7,7 @@
 class AActor;
 class FSceneView;
 class UGameInstance;
+class UGameViewportClient;
 class ULocalPlayer;
 struct FMinimalViewInfo;
 struct FSceneViewProjectionData;
@@ -14,4 +15,8 @@ struct FSceneViewProjectionData;
 class ULocalPlayer : public UPlayer {
 public:
 	DefineUnrealClass(ULocalPlayer);
+
+	DefineUProperty(UGameViewportClient*, ViewportClient);
+public:
+	FORCEINLINE UGameViewportClient* GetViewportClient() const { return ViewportClient; }
 };

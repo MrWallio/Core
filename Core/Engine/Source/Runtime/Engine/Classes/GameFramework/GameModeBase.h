@@ -35,7 +35,7 @@ public:
 	DefineBitfieldUProperty(bPauseable);
 public:
 	template<class T>
-	FORCEINLINE T* GetGameState() const { return Cast<T>(GameState); }
+	FORCEINLINE T* GetGameState() const { return ::Cast<T>(GameState); }
 public:
 	APawn* SpawnDefaultPawnFor(AController* NewPlayer, AActor* StartSpot);
 

@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "PrimitiveComponent.h"
+#include "Engine/Source/Runtime/Engine/Classes/Materials/MaterialInterface.h"
 
 class UMaterialInterface;
 

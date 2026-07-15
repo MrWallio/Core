@@ -9,7 +9,7 @@
 #include "Engine/Plugins/Online/OnlineSubsystemUtils/Source/OnlineSubsystemUtils/Public/OnlineBeaconClient.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/HitResult.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h"
-#include "Engine/Source/Runtime/Engine/Classes/Components/ActorComponent.h"
+#include "Engine/Source/Runtime/Engine/Classes/Components/SceneComponent.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 
@@ -19,6 +19,14 @@ float AActor::GetGameTimeSinceCreation() const
 		return MyWorld->TimeSeconds - CreationTime;
 
 	return 0.f;
+}
+
+FVector AActor::GetVelocity() const
+{
+	if (USceneComponent* Root = GetRootComponent())
+		return Root->ComponentVelocity;
+
+	return FVector(0.f, 0.f, 0.f);
 }
 
 UActorComponent* AActor::FindComponentByClass(UClass* ComponentClass) const

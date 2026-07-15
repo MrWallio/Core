@@ -12,6 +12,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/NoExportTypes.h"
 #include "Engine/Source/Runtime/Core/Public/Math/Rotator.h"
 #include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/LevelStreaming.h"
 
 class ULevel;
 class AController;
@@ -168,8 +169,10 @@ public:
 
 	FORCEINLINE TArray<ULevel*> GetLevels() const { return Levels; }
 
+	FORCEINLINE UGameInstance* GetGameInstance() const { return OwningGameInstance; }
+
 	template<class T>
-	FORCEINLINE T* GetGameState() const { return Cast<T>(GameState); }
+	FORCEINLINE T* GetGameState() const { return ::Cast<T>(GameState); }
 
 	FORCEINLINE AGameStateBase* GetGameState() const { return GameState; }
 
@@ -180,6 +183,8 @@ public:
 	ULevel* GetCurrentLevelPendingInvisibility() const { return CurrentLevelPendingInvisibility; }
 
 	class ULevel* GetCurrentLevel() const;
+
+	APlayerController* GetFirstPlayerController() const;
 
 	bool IsInSeamlessTravel();
 

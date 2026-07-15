@@ -32,12 +32,14 @@ public:
 
 	FORCEINLINE APawn* GetPawn() const { return Pawn; }
 	template<class T>
-	FORCEINLINE T* GetPawn() const { return Cast<T>(Pawn); }
+	FORCEINLINE T* GetPawn() const { return ::Cast<T>(Pawn); }
+
+	FORCEINLINE ACharacter* GetCharacter() const { return Character; }
 
 	FORCEINLINE APawn* K2_GetPawn() const { return Pawn; }
 
 	template<class T>
-	FORCEINLINE T* GetPlayerState() const { return Cast<T>(PlayerState); }
+	FORCEINLINE T* GetPlayerState() const { return ::Cast<T>(PlayerState); }
 
 	bool IsPlayerController() const;
 

@@ -26,6 +26,11 @@ public:
 	DefineUProperty(float, CrouchedEyeHeight);
 	DefineUProperty(uint8, ReplicatedMovementMode);
 	DefineBitfieldUProperty(bIsCrouched);
+	DefineBitfieldUProperty(bPressedJump);
+	DefineUProperty(float, JumpKeyHoldTime);
+	DefineUProperty(float, JumpMaxHoldTime);
+	DefineUProperty(int32, JumpMaxCount);
+	DefineUProperty(int32, JumpCurrentCount);
 public:
 	FORCEINLINE USkeletalMeshComponent* GetMesh() const { return Mesh; }
 	FORCEINLINE UCharacterMovementComponent* GetCharacterMovement() const { return CharacterMovement; }

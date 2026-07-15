@@ -2,6 +2,8 @@
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetSystemLibrary.h"
 
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/NetSerialization.h"
 
 FString UKismetSystemLibrary::GetEngineVersion()
 {
@@ -54,4 +56,22 @@ FTimerHandle UKismetSystemLibrary::K2_SetTimer(UObject* Object, const FString& F
 		Func = StaticClass()->GetFunction("Function /Script/Engine.KismetSystemLibrary.K2_SetTimer");
 
 	return GetDefaultObj()->Call<FTimerHandle>(Func, Object, FunctionName, Time, bLooping);
+}
+
+bool UKismetSystemLibrary::IsDedicatedServer(const UObject* WorldContextObject)
+{
+	UWorld* World = UWorld::GetWorld();
+	return World && World->InternalGetNetMode() == NM_DedicatedServer;
+}
+
+bool UKismetSystemLibrary::IsServer(const UObject* WorldContextObject)
+{
+	UWorld* World = UWorld::GetWorld();
+	return World && World->InternalGetNetMode() != NM_Client;
+}
+
+bool UKismetSystemLibrary::IsStandalone(const UObject* WorldContextObject)
+{
+	UWorld* World = UWorld::GetWorld();
+	return World && World->InternalGetNetMode() == NM_Standalone;
 }

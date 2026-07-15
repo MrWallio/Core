@@ -2,6 +2,8 @@
 #include "pch.h"
 
 #include "SkinnedMeshComponent.h"
+#include "Engine/Source/Runtime/Engine/Classes/Animation/AnimInstance.h"
+#include "Engine/Source/Runtime/Engine/Classes/Animation/AnimMontage.h"
 
 class UAnimInstance;
 class UAnimMontage;

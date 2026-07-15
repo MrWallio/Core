@@ -1,6 +1,10 @@
 #pragma once
 #include "pch.h"
 
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
+#include "Engine/Source/Runtime/Core/Public/Math/Vector.h"
+#include "Engine/Source/Runtime/Core/Public/Math/Rotator.h"
+
 class AActor;
 class UDecalComponent;
 class UPhysicalMaterial;
@@ -122,3 +126,56 @@ namespace ECollisionEnabled
 		QueryAndPhysics,
 	};
 }
+
+enum class ETeleportType : uint8
+{
+	None,
+	TeleportPhysics,
+	ResetPhysics,
+};
+
+namespace EEndPlayReason
+{
+	enum Type
+	{
+		Destroyed,
+		LevelTransition,
+		EndPlayInEditor,
+		RemovedFromWorld,
+		Quit,
+	};
+}
+
+enum ETravelType
+{
+	TRAVEL_Absolute,
+	TRAVEL_Partial,
+	TRAVEL_Relative,
+	TRAVEL_MAX,
+};
+
+namespace EAttachLocation
+{
+	enum Type
+	{
+		KeepRelativeOffset,
+		KeepWorldPosition,
+		SnapToTarget,
+		SnapToTargetIncludingScale = SnapToTarget,
+	};
+}
+
+struct FRepMovement
+{
+public:
+	DefineUnrealStruct(FRepMovement);
+public:
+	uint8 OpaqueStorage[0x80]{};
+public:
+	DefineStructProperty(FVector, LinearVelocity);
+	DefineStructProperty(FVector, AngularVelocity);
+	DefineStructProperty(FVector, Location);
+	DefineStructProperty(FRotator, Rotation);
+	DefineBitfieldStructProperty(bSimulatedPhysicSleep);
+	DefineBitfieldStructProperty(bRepPhysics);
+};

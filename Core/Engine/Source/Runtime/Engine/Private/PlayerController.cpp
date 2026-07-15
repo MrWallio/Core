@@ -1,6 +1,13 @@
 #include "pch.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 
+#include "Engine/Source/Runtime/Engine/Classes/Engine/LocalPlayer.h"
+
+ULocalPlayer* APlayerController::GetLocalPlayer() const
+{
+	return ::Cast<ULocalPlayer>(Player);
+}
+
 void APlayerController::ServerAcknowledgePossession(APawn* P)
 {
 	static UFunction* Func = nullptr;

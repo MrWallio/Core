@@ -3,6 +3,7 @@
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UnrealType.h"
 #include "GameViewportClient.h"
+#include "PendingNetGame.h"
 #include "Engine/Source/Runtime/Net/Core/Public/Net/Core/Connection/NetEnums.h"
 #include "Engine/Source/Runtime/Core/Public/CoreGlobals.h"
 #include "EngineBaseTypes.h"
@@ -37,6 +38,9 @@ class UNetDriver;
 class UTimecodeProvider;
 class UConsole;
 class UWorld;
+class UGameInstance;
+class UAssetManager;
+class AWorldSettings;
 
 struct FNetDriverDefinition
 {
@@ -103,6 +107,26 @@ public:
 
 	DefineUProperty(TSubclassOf<UConsole>, ConsoleClass);
 
+	DefineUProperty(UGameInstance*, GameInstance);
+
+	DefineUProperty(UObject*, GameSingleton);
+
+	DefineUProperty(UAssetManager*, AssetManager);
+
+	DefineUProperty(TSubclassOf<UGameViewportClient>, GameViewportClientClass);
+
+	DefineUProperty(TSubclassOf<ULocalPlayer>, LocalPlayerClass);
+
+	DefineUProperty(TSubclassOf<AWorldSettings>, WorldSettingsClass);
+
+	DefineBitfieldUProperty(bUseFixedFrameRate);
+
+	DefineUProperty(float, FixedFrameRate);
+
+	DefineBitfieldUProperty(bSmoothFrameRate);
+public:
+	FORCEINLINE UGameViewportClient* GetGameViewport() const { return GameViewport; }
+	FORCEINLINE UGameInstance* GetGameInstance() const { return GameInstance; }
 public:
 	static UEngine* GetEngine();
 

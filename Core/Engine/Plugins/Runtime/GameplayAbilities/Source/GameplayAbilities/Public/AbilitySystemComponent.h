@@ -9,6 +9,7 @@
 #include "GameplayAbilitySpec.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "GameplayEffectTypes.h"
+#include "GameplayEffect.h"
 
 class AGameplayAbilityTargetActor;
 class AHUD;

@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "ScriptViewportClient.h"
+#include "Console.h"
 
 class UWorld;
 class UConsole;

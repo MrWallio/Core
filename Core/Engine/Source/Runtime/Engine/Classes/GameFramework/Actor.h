@@ -76,6 +76,18 @@ public:
 	void GetComponents(TArray<UActorComponent*>& OutComponents) const;
 
 	float GetGameTimeSinceCreation() const;
+
+	FVector GetVelocity() const;
+
+	FRepMovement* GetReplicatedMovement()
+	{
+		static int32 Offset = -2;
+		if (Offset == -2)
+			Offset = (int32)StaticClass()->GetPropertyOffset("ReplicatedMovement");
+		if (Offset < 0)
+			return nullptr;
+		return (FRepMovement*)((uint8*)this + Offset);
+	}
 public:
 	static inline ENetMode(*InternalGetNetModeOG)(AActor* This);
 	static ENetMode InternalGetNetMode(AActor* This);

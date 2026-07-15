@@ -22,6 +22,7 @@ class UInterpTrackInstDirector;
 class ULocalMessage;
 class UNetConnection;
 class UPlayer;
+class ULocalPlayer;
 class UPrimitiveComponent;
 struct FActiveHapticFeedbackEffect;
 struct FCollisionQueryParams;
@@ -45,6 +46,8 @@ public:
 	FORCEINLINE AHUD* GetHUD() const { return MyHUD; }
 	FORCEINLINE APawn* GetAcknowledgedPawn() const { return AcknowledgedPawn; }
 	FORCEINLINE APawn* GetPawnOrSpectator() const { return Pawn ? Pawn : reinterpret_cast<APawn*>(GetSpectatorPawn()); }
+
+	ULocalPlayer* GetLocalPlayer() const;
 public:
 	static inline void (*ServerAcknowledgePossessionOG)(APlayerController* This, APawn* P);
 	void ServerAcknowledgePossession(APawn* P);

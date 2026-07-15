@@ -33,10 +33,12 @@ public:
 	DefineBitfieldUProperty(bCanAffectNavigationGeneration);
 public:
 	FORCEINLINE AController* GetController() const { return Controller; }
+	template<class T>
+	FORCEINLINE T* GetController() const { return ::Cast<T>(Controller); }
 
 	FORCEINLINE APlayerState* GetPlayerState() const { return PlayerState; }
 	template<class T>
-	FORCEINLINE T* GetPlayerState() const { return Cast<T>(PlayerState); }
+	FORCEINLINE T* GetPlayerState() const { return ::Cast<T>(PlayerState); }
 
 	FORCEINLINE bool IsPlayerControlled() const { return PlayerState && !PlayerState->bIsABot; }
 	FORCEINLINE bool IsBotControlled() const { return PlayerState && PlayerState->bIsABot; }

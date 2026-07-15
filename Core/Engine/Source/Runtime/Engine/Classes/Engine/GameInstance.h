@@ -18,6 +18,17 @@ public:
 	DefineUProperty(UOnlineSession*, OnlineSession);
 	DefineUProperty(TArray<UObject*>, ReferencedObjects);
 public:
+	ULocalPlayer* GetFirstGamePlayer() const
+	{
+		TArray<ULocalPlayer*>& Players = const_cast<UGameInstance*>(this)->_GetLocalPlayers();
+		return Players.Num() > 0 ? Players[0] : nullptr;
+	}
+
+	int32 GetNumLocalPlayers() const
+	{
+		return const_cast<UGameInstance*>(this)->_GetLocalPlayers().Num();
+	}
+
 	APlayerController* GetFirstLocalPlayerController(const UWorld* World = nullptr) const;
 
 	void CleanupGameViewport();

@@ -57,6 +57,9 @@ bool AController::IsPlayerController() const
 	return IsA<APlayerController>();
 }
 
+template APawn* AController::GetPawn<APawn>() const;
+template APlayerState* AController::GetPlayerState<APlayerState>() const;
+
 AActor* AController::GetViewTarget() const
 {
 	static UFunction* Func = nullptr;

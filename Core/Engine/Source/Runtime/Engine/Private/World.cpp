@@ -6,6 +6,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Engine/Source/Runtime/Core/Public/Math/TransformNonVectorized.h"
 #include "Engine/Source/Runtime/Engine/Classes/AI/Navigation/NavigationSystem.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/GameStateBase.h"
 
 UWorld* UWorld::GetWorld() {
 	if (ServerOffsets::GWorld != 0)
@@ -240,6 +241,13 @@ ULevel* UWorld::GetCurrentLevel() const
 {
 	return PersistentLevel;
 }
+
+APlayerController* UWorld::GetFirstPlayerController() const
+{
+	return UGameplayStatics::GetPlayerController(this, 0);
+}
+
+template AGameStateBase* UWorld::GetGameState<AGameStateBase>() const;
 
 bool UWorld::IsInSeamlessTravel()
 {

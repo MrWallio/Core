@@ -20,4 +20,10 @@ public:
 	static void ExecuteConsoleCommand(UObject* WorldContextObject, const FString& Command, APlayerController* SpecificPlayer);
 
 	static FTimerHandle K2_SetTimer(UObject* Object, const FString& FunctionName, float Time, bool bLooping);
+
+	static bool IsDedicatedServer(const UObject* WorldContextObject);
+
+	static bool IsServer(const UObject* WorldContextObject);
+
+	static bool IsStandalone(const UObject* WorldContextObject);
 };
