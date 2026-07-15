@@ -40,6 +40,8 @@ public:
 
 	FORCEINLINE bool IsPlayerControlled() const { return PlayerState && !PlayerState->bIsABot; }
 	FORCEINLINE bool IsBotControlled() const { return PlayerState && PlayerState->bIsABot; }
+
+	UPawnMovementComponent* GetMovementComponent() const;
 public:
 	void OnRep_PlayerState();
 };

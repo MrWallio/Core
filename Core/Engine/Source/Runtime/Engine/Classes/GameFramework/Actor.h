@@ -10,6 +10,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/NoExportTypes.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/Level.h"
 #include "Engine/Source/Runtime/GameplayTags/Classes/GameplayTagContainer.h"
+#include "Engine/Source/Runtime/Core/Public/Containers/Set.h"
 
 class AActor;
 class AController;
@@ -54,6 +55,7 @@ public:
 	DefineUProperty(USceneComponent*, RootComponent);
 	DefineUProperty(APawn*, Instigator);
 	DefineBitfieldUProperty(bHidden);
+	DefineUProperty(TSet<UActorComponent*>, OwnedComponents);
 public:
 	FORCEINLINE bool HasAuthority() const { return Role == ROLE_Authority; }
 	FORCEINLINE ENetRole GetLocalRole() const { return (ENetRole)Role; }
@@ -63,6 +65,17 @@ public:
 	FORCEINLINE bool IsHidden() const { return bHidden; }
 
 	FORCEINLINE bool ActorHasTag(FName Tag) const { return Tag != FName() && const_cast<AActor*>(this)->Tags.Contains(Tag); }
+
+	UActorComponent* FindComponentByClass(UClass* ComponentClass) const;
+
+	template<class T>
+	FORCEINLINE T* FindComponentByClass() const { return (T*)FindComponentByClass(T::StaticClass()); }
+
+	FORCEINLINE UActorComponent* GetComponentByClass(UClass* ComponentClass) const { return FindComponentByClass(ComponentClass); }
+
+	void GetComponents(TArray<UActorComponent*>& OutComponents) const;
+
+	float GetGameTimeSinceCreation() const;
 public:
 	static inline ENetMode(*InternalGetNetModeOG)(AActor* This);
 	static ENetMode InternalGetNetMode(AActor* This);

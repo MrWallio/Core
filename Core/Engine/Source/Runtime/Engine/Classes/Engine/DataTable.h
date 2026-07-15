@@ -18,22 +18,34 @@ public:
 
 	DefineUProperty(FString, ImportKeyField);
 public:
+	FORCEINLINE UScriptStruct* GetRowStruct() const { return RowStruct; }
+	FORCEINLINE const TMap<FName, uint8*>& GetRowMap() const { return RowMap; }
+	FORCEINLINE TMap<FName, uint8*>& GetRowMap() { return RowMap; }
+
 	template <class T>
 	void GetAllRows(TArray<T*>& OutRowArray) const
 	{
 		if (RowStruct == nullptr)
 		{
 			Log("UDataTable::GetAllRows : DataTable '" + GetPathName().ToString() + "' has no RowStruct specified.");
+			return;
 		}
-		else
+
+		TArray<uint8*> Rows;
+		RowMap.GenerateValueArray(Rows);
+
+		OutRowArray.Reserve(OutRowArray.Num() + Rows.Num());
+		for (int32 i = 0; i < Rows.Num(); ++i)
 		{
-			OutRowArray.Reserve(OutRowArray.Num() + RowMap.Num());
-			for (int i = 0; i < RowMap.Num(); ++i)
-			{
-				auto& Row = RowMap[i];
-				OutRowArray.Add(reinterpret_cast<T*>(Row.Value()));
-			}
+			OutRowArray.Add(reinterpret_cast<T*>(Rows[i]));
 		}
+	}
+
+	TArray<FName> GetRowNames() const
+	{
+		TArray<FName> Keys;
+		RowMap.GenerateKeyArray(Keys);
+		return Keys;
 	}
 
 	/** Function to find the row of a table given its name. */
@@ -52,16 +64,7 @@ public:
 			return nullptr;
 		}
 
-		uint8* const* RowDataPtr = nullptr;
-		for (int i = 0; i < RowMap.Num(); i++)
-		{
-			auto& Row = RowMap[i];
-			if (Row.Key() == RowName)
-			{
-				RowDataPtr = &Row.Value();
-				break;
-			}
-		}
+		uint8* const* RowDataPtr = RowMap.Find(RowName);
 		if (RowDataPtr == nullptr)
 		{
 			if (bWarnIfRowMissing)
@@ -93,24 +96,13 @@ public:
 			return nullptr;
 		}
 
-		uint8* const* RowDataPtr = nullptr;
-		for (int i = 0; i < RowMap.Num(); i++)
-		{
-			auto& Row = RowMap[i];
-			if (Row.Key() == RowName)
-			{
-				RowDataPtr = &Row.Value();
-				break;
-			}
-		}
-
+		uint8* const* RowDataPtr = RowMap.Find(RowName);
 		if (RowDataPtr == nullptr)
 		{
 			return nullptr;
 		}
 
-		uint8* RowData = *RowDataPtr;
-		return RowData;
+		return *RowDataPtr;
 	}
 };
 
@@ -123,6 +115,19 @@ public:
 
 	/** Name of row in the table that we want */
 	FName RowName;
+
+	FORCEINLINE bool IsNull() const { return DataTable == nullptr && RowName == FName(); }
+
+	template <class T>
+	T* GetRow(bool bWarnIfRowMissing = true) const
+	{
+		if (DataTable == nullptr)
+		{
+			return nullptr;
+		}
+
+		return DataTable->FindRow<T>(RowName, bWarnIfRowMissing);
+	}
 };
 
 struct FTableRowBase

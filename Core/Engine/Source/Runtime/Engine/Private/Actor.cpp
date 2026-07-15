@@ -9,6 +9,68 @@
 #include "Engine/Plugins/Online/OnlineSubsystemUtils/Source/OnlineSubsystemUtils/Public/OnlineBeaconClient.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/HitResult.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Engine/Source/Runtime/Engine/Classes/Components/ActorComponent.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h"
+#include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
+
+float AActor::GetGameTimeSinceCreation() const
+{
+	if (UWorld* MyWorld = GetWorld())
+		return MyWorld->TimeSeconds - CreationTime;
+
+	return 0.f;
+}
+
+UActorComponent* AActor::FindComponentByClass(UClass* ComponentClass) const
+{
+	if (!ComponentClass)
+		return nullptr;
+
+	AActor* MutableThis = const_cast<AActor*>(this);
+
+	if (MutableThis->_HasOwnedComponents())
+	{
+		for (UActorComponent* Component : MutableThis->_GetOwnedComponents())
+		{
+			if (Component && Component->IsA(ComponentClass))
+				return Component;
+		}
+
+		return nullptr;
+	}
+
+	for (UActorComponent* Component : TObjectRange<UActorComponent>())
+	{
+		if (Component->GetOwner() == this && Component->IsA(ComponentClass))
+			return Component;
+	}
+
+	return nullptr;
+}
+
+void AActor::GetComponents(TArray<UActorComponent*>& OutComponents) const
+{
+	OutComponents.Reset();
+
+	AActor* MutableThis = const_cast<AActor*>(this);
+
+	if (MutableThis->_HasOwnedComponents())
+	{
+		for (UActorComponent* Component : MutableThis->_GetOwnedComponents())
+		{
+			if (Component)
+				OutComponents.Add(Component);
+		}
+
+		return;
+	}
+
+	for (UActorComponent* Component : TObjectRange<UActorComponent>())
+	{
+		if (Component->GetOwner() == this)
+			OutComponents.Add(Component);
+	}
+}
 
 ENetMode AActor::InternalGetNetMode(AActor* This)
 {
