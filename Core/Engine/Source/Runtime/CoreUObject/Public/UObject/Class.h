@@ -418,35 +418,30 @@ Ret UObject::Call(UFunction* Function, Args&&... args)
     static UClass* StaticClass() \
     { \
         static UClass* CachedStaticClass = nullptr; \
-        static bool bInitialized = false; \
-        if (!bInitialized) \
-        { \
-            bInitialized = true; \
+        if (!CachedStaticClass) \
             CachedStaticClass = (UClass*)FUObjectArray::FindObjectFast(#__Class + 1); \
-        } \
         return CachedStaticClass; \
     } \
     \
     static __Class* GetDefaultObj() \
     { \
         static UObject* CachedDefaultObject = nullptr; \
-        static bool bInitialized = false; \
-        \
-        if (!bInitialized) \
+        if (!CachedDefaultObject) \
         { \
-            bInitialized = true; \
-            CachedDefaultObject = StaticClass()->GetDefaultObj(); \
+            UClass* Class = StaticClass(); \
+            if (Class) \
+                CachedDefaultObject = Class->GetDefaultObj(); \
         } \
-        \
         return (__Class*)CachedDefaultObject; \
     } \
     \
     static int32 GetSize() \
     { \
         static int32 Size = -1; \
-        if (Size == -1) \
+        if (Size <= 0) \
         { \
-            Size = StaticClass()->PropertiesSize; \
+            UClass* Class = StaticClass(); \
+            Size = Class ? Class->PropertiesSize : -1; \
             if (Size <= 0) \
             { \
                 Log("Failed to find size for " #__Class "!"); \
@@ -460,22 +455,18 @@ Ret UObject::Call(UFunction* Function, Args&&... args)
     static UStruct* StaticStruct() \
     { \
         static UStruct* CachedStaticStruct = nullptr; \
-        static bool bInitialized = false; \
-        \
-        if (!bInitialized) \
-        { \
-            bInitialized = true; \
-            CachedStaticStruct = (UStruct*)FUObjectArray::FindObjectFast(#__Class + 1);  \
-        } \
+        if (!CachedStaticStruct) \
+            CachedStaticStruct = (UStruct*)FUObjectArray::FindObjectFast(#__Class + 1); \
         return CachedStaticStruct; \
     } \
     \
     static int32 GetSize() \
     { \
         static int32 Size = -1; \
-        if (Size == -1) \
+        if (Size <= 0) \
         { \
-            Size = StaticStruct()->PropertiesSize; \
+            UStruct* Struct = StaticStruct(); \
+            Size = Struct ? Struct->PropertiesSize : -1; \
             if (Size <= 0) \
             { \
                 Log("Failed to find size for " #__Class "!"); \
@@ -499,22 +490,18 @@ Ret UObject::Call(UFunction* Function, Args&&... args)
     static UStruct* StaticStruct() \
     { \
         static UStruct* CachedStaticStruct = nullptr; \
-        static bool bInitialized = false; \
-        \
-        if (!bInitialized) \
-        { \
-            bInitialized = true; \
+        if (!CachedStaticStruct) \
             CachedStaticStruct = (UStruct*)FUObjectArray::FindObject(FullName, true); \
-        } \
         return CachedStaticStruct; \
     } \
     \
     static int32 GetSize() \
     { \
         static int32 Size = -1; \
-        if (Size == -1) \
+        if (Size <= 0) \
         { \
-            Size = StaticStruct()->PropertiesSize; \
+            UStruct* Struct = StaticStruct(); \
+            Size = Struct ? Struct->PropertiesSize : -1; \
             if (Size <= 0) \
             { \
                 Log("Failed to find size for " #FullName "!"); \
@@ -534,12 +521,7 @@ Ret UObject::Call(UFunction* Function, Args&&... args)
     static UEnum* StaticEnum() \
     { \
         static UEnum* CachedStaticEnum = nullptr; \
-        static bool bInitialized = false; \
-        \
-        if (!bInitialized) \
-        { \
-            bInitialized = true; \
-            CachedStaticEnum = (UEnum*)FUObjectArray::FindObjectFast(#__Class);  \
-        } \
+        if (!CachedStaticEnum) \
+            CachedStaticEnum = (UEnum*)FUObjectArray::FindObjectFast(#__Class); \
         return CachedStaticEnum; \
     }

@@ -52,7 +52,7 @@ void UAbilitySystemComponent::InternalServerTryActivateAbility(UAbilitySystemCom
 		return;
 	}
 
-	if (AbilityToActivate->_HasInstancingPolicy()) {
+	if (AbilityToActivate->_HasNetSecurityPolicy()) {
 		if (AbilityToActivate->NetSecurityPolicy == EGameplayAbilityNetSecurityPolicy::GetServerOnlyExecution() ||
 			AbilityToActivate->NetSecurityPolicy == EGameplayAbilityNetSecurityPolicy::GetServerOnly())
 		{

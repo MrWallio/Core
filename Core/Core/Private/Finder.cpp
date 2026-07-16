@@ -10983,6 +10983,37 @@ uintptr_t Finder::FindAFortGameModeAthena_OnGivenMatchAssignmentVFT() {
 	return ServerOffsets::AFortGameModeAthena_OnGivenMatchAssignmentVFT;
 }
 
+uintptr_t Finder::FindABuildingActor_HandleDamagedVFT() {
+	if (ServerOffsets::ABuildingActor_HandleDamagedVFT)
+		return ServerOffsets::ABuildingActor_HandleDamagedVFT;
+
+	uintptr_t Addr = 0;
+
+	auto StringAddr = Memcury::Scanner::FindStringRef("WeakPointHit");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
+	}
+
+	if (Addr) {
+		void** VFT = ABuildingSMActor::StaticClass()->GetDefaultObject()->VTable;
+
+		for (int i = 0; i < 2048; i++)
+		{
+			if (VFT[i] == (void*)(Addr))
+			{
+				ServerOffsets::ABuildingActor_HandleDamagedVFT = i;
+				break;
+			}
+		}
+	}
+	else {
+		Log("FindABuildingActor_HandleDamagedVFT: Couldnt find Addr!");
+	}
+
+	Log("ABuildingActor_HandleDamagedVFT found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingActor_HandleDamagedVFT));
+	return ServerOffsets::ABuildingActor_HandleDamagedVFT;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -11389,6 +11420,8 @@ void Finder::SetupOffsets() {
 	FindAFortGameModeAthena_OnGivenMatchAssignmentVFT();
 
 	FindStaticConstructObject_Internal();
+
+	FindABuildingActor_HandleDamagedVFT();
 
 	return;
 }

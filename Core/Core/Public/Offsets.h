@@ -34,6 +34,7 @@ namespace ServerOffsets {
 	inline uintptr_t ABuildingActor_OnDamageServer = 0;
 	inline uintptr_t ABuildingActor_PostUpdateVFT = 0;
 	inline uintptr_t ABuildingActor_ServerOnAttemptInteractVFT = 0;
+	inline uintptr_t ABuildingActor_HandleDamagedVFT = 0;
 
 	inline uintptr_t SpawnActor = 0;
 

@@ -88,6 +88,8 @@ DWORD Main(LPVOID)
         }
         Log(std::format("Fortnite CL: {}", Version::Fortnite_CL));
 
+        Sleep(3000);
+
         if (!Config.bListenServer) {
             *GIsClient = false;
         }

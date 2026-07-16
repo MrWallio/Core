@@ -1088,6 +1088,8 @@ public:
 	static uintptr_t FindAActor_PostInitializeComponentsVFT();
 
 	static uintptr_t FindAFortGameModeAthena_OnGivenMatchAssignmentVFT();
+
+	static uintptr_t FindABuildingActor_HandleDamagedVFT();
 public:
 	static void SetupCoreOffsets();
 
