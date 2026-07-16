@@ -6,6 +6,7 @@
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortPawn/FortPlayerPawnAthena.h"
 
 bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* PlayerPawn, uint8 InSourceTypeFlag, uint8 InSpawnSource) {
 	if (!This) {
@@ -20,6 +21,11 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ABuildingContainer::SpawnLoot: World is null!");
+		return false;
+	}
+
+	AFortGameModeZone* GameMode = World->AuthorityGameMode->Cast<AFortGameModeZone>();
+	if (!GameMode) {
 		return false;
 	}
 
@@ -65,6 +71,11 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 				Pickup->PrimaryPickupItemEntry.bIsDirty = true;
 				Pickup->PrimaryPickupItemEntry.ReplicationKey++;
 				Pickup->OnRep_PrimaryPickupItemEntry();
+			}
+		}
+		if (GameMode->AssociatedSubGame == ESubGame::GetCampaign()) {
+			if (PlayerPawn) {
+				PlayerPawn->ServerHandlePickup(PlayerPawn, Pickup, 1.0f, *FVector::Allocate(), true);
 			}
 		}
 	}

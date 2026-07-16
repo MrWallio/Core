@@ -580,12 +580,6 @@ void UFortKismetLibrary::K2_GiveItemToAllPlayers(
 		return;
 	}
 
-	AFortGameModeAthena* GameMode = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
-	if (!GameMode) {
-		Log("UFortKismetLibrary::K2_GiveItemToAllPlayers: Failed to cast AuthorityGameMode to AFortGameModeAthena, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
-		return;
-	}
-
 	Log(
 		"UFortKismetLibrary::K2_GiveItemToAllPlayers: Giving Item: "
 		+ ItemDefinition->GetName().ToString() +
@@ -594,14 +588,13 @@ void UFortKismetLibrary::K2_GiveItemToAllPlayers(
 		+ World->GetName().ToString()
 	);
 
-	for (int i = 0; i < GameMode->AlivePlayers.Num(); i++) {
-		AFortPlayerControllerAthena* PlayerController = GameMode->AlivePlayers[i];
-		if (PlayerController) {
-			PlayerController->WorldInventory->AddItemAndHandleOverflow(ItemDefinition, NumberToGive);
+	for (AFortPlayerController* PlayerController : TObjectRange<AFortPlayerController>())
+	{
+		if (PlayerController->GetWorld() != World) {
+			continue;
 		}
-		else {
-			Log("UFortKismetLibrary::K2_GiveItemToAllPlayers: Failed to get player controller for player at index: " + std::to_string(i));
-		}
+
+		PlayerController->WorldInventory->AddItemAndHandleOverflow(ItemDefinition, NumberToGive);
 	}
 }
 
@@ -707,12 +700,6 @@ void UFortKismetLibrary::K2_RemoveItemFromAllPlayers(
 		return;
 	}
 
-	AFortGameModeAthena* GameMode = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
-	if (!GameMode) {
-		Log("UFortKismetLibrary::K2_RemoveItemFromAllPlayers: Failed to cast AuthorityGameMode to AFortGameModeAthena, AuthorityGameMode: " + World->AuthorityGameMode->GetFullName());
-		return;
-	}
-
 	Log(
 		"UFortKismetLibrary::K2_RemoveItemFromAllPlayers: Removing Item: "
 		+ ItemDefinition->GetName().ToString() +
@@ -721,17 +708,16 @@ void UFortKismetLibrary::K2_RemoveItemFromAllPlayers(
 		+ World->GetName().ToString()
 	);
 
-	for (int i = 0; i < GameMode->AlivePlayers.Num(); i++) {
-		AFortPlayerControllerAthena* PlayerController = GameMode->AlivePlayers[i];
-		if (PlayerController) {
-			PlayerController->WorldInventory->RemoveItem(
-				ItemDefinition,
-				AmountToRemove
-			);
+	for (AFortPlayerController* PlayerController : TObjectRange<AFortPlayerController>())
+	{
+		if (PlayerController->GetWorld() != World) {
+			continue;
 		}
-		else {
-			Log("UFortKismetLibrary::K2_RemoveItemFromAllPlayers: Failed to get player controller for player at index: " + std::to_string(i));
-		}
+
+		PlayerController->WorldInventory->RemoveItem(
+			ItemDefinition,
+			AmountToRemove
+		);
 	}
 }
 

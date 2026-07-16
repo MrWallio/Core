@@ -18,9 +18,9 @@ public:
 	DefineUnrealClass(AFortGameModeZone);
 
 	DefineUProperty(TArray<FItemAndCount>, StartingItems);
-
 	DefineUProperty(AFortAIDirector*, AIDirector);
 	DefineUProperty(AFortAIGoalManager*, AIGoalManager);
+	DefineUProperty(uint8, AssociatedSubGame);
 public:
 	static inline void (*HandleStartingNewPlayerOG)(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer);
 	static void HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer);
