@@ -71,13 +71,15 @@ public:
 
 	int32 FindQuickBarSlotForItem(uint8 QuickBar, FGuid Guid) const;
 
-	void EmptyQuickbarSlot(FGuid Guid);
+	void EmptyQuickbarSlot(FGuid Guid, bool bEquipHarvestingTool = true, bool bFindReplacement = true);
 
 	AFortPlayerController* GetOwnerPlayerController() const;
 
 	void EquipHarvestingTool();
 
-	void AddItemToQuickBar(FGuid Guid, uint8 QuickBar);
+	void AddItemToQuickBar(FGuid Guid, uint8 QuickBar, int32 Slot = -3);
+
+	void Update();
 
 	void OnRep_PrimaryQuickBar();
 

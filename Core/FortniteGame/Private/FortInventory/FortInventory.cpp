@@ -53,6 +53,9 @@ bool AFortInventory::Update(FFortItemEntry* ItemEntry)
 
 	ForceNetUpdate();
 
+	if (PC->IsUsingOldQuickBars() && PC->QuickBars)
+		PC->QuickBars->Update();
+
 	return true;
 }
 
@@ -271,7 +274,7 @@ AFortPlayerController* AFortInventory::GetOwnerPlayerController() const
 	return Owner ? Owner->Cast<AFortPlayerController>() : nullptr;
 }
 
-FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item, bool bDeferUpdate)
+FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item, bool bDeferUpdate, int32 PreferredQuickBarSlot)
 {
 	if (!Item)
 		return nullptr;
@@ -289,7 +292,7 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item, bool bDeferUpdate)
 
 	if (PC->IsUsingOldQuickBars())
 	{
-		PC->QuickBars->AddItemToQuickBar(ItemGuid, Item->ItemEntry.ItemDefinition->GetQuickBarForItem());
+		PC->QuickBars->AddItemToQuickBar(ItemGuid, Item->ItemEntry.ItemDefinition->GetQuickBarForItem(), PreferredQuickBarSlot);
 	}
 
 	FFortItemEntry* RepEntry = FindItemEntry(ItemGuid);
@@ -307,7 +310,7 @@ FFortItemEntry* AFortInventory::AddItem(UFortWorldItem* Item, bool bDeferUpdate)
 	return nullptr;
 }
 
-FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, int32 Level, bool bDeferUpdate)
+FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, int32 Level, bool bDeferUpdate, int32 PreferredQuickBarSlot)
 {
 	if (!CanAddItem(Def, Count))
 		return nullptr;
@@ -319,10 +322,10 @@ FFortItemEntry* AFortInventory::AddItem(UFortItemDefinition* Def, int32 Count, i
 		return nullptr;
 	}
 
-	return AddItem(Item);
+	return AddItem(Item, bDeferUpdate, PreferredQuickBarSlot);
 }
 
-FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry, bool bDeferUpdate)
+FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry, bool bDeferUpdate, int32 PreferredQuickBarSlot)
 {
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC)
@@ -335,7 +338,7 @@ FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry, bool bD
 		return nullptr;
 	}
 
-	FFortItemEntry* RepEntry = AddItem(Def, ItemEntry.Count, ItemEntry.Level);
+	FFortItemEntry* RepEntry = AddItem(Def, ItemEntry.Count, ItemEntry.Level, bDeferUpdate, PreferredQuickBarSlot);
 	if (!RepEntry)
 		return nullptr;
 
@@ -351,7 +354,7 @@ FFortItemEntry* AFortInventory::AddItem(const FFortItemEntry& ItemEntry, bool bD
 	return nullptr;
 }
 
-FFortItemEntry* AFortInventory::AddItemPreserveGuid(const FFortItemEntry& ItemEntry)
+FFortItemEntry* AFortInventory::AddItemPreserveGuid(const FFortItemEntry& ItemEntry, int32 PreferredQuickBarSlot)
 {
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC)
@@ -379,7 +382,7 @@ FFortItemEntry* AFortInventory::AddItemPreserveGuid(const FFortItemEntry& ItemEn
 	InitializeExistingItem(Item);
 
 	if (PC->IsUsingOldQuickBars())
-		PC->QuickBars->AddItemToQuickBar(ItemEntry.ItemGuid, Def->GetQuickBarForItem());
+		PC->QuickBars->AddItemToQuickBar(ItemEntry.ItemGuid, Def->GetQuickBarForItem(), PreferredQuickBarSlot);
 
 	FFortItemEntry* RepEntry = FindItemEntry(ItemEntry.ItemGuid);
 	if (!RepEntry)
@@ -723,57 +726,48 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 	if (!CurrentItemEntry)
 		return nullptr;
 
-	const FFortItemEntry OldItemEntry = *CurrentItemEntry;
-	const FGuid CurrentGuid = CurrentItemEntry->ItemGuid;
-	const int32 CurrentCount = CurrentItemEntry->Count;
-	const uint8 CurrentQuickBar = CurrentItemEntry->ItemDefinition->GetQuickBarForItem();
-	const int32 CurrentSlot = PC->IsUsingOldQuickBars()
-		? PC->QuickBars->FindQuickBarSlotForItem(CurrentQuickBar, CurrentGuid)
-		: PC->ClientQuickBars->FindQuickBarSlotForItem(CurrentQuickBar, CurrentGuid);
-
-	if (PC->IsUsingOldQuickBars())
+	UFortItemDefinition* CurrentItemDef = CurrentItemEntry->ItemDefinition;
+	if (!CurrentItemDef)
 	{
-		PC->QuickBars->EmptyQuickbarSlot(CurrentGuid);
-	}
-
-	for (int32 i = 0; i < Inventory.ReplicatedEntries.Num(); i++)
-	{
-		auto& Entry = Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
-		if (Entry.ItemGuid == CurrentGuid)
-		{
-			Inventory.ReplicatedEntries.RemoveAt(i, FFortItemEntry::GetSize());
-			break;
-		}
-	}
-
-	for (int32 i = 0; i < Inventory.ItemInstances.Num(); i++)
-	{
-		UFortWorldItem* Item = Inventory.ItemInstances[i];
-		if (Item && Item->ItemEntry.ItemGuid == CurrentGuid)
-		{
-			Inventory.ItemInstances.RemoveAt(i);
-			break;
-		}
-	}
-
-	FFortItemEntry* AddedEntry = AddItem(NewItemEntry);
-	if (!AddedEntry)
-	{
-		AddItem(OldItemEntry);
+		Log("AFortInventory::SwapCurrentItem: CurrentItemDef is null!");
 		return nullptr;
 	}
 
-	if (bExecuteItem) {
-		PC->ServerExecuteInventoryItem(PC, AddedEntry->ItemGuid);
-		if (PC->IsUsingOldQuickBars())
-		{
-			PC->QuickBars->EquipItem(AddedEntry->ItemGuid);
-		}
+	const FFortItemEntry OldItemEntry = *CurrentItemEntry;
+	const FGuid CurrentGuid = CurrentItemEntry->ItemGuid;
 
-		PC->ClientExecuteInventoryItem(AddedEntry->ItemGuid, 0.f, true, true);
+	int32 CurrentSlot = -3;
+	const uint8 CurrentQuickBar = CurrentItemDef->GetQuickBarForItem();
+
+	AFortQuickBars* QuickBars = PC->IsUsingOldQuickBars() ? PC->QuickBars : PC->ClientQuickBars;
+
+	const int32 FoundSlot = PC->QuickBars->FindQuickBarSlotForItem(CurrentQuickBar, CurrentGuid);
+	if (FoundSlot != -1)
+		CurrentSlot = FoundSlot;
+
+	if (QuickBars)
+		QuickBars->EmptySlot(CurrentQuickBar, FoundSlot);
+
+	RemoveEntryAndInstance(CurrentGuid);
+
+	FFortItemEntry* AddedEntry = AddItem(NewItemEntry, true, CurrentSlot);
+	if (!AddedEntry)
+	{
+		AddItemPreserveGuid(OldItemEntry, CurrentSlot);
+		return nullptr;
 	}
 
-	if (bSpawnPickup)
+	const bool bUpdated = Update(AddedEntry);
+
+	if (bExecuteItem)
+	{
+		if (AFortPlayerControllerAthena* AthenaPC = PC->Cast<AFortPlayerControllerAthena>())
+			AthenaPC->ClientEquipItem(AddedEntry->ItemGuid);
+		else
+			PC->ClientExecuteInventoryItem(AddedEntry->ItemGuid, 0.f, true, true);
+	}
+
+	if (bSpawnPickup && PC->Pawn)
 	{
 		AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
 			World,
@@ -792,15 +786,18 @@ FFortItemEntry* AFortInventory::SwapCurrentItem(const FFortItemEntry& NewItemEnt
 			false
 		);
 
-		Pickup->PrimaryPickupItemEntry.LoadedAmmo = OldItemEntry.LoadedAmmo;
-		Pickup->PrimaryPickupItemEntry.Durability = OldItemEntry.Durability;
-		Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+		if (Pickup)
+		{
+			Pickup->PrimaryPickupItemEntry.LoadedAmmo = OldItemEntry.LoadedAmmo;
+			Pickup->PrimaryPickupItemEntry.Durability = OldItemEntry.Durability;
+			Pickup->PrimaryPickupItemEntry.bIsDirty = true;
 
-		Pickup->PrimaryPickupItemEntry.ReplicationKey++;
-		Pickup->OnRep_PrimaryPickupItemEntry();
+			Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+			Pickup->OnRep_PrimaryPickupItemEntry();
+		}
 	}
 
-	return Update(AddedEntry) ? AddedEntry : nullptr;
+	return bUpdated ? AddedEntry : nullptr;
 }
 
 bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, bool bAllowSwap, bool bSpawnOverflowPickup)

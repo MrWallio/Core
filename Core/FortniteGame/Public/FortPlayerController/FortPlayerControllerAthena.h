@@ -71,6 +71,8 @@ public:
 
 	void TogglePersonalVehicle(bool bOn);
 
+	void ClientEquipItem(FGuid ItemGuid);
+
 	static void Hook() {
 		UObject* AircraftComp = FUObjectArray::FindObject("Class FortniteGame.FortControllerComponent_Aircraft");
 		if (!AircraftComp) {

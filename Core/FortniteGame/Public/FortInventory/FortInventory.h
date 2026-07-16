@@ -59,11 +59,11 @@ public:
 	// Inventory Mutation
 	// =================================================================
 
-	FFortItemEntry* AddItem(UFortWorldItem* Item, bool bDeferUpdate = false);
-	FFortItemEntry* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0, bool bDeferUpdate = false);
-	FFortItemEntry* AddItem(const FFortItemEntry& ItemEntry, bool bDeferUpdate = false);
+	FFortItemEntry* AddItem(UFortWorldItem* Item, bool bDeferUpdate = false, int32 PreferredQuickBarSlot = -3);
+	FFortItemEntry* AddItem(UFortItemDefinition* Def, int32 Count = 1, int32 Level = 0, bool bDeferUpdate = false, int32 PreferredQuickBarSlot = -3);
+	FFortItemEntry* AddItem(const FFortItemEntry& ItemEntry, bool bDeferUpdate = false, int32 PreferredQuickBarSlot = -3);
 
-	FFortItemEntry* AddItemPreserveGuid(const FFortItemEntry& ItemEntry);
+	FFortItemEntry* AddItemPreserveGuid(const FFortItemEntry& ItemEntry, int32 PreferredQuickBarSlot = -3);
 
 	int32 GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry);
 

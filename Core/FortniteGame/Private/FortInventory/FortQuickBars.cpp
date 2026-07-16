@@ -119,7 +119,7 @@ int32 AFortQuickBars::FindQuickBarSlotForItem(uint8 QuickBar, FGuid Guid) const
 	return -1;
 }
 
-void AFortQuickBars::EmptyQuickbarSlot(FGuid Guid)
+void AFortQuickBars::EmptyQuickbarSlot(FGuid Guid, bool bEquipHarvestingTool, bool bFindReplacement)
 {
 	if (!this) return;
 	if (!Guid.IsValid())
@@ -131,7 +131,7 @@ void AFortQuickBars::EmptyQuickbarSlot(FGuid Guid)
 
 	bool bIsCurrentItem = PC->WorldInventory->IsCurrentItem(Guid);
 
-	ServerRemoveItemInternal(Guid, true, true);
+	ServerRemoveItemInternal(Guid, bFindReplacement, true);
 
 	const int32 PrimarySlotIndex = FindQuickBarSlotForItem(EFortQuickBars::GetPrimary(), Guid);
 	if (PrimarySlotIndex != -1)
@@ -145,7 +145,7 @@ void AFortQuickBars::EmptyQuickbarSlot(FGuid Guid)
 		EmptySlot(EFortQuickBars::GetSecondary(), SecondarySlotIndex);
 	}
 
-	if (bIsCurrentItem)
+	if (bIsCurrentItem && bEquipHarvestingTool)
 	{
 		EquipHarvestingTool();
 	}
@@ -162,13 +162,31 @@ void AFortQuickBars::EquipHarvestingTool() {
 	ServerActivateSlotInternal(EFortQuickBars::GetPrimary(), 0, 0.f, true);
 }
 
-void AFortQuickBars::AddItemToQuickBar(FGuid Guid, uint8 QuickBar)
+void AFortQuickBars::AddItemToQuickBar(FGuid Guid, uint8 QuickBar, int32 Slot)
 {
 	if (!this) return;
 	if (!Guid.IsValid())
 		return;
 
-	ServerAddItemInternal(Guid, QuickBar, -3);
+	ServerAddItemInternal(Guid, QuickBar, Slot);
+}
+
+void AFortQuickBars::Update()
+{
+	if (!this) return;
+
+	AFortPlayerController* PC = GetOwnerPlayerController();
+	if (!PC) {
+		return;
+	}
+
+	OnRep_PrimaryQuickBar();
+	PC->ClientForceUpdateQuickbar(EFortQuickBars::GetPrimary());
+
+	OnRep_SecondaryQuickBar();
+	PC->ClientForceUpdateQuickbar(EFortQuickBars::GetSecondary());
+
+	ForceNetUpdate();
 }
 
 void AFortQuickBars::OnRep_PrimaryQuickBar()
