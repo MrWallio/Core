@@ -11014,6 +11014,28 @@ uintptr_t Finder::FindABuildingActor_HandleDamagedVFT() {
 	return ServerOffsets::ABuildingActor_HandleDamagedVFT;
 }
 
+uintptr_t Finder::FindAFortMission_CreateEncounterSequence() {
+	if (ServerOffsets::AFortMission_CreateEncounterSequence)
+		return ServerOffsets::AFortMission_CreateEncounterSequence;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortMission_CreateEncounterSequence;
+
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"Could not create encounter sequence with given tags: %s, generated sequence not found");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortMission_CreateEncounterSequence = Addr - ImageBase;
+	}
+
+	bInitialized = true;
+	Log("AFortMission_CreateEncounterSequence found at: 0x" + std::format("{:X}", ServerOffsets::AFortMission_CreateEncounterSequence));
+	return ServerOffsets::AFortMission_CreateEncounterSequence;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;

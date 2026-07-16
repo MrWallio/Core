@@ -37,69 +37,96 @@ AFortAIDirector* AFortAIDirector::GetCurrent(UObject* WorldContextObject) {
 }
 
 void AFortAIDirector::Hook() {
-	TArray<uintptr_t> GetCurrentPatchCallSites;
-
 	{
-		uintptr_t Addr = 0;
+		TArray<uintptr_t> GetCurrentPatchCallSites;
 
-		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Could not create encounter sequence with given tags: %s, generated sequence not found").Get();
-		if (StringAddr) {
-			int Skipped = 0;
-			for (int i = 0; i < 1024; i++)
-			{
-				auto Ptr = (uint8_t*)(StringAddr - i);
-				if (*Ptr == 0xE8)
+		{
+			uintptr_t Addr = 0;
+
+			uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Could not create encounter sequence with given tags: %s, generated sequence not found").Get();
+			if (StringAddr) {
+				int Skipped = 0;
+				for (int i = 0; i < 1024; i++)
 				{
-					if (Skipped == 2) {
-						Addr = uint64_t(Ptr);
+					auto Ptr = (uint8_t*)(StringAddr - i);
+					if (*Ptr == 0xE8)
+					{
+						if (Skipped == 2) {
+							Addr = uint64_t(Ptr);
+							break;
+						}
+						Skipped++;
+					}
+				}
+			}
+			else {
+				Log("AFortAIDirector::Hook: string ref for encounter-sequence patch not found");
+			}
+
+			GetCurrentPatchCallSites.Add(Addr);
+		}
+
+		{
+			uintptr_t Addr = 0;
+
+			uintptr_t HandleDamagedVFT = Finder::FindABuildingActor_HandleDamagedVFT();
+			if (HandleDamagedVFT) {
+				uintptr_t HandleDamagedAddr = (uintptr_t)ABuildingActor::StaticClass()->GetDefaultObject()->VTable[HandleDamagedVFT];
+				uintptr_t FunctionEnd = Memcury::Scanner(HandleDamagedAddr).ScanFor({ 0x5D, 0xC3 }).Get();
+
+				for (int i = 0; i < 1024; i++)
+				{
+					auto Cursor = (FunctionEnd - i);
+					if (*(uint8*)(Cursor) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 && *(uint8*)(Cursor + 9) == 0xE8)
+					{
+						Addr = Cursor + 9;
 						break;
 					}
-					Skipped++;
+					else if (*(uint8*)(Cursor) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 && *(uint8*)(Cursor + 9) == 0x38)
+					{
+						Addr = Cursor + 9;
+						break;
+					}
 				}
 			}
+
+			GetCurrentPatchCallSites.Add(Addr);
 		}
-		else {
-			Log("AFortAIDirector::Hook: string ref for encounter-sequence patch not found");
-		}
 
-		GetCurrentPatchCallSites.Add(Addr);
-	}
+		{
+			uintptr_t Addr = 0;
 
-	{
-		uintptr_t Addr = 0;
-
-		uintptr_t HandleDamagedVFT = Finder::FindABuildingActor_HandleDamagedVFT();
-		if (HandleDamagedVFT) {
-			uintptr_t HandleDamagedAddr = (uintptr_t)ABuildingActor::StaticClass()->GetDefaultObject()->VTable[HandleDamagedVFT];
-			uintptr_t FunctionEnd = Memcury::Scanner(HandleDamagedAddr).ScanFor({ 0x5D, 0xC3 }).Get();
-
-			for (int i = 0; i < 1024; i++)
-			{
-				auto Cursor = (FunctionEnd - i);
-				if (*(uint8*)(Cursor) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 && *(uint8*)(Cursor + 9) == 0xE8)
+			uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"StartMissionAIEncounter: No AI Director!").Get();
+			if (StringAddr) {
+				for (int i = 0; i < 2048; i++)
 				{
-					Addr = Cursor + 9;
-					break;
-				}
-				else if (*(uint8*)(Cursor) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 && *(uint8*)(Cursor + 9) == 0x38)
-				{
-					Addr = Cursor + 9;
-					break;
+					auto Cursor = (StringAddr - i);
+					if (*(uint8*)(Cursor + 0) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 &&
+						*(uint8*)(Cursor + 2) == 0x38 && *(uint8*)(Cursor + 3) == 0x01 &&
+						*(uint8*)(Cursor + 6) == 0x48 && *(uint8*)(Cursor + 7) == 0x8B &&
+						*(uint8*)(Cursor + 8) == 0xC8 && *(uint8*)(Cursor + 9) == 0xE8)
+					{
+						Addr = Cursor + 9;
+						break;
+					}
 				}
 			}
+			else {
+				Log("AFortAIDirector::Hook: string ref for StartMissionAIEncounter patch not found");
+			}
+
+			GetCurrentPatchCallSites.Add(Addr);
 		}
 
-		GetCurrentPatchCallSites.Add(Addr);
-	}
-
-	for (int32 i = 0; i < GetCurrentPatchCallSites.Num(); i++) {
-		uintptr_t Patch = GetCurrentPatchCallSites[i];
-		if (Patch) {
-			Log("AFortAIDirector::GetCurrent Patch: 0x" + std::format("{:X}", (Patch - ImageBase)));
-			PatchCallFar(Patch, GetCurrent);
-		}
-		else {
-			Log("Failed to find patch for AFortAIDirector::GetCurrent: Index (" + std::to_string(i) + ")");
+		for (int32 i = 0; i < GetCurrentPatchCallSites.Num(); i++) {
+			uintptr_t Patch = GetCurrentPatchCallSites[i];
+			if (Patch) {
+				Log("AFortAIDirector::GetCurrent Patch: 0x" + std::format("{:X}", (Patch - ImageBase)));
+				PatchCallFar(Patch, GetCurrent);
+			}
+			else {
+				Log("Failed to find patch for AFortAIDirector::GetCurrent: Index (" + std::to_string(i) + ")");
+			}
 		}
 	}
 

@@ -1090,6 +1090,8 @@ public:
 	static uintptr_t FindAFortGameModeAthena_OnGivenMatchAssignmentVFT();
 
 	static uintptr_t FindABuildingActor_HandleDamagedVFT();
+
+	static uintptr_t FindAFortMission_CreateEncounterSequence();
 public:
 	static void SetupCoreOffsets();
 
