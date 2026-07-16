@@ -11445,5 +11445,7 @@ void Finder::SetupOffsets() {
 
 	FindABuildingActor_HandleDamagedVFT();
 
+	FindFOutBunch_Constructor();
+
 	return;
 }

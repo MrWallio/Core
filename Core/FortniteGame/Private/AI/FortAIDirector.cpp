@@ -96,23 +96,61 @@ void AFortAIDirector::Hook() {
 		{
 			uintptr_t Addr = 0;
 
-			uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"StartMissionAIEncounter: No AI Director!").Get();
-			if (StringAddr) {
+			auto StringAddr = Memcury::Scanner::FindStringRef(L"StartMissionAIEncounter: No AI Director!");
+			if (StringAddr.IsValid()) {
+				uintptr_t FunctionStart = StringAddr.FindFunctionStart().Get();
+				int Skipped = 0;
+
 				for (int i = 0; i < 2048; i++)
 				{
-					auto Cursor = (StringAddr - i);
-					if (*(uint8*)(Cursor + 0) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 &&
-						*(uint8*)(Cursor + 2) == 0x38 && *(uint8*)(Cursor + 3) == 0x01 &&
-						*(uint8*)(Cursor + 6) == 0x48 && *(uint8*)(Cursor + 7) == 0x8B &&
-						*(uint8*)(Cursor + 8) == 0xC8 && *(uint8*)(Cursor + 9) == 0xE8)
+					auto Cursor = (FunctionStart + i);
+					if (*(uint8*)(Cursor + 0) == 0xE8)
 					{
-						Addr = Cursor + 9;
-						break;
+						if (Skipped == 1) {
+							Addr = uint64_t(Cursor);
+							break;
+						}
+						Skipped++;
 					}
 				}
 			}
 			else {
 				Log("AFortAIDirector::Hook: string ref for StartMissionAIEncounter patch not found");
+			}
+
+			GetCurrentPatchCallSites.Add(Addr);
+		}
+
+		{
+			uintptr_t Addr = 0;
+
+			UFunction* Fn = (UFunction*)FUObjectArray::FindObject("Function /Script/FortniteGame.FortMission.StopEncounterSequence");
+			if (Fn && Fn->Func) {
+				uintptr_t Impl = 0;
+
+				for (int i = 0; i < 512; i++)
+				{
+					uintptr_t Cursor = (uintptr_t)Fn->Func + i;
+					if (*(uint8*)Cursor == 0xE8)
+						Impl = Cursor + 5 + *(int32*)(Cursor + 1);
+					else if (*(uint8*)Cursor == 0xC3)
+						break;
+				}
+
+				if (Impl) {
+					for (int i = 0; i < 256; i++)
+					{
+						uintptr_t Cursor = Impl + i;
+						if (*(uint8*)(Cursor + 0) == 0xE8)
+						{
+							Addr = uint64_t(Cursor);
+							break;
+						}
+					}
+				}
+			}
+			else {
+				Log("AFortAIDirector::Hook: StopEncounterSequence UFunction not found");
 			}
 
 			GetCurrentPatchCallSites.Add(Addr);
