@@ -40,20 +40,27 @@ int32 UFortItemDefinition::GetMaxStackSize() const
 
 bool UFortItemDefinition::IsStackable() const
 {
-	if (Version::Fortnite_Version > 3.6) {
-		static UFunction* Func = nullptr;
+    if (Version::Fortnite_Version <= 3.6 ||
+        Version::Fortnite_Version == 4.10)
+    {
+        return GetMaxStackSize() > 1;
+    }
 
-		if (Func == nullptr)
-			Func = FindFunction(UKismetStringLibrary::Conv_StringToName(L"IsStackable"));
+    static UFunction* Func = nullptr;
 
-		return const_cast<UFortItemDefinition*>(this)->Call<bool>(Func);
-	}
-	else {
-		if (GetMaxStackSize() > 1)
-			return true;
-	}
+    if (Func == nullptr)
+    {
+        Func = FindFunction(
+            UKismetStringLibrary::Conv_StringToName(L"IsStackable")
+        );
+    }
 
-	return false;
+    if (!Func)
+    {
+        return GetMaxStackSize() > 1;
+    }
+
+    return const_cast<UFortItemDefinition*>(this)->Call<bool>(Func);
 }
 
 uint8 UFortItemDefinition::GetQuickBarForItem() {
