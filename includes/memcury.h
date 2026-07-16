@@ -1268,6 +1268,29 @@ namespace Memcury
                 RFE = reinterpret_cast<RUNTIME_FUNCTION*>(reinterpret_cast<BYTE*>(Scuffness) + sizeof(UNWIND_INFO_HDR) + CodesSize);
             }
         }
+
+        // Mirror of FindFunctionStart: returns the address one-past the last byte of the
+        // function containing the current address, from RUNTIME_FUNCTION::EndAddress.
+        auto FindFunctionEnd() -> Scanner
+        {
+            uintptr_t ImageBase = Memcury::PE::GetModuleBase();
+
+            RUNTIME_FUNCTION* RFE = RtlLookupFunctionEntry(_address.Get(), &ImageBase, nullptr);
+            if (!RFE)
+                return *this;
+
+            while (true)
+            {
+                auto* Scuffness = reinterpret_cast<UNWIND_INFO_HDR*>(ImageBase + RFE->UnwindData);
+                BYTE Flags = Scuffness->VersionFlags >> 3;
+
+                if (!(Flags & UNW_FLAG_CHAININFO))
+                    return Scanner(ImageBase + RFE->EndAddress);
+
+                DWORD CodesSize = ((Scuffness->CountOfCodes + 1) & ~1) * sizeof(WORD);
+                RFE = reinterpret_cast<RUNTIME_FUNCTION*>(reinterpret_cast<BYTE*>(Scuffness) + sizeof(UNWIND_INFO_HDR) + CodesSize);
+            }
+        }
     };
 
     /* Bad don't use it tbh... */
@@ -1683,6 +1706,125 @@ inline uintptr_t FindWideString(const wchar_t* target)
     }
 
     return 0;
+}
+
+// --- ICF-folded return-null stub callsite analysis ---------------------------------------------
+// A stripped function compiled to `return nullptr` shares one address with every identical stub
+// (Identical COMDAT Folding), so it can't be found by body or by xref. These helpers recover such a
+// stub from one known callsite and recognise its genuine callers by their surrounding code.
+
+// A trivial `return nullptr` stub body (the shared, folded target).
+inline bool IsReturnNullStub(uintptr_t Addr)
+{
+    if (!Addr)
+        return false;
+
+    auto b = reinterpret_cast<const uint8_t*>(Addr);
+    return (b[0] == 0x33 && b[1] == 0xC0 && b[2] == 0xC3)                        // xor eax, eax ; ret
+        || (b[0] == 0x48 && b[1] == 0x33 && b[2] == 0xC0 && b[3] == 0xC3)        // xor rax, rax ; ret
+        || (b[0] == 0xB8 && !b[1] && !b[2] && !b[3] && !b[4] && b[5] == 0xC3);   // mov eax, 0 ; ret
+}
+
+// Length of `call qword ptr [reg + disp32]` at p (writing disp to OutDisp), or 0 if not that form.
+// Covers reg = rax..rdi (FF 9X) and r8..r15 (41 FF 9X).
+inline int DecodeIndirectCall(uintptr_t p, uint32_t& OutDisp)
+{
+    auto b = reinterpret_cast<const uint8_t*>(p);
+    if (b[0] == 0xFF && b[1] >= 0x90 && b[1] <= 0x97)              { OutDisp = *reinterpret_cast<const uint32_t*>(b + 2); return 6; }
+    if (b[0] == 0x41 && b[1] == 0xFF && b[2] >= 0x90 && b[2] <= 0x97) { OutDisp = *reinterpret_cast<const uint32_t*>(b + 3); return 7; }
+    return 0;
+}
+
+// Address just past the last `call [reg+disp]` in [CallSite-Window, CallSite). WantDisp of 0 matches
+// any displacement; otherwise only that one. The match's displacement is written to OutDisp; 0 if none.
+inline uintptr_t FindIndirectCallBefore(uintptr_t CallSite, uint32_t WantDisp, int Window, uint32_t& OutDisp)
+{
+    uintptr_t End = 0;
+    for (uintptr_t p = CallSite - Window; p < CallSite; p++)
+    {
+        uint32_t Disp;
+        int Len = DecodeIndirectCall(p, Disp);
+        if (Len && (WantDisp == 0 || Disp == WantDisp))
+        {
+            End = p + Len;
+            OutDisp = Disp;
+        }
+    }
+    return End;
+}
+
+// True if the call at CallSite takes an accessor's result as its arg: a `call [reg+AccessorDisp]`
+// within Window bytes before it, then `mov rcx, rax` (48 8B C8). (e.g. Stub(obj->GetWorld()).)
+inline bool CallArgFromAccessor(uintptr_t CallSite, uint32_t AccessorDisp, int Window)
+{
+    uint32_t Disp;
+    uintptr_t End = FindIndirectCallBefore(CallSite, AccessorDisp, Window, Disp);
+    if (!End)
+        return false;
+
+    for (uintptr_t p = End; p + 3 <= CallSite; p++)
+    {
+        auto b = reinterpret_cast<const uint8_t*>(p);
+        if (b[0] == 0x48 && b[1] == 0x8B && b[2] == 0xC8)
+            return true;
+    }
+    return false;
+}
+
+// True if the call at CallSite returns an object smaller than MaxSize: its result (rax) is passed as
+// `this` to a getter `mov reg, [rcx + disp]` with disp in [MinOffset, MaxSize). A large MinOffset
+// makes the match specific to big objects.
+inline bool CallResultIsSizedObject(uintptr_t CallSite, uint32_t MinOffset, uint32_t MaxSize)
+{
+    for (uintptr_t p = CallSite + 5; p + 3 <= CallSite + 48; p++)
+    {
+        auto b = reinterpret_cast<const uint8_t*>(p);
+        if (!(b[0] == 0x48 && b[1] == 0x8B && b[2] == 0xC8))                 // mov rcx, rax
+            continue;
+
+        // The getter call follows within a few bytes (compiler may emit unrelated ops between).
+        for (uintptr_t q = p + 3; q + 5 <= p + 13; q++)
+        {
+            if (*reinterpret_cast<const uint8_t*>(q) != 0xE8)               // call getter
+                continue;
+
+            auto g = reinterpret_cast<const uint8_t*>(Memcury::PE::Address(q).RelativeOffset(1).Get());
+            int i = (g[0] == 0x48) ? 1 : 0;                                // skip optional REX.W
+            if (g[i] == 0x8B && (g[i + 1] & 0xC7) == 0x81)                 // mov reg, [rcx + disp32]
+            {
+                uint32_t Disp = *reinterpret_cast<const uint32_t*>(g + i + 2);
+                if (Disp >= MinOffset && Disp < MaxSize)
+                    return true;
+            }
+            break;
+        }
+        return false;
+    }
+    return false;
+}
+
+// Every E8 CALL in .text whose resolved target == Target (the call-site sibling of FindLeaRefsToAddress).
+inline std::vector<uintptr_t> FindCallRefsToAddress(uintptr_t Target)
+{
+    std::vector<uintptr_t> Refs;
+
+    auto textSection = Memcury::PE::Section::GetSection(".text");
+    auto* textBytes = reinterpret_cast<uint8_t*>(textSection.GetSectionStart().Get());
+    size_t textSize = textSection.GetSectionSize();
+
+    for (size_t i = 0; i + 5 <= textSize; i++)
+    {
+        auto* Ptr = textBytes + i;
+
+        if (Ptr[0] == 0xE8)
+        {
+            int32_t Rel = *reinterpret_cast<int32_t*>(Ptr + 1);
+            if (reinterpret_cast<uintptr_t>(Ptr) + 5 + Rel == Target)
+                Refs.push_back(reinterpret_cast<uintptr_t>(Ptr));
+        }
+    }
+
+    return Refs;
 }
 
 inline std::vector<uintptr_t> FindLeaRefsToAddress(uintptr_t Target)

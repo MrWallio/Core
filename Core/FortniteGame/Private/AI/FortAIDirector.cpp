@@ -15,7 +15,6 @@ void AFortAIDirector::Activate()
 }
 
 AFortAIDirector* AFortAIDirector::GetCurrent(UObject* WorldContextObject) {
-	//Log("AFortAIDirector::GetCurrent");
 	if (!WorldContextObject) {
 		Log("AFortAIDirector::GetCurrent: Failed due to no WorldContextObject!");
 		return nullptr;
@@ -36,71 +35,50 @@ AFortAIDirector* AFortAIDirector::GetCurrent(UObject* WorldContextObject) {
 	return GameMode->AIDirector;
 }
 
-void AFortAIDirector::Hook() {
-	TArray<uintptr_t> GetCurrentPatchCallSites;
-
+void AFortAIDirector::Hook()
+{
 	{
-		uintptr_t Addr = 0;
+		uintptr_t GetCurrentStub = 0;
+		uint32_t GetWorldDisp = 0;
 
 		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Could not create encounter sequence with given tags: %s, generated sequence not found").Get();
-		if (StringAddr) {
-			int Skipped = 0;
-			for (int i = 0; i < 1024; i++)
+		if (StringAddr)
+		{
+			uintptr_t FuncStart = Memcury::Scanner(StringAddr).FindFunctionStart().Get();
+			uintptr_t FuncEnd = Memcury::Scanner(StringAddr).FindFunctionEnd().Get();
+
+			for (uintptr_t p = FuncStart; p && p + 5 <= FuncEnd; p++)
 			{
-				auto Ptr = (uint8_t*)(StringAddr - i);
-				if (*Ptr == 0xE8)
-				{
-					if (Skipped == 2) {
-						Addr = uint64_t(Ptr);
-						break;
-					}
-					Skipped++;
-				}
-			}
-		}
-		else {
-			Log("AFortAIDirector::Hook: string ref for encounter-sequence patch not found");
-		}
+				if (*reinterpret_cast<const uint8_t*>(p) != 0xE8)
+					continue;
 
-		GetCurrentPatchCallSites.Add(Addr);
-	}
+				uintptr_t Target = Memcury::PE::Address(p).RelativeOffset(1).Get();
+				if (!IsReturnNullStub(Target))
+					continue;
 
-	{
-		uintptr_t Addr = 0;
-
-		uintptr_t HandleDamagedVFT = Finder::FindABuildingActor_HandleDamagedVFT();
-		if (HandleDamagedVFT) {
-			uintptr_t HandleDamagedAddr = (uintptr_t)ABuildingActor::StaticClass()->GetDefaultObject()->VTable[HandleDamagedVFT];
-			uintptr_t FunctionEnd = Memcury::Scanner(HandleDamagedAddr).ScanFor({ 0x5D, 0xC3 }).Get();
-
-			for (int i = 0; i < 1024; i++)
-			{
-				auto Cursor = (FunctionEnd - i);
-				if (*(uint8*)(Cursor) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 && *(uint8*)(Cursor + 9) == 0xE8)
-				{
-					Addr = Cursor + 9;
-					break;
-				} 
-				else if (*(uint8*)(Cursor) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 && *(uint8*)(Cursor + 9) == 0x38)
-				{
-					Addr = Cursor + 9;
-					break;
-				}
+				GetCurrentStub = Target;
+				FindIndirectCallBefore(p, 0, 16, GetWorldDisp);
+				break;
 			}
 		}
 
-		GetCurrentPatchCallSites.Add(Addr);
-	}
+		if (!GetCurrentStub || !GetWorldDisp)
+		{
+			Log("AFortAIDirector::Hook: failed to resolve GetCurrent stub / GetWorld offset; aborting.");
+			return;
+		}
 
-	for (int32 i = 0; i < GetCurrentPatchCallSites.Num(); i++) {
-		uintptr_t Patch = GetCurrentPatchCallSites[i];
-		if (Patch) {
-			Log("AFortAIDirector::GetCurrent Patch: 0x" + std::format("{:X}", (Patch - ImageBase)));
-			PatchCallFar(Patch, GetCurrent);
-		}
-		else {
-			Log("Failed to find patch for AFortAIDirector::GetCurrent: Index (" + std::to_string(i) + ")");
-		}
+		int32 DirectorSize = AFortAIDirector::GetSize();
+
+		std::vector<uintptr_t> CallSites;
+		for (uintptr_t CallSite : FindCallRefsToAddress(GetCurrentStub))
+			if (CallArgFromAccessor(CallSite, GetWorldDisp, 28) || (DirectorSize > 0 && CallResultIsSizedObject(CallSite, 0x400, DirectorSize)))
+				CallSites.push_back(CallSite);
+
+		for (uintptr_t CallSite : CallSites)
+			PatchCallFar(CallSite, GetCurrent);
+
+		Log("AFortAIDirector Hooked (" + std::to_string(CallSites.size()) + " GetCurrent callsites, stub 0x" + std::format("{:X}", (GetCurrentStub - ImageBase)) + ", GetWorld vtable +0x" + std::format("{:X}", GetWorldDisp) + ", director size 0x" + std::format("{:X}", DirectorSize) + ")");
 	}
 
 	Log("AFortAIDirector Hooked");
