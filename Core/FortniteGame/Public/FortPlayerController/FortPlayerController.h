@@ -215,7 +215,7 @@ public:
 		);*/
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_RemoveInventoryItem()), RemoveInventoryItem, (LPVOID*)&RemoveInventoryItemOG);
 
-		if (Version::Fortnite_Version <= 3.6 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+		if (Version::Fortnite_Version < 8.30){
 			HookEveryVTable(
 				AFortPlayerController::StaticClass(),
 				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerCreateBuildingActor"),
