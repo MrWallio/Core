@@ -57,6 +57,9 @@ void AFortAIDirector::Hook() {
 			{ "AFortMission::StartMissionAIEncounter", {
 				StubCallsites::ByString(L"StartMissionAIEncounter: No AI Director!") } },
 
+			{ "AFortMission::StartMissionAIEncounterFromGeneratedProfile", {
+				StubCallsites::ByString(L"StartMissionAIEncounterFromGeneratedProfile: No AI Director!") } },
+
 			{ "AFortMission::StopEncounterSequence", {
 				StubCallsites::ByReflection("Function /Script/FortniteGame.FortMission.StopEncounterSequence") } },
 
