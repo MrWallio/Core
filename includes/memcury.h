@@ -1269,8 +1269,12 @@ namespace Memcury
             }
         }
 
-        // Mirror of FindFunctionStart: returns the address one-past the last byte of the
-        // function containing the current address, from RUNTIME_FUNCTION::EndAddress.
+        // Returns the address one-past the last byte of the function containing the current address.
+        //
+        // A RUNTIME_FUNCTION only describes one chunk, and MSVC splits most functions into several
+        // chained chunks whose primary entry often covers just the prologue -- so a single EndAddress
+        // (even the primary's) stops far short of the real end. Walk the contiguous chunks that resolve
+        // back to the same primary instead.
         auto FindFunctionEnd() -> Scanner
         {
             uintptr_t ImageBase = Memcury::PE::GetModuleBase();
@@ -1279,17 +1283,29 @@ namespace Memcury
             if (!RFE)
                 return *this;
 
+            uintptr_t Primary = FindFunctionStart().Get();
+            uintptr_t End = ImageBase + RFE->EndAddress;
+
             while (true)
             {
-                auto* Scuffness = reinterpret_cast<UNWIND_INFO_HDR*>(ImageBase + RFE->UnwindData);
-                BYTE Flags = Scuffness->VersionFlags >> 3;
+                uintptr_t NextBase = Memcury::PE::GetModuleBase();
 
-                if (!(Flags & UNW_FLAG_CHAININFO))
-                    return Scanner(ImageBase + RFE->EndAddress);
+                RUNTIME_FUNCTION* Next = RtlLookupFunctionEntry(End, &NextBase, nullptr);
+                if (!Next)
+                    break;
 
-                DWORD CodesSize = ((Scuffness->CountOfCodes + 1) & ~1) * sizeof(WORD);
-                RFE = reinterpret_cast<RUNTIME_FUNCTION*>(reinterpret_cast<BYTE*>(Scuffness) + sizeof(UNWIND_INFO_HDR) + CodesSize);
+                // Once the chunk at End belongs to a different function, we are past the last byte.
+                if (Scanner(End).FindFunctionStart().Get() != Primary)
+                    break;
+
+                uintptr_t NextEnd = NextBase + Next->EndAddress;
+                if (NextEnd <= End)
+                    break;
+
+                End = NextEnd;
             }
+
+            return Scanner(End);
         }
     };
 

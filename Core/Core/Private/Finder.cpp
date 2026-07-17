@@ -11036,6 +11036,25 @@ uintptr_t Finder::FindAFortMission_CreateEncounterSequence() {
 	return ServerOffsets::AFortMission_CreateEncounterSequence;
 }
 
+uintptr_t Finder::FindABuildingTrap_FinishTrigger() {
+	if (ServerOffsets::ABuildingTrap_FinishTrigger)
+		return ServerOffsets::ABuildingTrap_FinishTrigger;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::ABuildingTrap_FinishTrigger;
+
+	Addr = Memcury::Scanner::FindPattern("40 57 48 83 EC ? 80 B9 ? ? ? ? ? 48 8B F9 0F 85 ? ? ? ? 48 8B 89").Get();
+
+	if (Addr) {
+		ServerOffsets::ABuildingTrap_FinishTrigger = Addr - ImageBase;
+	}
+
+	bInitialized = true;
+	Log("ABuildingTrap_FinishTrigger found at: 0x" + std::format("{:X}", ServerOffsets::ABuildingTrap_FinishTrigger));
+	return ServerOffsets::ABuildingTrap_FinishTrigger;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -11446,6 +11465,10 @@ void Finder::SetupOffsets() {
 	FindABuildingActor_HandleDamagedVFT();
 
 	FindFOutBunch_Constructor();
+
+	FindABuildingTrap_FinishTrigger();
+
+	FindUPackageMap_WriteObject();
 
 	return;
 }

@@ -3,6 +3,7 @@
 
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 #include "FortniteGame/Public/BuildingActor/BuildingActor.h"
+#include "Core/Public/StubCallsites.h"
 
 void AFortAIDirector::Activate()
 {
@@ -38,134 +39,125 @@ AFortAIDirector* AFortAIDirector::GetCurrent(UObject* WorldContextObject) {
 
 void AFortAIDirector::Hook() {
 	{
-		TArray<uintptr_t> GetCurrentPatchCallSites;
+		uintptr_t EncounterSequence = StubCallsites::FromString(L"Could not create encounter sequence with given tags: %s, generated sequence not found");
+		uintptr_t Stub = StubCallsites::ResolveStub(EncounterSequence);
 
-		{
-			uintptr_t Addr = 0;
-
-			uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Could not create encounter sequence with given tags: %s, generated sequence not found").Get();
-			if (StringAddr) {
-				int Skipped = 0;
-				for (int i = 0; i < 1024; i++)
-				{
-					auto Ptr = (uint8_t*)(StringAddr - i);
-					if (*Ptr == 0xE8)
-					{
-						if (Skipped == 2) {
-							Addr = uint64_t(Ptr);
-							break;
-						}
-						Skipped++;
-					}
-				}
-			}
-			else {
-				Log("AFortAIDirector::Hook: string ref for encounter-sequence patch not found");
-			}
-
-			GetCurrentPatchCallSites.Add(Addr);
+		if (!Stub) {
+			Log("AFortAIDirector::Hook: could not resolve the GetCurrent stub, no callsites patched!");
+			return;
 		}
 
-		{
-			uintptr_t Addr = 0;
+		StubCallsites::Patch("AFortAIDirector::GetCurrent", Stub, GetCurrent, {
+			{ "AFortMission::CreateEncounterSequence", {
+				[=] { return EncounterSequence; } } },
 
-			uintptr_t HandleDamagedVFT = Finder::FindABuildingActor_HandleDamagedVFT();
-			if (HandleDamagedVFT) {
-				uintptr_t HandleDamagedAddr = (uintptr_t)ABuildingActor::StaticClass()->GetDefaultObject()->VTable[HandleDamagedVFT];
-				uintptr_t FunctionEnd = Memcury::Scanner(HandleDamagedAddr).ScanFor({ 0x5D, 0xC3 }).Get();
+			{ "ABuildingActor::HandleDamaged", {
+				StubCallsites::ByVTable(ABuildingActor::StaticClass(), Finder::FindABuildingActor_HandleDamagedVFT()) } },
 
-				for (int i = 0; i < 1024; i++)
-				{
-					auto Cursor = (FunctionEnd - i);
-					if (*(uint8*)(Cursor) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 && *(uint8*)(Cursor + 9) == 0xE8)
-					{
-						Addr = Cursor + 9;
-						break;
-					}
-					else if (*(uint8*)(Cursor) == 0xFF && *(uint8*)(Cursor + 1) == 0x90 && *(uint8*)(Cursor + 9) == 0x38)
-					{
-						Addr = Cursor + 9;
-						break;
-					}
-				}
+			{ "AFortMission::StartMissionAIEncounter", {
+				StubCallsites::ByString(L"StartMissionAIEncounter: No AI Director!") } },
+
+			{ "AFortMission::StopEncounterSequence", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortMission.StopEncounterSequence") } },
+
+			{ "AFortMission::StopMissionAIEncounter", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortMission.StopMissionAIEncounter") } },
+
+			{ "ABuildingTrap::FinishTrigger", {
+				StubCallsites::ByOffset(Finder::FindABuildingTrap_FinishTrigger()) } },
+
+			{ "AFortGameMode::GetFriendlyActors", {
+				StubCallsites::BySignature("48 89 5C 24 ? 48 89 6C 24 ? 57 41 56 41 57 48 83 EC ? 41 8B 40") } },
+
+			{ "UFortBTService_UpdateBotMissionGoal::TickNode", {
+				StubCallsites::BySignature("48 8B C4 48 89 50 ? 55 48 8D 68 ? 48 81 EC ? ? ? ? 48 89 58 ? 48 89 70 ? 48 89 78 ? 4C 89 60 ? 4C 89 68 ? 4C 8B EA 4C 89 78") } },
+
+			{ "FUndermineHelpers::AreBuildingsInRange", {
+				StubCallsites::BySignature("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 0F 29 74 24 ? 48 8B D9 48 8B 89 C8 05 00 00") } },
+
+			{ "AFortPlayerController::CreateAIDirectorDataManager", {
+				StubCallsites::BySignature("40 57 48 83 EC ? 48 83 B9 A8 14 00 00 00 48 8B F9 0F 85") } },
+
+			{ "AFortUIZone::InitUtilitiesGraph", {
+				StubCallsites::BySignature("48 89 5C 24 ? 57 48 83 EC ? 48 8B 99 88 03 00 00 48 8B F9 48 85 DB 74") } },
+
+			{ "UFortCheatManager::CycleCurrentEncounterToDebug", {
+				StubCallsites::ByString(L"No active encounters to debug."),
+				StubCallsites::ByString(L"Now debugging encounter with index: %i of type: %s") } },
+
+			{ "AFortPlayerControllerZone::UpdateNearbyEncounters", {
+				StubCallsites::BySignature("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B F9 48 8B CA E8") } },
+
+			{ "UFortQueryTest_HasNearbyEncounterGoals::RunTest", {
+				StubCallsites::BySignature("40 55 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC 98 00 00 00 4C 8B F1 4C 8B FA 48 8B 4A ? E8") } },
+
+			{ "UFortCheatManager::ClearEncounterSimulatedNumberOfPlayers", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ClearEncounterSimulatedNumberOfPlayers") } },
+
+			{ "UFortCheatManager::ClearEncounterSpawnPointsCap", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ClearEncounterSpawnPointsCap") } },
+
+			{ "UFortCheatManager::ClearEncounterSpawnPointsCurve", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ClearEncounterSpawnPointsCurve") } },
+
+			{ "UFortCheatManager::DisableAI", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.DisableAI") } },
+
+			{ "UFortCheatManager::EncounterCurrentUtilities", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.EncounterCurrentUtilities") } },
+
+			{ "UFortCheatManager::EncounterInitialUtilities", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.EncounterInitialUtilities") } },
+
+			{ "UFortCheatManager::EncounterSetDifficultyLevel", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.EncounterSetDifficultyLevel") } },
+
+			{ "UFortCheatManager::EncounterSpawnProbabilities", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.EncounterSpawnProbabilities") } },
+
+			{ "UFortCheatManager::EncounterTopUtilityPercentages", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.EncounterTopUtilityPercentages") } },
+
+			{ "UFortCheatManager::ListActiveEncounters", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ListActiveEncounters") } },
+
+			{ "UFortCheatManager::ResetEncounterWave", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ResetEncounterWave") } },
+
+			{ "UFortCheatManager::ResetMaxAITracking", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ResetMaxAITracking") } },
+
+			{ "UFortCheatManager::SetCurrentEncounterToDebug", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.SetCurrentEncounterToDebug") } },
+
+			{ "UFortCheatManager::SetEncounterDirections", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.SetEncounterDirections") } },
+
+			{ "UFortCheatManager::SetEncounterSimulatedNumberOfPlayers", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.SetEncounterSimulatedNumberOfPlayers") } },
+
+			{ "UFortCheatManager::SetEncounterSpawnPointsCap", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.SetEncounterSpawnPointsCap") } },
+
+			{ "UFortCheatManager::SetEncounterSpawnPointsCurve", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.SetEncounterSpawnPointsCurve") } },
+
+			{ "UFortCheatManager::SetEncounterTopUtilityPercentages", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.SetEncounterTopUtilityPercentages") } },
+
+			{ "UFortCheatManager::ToggleAISpawnCap", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ToggleAISpawnCap") } },
+
+			{ "UFortCheatManager::ToggleAISpawning", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ToggleAISpawning") } },
+
+			{ "UFortCheatManager::ToggleEncounterEQSDebug", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ToggleEncounterEQSDebug") } },
+
+			{ "UFortCheatManager::ToggleEncounterModifierTags", {
+				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ToggleEncounterModifierTags") } },
 			}
-
-			GetCurrentPatchCallSites.Add(Addr);
-		}
-
-		{
-			uintptr_t Addr = 0;
-
-			auto StringAddr = Memcury::Scanner::FindStringRef(L"StartMissionAIEncounter: No AI Director!");
-			if (StringAddr.IsValid()) {
-				uintptr_t FunctionStart = StringAddr.FindFunctionStart().Get();
-				int Skipped = 0;
-
-				for (int i = 0; i < 2048; i++)
-				{
-					auto Cursor = (FunctionStart + i);
-					if (*(uint8*)(Cursor + 0) == 0xE8)
-					{
-						if (Skipped == 1) {
-							Addr = uint64_t(Cursor);
-							break;
-						}
-						Skipped++;
-					}
-				}
-			}
-			else {
-				Log("AFortAIDirector::Hook: string ref for StartMissionAIEncounter patch not found");
-			}
-
-			GetCurrentPatchCallSites.Add(Addr);
-		}
-
-		{
-			uintptr_t Addr = 0;
-
-			UFunction* Fn = (UFunction*)FUObjectArray::FindObject("Function /Script/FortniteGame.FortMission.StopEncounterSequence");
-			if (Fn && Fn->Func) {
-				uintptr_t Impl = 0;
-
-				for (int i = 0; i < 512; i++)
-				{
-					uintptr_t Cursor = (uintptr_t)Fn->Func + i;
-					if (*(uint8*)Cursor == 0xE8)
-						Impl = Cursor + 5 + *(int32*)(Cursor + 1);
-					else if (*(uint8*)Cursor == 0xC3)
-						break;
-				}
-
-				if (Impl) {
-					for (int i = 0; i < 256; i++)
-					{
-						uintptr_t Cursor = Impl + i;
-						if (*(uint8*)(Cursor + 0) == 0xE8)
-						{
-							Addr = uint64_t(Cursor);
-							break;
-						}
-					}
-				}
-			}
-			else {
-				Log("AFortAIDirector::Hook: StopEncounterSequence UFunction not found");
-			}
-
-			GetCurrentPatchCallSites.Add(Addr);
-		}
-
-		for (int32 i = 0; i < GetCurrentPatchCallSites.Num(); i++) {
-			uintptr_t Patch = GetCurrentPatchCallSites[i];
-			if (Patch) {
-				Log("AFortAIDirector::GetCurrent Patch: 0x" + std::format("{:X}", (Patch - ImageBase)));
-				PatchCallFar(Patch, GetCurrent);
-			}
-			else {
-				Log("Failed to find patch for AFortAIDirector::GetCurrent: Index (" + std::to_string(i) + ")");
-			}
-		}
+		);
 	}
 
 	Log("AFortAIDirector Hooked");

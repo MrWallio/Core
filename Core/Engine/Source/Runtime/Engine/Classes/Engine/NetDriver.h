@@ -60,16 +60,13 @@ struct FActorPriority
 struct FActorDestructionInfo
 {
 public:
-	TWeakObjectPtr<ULevel> Level;
 	TWeakObjectPtr<UObject> ObjOuter;
 	FVector DestroyedPosition;
 	uint32 NetGUID;
 	FString PathName;
 	FName StreamingLevelName;
-	uint8_t Reason;
-
-	bool bIgnoreDistanceCulling;
 };
+static_assert(sizeof(FActorDestructionInfo) == 0x30, "Wrong size on FActorDestructionInfo");
 
 class UNetDriver : public UObject {
 public:

@@ -87,9 +87,6 @@ void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFort
 	}
 
 	AFortGameModeAthena* FortGameModeAthena = This->Cast<AFortGameModeAthena>();
-	
-	This->CreateAIDirector();
-	This->CreateAIGoalManager();
 
 	FortGameStateZone->GameDifficulty = 10.f;
 	FortGameStateZone->OnRep_GameDifficulty();
@@ -127,6 +124,13 @@ void AFortGameModeZone::AddInactivePlayerHK(AFortGameModeZone* This, APlayerStat
 	return AGameMode::AddInactivePlayerOG(This, PlayerState, PC);
 }
 
+void AFortGameModeZone::InitGameState(AFortGameModeZone* This) {
+	InitGameStateOG(This);
+
+	This->CreateAIDirector();
+	This->CreateAIGoalManager();
+}
+
 void AFortGameModeZone::Hook() {
 	HookEveryVTable(AFortGameModeZone::StaticClass(),
 		AGameModeBase::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.HandleStartingNewPlayer"),
@@ -152,6 +156,12 @@ void AFortGameModeZone::Hook() {
 		AFortGameModeZone::GetDefaultObj(),
 		Finder::FindAGameMode_AddInactivePlayerVFT(),
 		AddInactivePlayerHK
+	);
+
+	MH_CreateHook(
+		(LPVOID)(GetOffsetFromVTable(AFortGameModeZone::GetDefaultObj(), Finder::FindAGameModeBase_InitGameStateVFT())),
+		InitGameState,
+		(LPVOID*)&InitGameStateOG
 	);
 
 	Log("Hooked AFortGameModeZone");
