@@ -35,24 +35,6 @@ void UActorChannel::SetChannelActorForDestroy(FActorDestructionInfo* DestructInf
 		void (*SetChannelActorForDestroyInternal)(UActorChannel*, FActorDestructionInfo*) = decltype(SetChannelActorForDestroyInternal)(ImageBase + Finder::FindUActorChannel_SetChannelActorForDestroy());
 		SetChannelActorForDestroyInternal(this, DestructInfo);
 	}
-	else {
-		if (Version::Engine_Version >= 4.0 && Version::Engine_Version <= 4.19) {
-			if (/*Closing && */(Connection->State == USOCK_Open || Connection->State == USOCK_Pending))
-			{
-				// Send a close notify, and wait for ack.
-				FOutBunch CloseBunch(this, 1);
-				CloseBunch.SetbReliable(1);
-				CloseBunch.SetbDormant(0);
-
-				// Serialize DestructInfo
-				Connection->PackageMap->WriteObject(CloseBunch, DestructInfo->ObjOuter.Get(), DestructInfo->NetGUID, DestructInfo->PathName);
-
-				Log("SetChannelActorForDestroy");
-
-				SendBunch(&CloseBunch, 0);
-			}
-		}
-	}
 }
 
 void UActorChannel::SetChannelActor(AActor* InActor)

@@ -517,6 +517,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\URL.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\World.cpp" />
     <ClCompile Include="FortniteGame\Private\AI\FortAIDirector.cpp" />
+    <ClCompile Include="FortniteGame\Private\AI\FortAIGoalManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Asset\FortAssetManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingActor.cpp" />

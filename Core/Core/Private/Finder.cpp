@@ -8584,10 +8584,12 @@ uintptr_t Finder::FindAFortGameModeZone_CreateAIDirectorVFT() {
 	static bool bInitialized = false;
 	if (bInitialized)
 		return ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT;
-
-	// Not found this yet!
-
 	bInitialized = true;
+
+	uintptr_t GoalManagerVFT = FindAFortGameModeZone_CreateAIGoalManagerVFT();
+	if (GoalManagerVFT)
+		ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT = GoalManagerVFT - 1;
+
 	Log("AFortGameModeZone_CreateAIDirectorVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT));
 	return ServerOffsets::AFortGameModeZone_CreateAIDirectorVFT;
 }

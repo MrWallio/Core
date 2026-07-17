@@ -76,13 +76,16 @@ void AFortAIDirector::Hook() {
 				StubCallsites::BySignature("48 8B C4 48 89 50 ? 55 48 8D 68 ? 48 81 EC ? ? ? ? 48 89 58 ? 48 89 70 ? 48 89 78 ? 4C 89 60 ? 4C 89 68 ? 4C 8B EA 4C 89 78") } },
 
 			{ "FUndermineHelpers::AreBuildingsInRange", {
-				StubCallsites::BySignature("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 0F 29 74 24 ? 48 8B D9 48 8B 89 C8 05 00 00") } },
+				StubCallsites::BySignature("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 0F 29 74 24 ? 48 8B D9 48 8B 89 C8 05 00 00"),
+				StubCallsites::BySignature("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 0F 29 74 24 ? 48 8B D9") } },
 
 			{ "AFortPlayerController::CreateAIDirectorDataManager", {
-				StubCallsites::BySignature("40 57 48 83 EC ? 48 83 B9 A8 14 00 00 00 48 8B F9 0F 85") } },
+				StubCallsites::BySignature("40 57 48 83 EC ? 48 83 B9 A8 14 00 00 00 48 8B F9 0F 85"),
+				StubCallsites::BySignature("40 57 48 83 EC ? 48 83 B9 ? ? ? ? 00 48 8B F9 0F 85 ? ? ? ? ? ? ? 48 89 5C 24") } },
 
 			{ "AFortUIZone::InitUtilitiesGraph", {
-				StubCallsites::BySignature("48 89 5C 24 ? 57 48 83 EC ? 48 8B 99 88 03 00 00 48 8B F9 48 85 DB 74") } },
+				StubCallsites::BySignature("48 89 5C 24 ? 57 48 83 EC ? 48 8B 99 88 03 00 00 48 8B F9 48 85 DB 74"),
+				StubCallsites::BySignature("48 89 5C 24 ? 57 48 83 EC ? 48 8B 99 ? ? ? ? 48 8B F9 48 85 DB 74 ? E8 ? ? ? ? 48 8B 53 ? 4C 8D 80 ? ? ? ? 49 63 40 ? 3B 82 ? ? ? ? 7F ? 48 8B C8 48 8B 82 ? ? ? ? ? ? ? ? 74 ? 33 DB 48 83 BF ? ? ? ? 00") } },
 
 			{ "UFortCheatManager::CycleCurrentEncounterToDebug", {
 				StubCallsites::ByString(L"No active encounters to debug."),
@@ -92,7 +95,8 @@ void AFortAIDirector::Hook() {
 				StubCallsites::BySignature("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B F9 48 8B CA E8") } },
 
 			{ "UFortQueryTest_HasNearbyEncounterGoals::RunTest", {
-				StubCallsites::BySignature("40 55 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC 98 00 00 00 4C 8B F1 4C 8B FA 48 8B 4A ? E8") } },
+				StubCallsites::BySignature("40 55 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC 98 00 00 00 4C 8B F1 4C 8B FA 48 8B 4A ? E8"),
+				StubCallsites::BySignature("40 55 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 4C 8B F1 4C 8B FA 48 8B 4A ? E8 ? ? ? ? 4C 8B E0 48 85 C0 0F 84 ? ? ? ? 48 89 9C 24 ? ? ? ? 49 8D 4F ? 48 89 B4 24 ? ? ? ? 48 89 BC 24 ? ? ? ? 0F 29 B4 24 ? ? ? ? 0F 29 BC 24 ? ? ? ? 44 0F 29 44 24") } },
 
 			{ "UFortCheatManager::ClearEncounterSimulatedNumberOfPlayers", {
 				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ClearEncounterSimulatedNumberOfPlayers") } },

@@ -39,6 +39,8 @@
 #include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
 #include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
 #include "FortniteGame/Public/AI/FortAIDirector.h"
+#include "FortniteGame/Public/AI/FortAIGoalManager.h"
+
 
 void Utils::InitConsole(FCoreConfig& Config)
 {
@@ -218,6 +220,7 @@ void Utils::Hook() {
 
 	// FortniteGame
 	AFortAIDirector::Hook();
+	AFortAIGoalManager::Hook();
 	AFortGameSession::Hook();
 	AFortGameModeAthena::Hook();
 	AFortPlayerController::Hook();
