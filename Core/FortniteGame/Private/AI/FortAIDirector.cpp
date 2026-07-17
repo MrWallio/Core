@@ -16,7 +16,7 @@ void AFortAIDirector::Activate()
 }
 
 AFortAIDirector* AFortAIDirector::GetCurrent(UObject* WorldContextObject) {
-	Log("AFortAIDirector::GetCurrent");
+	//Log("AFortAIDirector::GetCurrent");
 	if (!WorldContextObject) {
 		Log("AFortAIDirector::GetCurrent: Failed due to no WorldContextObject!");
 		return nullptr;
