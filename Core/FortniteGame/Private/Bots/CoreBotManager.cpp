@@ -7,6 +7,8 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "FortniteGame/Public/AI/FortAIController.h"
 #include "FortniteGame/Public/AI/FortAIPawn.h"
+#include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
+#include "FortniteGame/Public/FortPawn/FortPlayerPawn.h"
 
 CoreBotManager& CoreBotManager::Get()
 {
@@ -161,11 +163,12 @@ APawn* CoreBotManager::SpawnBotPawn(UClass* PawnClass, const FVector& Location, 
 	return Pawn;
 }
 
-APawn* CoreBotManager::RegisterBot(const FBotSpawnOptions& Options, AController* Controller, APawn* Pawn) {
+APawn* CoreBotManager::RegisterBot(const FBotSpawnOptions& Options, int32 BotId, AController* Controller, APawn* Pawn, APlayerState* PlayerState) {
 	FBotEntry Entry;
-	Entry.BotId = NextBotId++;
+	Entry.BotId = BotId;
 	Entry.Controller = Controller;
 	Entry.Pawn = Pawn;
+	Entry.PlayerState = PlayerState;
 	Entry.BehaviorTree = Options.BehaviorTree;
 	Entry.Kind = Options.Kind;
 	Entry.BrainMode = Options.BrainMode;
@@ -179,6 +182,72 @@ APawn* CoreBotManager::RegisterBot(const FBotSpawnOptions& Options, AController*
 	return Pawn;
 }
 
+bool CoreBotManager::PossessBot(AController* Controller, APawn* Pawn, std::string& OutError) {
+	Controller->PossessVFT(Pawn);
+	if (Pawn->Controller != Controller) {
+		OutError = "Failed to properly possess the pawn!";
+		return false;
+	}
+
+	return true;
+}
+
+APlayerState* CoreBotManager::InitBotPlayerState(AController* Controller, AFortGameMode* GameMode, int32 BotId, std::string& OutError) {
+	APlayerState* PlayerState = Controller->PlayerState;
+
+	if (!PlayerState) {
+		Controller->InitPlayerState();
+		PlayerState = Controller->PlayerState;
+	}
+
+	if (!PlayerState) {
+		UWorld* World = UWorld::GetWorld();
+		UClass* PlayerStateClass = GameMode ? GameMode->PlayerStateClass.Get() : nullptr;
+		if (!World || !PlayerStateClass) {
+			OutError = "InitPlayerState failed and no PlayerStateClass to spawn manually";
+			return nullptr;
+		}
+
+		AActor* SpawnedPlayerState = World->SpawnActor(PlayerStateClass, FVector(), FRotator(), Controller);
+		PlayerState = SpawnedPlayerState ? SpawnedPlayerState->Cast<APlayerState>() : nullptr;
+		if (!PlayerState) {
+			OutError = "Failed to spawn PlayerState of class " + PlayerStateClass->GetName().ToString();
+			if (SpawnedPlayerState) {
+				SpawnedPlayerState->K2_DestroyActor();
+			}
+			return nullptr;
+		}
+
+		Controller->PlayerState = PlayerState;
+	}
+
+	PlayerState->bIsABot = true;
+	PlayerState->PlayerName = FString("CoreBot-" + std::to_string(BotId));
+
+	if (AFortPlayerState* FortPlayerState = PlayerState->Cast<AFortPlayerState>()) {
+		FortPlayerState->bHasFinishedLoading = true;
+		FortPlayerState->bHasStartedPlaying = true;
+		FortPlayerState->OnRep_bHasStartedPlaying();
+	}
+
+	PlayerState->ForceNetUpdate();
+	return PlayerState;
+}
+
+void CoreBotManager::ApplyBotCosmetics(APawn* Pawn) {
+	AFortPlayerPawn* FortPawn = Pawn->Cast<AFortPlayerPawn>();
+	if (!FortPawn) {
+		return;
+	}
+
+	AFortPlayerState* FortPlayerState = FortPawn->PlayerState ? FortPawn->PlayerState->Cast<AFortPlayerState>() : nullptr;
+	if (!FortPlayerState) {
+		return;
+	}
+
+	FortPlayerState->ApplyCharacterCustomization(FortPawn);
+}
+
 APawn* CoreBotManager::SpawnBot(const FBotSpawnOptions& Options, std::string& OutError)
 {
 	UWorld* World = UWorld::GetWorld();
@@ -188,6 +257,7 @@ APawn* CoreBotManager::SpawnBot(const FBotSpawnOptions& Options, std::string& Ou
 	}
 
 	AFortGameMode* GameMode = ResolveGameMode(World);
+	const int32 BotId = NextBotId++;
 
 	AActor* SpawnPoint = ResolveSpawnPoint(Options);
 	if (!SpawnPoint) {
@@ -209,13 +279,27 @@ APawn* CoreBotManager::SpawnBot(const FBotSpawnOptions& Options, std::string& Ou
 		return nullptr;
 	}
 
+	APlayerState* PlayerState = InitBotPlayerState(Controller, GameMode, BotId, OutError);
+	if (!PlayerState) {
+		Controller->K2_DestroyActor();
+		return nullptr;
+	}
+
 	APawn* Pawn = SpawnBotPawn(PawnClass, SpawnLocation, SpawnRotation, OutError);
 	if (!Pawn) {
 		Controller->K2_DestroyActor();
 		return nullptr;
 	}
 
-	return RegisterBot(Options, Controller, Pawn);
+	if (!PossessBot(Controller, Pawn, OutError)) {
+		Pawn->K2_DestroyActor();
+		Controller->K2_DestroyActor();
+		return nullptr;
+	}
+
+	ApplyBotCosmetics(Pawn);
+
+	return RegisterBot(Options, BotId, Controller, Pawn, PlayerState);
 }
 
 int32 CoreBotManager::DespawnAll()
