@@ -335,6 +335,7 @@
     <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchTeamStats.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaPlayerMatchReport.h" />
     <ClInclude Include="FortniteGame\Public\Athena\FortAthenaAircraft.h" />
+    <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTimeOfDayLights.h" />
     <ClInclude Include="FortniteGame\Public\FortLoadout\FortCampaignLoadout.h" />
     <ClInclude Include="FortniteGame\Public\FortSupplyDrop\FortSupplyDropInfo.h" />
     <ClInclude Include="FortniteGame\Public\QuickChat\AthenaQuickChatActiveEntry.h" />

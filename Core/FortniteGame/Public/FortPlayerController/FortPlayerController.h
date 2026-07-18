@@ -23,6 +23,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/WorldSettings.h"
 
 class AFortPlayerPawn;
 class ABuildingSMActor;

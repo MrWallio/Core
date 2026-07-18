@@ -26,7 +26,8 @@
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
-#include "Engine/Source/Runtime/Engine/Classes/GameFramework/WorldSettings.h"
+#include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
+#include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -181,6 +182,11 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("SwapPlaces <PawnName> - Swaps locations with a pawn (case-insensitive, substring).");
 		This->ClientMessage("LaunchPawn [PawnName] [ZVelocity] - Yeets a pawn (default: you) into the sky.");
 		This->ClientMessage("SetScale <Multiplier> - Scales your pawn (body, weapon and collision).");
+		This->ClientMessage("ScalePawn <PawnName> <Multiplier> - Scales any pawn. Giant bots!");
+		This->ClientMessage("Goto <PawnName> - Teleports you to a pawn.");
+		This->ClientMessage("DestroyBuildings [Radius] - Destroys every building around you.");
+		This->ClientMessage("EmoteAll - Everyone in the world uses a random emote.");
+		This->ClientMessage("SupplyDrop [Count] - Calls in supply drops above you.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -1250,6 +1256,156 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->MyFortPawn->ForceNetUpdate();
 
 		This->ClientMessage("Set scale to x" + std::to_string(Scale) + ".");
+		return;
+	}
+	else if (Parser.IsCommand("ScalePawn")) {
+		if (Parser.GetArgCount() < 2)
+		{
+			This->ClientMessage("Usage: ScalePawn <PawnName> <Multiplier> (case-insensitive, matches substrings)");
+			return;
+		}
+
+		std::string PawnName = Parser.GetArg(0);
+		float Scale = Parser.GetArgFloat(1, 1.0f);
+		if (Scale < 0.1f) Scale = 0.1f;
+		if (Scale > 10.0f) Scale = 10.0f;
+
+		std::string PawnNameLower = Utils::StringToLower(PawnName);
+
+		TArray<AActor*> Pawns;
+		UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+		APawn* TargetPawn = nullptr;
+		for (AActor* Actor : Pawns) {
+			if (!Actor)
+				continue;
+
+			std::string ActorNameLower = Utils::StringToLower(Actor->GetName().ToString());
+			if (ActorNameLower == PawnNameLower || ActorNameLower.find(PawnNameLower) != std::string::npos) {
+				TargetPawn = (APawn*)Actor;
+				break;
+			}
+		}
+
+		if (!TargetPawn) {
+			This->ClientMessage("Pawn with name '" + PawnName + "' not found.");
+			return;
+		}
+
+		ACharacter* TargetCharacter = TargetPawn->Cast<ACharacter>();
+		if (!TargetCharacter) {
+			This->ClientMessage(TargetPawn->GetName().ToString() + " is not a Character, cannot scale it.");
+			return;
+		}
+
+		UCapsuleComponent* Capsule = TargetCharacter->GetCapsuleComponent();
+		if (Capsule)
+			Capsule->SetIsReplicated(true);
+
+		TargetCharacter->SetActorScale3D(FVector(Scale, Scale, Scale));
+		TargetCharacter->ForceNetUpdate();
+
+		This->ClientMessage("Scaled " + TargetCharacter->GetName().ToString() + " to x" + std::to_string(Scale));
+		return;
+	}
+	else if (Parser.IsCommand("Goto")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: Goto <PawnName> (case-insensitive, matches substrings)");
+			return;
+		}
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		std::string PawnName = Parser.GetArg(0);
+		std::string PawnNameLower = Utils::StringToLower(PawnName);
+
+		TArray<AActor*> Pawns;
+		UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+		APawn* TargetPawn = nullptr;
+		for (AActor* Actor : Pawns) {
+			if (!Actor)
+				continue;
+
+			std::string ActorNameLower = Utils::StringToLower(Actor->GetName().ToString());
+			if (ActorNameLower == PawnNameLower || ActorNameLower.find(PawnNameLower) != std::string::npos) {
+				TargetPawn = (APawn*)Actor;
+				break;
+			}
+		}
+
+		if (!TargetPawn) {
+			This->ClientMessage("Pawn with name '" + PawnName + "' not found.");
+			return;
+		}
+
+		if (TargetPawn == This->MyFortPawn) {
+			This->ClientMessage("That's you.");
+			return;
+		}
+
+		FVector TargetLocation = TargetPawn->K2_GetActorLocation();
+		TargetLocation.X += 150.0f;
+		TargetLocation.Z += 50.0f;
+
+		FHitResult HitResult;
+		This->MyFortPawn->K2_SetActorLocation(TargetLocation, false, &HitResult, true);
+		This->ClientMessage("Teleported to " + TargetPawn->GetName().ToString());
+		return;
+	}
+	else if (Parser.IsCommand("DestroyBuildings")) {
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		float Radius = Parser.GetArgFloat(0, 2000.0f);
+		if (Radius < 500.0f) Radius = 500.0f;
+		if (Radius > 10000.0f) Radius = 10000.0f;
+
+		TArray<AActor*> Buildings;
+		UGameplayStatics::GetAllActorsOfClass(World, ABuildingActor::StaticClass(), &Buildings);
+
+		int32 Destroyed = 0;
+		for (AActor* Building : Buildings) {
+			if (!Building)
+				continue;
+
+			if (This->MyFortPawn->GetDistanceTo(Building) > Radius)
+				continue;
+
+			Building->K2_DestroyActor();
+			Destroyed++;
+		}
+
+		This->ClientMessage("Destroyed " + std::to_string(Destroyed) + " buildings within " + std::to_string((int32)Radius) + " units.");
+		return;
+	}
+	else if (Parser.IsCommand("EmoteAll")) {
+		TArray<UObject*> Emotes = FUObjectArray::GetObjectsOfClass(UFortMontageItemDefinitionBase::StaticClass());
+		if (Emotes.Num() == 0) {
+			This->ClientMessage("No emotes are loaded!");	
+			return;
+		}
+
+		TArray<AActor*> Controllers;
+		UGameplayStatics::GetAllActorsOfClass(World, AFortPlayerController::StaticClass(), &Controllers);
+
+		int32 Dancing = 0;
+		for (AActor* Actor : Controllers) {
+			AFortPlayerController* Controller = Actor ? Actor->Cast<AFortPlayerController>() : nullptr;
+			if (!Controller)
+				continue;
+
+			ServerPlayEmoteItem(Controller, (UFortMontageItemDefinitionBase*)Emotes[rand() % Emotes.Num()], 0.0f);
+			Dancing++;
+		}
+
+		This->ClientMessage(std::to_string(Dancing) + " pawns are emoting.");
 		return;
 	}
 
