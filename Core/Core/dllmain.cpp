@@ -88,14 +88,17 @@ DWORD Main(LPVOID)
         }
         Log(std::format("Fortnite CL: {}", Version::Fortnite_CL));
 
-        Sleep(3000);
-
         if (!Config.bListenServer) {
             *GIsClient = false;
         }
         if (Version::Engine_Version > 4.20) {
             *GIsServer = true;
         }
+
+        Finder::SetupOffsets();
+
+        Utils::DumpGObjects(false);
+        Utils::DumpClassProperties("NetDriver"); // DEBUG
 
         if (!Utils::SetupDedicatedServer(Config)) {
             Log("Failed to setup dedicated server!");
@@ -112,11 +115,6 @@ DWORD Main(LPVOID)
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-
-        Finder::SetupOffsets();
-
-        Utils::DumpGObjects(false);
-        Utils::DumpClassProperties("NetDriver"); // DEBUG
 
         Utils::Hook();
 
