@@ -33,6 +33,45 @@ APawn* AFortGameMode::SpawnDefaultPawnFor(AFortGameMode* This, AController* NewP
 	return SpawnDefaultPawnForOG(This, NewPlayer, StartSpot);
 }
 
+bool AFortGameMode::SpawnNativePlayerBot(AActor* SpawnPoint)
+{
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortGameMode::SpawnNativePlayerBot: World is null!");
+		return false;
+	}
+
+	AFortGameMode* FortGameMode = this->Cast<AFortGameMode>();
+	AFortGameModeZone* FortGameModeZone = FortGameMode ? FortGameMode->Cast<AFortGameModeZone>() : nullptr;
+	AFortGameModeAthena* FortGameModeAthena = this->Cast<AFortGameModeAthena>();
+
+	static TArray<AActor*> PlayerStarts;
+	if (PlayerStarts.Num() == 0) {
+		UGameplayStatics::GetAllActorsOfClass(World, AFortPlayerStartWarmup::StaticClass(), &PlayerStarts);
+	}
+
+	int32 MaxSpawnLocations = PlayerStarts.Num();
+	static int32 BotSpawnLocationIndex = 0;
+
+	if (!SpawnPoint && PlayerStarts.Num() > 0) {
+		if (BotSpawnLocationIndex >= MaxSpawnLocations) {
+			BotSpawnLocationIndex = 0;
+		}
+		SpawnPoint = PlayerStarts.IsValidIndex(BotSpawnLocationIndex) ? PlayerStarts[BotSpawnLocationIndex] : nullptr;
+		BotSpawnLocationIndex++;
+	}
+
+	if (!SpawnPoint) {
+		Log("AFortGameMode::SpawnNativePlayerBot: Failed to find spawn point!");
+		return false;
+	}
+
+	FVector SpawnLocation = SpawnPoint->K2_GetActorLocation();
+	FRotator SpawnRotation = SpawnPoint->K2_GetActorRotation();
+
+	return false;
+}
+
 bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 {
 	UWorld* World = UWorld::GetWorld();

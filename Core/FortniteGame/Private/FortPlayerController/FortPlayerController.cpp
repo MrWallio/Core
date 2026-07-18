@@ -164,9 +164,10 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("TeleportToLocation <X> <Y> <Z> - Teleports the player to a specific location.");
 		This->ClientMessage("DumpCurrentLocation - Dumps the player's current location and rotation.");
 		This->ClientMessage("-- Pawns / Bots --");
-		This->ClientMessage("SpawnPlayerBot [bSpawnAtPlayer] - Spawns a player bot at the player's location or a playerstart.");
-		This->ClientMessage("SpawnBot [bSpawnAtPlayer] - Spawns a bot at the player's location or a playerstart.");
-		This->ClientMessage("SpawnCustomBot [bSpawnAtPlayer] [CustomPawnClass] [CustomBehaviorTree] - Spawns a custom configured bot at the player's location or a playerstart.");
+		This->ClientMessage("SpawnNativePlayerBot [bSpawnAtPlayer] [Count] [AtPawn] - Spawns native player bots (like a real player) at you, a named pawn, or a playerstart.");
+		This->ClientMessage("SpawnPlayerBot [bSpawnAtPlayer] [Count] [AtPawn] - Spawns player bots at you, a named pawn, or a playerstart.");
+		This->ClientMessage("SpawnBot [bSpawnAtPlayer] [Count] [AtPawn] [Scale] - Spawns bots at you, a named pawn, or a playerstart.");
+		This->ClientMessage("SpawnCustomBot [bSpawnAtPlayer] [CustomPawnClass] [CustomBehaviorTree] [Count] [AtPawn] [Scale] [Health] [MaxHealth] - Spawns custom configured bots.");
 		This->ClientMessage("DumpAllPawns - Lists every pawn in the world with its index.");
 		This->ClientMessage("PossessPawnByIndex <PawnIndex> - Possesses a pawn by its index (see DumpAllPawns).");
 		This->ClientMessage("PossessPawnByName <PawnName> - Possesses a pawn by name (case-insensitive, substring).");
@@ -190,6 +191,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("DestroyBuildings [Radius] - Destroys every building around you.");
 		This->ClientMessage("EmoteAll - Everyone in the world uses a random emote.");
 		This->ClientMessage("EmoteAllSpecific [EmoteItemDefinitionName] - Everyone in the world uses a specific emote.");
+		This->ClientMessage("EmotePlayerByName <PlayerName> [EmoteItemDefinitionName] - make a player use a specific emote.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -461,23 +463,195 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("=== End of Inventory Dump ===");
 		return;
 	}
+	else if (Parser.IsCommand("SpawnNativePlayerBot")) {
+		bool bSpawnAtPlayer = Parser.GetArgBool("bSpawnAtPlayer", 0, false);
+		int32 Count = Parser.GetArgInt("Count", 1, 1);
+		std::string AtPawnName = Parser.GetArg("AtPawn", 2);
+		if (Count < 1) Count = 1;
+		if (Count > 32) Count = 32;
+
+		AActor* SpawnPoint = bSpawnAtPlayer ? This->MyFortPawn : nullptr;
+
+		if (!AtPawnName.empty()) {
+			std::string AtPawnNameLower = Utils::StringToLower(AtPawnName);
+
+			TArray<AActor*> Pawns;
+			UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+			SpawnPoint = nullptr;
+			for (AActor* Actor : Pawns) {
+				if (!Actor)
+					continue;
+
+				std::string ActorNameLower = Utils::StringToLower(Actor->GetName().ToString());
+				if (ActorNameLower == AtPawnNameLower || ActorNameLower.find(AtPawnNameLower) != std::string::npos) {
+					SpawnPoint = Actor;
+					break;
+				}
+			}
+
+			if (!SpawnPoint) {
+				This->ClientMessage("Pawn with name '" + AtPawnName + "' not found.");
+				return;
+			}
+		}
+
+		int32 SpawnedBots = 0;
+		for (int32 i = 0; i < Count; i++) {
+			if (GameMode->SpawnNativePlayerBot(SpawnPoint))
+				SpawnedBots++;
+		}
+
+		This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " native player bots.");
+		return;
+	}
 	else if (Parser.IsCommand("SpawnPlayerBot")) {
 		bool bSpawnAtPlayer = Parser.GetArgBool("bSpawnAtPlayer", 0, false);
-		
-		bool bSuccessfulSpawn = GameMode->SpawnPlayerBot(bSpawnAtPlayer ? This->MyFortPawn : nullptr);
-		if (bSuccessfulSpawn) {
-			This->ClientMessage("Bot spawned successfully!");
+		int32 Count = Parser.GetArgInt("Count", 1, 1);
+		std::string AtPawnName = Parser.GetArg("AtPawn", 2);
+		if (Count < 1) Count = 1;
+		if (Count > 32) Count = 32;
+
+		AActor* SpawnPoint = bSpawnAtPlayer ? This->MyFortPawn : nullptr;
+
+		if (!AtPawnName.empty()) {
+			std::string AtPawnNameLower = Utils::StringToLower(AtPawnName);
+
+			TArray<AActor*> Pawns;
+			UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+			SpawnPoint = nullptr;
+			for (AActor* Actor : Pawns) {
+				if (!Actor)
+					continue;
+
+				std::string ActorNameLower = Utils::StringToLower(Actor->GetName().ToString());
+				if (ActorNameLower == AtPawnNameLower || ActorNameLower.find(AtPawnNameLower) != std::string::npos) {
+					SpawnPoint = Actor;
+					break;
+				}
+			}
+
+			if (!SpawnPoint) {
+				This->ClientMessage("Pawn with name '" + AtPawnName + "' not found.");
+				return;
+			}
 		}
-		else {
-			This->ClientMessage("Failed to spawn bot.");
+
+		int32 SpawnedBots = 0;
+		for (int32 i = 0; i < Count; i++) {
+			if (GameMode->SpawnPlayerBot(SpawnPoint))
+				SpawnedBots++;
 		}
+
+		This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " player bots.");
 		return;
 	}
 	else if (Parser.IsCommand("SpawnBot")) {
+		bool bSpawnAtPlayer = Parser.GetArgBool("bSpawnAtPlayer", 0, false);
+		int32 Count = Parser.GetArgInt("Count", 1, 1);
+		std::string AtPawnName = Parser.GetArg("AtPawn", 2);
+		float Scale = Parser.GetArgFloat("Scale", 3, 1.0f);
+		if (Count < 1) Count = 1;
+		if (Count > 32) Count = 32;
+		if (Scale < 0.1f) Scale = 0.1f;
+		if (Scale > 10.0f) Scale = 10.0f;
+
+		AActor* SpawnPoint = bSpawnAtPlayer ? This->MyFortPawn : nullptr;
+
+		if (!AtPawnName.empty()) {
+			std::string AtPawnNameLower = Utils::StringToLower(AtPawnName);
+
+			TArray<AActor*> Pawns;
+			UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+			SpawnPoint = nullptr;
+			for (AActor* Actor : Pawns) {
+				if (!Actor)
+					continue;
+
+				std::string ActorNameLower = Utils::StringToLower(Actor->GetName().ToString());
+				if (ActorNameLower == AtPawnNameLower || ActorNameLower.find(AtPawnNameLower) != std::string::npos) {
+					SpawnPoint = Actor;
+					break;
+				}
+			}
+
+			if (!SpawnPoint) {
+				This->ClientMessage("Pawn with name '" + AtPawnName + "' not found.");
+				return;
+			}
+		}
+
+		This->ClientMessage("SpawnBot is not implemented yet. (Count=" + std::to_string(Count)
+			+ " Scale=" + std::to_string(Scale)
+			+ " SpawnPoint=" + (SpawnPoint ? SpawnPoint->GetName().ToString() : "playerstart") + ")");
 		return;
 	}
 	else if (Parser.IsCommand("SpawnCustomBot")) {
+		bool bSpawnAtPlayer = Parser.GetArgBool("bSpawnAtPlayer", 0, false);
+		std::string CustomPawnClassName = Parser.GetArg("CustomPawnClass", 1);
+		std::string CustomBehaviorTreeName = Parser.GetArg("CustomBehaviorTree", 2);
+		int32 Count = Parser.GetArgInt("Count", 3, 1);
+		std::string AtPawnName = Parser.GetArg("AtPawn", 4);
+		float Scale = Parser.GetArgFloat("Scale", 5, 1.0f);
+		float Health = Parser.GetArgFloat("Health", 6, -1.0f);
+		float MaxHealth = Parser.GetArgFloat("MaxHealth", 7, -1.0f);
+		if (Count < 1) Count = 1;
+		if (Count > 32) Count = 32;
+		if (Scale < 0.1f) Scale = 0.1f;
+		if (Scale > 10.0f) Scale = 10.0f;
 
+		UClass* CustomPawnClass = nullptr;
+		if (!CustomPawnClassName.empty()) {
+			UObject* ClassObj = Utils::GetObjectFromString(CustomPawnClassName, EClassCastFlags::CASTCLASS_UClass);
+			CustomPawnClass = ClassObj ? ClassObj->Cast<UClass>() : nullptr;
+			if (!CustomPawnClass) {
+				This->ClientMessage("Custom pawn class not found: " + CustomPawnClassName);
+				return;
+			}
+		}
+
+		UObject* CustomBehaviorTree = nullptr;
+		if (!CustomBehaviorTreeName.empty()) {
+			CustomBehaviorTree = Utils::GetObjectFromString(CustomBehaviorTreeName, EClassCastFlags::RF_NoFlags);
+			if (!CustomBehaviorTree) {
+				This->ClientMessage("Behavior tree not found: " + CustomBehaviorTreeName);
+				return;
+			}
+		}
+
+		AActor* SpawnPoint = bSpawnAtPlayer ? This->MyFortPawn : nullptr;
+
+		if (!AtPawnName.empty()) {
+			std::string AtPawnNameLower = Utils::StringToLower(AtPawnName);
+
+			TArray<AActor*> Pawns;
+			UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+			SpawnPoint = nullptr;
+			for (AActor* Actor : Pawns) {
+				if (!Actor)
+					continue;
+
+				std::string ActorNameLower = Utils::StringToLower(Actor->GetName().ToString());
+				if (ActorNameLower == AtPawnNameLower || ActorNameLower.find(AtPawnNameLower) != std::string::npos) {
+					SpawnPoint = Actor;
+					break;
+				}
+			}
+
+			if (!SpawnPoint) {
+				This->ClientMessage("Pawn with name '" + AtPawnName + "' not found.");
+				return;
+			}
+		}
+
+		This->ClientMessage("SpawnCustomBot is not implemented yet. (Count=" + std::to_string(Count)
+			+ " PawnClass=" + (CustomPawnClass ? CustomPawnClass->GetName().ToString() : "default")
+			+ " BehaviorTree=" + (CustomBehaviorTree ? CustomBehaviorTree->GetName().ToString() : "default")
+			+ " SpawnPoint=" + (SpawnPoint ? SpawnPoint->GetName().ToString() : "playerstart") + ")");
+		return;
 	}
 	else if (Parser.IsCommand("SetHealth")) {
 		if (Parser.GetArgCount() < 1 && !Parser.HasNamedArg("Health"))
@@ -1466,7 +1640,53 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 
 		This->ClientMessage(std::to_string(Dancing) + " pawns are emoting.");
 		return;
+	}
+	else if (Parser.IsCommand("EmotePlayerByName")) {
+		std::string PlayerName = Parser.GetArg("PlayerName", 0);
+
+		if (PlayerName.empty())
+		{
+			This->ClientMessage("Usage: EmotePlayerByName <PlayerName> [EmoteItemDefinitionName]");
+			return;
 		}
+
+		std::string EmoteItemDefinitionName = Parser.GetArg("EmoteItemDefinitionName", 0);
+
+		UFortMontageItemDefinitionBase* ChosenEmote = nullptr;
+		if (!EmoteItemDefinitionName.empty()) {
+			ChosenEmote = (UFortMontageItemDefinitionBase*)Utils::GetObjectFromString(EmoteItemDefinitionName, UFortMontageItemDefinitionBase::StaticClass());
+			if (!ChosenEmote) {
+				This->ClientMessage("EmoteItemDefinition not found: " + EmoteItemDefinitionName);
+				return;
+			}
+		}
+		else {
+			TArray<UObject*> Emotes = FUObjectArray::GetObjectsOfClass(UFortMontageItemDefinitionBase::StaticClass());
+			if (Emotes.Num() == 0) {
+				This->ClientMessage("No emotes are loaded!");
+				return;
+			}
+
+			ChosenEmote = (UFortMontageItemDefinitionBase*)Emotes[rand() % Emotes.Num()];
+		}
+
+		TArray<AActor*> Controllers;
+		UGameplayStatics::GetAllActorsOfClass(World, AFortPlayerController::StaticClass(), &Controllers);
+
+		for (AActor* Actor : Controllers) {
+			AFortPlayerController* Controller = Actor ? Actor->Cast<AFortPlayerController>() : nullptr;
+			if (!Controller)
+				continue;
+
+			AFortPlayerState* PlayerState = Controller->PlayerState->Cast<AFortPlayerState>();
+			if (!PlayerState || PlayerState->GetPlayerName() != PlayerName)
+				continue;
+
+			ServerPlayEmoteItem(Controller, ChosenEmote, 0.0f);
+			This->ClientMessage("Player: " + PlayerName + " is emoting!");
+			return;
+		}
+	}
 
 	if (Version::Fortnite_Version >= 2.2) {
 		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), Msg, This);
