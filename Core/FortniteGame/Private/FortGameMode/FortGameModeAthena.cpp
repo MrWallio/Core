@@ -93,6 +93,14 @@ bool AFortGameModeAthena::SetupPlaylist() {
 	MaxPlayerCount = MaxPlayerCount;
 
 	if (Playlist) {
+		if (FortGameState->_HasTeamSize()) {
+			FortGameState->TeamSize = Playlist->MaxTeamSize;
+		}
+
+		if (FortGameState->_HasTeamCount()) {
+			FortGameState->TeamCount = Playlist->MaxTeamCount;
+		}
+
 		if (FortGameState->_HasCurrentPlaylistData()) {
 			FortGameState->CurrentPlaylistData = Playlist;
 			FortGameState->OnRep_CurrentPlaylistData();
@@ -110,6 +118,23 @@ bool AFortGameModeAthena::SetupPlaylist() {
 	}
 
 	FortGameState->SetCurrentPlaylistId(CurrentPlaylistId);
+
+	if (Playlist && Playlist->MaxTeamCount > 0 && Playlist->MaxTeamSize > 0) {
+		bool bHasUsableTeams = false;
+		for (AFortTeamInfo* TeamInfo : FortGameState->Teams) {
+			if (TeamInfo && TeamInfo->Team >= 2) {
+				bHasUsableTeams = true;
+				break;
+			}
+		}
+
+		// Some playlists can be applied after native team initialization has
+		// already run, leaving only the fallback team in GameState->Teams.
+		if (!bHasUsableTeams) {
+			Log("AFortGameModeAthena::SetupPlaylist: Initializing missing player teams");
+			InitializeTeams();
+		}
+	}
 
 	Log("AFortGameModeAthena::SetupPlaylist: Applied playlist " + (Playlist ? Playlist->GetFName().ToString().ToString() : std::to_string(CurrentPlaylistId)));
 
@@ -232,12 +257,25 @@ uint8 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 		Log("AFortGameModeAthena::PickTeam: Team " + std::to_string(TeamInfo->Team) + " has " + std::to_string(TeamInfo->TeamMembers.Num()) + " members.");
 	}*/
 
+	APlayerState* PlayerStateToIgnore = ControllerToPickFor ? ControllerToPickFor->PlayerState : nullptr;
+
 	for (AFortTeamInfo* TeamInfo : GameState->Teams) {
-		if (!TeamInfo) {
+		if (!TeamInfo || TeamInfo->Team < 2) {
 			continue;
 		}
 
-		int32 TeamMemberCount = TeamInfo->TeamMembers.Num();
+		int32 TeamMemberCount = 0;
+		for (APlayerState* PlayerState : GameState->PlayerArray) {
+			if (!PlayerState || PlayerState == PlayerStateToIgnore) {
+				continue;
+			}
+
+			AFortPlayerStateAthena* AthenaPlayerState = PlayerState->Cast<AFortPlayerStateAthena>();
+			if (AthenaPlayerState && AthenaPlayerState->TeamIndex == TeamInfo->Team) {
+				TeamMemberCount++;
+			}
+		}
+
 		if (TeamMemberCount < GameState->TeamSize) {
 			Log("AFortGameModeAthena::PickTeam: Assigning player to team " + std::to_string(TeamInfo->Team) + " with " + std::to_string(TeamMemberCount) + " members.");
 			return TeamInfo->Team;
@@ -313,6 +351,7 @@ void AFortGameModeAthena::PlacePlayerOnTeam(AFortGameModeAthena* This, AFortPlay
 	if (!FortPS) {
 		return;
 	}
+	
 
 	FCoreConfig& Config = ConfigurationManager::GetConfig();
 	if (FortPS->_HasSquadId()) {
