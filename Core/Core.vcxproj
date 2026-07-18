@@ -352,7 +352,6 @@
     <ClInclude Include="FortniteGame\Public\AI\FortAIController.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIDirector.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIGoalManager.h" />
-    <ClInclude Include="FortniteGame\Public\Bots\CoreBotManager.h" />
     <ClInclude Include="FortniteGame\Public\AI\FortAIPawn.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingAutoNav.h" />
@@ -525,7 +524,6 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\World.cpp" />
     <ClCompile Include="FortniteGame\Private\AI\FortAIDirector.cpp" />
     <ClCompile Include="FortniteGame\Private\AI\FortAIGoalManager.cpp" />
-    <ClCompile Include="FortniteGame\Private\Bots\CoreBotManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Asset\FortAssetManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingActor.cpp" />

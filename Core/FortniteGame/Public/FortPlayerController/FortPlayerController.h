@@ -153,6 +153,8 @@ public:
 
 	void ServerModifyStat(FName StatName, int32 Amount, uint8 ModType, bool bForceStatSave);
 
+	void OnReadyToStartMatchVFT();
+
 	static void Hook() {
 		/*HookVTableIdx(
 			AFortPlayerController::GetDefaultObj(),

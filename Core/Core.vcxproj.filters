@@ -588,9 +588,6 @@
     <ClInclude Include="FortniteGame\Public\AI\FortAIGoalManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FortniteGame\Public\Bots\CoreBotManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FortniteGame\Public\Mcp\McpProfileGroup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1203,9 +1200,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\AI\FortAIDirector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FortniteGame\Private\Bots\CoreBotManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\FortQuest\FortQuestManager.cpp">

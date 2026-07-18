@@ -351,12 +351,11 @@ void AFortGameModeAthena::PlacePlayerOnTeam(AFortGameModeAthena* This, AFortPlay
 	if (!FortPS) {
 		return;
 	}
-	
 
 	FCoreConfig& Config = ConfigurationManager::GetConfig();
 	if (FortPS->_HasSquadId()) {
-		if (GameState->TeamSize > 1 && !Config.bUseGameSessions) {
-			FortPS->SquadId = FortPS->TeamIndex - 3;
+		if (!Config.bUseGameSessions) {
+			FortPS->SquadId = FortPS->TeamIndex;
 		}
 
 		FortPS->OnRep_SquadId();

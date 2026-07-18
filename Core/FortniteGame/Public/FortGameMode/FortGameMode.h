@@ -58,6 +58,8 @@ public:
 
 	void SetCurrentPlaylistId(int32 NewPlaylistID);
 
+	void PlacePlayerOnTeamVFT(AFortPlayerController* FortPC);
+
 	static void Hook() {
 		//CreateVTableOriginal(AFortGameMode::GetDefaultObj(), AFortGameMode::StaticClass()->GetFunction("Function /Script/Engine.GameModeBase.SpawnDefaultPawnFor"), (LPVOID*)&SpawnDefaultPawnForOG);
 		HookVTable(

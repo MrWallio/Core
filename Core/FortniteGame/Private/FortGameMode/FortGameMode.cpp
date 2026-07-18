@@ -221,3 +221,8 @@ void AFortGameMode::SetCurrentPlaylistId(int32 NewPlaylistID) {
 		CurrentPlaylistId = NewPlaylistID;
 	}
 }
+
+void AFortGameMode::PlacePlayerOnTeamVFT(AFortPlayerController* FortPC) {
+	void (*&PlacePlayerOnTeamInternal)(AFortGameMode*, AFortPlayerController*) = decltype(PlacePlayerOnTeamInternal)(VTable[Finder::FindAFortGameMode_PlacePlayerOnTeamVFT()]);
+	return PlacePlayerOnTeamInternal(this, FortPC);
+}

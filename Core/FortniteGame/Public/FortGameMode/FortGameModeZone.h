@@ -5,6 +5,7 @@
 
 #include "FortGameMode.h"
 #include "FortniteGame/Public/FortItem/ItemAndCount.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 class AFortPlayerController;
 class AFortAIGoalManager;
@@ -20,7 +21,7 @@ public:
 	DefineUProperty(TArray<FItemAndCount>, StartingItems);
 	DefineUProperty(AFortAIDirector*, AIDirector);
 	DefineUProperty(AFortAIGoalManager*, AIGoalManager);
-	DefineUProperty(uint8, AssociatedSubGame);
+	DefineUProperty(ESubGame, AssociatedSubGame);
 public:
 	static inline void (*HandleStartingNewPlayerOG)(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer);
 	static void HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer);

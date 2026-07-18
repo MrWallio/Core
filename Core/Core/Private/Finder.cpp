@@ -9153,29 +9153,16 @@ uintptr_t Finder::FindAFortGameModeAthena_AddToAlivePlayers() {
 		return ServerOffsets::AFortGameModeAthena_AddToAlivePlayers;
 	uintptr_t Addr = 0;
 	
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena: Player [%s] added to alive players list (Team [%d]).  Player count is now [%d].  Team count is now [%d]. ").Get();
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena: Player [%s] added to alive players list (Team [%d]).  Player count is now [%d].  Team count is now [%d]. ");
 	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena::AddToAlivePlayers: Player [%s] PC [%s] doesn't have a valid PvP team, and won't be added to the alive players list.").Get();
+		StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena::AddToAlivePlayers: Player [%s] PC [%s] doesn't have a valid PvP team, and won't be added to the alive players list.");
 	}
 	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena::AddToAlivePlayers: Player [%s] PC [%s] added to alive players list (Team [%d]).  Player count is now [%d].  Team count is now [%d].").Get();
+		StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena::AddToAlivePlayers: Player [%s] PC [%s] added to alive players list (Team [%d]).  Player count is now [%d].  Team count is now [%d].");
 	}
 
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x53)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x85 && *(Ptr + 2) == 0xD2)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 	
 	if (Addr) {

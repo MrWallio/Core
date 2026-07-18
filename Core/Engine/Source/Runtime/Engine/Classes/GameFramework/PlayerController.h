@@ -51,6 +51,7 @@ public:
 public:
 	static inline void (*ServerAcknowledgePossessionOG)(APlayerController* This, APawn* P);
 	void ServerAcknowledgePossession(APawn* P);
+	void ServerAcknowledgePossessionVFT(APawn* P);
 
 	void SendClientAdjustment();
 

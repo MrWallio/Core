@@ -33,7 +33,7 @@ public:
 
 	DefineUProperty(FScalableFloat, MaxStackSize);
 
-	DefineUProperty(uint8, ItemType);
+	DefineUProperty(EFortItemType, ItemType);
 	DefineUProperty(uint8, Rarity);
 
 	DefineBitfieldUProperty(bForceAutoPickup);

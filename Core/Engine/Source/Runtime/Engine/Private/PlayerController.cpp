@@ -18,6 +18,21 @@ void APlayerController::ServerAcknowledgePossession(APawn* P)
 	Call(Func, P);
 }
 
+void APlayerController::ServerAcknowledgePossessionVFT(APawn* P)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("ServerAcknowledgePossession");
+
+	if (!Func) {
+		return;
+	}
+
+	void (*&ServerAcknowledgePossessionInternal)(APlayerController*, APawn*) = decltype(ServerAcknowledgePossessionInternal)(VTable[Func->GetVTableIndex()]);
+	return ServerAcknowledgePossessionInternal(this, P);
+}
+
 void APlayerController::SendClientAdjustment()
 {
 	void (*&SendClientAdjustmentInternal)(APlayerController*) = decltype(SendClientAdjustmentInternal)(VTable[Finder::FindAPlayerController_SendClientAdjustmentVFT()]);

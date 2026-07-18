@@ -38,6 +38,21 @@ void AGameModeBase::RestartPlayer(AController* NewPlayer)
 	return const_cast<AGameModeBase*>(this)->Call<void>(Func, NewPlayer);
 }
 
+void AGameModeBase::RestartPlayerVFT(AController* NewPlayer)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("RestartPlayer");
+
+	if (!Func) {
+		return;
+	}
+
+	void (*&RestartPlayerInternal)(AGameModeBase*, AController*) = decltype(RestartPlayerInternal)(VTable[Func->GetVTableIndex()]);
+	return RestartPlayerInternal(this, NewPlayer);
+}
+
 void AGameModeBase::FinishRestartPlayer(AController* NewPlayer, const FRotator& StartRotation)
 {
 	void (*&FinishRestartPlayerInternal)(AGameModeBase*, AController*, const FRotator&) = decltype(FinishRestartPlayerInternal)(VTable[Finder::FindAGameModeBase_FinishRestartPlayerVFT()]);
@@ -52,6 +67,21 @@ void AGameModeBase::HandleStartingNewPlayer(APlayerController* NewPlayer)
 		Func = FindFunction("HandleStartingNewPlayer");
 
 	return const_cast<AGameModeBase*>(this)->Call<void>(Func, NewPlayer);
+}
+
+void AGameModeBase::HandleStartingNewPlayerVFT(APlayerController* NewPlayer)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("HandleStartingNewPlayer");
+
+	if (!Func) {
+		return;
+	}
+
+	void (*&HandleStartingNewPlayerInternal)(AGameModeBase*, APlayerController*) = decltype(HandleStartingNewPlayerInternal)(VTable[Func->GetVTableIndex()]);
+	return HandleStartingNewPlayerInternal(this, NewPlayer);
 }
 
 AActor* AGameModeBase::ChoosePlayerStart(AController* Player)

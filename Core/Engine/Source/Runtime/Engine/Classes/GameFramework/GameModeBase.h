@@ -42,10 +42,12 @@ public:
 	APawn* SpawnDefaultPawnAtTransform(AController* NewPlayer, const FTransform& SpawnTransform);
 
 	void RestartPlayer(AController* NewPlayer);
+	void RestartPlayerVFT(AController* NewPlayer);
 
 	void FinishRestartPlayer(AController* NewPlayer, const FRotator& StartRotation);
 
 	void HandleStartingNewPlayer(APlayerController* NewPlayer);
+	void HandleStartingNewPlayerVFT(APlayerController* NewPlayer);
 
 	AActor* ChoosePlayerStart(AController* Player);
 
