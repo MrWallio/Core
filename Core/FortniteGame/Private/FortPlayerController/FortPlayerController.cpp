@@ -186,7 +186,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("Goto <PawnName> - Teleports you to a pawn.");
 		This->ClientMessage("DestroyBuildings [Radius] - Destroys every building around you.");
 		This->ClientMessage("EmoteAll - Everyone in the world uses a random emote.");
-		This->ClientMessage("SupplyDrop [Count] - Calls in supply drops above you.");
+		This->ClientMessage("EmoteAllSpecific [EmoteItemDefinitionName] - Everyone in the world uses a specific emote.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -1408,6 +1408,41 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage(std::to_string(Dancing) + " pawns are emoting.");
 		return;
 	}
+	else if (Parser.IsCommand("EmoteAllSpecific")) {
+		std::string EmoteItemDefinitionName = Parser.GetArg(0);
+
+		UFortMontageItemDefinitionBase* ChosenEmote = nullptr;
+		if (!EmoteItemDefinitionName.empty()) {
+			ChosenEmote = (UFortMontageItemDefinitionBase*)Utils::GetObjectFromString(EmoteItemDefinitionName, UFortMontageItemDefinitionBase::StaticClass());
+			if (!ChosenEmote) {
+				This->ClientMessage("EmoteItemDefinition not found: " + EmoteItemDefinitionName);
+				return;
+			}
+		}
+		else {
+			TArray<UObject*> Emotes = FUObjectArray::GetObjectsOfClass(UFortMontageItemDefinitionBase::StaticClass());
+			if (Emotes.Num() == 0) {
+				This->ClientMessage("No emotes are loaded!");
+				return;
+			}
+		}
+
+		TArray<AActor*> Controllers;
+		UGameplayStatics::GetAllActorsOfClass(World, AFortPlayerController::StaticClass(), &Controllers);
+
+		int32 Dancing = 0;
+		for (AActor* Actor : Controllers) {
+			AFortPlayerController* Controller = Actor ? Actor->Cast<AFortPlayerController>() : nullptr;
+			if (!Controller)
+				continue;
+
+			ServerPlayEmoteItem(Controller, ChosenEmote, 0.0f);
+			Dancing++;
+		}
+
+		This->ClientMessage(std::to_string(Dancing) + " pawns are emoting.");
+		return;
+		}
 
 	if (Version::Fortnite_Version >= 2.2) {
 		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), Msg, This);
