@@ -24,4 +24,6 @@ public:
 
 	FORCEINLINE bool IsActive() const { return bIsActive; }
 	FORCEINLINE bool GetIsReplicated() const { return bReplicates; }
+
+	void SetIsReplicated(bool bShouldReplicate);
 };

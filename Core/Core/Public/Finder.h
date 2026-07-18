@@ -1092,6 +1092,8 @@ public:
 	static uintptr_t FindABuildingActor_HandleDamagedVFT();
 
 	static uintptr_t FindAFortMission_CreateEncounterSequence();
+
+	static uintptr_t FindABuildingTrap_FinishTrigger();
 public:
 	static void SetupCoreOffsets();
 

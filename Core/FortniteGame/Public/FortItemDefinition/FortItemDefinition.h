@@ -74,6 +74,11 @@ public:
 	DefineUnrealClass(UAthenaDanceItemDefinition);
 };
 
+class UFortEmoteItemDefinition : public UFortMontageItemDefinitionBase {
+public:
+	DefineUnrealClass(UAthenaDanceItemDefinition);
+};
+
 class UAthenaEmojiItemDefinition : public UAthenaDanceItemDefinition {
 public:
 	DefineUnrealClass(UAthenaEmojiItemDefinition);

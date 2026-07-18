@@ -299,6 +299,26 @@ bool AActor::K2_SetActorLocation(FVector& NewLocation, bool bSweep, FHitResult* 
 	return Call<bool>(Func, NewLocation, bSweep, SweepHitResult, bTeleport);
 }
 
+FVector AActor::GetActorScale3D()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("GetActorScale3D");
+
+	return Call<FVector>(Func);
+}
+
+void AActor::SetActorScale3D(FVector NewScale3D)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("SetActorScale3D");
+
+	Call(Func, NewScale3D);
+}
+
 void AActor::FlushNetDormancy()
 {
 	static UFunction* Func = nullptr;

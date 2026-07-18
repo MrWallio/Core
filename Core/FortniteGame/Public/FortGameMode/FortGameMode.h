@@ -29,6 +29,8 @@ public:
 	static inline APawn* (*SpawnDefaultPawnForOG)(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);
 	static APawn* SpawnDefaultPawnFor(AFortGameMode* This, AController* NewPlayer, AActor* StartSpot);
 
+	bool SpawnNativePlayerBot(AActor* SpawnPoint = nullptr);
+
 	bool SpawnPlayerBot(AActor* SpawnPoint = nullptr);
 
 	uint8 PickTeam(uint8 PreferredTeam, AFortPlayerController* ControllerToPickFor);

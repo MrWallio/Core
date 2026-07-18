@@ -35,4 +35,6 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetMesh() const { return Mesh; }
 	FORCEINLINE UCharacterMovementComponent* GetCharacterMovement() const { return CharacterMovement; }
 	FORCEINLINE UCapsuleComponent* GetCapsuleComponent() const { return CapsuleComponent; }
+
+	void LaunchCharacter(FVector LaunchVelocity, bool bXYOverride, bool bZOverride);
 };

@@ -37,5 +37,8 @@ public:
 
 	static void AddInactivePlayerHK(AFortGameModeZone* This, APlayerState* PlayerState, APlayerController* PC);
 
+	static inline void (*InitGameStateOG)(AFortGameModeZone* This);
+	static void InitGameState(AFortGameModeZone* This);
+
 	static void Hook();
 };

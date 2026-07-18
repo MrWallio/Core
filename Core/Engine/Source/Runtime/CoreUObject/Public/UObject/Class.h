@@ -530,7 +530,19 @@ Ret UObject::Call(UFunction* Function, Args&&... args)
         return Mem; \
     } \
 
+// A reflected enum is a 1-byte value type: it carries its uint8 value, converts implicitly in both
+// directions, and so supports every integer operator (==, <, |, &, ~, switch, ...) and drops straight
+// into parameter structs and reflected calls in place of uint8. Enumerator values still resolve by
+// name at runtime (DefineEnumProperty), because they shift between builds.
 #define DefineUnrealEnum(__Class) \
+private: \
+    uint8 __EnumValue = 0; \
+public: \
+    using __EnumType = __Class; \
+    constexpr __Class() = default; \
+    constexpr __Class(uint8 InValue) : __EnumValue(InValue) {} \
+    constexpr operator uint8() const { return __EnumValue; } \
+    \
     static UEnum* StaticEnum() \
     { \
         static UEnum* CachedStaticEnum = nullptr; \

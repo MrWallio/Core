@@ -675,4 +675,6 @@ namespace ServerOffsets {
 	inline uintptr_t AFortDecoTool_SpawnDecoVFT = 0;
 
 	inline uintptr_t AFortMission_CreateEncounterSequence = 0;
+
+	inline uintptr_t ABuildingTrap_FinishTrigger = 0;
 }

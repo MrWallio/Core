@@ -108,8 +108,8 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 	bool bRandomRotation,
 	bool bBlockedFromAutoPickup,
 	int32 PickupInstigatorHandle,
-	uint8 SourceType,
-	uint8 Source,
+	EFortPickupSourceTypeFlag SourceType,
+	EFortPickupSpawnSource Source,
 	AFortPlayerController* OptionalOwnerPC,
 	bool bPickupOnlyRelevantToOwner) {
 	if (!ItemDefinition) {

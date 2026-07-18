@@ -33,6 +33,8 @@ public:
 	FORCEINLINE FRotator GetRelativeRotation() const { return RelativeRotation; }
 	FORCEINLINE FVector GetRelativeScale3D() const { return RelativeScale3D; }
 
+	void SetRelativeScale3D(FVector NewScale3D);
+
 	FORCEINLINE bool IsVisible() const { return bVisible; }
 
 	USceneComponent* GetAttachmentRoot() const

@@ -67,7 +67,6 @@ bool UObjectBase::IsA(UClass* TypeClass) const
 	}
 
 	if (!TypeClass) {
-		Log("IsA: TypeClass is null when checking: " + GetFullName());
 		return false;
 	}
 

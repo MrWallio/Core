@@ -132,6 +132,10 @@ public:
 
 	FRotator K2_GetActorRotation() const;
 
+	FVector GetActorScale3D();
+
+	void SetActorScale3D(FVector NewScale3D);
+
 	ENetRole GetRemoteRole() const;
 
 	ULevel* GetLevel() const { return GetOuter()->Cast<ULevel>(); }

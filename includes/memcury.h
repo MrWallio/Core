@@ -1269,8 +1269,12 @@ namespace Memcury
             }
         }
 
-        // Mirror of FindFunctionStart: returns the address one-past the last byte of the
-        // function containing the current address, from RUNTIME_FUNCTION::EndAddress.
+        // Returns the address one-past the last byte of the function containing the current address.
+        //
+        // A RUNTIME_FUNCTION only describes one chunk, and MSVC splits most functions into several
+        // chained chunks whose primary entry often covers just the prologue -- so a single EndAddress
+        // (even the primary's) stops far short of the real end. Walk the contiguous chunks that resolve
+        // back to the same primary instead.
         auto FindFunctionEnd() -> Scanner
         {
             uintptr_t ImageBase = Memcury::PE::GetModuleBase();
@@ -1279,17 +1283,29 @@ namespace Memcury
             if (!RFE)
                 return *this;
 
+            uintptr_t Primary = FindFunctionStart().Get();
+            uintptr_t End = ImageBase + RFE->EndAddress;
+
             while (true)
             {
-                auto* Scuffness = reinterpret_cast<UNWIND_INFO_HDR*>(ImageBase + RFE->UnwindData);
-                BYTE Flags = Scuffness->VersionFlags >> 3;
+                uintptr_t NextBase = Memcury::PE::GetModuleBase();
 
-                if (!(Flags & UNW_FLAG_CHAININFO))
-                    return Scanner(ImageBase + RFE->EndAddress);
+                RUNTIME_FUNCTION* Next = RtlLookupFunctionEntry(End, &NextBase, nullptr);
+                if (!Next)
+                    break;
 
-                DWORD CodesSize = ((Scuffness->CountOfCodes + 1) & ~1) * sizeof(WORD);
-                RFE = reinterpret_cast<RUNTIME_FUNCTION*>(reinterpret_cast<BYTE*>(Scuffness) + sizeof(UNWIND_INFO_HDR) + CodesSize);
+                // Once the chunk at End belongs to a different function, we are past the last byte.
+                if (Scanner(End).FindFunctionStart().Get() != Primary)
+                    break;
+
+                uintptr_t NextEnd = NextBase + Next->EndAddress;
+                if (NextEnd <= End)
+                    break;
+
+                End = NextEnd;
             }
+
+            return Scanner(End);
         }
     };
 
@@ -1719,10 +1735,37 @@ inline bool IsReturnNullStub(uintptr_t Addr)
     if (!Addr)
         return false;
 
+    // Follow leading jmp thunks. Incremental-linked / hot-patched builds (e.g. 3.6) don't call the folded
+    // body directly -- every call goes through an `EB rel8` / `E9 rel32` jump thunk (sometimes `EB 01 CC`,
+    // a short jump over an int3 pad, then the real `E9`). Chase those to the actual body before matching.
+    for (int hops = 0; Addr && hops < 4; hops++)
+    {
+        auto* j = reinterpret_cast<const uint8_t*>(Addr);
+        if (j[0] == 0xE9)
+            Addr = Addr + 5 + *reinterpret_cast<const int32_t*>(Addr + 1);
+        else if (j[0] == 0xEB)
+            Addr = Addr + 2 + *reinterpret_cast<const int8_t*>(Addr + 1);
+        else
+            break;
+    }
+    if (!Addr)
+        return false;
+
     auto b = reinterpret_cast<const uint8_t*>(Addr);
-    return (b[0] == 0x33 && b[1] == 0xC0 && b[2] == 0xC3)                        // xor eax, eax ; ret
-        || (b[0] == 0x48 && b[1] == 0x33 && b[2] == 0xC0 && b[3] == 0xC3)        // xor rax, rax ; ret
-        || (b[0] == 0xB8 && !b[1] && !b[2] && !b[3] && !b[4] && b[5] == 0xC3);   // mov eax, 0 ; ret
+
+    // return 0: xor eax,eax / xor rax,rax / mov eax,0
+    int i;
+    if (b[0] == 0x33 && b[1] == 0xC0)                             i = 2;
+    else if (b[0] == 0x48 && b[1] == 0x33 && b[2] == 0xC0)        i = 3;
+    else if (b[0] == 0xB8 && !b[1] && !b[2] && !b[3] && !b[4])    i = 5;
+    else                                                         return false;
+
+    // ...then a return. Either a plain `ret`, or the `lea rsp,[rsp+8] ; jmp qword [rsp-8]` transform some
+    // builds emit in place of `C3`.
+    return b[i] == 0xC3
+        || b[i] == 0xC2
+        || (b[i] == 0x48 && b[i + 1] == 0x8D && b[i + 2] == 0x64 && b[i + 3] == 0x24 && b[i + 4] == 0x08
+            && b[i + 5] == 0xFF && b[i + 6] == 0x64 && b[i + 7] == 0x24 && b[i + 8] == 0xF8);
 }
 
 // First E8 CALL in [Start, End) whose resolved target == Target, or 0 if the range never calls it.
