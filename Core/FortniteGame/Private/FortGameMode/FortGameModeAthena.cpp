@@ -289,7 +289,7 @@ uint8 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 	InitGameStateOG(This);
 
-	if (Version::Fortnite_Version == 3.5 || Version::Fortnite_Version == 3.6 || Version::Fortnite_Version == 4.0) {
+	if (Version::Fortnite_Version >= 3.5 && Version::Fortnite_Version <= 3.6) {
 		std::thread([This]() {
 			while (true) {
 				UWorld* World = UWorld::GetWorld();
@@ -302,6 +302,9 @@ void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
+
+			// sleep for a second to make sure it wont freeze
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 			if (!This || !This->SetupPlaylist()) {
 				Log("Failed to setup playlist!");
