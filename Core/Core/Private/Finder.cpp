@@ -9154,10 +9154,10 @@ uintptr_t Finder::FindAFortGameModeAthena_AddToAlivePlayers() {
 	uintptr_t Addr = 0;
 	
 	auto StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena: Player [%s] added to alive players list (Team [%d]).  Player count is now [%d].  Team count is now [%d]. ");
-	if (!StringAddr) {
+	if (!StringAddr.IsValid()) {
 		StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena::AddToAlivePlayers: Player [%s] PC [%s] doesn't have a valid PvP team, and won't be added to the alive players list.");
 	}
-	if (!StringAddr) {
+	if (!StringAddr.IsValid()) {
 		StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena::AddToAlivePlayers: Player [%s] PC [%s] added to alive players list (Team [%d]).  Player count is now [%d].  Team count is now [%d].");
 	}
 
