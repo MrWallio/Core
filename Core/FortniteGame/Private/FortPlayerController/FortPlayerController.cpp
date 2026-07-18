@@ -144,31 +144,33 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 	if (Parser.IsCommand("Help"))
 	{
 		This->ClientMessage("=== Available Commands ===");
+		This->ClientMessage("-- Items / Ammo --");
 		This->ClientMessage("GiveItem <ItemDefinitionName> [Count] - Gives an item to the player's inventory.");
-		This->ClientMessage("ForceGiveItem <ItemDefinitionName> [Count] - Forces an item to the player's inventory. Use this if GiveItem fails!");
+		This->ClientMessage("ForceGiveItem <ItemDefinitionName> [Count] - Forces an item into the inventory. Use this if GiveItem fails!");
 		This->ClientMessage("SpawnPickup <ItemDefinitionName> [Count] - Spawns a pickup at the player's location.");
 		This->ClientMessage("SetLoadedAmmo <LoadedAmmo> - Sets the loaded ammo of the currently equipped weapon.");
 		This->ClientMessage("GiveAmmo [Amount] - Gives ammo for the currently equipped weapon.");
-		This->ClientMessage("DumpInventory - Dump Inventory Stats");
-		This->ClientMessage("SpawnBot [bSpawnAtPlayer] - Spawns a bot at the player's location or playerstart.");
-		This->ClientMessage("SetHealth <Health> - Sets the player's health.");
-		This->ClientMessage("SetShield <Shield> - Sets the player's shield.");
-		This->ClientMessage("SetMaxHealth <MaxHealth> - Sets the player's max health.");
-		This->ClientMessage("SetMaxShield <MaxShield> - Sets the player's max shield.");
-		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] - Spawns an actor");
-		This->ClientMessage("ClearEquippedItem - Clears the currently equipped item.");
+		This->ClientMessage("ClearEquippedItem - Removes the currently equipped item from the inventory.");
 		This->ClientMessage("GetWeaponStats - Gets the stats of the currently equipped weapon.");
-		This->ClientMessage("DumpActorsWithClass <ClassName> - Dumps all actors of a specific class.");
-		This->ClientMessage("TeleportToLocation <X> <Y> <Z> - Teleports the player to a specific location.");
-		This->ClientMessage("DumpCurrentLocation - Dumps the player's current location.");
-		This->ClientMessage("SpawnQuickBars - Spawns the player's quickbars.");
-		This->ClientMessage("DestroyQuickBars - Destroys the player's quickbars.");
-		This->ClientMessage("DumpQuickBars - Dumps the player's quickbars.");
 		This->ClientMessage("ServerExecuteInventoryItem <ItemGuid> - Executes an inventory item by its GUID.");
-		This->ClientMessage("PossessPawnByIndex <PawnIndex> - Possesses a pawn by its index in the array.");
-		This->ClientMessage("PossessPawnByName <PawnName> - Possesses a pawn by its name.");
-		This->ClientMessage("DumpAllPawns - Dumps all the pawns in the world.");
+		This->ClientMessage("DumpInventory - Dumps inventory stats and items.");
+		This->ClientMessage("-- Player --");
+		This->ClientMessage("SetHealth <Health> / SetMaxHealth <MaxHealth> - Sets the player's health / max health.");
+		This->ClientMessage("SetShield <Shield> / SetMaxShield <MaxShield> - Sets the player's shield / max shield.");
 		This->ClientMessage("SetKillScore <NewScore> - Sets the player's kill score.");
+		This->ClientMessage("TeleportToLocation <X> <Y> <Z> - Teleports the player to a specific location.");
+		This->ClientMessage("DumpCurrentLocation - Dumps the player's current location and rotation.");
+		This->ClientMessage("-- Pawns / Bots --");
+		This->ClientMessage("SpawnBot [bSpawnAtPlayer] - Spawns a bot at the player's location or a playerstart.");
+		This->ClientMessage("DumpAllPawns - Lists every pawn in the world with its index.");
+		This->ClientMessage("PossessPawnByIndex <PawnIndex> - Possesses a pawn by its index (see DumpAllPawns).");
+		This->ClientMessage("PossessPawnByName <PawnName> - Possesses a pawn by name (case-insensitive, substring).");
+		This->ClientMessage("-- World / Actors --");
+		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] - Spawns an actor at the player.");
+		This->ClientMessage("DumpActorsWithClass <ClassName> - Lists all actors of a class with their locations.");
+		This->ClientMessage("DestroyTarget - Destroys the actor under the crosshair.");
+		This->ClientMessage("-- QuickBars --");
+		This->ClientMessage("SpawnQuickBars / DestroyQuickBars / DumpQuickBars - Manage the player's quickbars.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -247,12 +249,15 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 			AFortPlayerPawn::ServerHandlePickup(Pawn, Pickup, Pickup->PickupLocationData.FlyTime, ZeroVector, true);
 			This->ClientMessage("Given Item: (Item=" + ItemDef->GetName().ToString() + " Count=" + std::to_string(Count) + ")");
 		}
+		else {
+			This->ClientMessage("Failed to spawn pickup for item: " + ItemDef->GetName().ToString() + " - try ForceGiveItem.");
+		}
 		return;
 	}
 	else if (Parser.IsCommand("ForceGiveItem")) {
 		if (Parser.GetArgCount() < 1)
 		{
-			This->ClientMessage("Usage: GiveItem <ItemDefinitionName> [Count]");
+			This->ClientMessage("Usage: ForceGiveItem <ItemDefinitionName> [Count]");
 			return;
 		}
 
@@ -276,7 +281,13 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 			return;
 		}
 
-		This->WorldInventory->AddItem(ItemDef, Count);
+		FFortItemEntry* AddedEntry = This->WorldInventory->AddItem(ItemDef, Count);
+		if (AddedEntry) {
+			This->ClientMessage("Force-gave item: (Item=" + ItemDef->GetName().ToString() + " Count=" + std::to_string(Count) + ")");
+		}
+		else {
+			This->ClientMessage("Failed to add item: " + ItemDef->GetName().ToString());
+		}
 		return;
 	}
 	else if (Parser.IsCommand("SpawnPickup")) {
@@ -306,7 +317,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 			return;
 		}
 
-		UFortKismetLibrary::K2_SpawnPickupInWorld(
+		AFortPickup* SpawnedPickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
 			World,
 			ItemDef,
 			Count,
@@ -322,6 +333,13 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 			This,
 			false
 		);
+
+		if (SpawnedPickup) {
+			This->ClientMessage("Spawned pickup: (Item=" + ItemDef->GetName().ToString() + " Count=" + std::to_string(Count) + ")");
+		}
+		else {
+			This->ClientMessage("Failed to spawn pickup for item: " + ItemDef->GetName().ToString());
+		}
 		return;
 	}
 	else if (Parser.IsCommand("SetLoadedAmmo")) {
@@ -586,7 +604,8 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 	}
 	else if (Parser.IsCommand("DestroyTarget"))
 	{
-		This->CheatManager->DestroyTarget();
+		CheatManager->DestroyTarget();
+		This->ClientMessage("Destroyed target.");
 		return;
 	}
 	else if (Parser.IsCommand("DumpActorsWithClass")) {
@@ -614,15 +633,15 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		UGameplayStatics::GetAllActorsOfClass(World, ActorClass, &FoundActors);
 
 		This->ClientMessage("Found " + std::to_string(FoundActors.Num()) + " actors of class: " + ActorClass->GetName().ToString());
-		This->ClientMessage("=== Actor List ===");
-		for (AActor* Actor : FoundActors) {
-			This->ClientMessage("");
-			This->ClientMessage("Actor: " + Actor->GetName().ToString());
+		for (int32 i = 0; i < FoundActors.Num(); i++) {
+			AActor* Actor = FoundActors[i];
+			if (!Actor)
+				continue;
+
 			FVector ActorLocation = Actor->K2_GetActorLocation();
-			This->ClientMessage("Location: X=" + std::to_string(ActorLocation.X) + " Y=" + std::to_string(ActorLocation.Y) + " Z=" + std::to_string(ActorLocation.Z));
-			This->ClientMessage("");
+			This->ClientMessage("[" + std::to_string(i) + "] " + Actor->GetName().ToString()
+				+ " @ X=" + std::to_string(ActorLocation.X) + " Y=" + std::to_string(ActorLocation.Y) + " Z=" + std::to_string(ActorLocation.Z));
 		}
-		This->ClientMessage("=== End of Actor List ===");
 		return;
 	}
 	else if (Parser.IsCommand("TeleportToLocation")) {
@@ -656,12 +675,10 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		}
 
 		FVector CurrentLocation = This->MyFortPawn->K2_GetActorLocation();
+		FRotator CurrentRotation = This->MyFortPawn->K2_GetActorRotation();
 
-		This->ClientMessage("=== Current Location ===");
-		This->ClientMessage("X: " + std::to_string(CurrentLocation.X));
-		This->ClientMessage("Y: " + std::to_string(CurrentLocation.Y));
-		This->ClientMessage("Z: " + std::to_string(CurrentLocation.Z));
-		This->ClientMessage("=== End of Current Location ===");
+		This->ClientMessage("Location: X=" + std::to_string(CurrentLocation.X) + " Y=" + std::to_string(CurrentLocation.Y) + " Z=" + std::to_string(CurrentLocation.Z));
+		This->ClientMessage("Rotation: Pitch=" + std::to_string(CurrentRotation.Pitch) + " Yaw=" + std::to_string(CurrentRotation.Yaw));
 
 		return;
 	}
@@ -693,16 +710,10 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		}
 	else if (Parser.IsCommand("DumpQuickBars")) {
 		if (This->QuickBars) {
-			This->ClientMessage("=== QuickBars ===");
-			This->ClientMessage("QuickBars: " + This->QuickBars->GetName().ToString());
-			This->ClientMessage("QuickBars Address: " + std::to_string((uintptr_t)This->QuickBars));
-			This->ClientMessage("=== End of QuickBars ===");
+			This->ClientMessage("QuickBars: " + This->QuickBars->GetName().ToString() + " @ 0x" + std::format("{:X}", (uintptr_t)This->QuickBars));
 		}
 		else if (This->ClientQuickBars) {
-			This->ClientMessage("=== ClientQuickBars ===");
-			This->ClientMessage("ClientQuickBars: " + This->ClientQuickBars->GetName().ToString());
-			This->ClientMessage("ClientQuickBars Address: " + std::to_string((uintptr_t)This->ClientQuickBars));
-			This->ClientMessage("=== End of ClientQuickBars ===");
+			This->ClientMessage("ClientQuickBars: " + This->ClientQuickBars->GetName().ToString() + " @ 0x" + std::format("{:X}", (uintptr_t)This->ClientQuickBars));
 		}
 		else {
 			This->ClientMessage("No QuickBars to dump.");
@@ -721,7 +732,13 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 
 		FGuid ItemGuid = FGuid::ParseGUID(GuidA);
 
+		if (!This->FindItemInstance(ItemGuid)) {
+			This->ClientMessage("No inventory item with GUID: " + GuidA + " (see DumpInventory)");
+			return;
+		}
+
 		This->ServerExecuteInventoryItem(This, ItemGuid);
+		This->ClientMessage("Executed inventory item: " + GuidA);
 
 		return;
 		}
@@ -768,7 +785,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		if (PreviousPawn) {
 			This->ClientMessage("Left behind: " + PreviousPawn->GetName().ToString());
 			if (PreviousPawn->Controller) {
-				Log("PossessPawnByIndex: previous pawn " + PreviousPawn->GetName().ToString() + " still has a Controller (" + PreviousPawn->Controller->GetName().ToString() + ") after UnPossessVFT!");
+				Log("PossessPawnByIndex: previous pawn " + PreviousPawn->GetName().ToString() + " still has a Controller (" + PreviousPawn->Controller->GetName().ToString() + ") after possession!");
 				This->ClientMessage("Warning: previous pawn did not fully detach.");
 			}
 		}
@@ -848,7 +865,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		if (PreviousPawn) {
 			This->ClientMessage("Left behind: " + PreviousPawn->GetName().ToString());
 			if (PreviousPawn->Controller) {
-				Log("PossessPawnByName: previous pawn " + PreviousPawn->GetName().ToString() + " still has a Controller (" + PreviousPawn->Controller->GetName().ToString() + ") after UnPossessVFT!");
+				Log("PossessPawnByName: previous pawn " + PreviousPawn->GetName().ToString() + " still has a Controller (" + PreviousPawn->Controller->GetName().ToString() + ") after possession!");
 				This->ClientMessage("Warning: previous pawn did not fully detach.");
 			}
 		}
@@ -860,20 +877,17 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
 
 		This->ClientMessage("Found " + std::to_string(Pawns.Num()) + " pawns in the world.");
-		
-		This->ClientMessage("=== Pawn List ===");
 
 		for (int32 i = 0; i < Pawns.Num(); ++i) {
-			AActor* Actor = Pawns[i];
-			if (Actor) {
-				This->ClientMessage("");
-				This->ClientMessage("Pawn: " + Actor->GetName().ToString());
-				This->ClientMessage("Pawn Index: " + std::to_string(i));
-				This->ClientMessage("");
-			}
-		}
+			APawn* IndexedPawn = (APawn*)Pawns[i];
+			if (!IndexedPawn)
+				continue;
 
-		This->ClientMessage("=== End of Pawn List ===");
+			std::string Line = "[" + std::to_string(i) + "] " + IndexedPawn->GetName().ToString() + " (" + IndexedPawn->GetClass()->GetName().ToString() + ")";
+			if (IndexedPawn->Controller)
+				Line += " - controlled by " + IndexedPawn->Controller->GetName().ToString();
+			This->ClientMessage(Line);
+		}
 
 		return;
 	}
