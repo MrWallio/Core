@@ -26,8 +26,11 @@
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
+#include "FortniteGame/Public/Bots/CoreBotManager.h"
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 #include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
+#include "FortniteGame/Public/AI/FortAIController.h"
+#include "FortniteGame/Public/AI/FortAIPawn.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -166,8 +169,8 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("-- Pawns / Bots --");
 		This->ClientMessage("SpawnNativePlayerBot [bSpawnAtPlayer] [Count] [AtPawn] - Spawns native player bots (like a real player) at you, a named pawn, or a playerstart.");
 		This->ClientMessage("SpawnPlayerBot [bSpawnAtPlayer] [Count] [AtPawn] - Spawns player bots at you, a named pawn, or a playerstart.");
-		This->ClientMessage("SpawnBot [bSpawnAtPlayer] [Count] [AtPawn] [Scale] - Spawns bots at you, a named pawn, or a playerstart.");
-		This->ClientMessage("SpawnCustomBot [bSpawnAtPlayer] [CustomPawnClass] [CustomBehaviorTree] [Count] [AtPawn] [Scale] [Health] [MaxHealth] - Spawns custom configured bots.");
+		This->ClientMessage("SpawnBot [bSpawnAtPlayer] [Count] [AtPawn] [Scale] - Spawns AI creature bots (husks etc.) at you, a named pawn, or a playerstart.");
+		This->ClientMessage("SpawnCustomBot [bSpawnAtPlayer] [CustomPawnClass] [CustomBehaviorTree] [Count] [AtPawn] [Scale] [Health] [MaxHealth] - Spawns custom AI creature bots (husks etc.).");
 		This->ClientMessage("DumpAllPawns - Lists every pawn in the world with its index.");
 		This->ClientMessage("PossessPawnByIndex <PawnIndex> - Possesses a pawn by its index (see DumpAllPawns).");
 		This->ClientMessage("PossessPawnByName <PawnName> - Possesses a pawn by name (case-insensitive, substring).");
@@ -497,12 +500,21 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		}
 
 		int32 SpawnedBots = 0;
+		std::string LastError;
 		for (int32 i = 0; i < Count; i++) {
-			if (GameMode->SpawnNativePlayerBot(SpawnPoint))
+			FBotSpawnOptions Options;
+			Options.SpawnPoint = SpawnPoint;
+			Options.Kind = EBotKind::PlayerBot;
+			Options.ControllerType = EBotControllerType::Native;
+
+			if (CoreBotManager::Get().SpawnBot(Options, LastError))
 				SpawnedBots++;
 		}
 
-		This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " native player bots.");
+		if (SpawnedBots > 0)
+			This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " native player bots.");
+		else
+			This->ClientMessage("Failed to spawn native player bot: " + LastError);
 		return;
 	}
 	else if (Parser.IsCommand("SpawnPlayerBot")) {
@@ -539,12 +551,20 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		}
 
 		int32 SpawnedBots = 0;
+		std::string LastError;
 		for (int32 i = 0; i < Count; i++) {
-			if (GameMode->SpawnPlayerBot(SpawnPoint))
+			FBotSpawnOptions Options;
+			Options.SpawnPoint = SpawnPoint;
+			Options.Kind = EBotKind::PlayerBot;
+
+			if (CoreBotManager::Get().SpawnBot(Options, LastError))
 				SpawnedBots++;
 		}
 
-		This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " player bots.");
+		if (SpawnedBots > 0)
+			This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " bots.");
+		else
+			This->ClientMessage("Failed to spawn bot: " + LastError);
 		return;
 	}
 	else if (Parser.IsCommand("SpawnBot")) {
@@ -583,9 +603,31 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 			}
 		}
 
-		This->ClientMessage("SpawnBot is not implemented yet. (Count=" + std::to_string(Count)
-			+ " Scale=" + std::to_string(Scale)
-			+ " SpawnPoint=" + (SpawnPoint ? SpawnPoint->GetName().ToString() : "playerstart") + ")");
+		TArray<UObject*> AIPawns = FUObjectArray::GetObjectsOfClass(AFortAIPawn::StaticClass());
+
+		int32 Spawned = 0;
+		std::string LastError;
+		for (int32 i = 0; i < Count; i++) {
+			FBotSpawnOptions Options;
+			Options.SpawnPoint = SpawnPoint;
+			Options.Scale = Scale;
+			Options.Kind = EBotKind::AI;
+			if (!AIPawns.IsEmpty()) {
+				// GetObjectsOfClass returns pawn instances/CDOs, not classes - spawn their class.
+				Options.PawnClassOverride = AIPawns[rand() % AIPawns.Num()]->GetClass();
+			}
+			else {
+				This->ClientMessage("AIPawns has no entries!");
+			}
+
+			if (CoreBotManager::Get().SpawnBot(Options, LastError))
+				Spawned++;
+		}
+
+		if (Spawned > 0)
+			This->ClientMessage("Spawned " + std::to_string(Spawned) + "/" + std::to_string(Count) + " bots.");
+		else
+			This->ClientMessage("Failed to spawn bot: " + LastError);
 		return;
 	}
 	else if (Parser.IsCommand("SpawnCustomBot")) {
@@ -647,10 +689,27 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 			}
 		}
 
-		This->ClientMessage("SpawnCustomBot is not implemented yet. (Count=" + std::to_string(Count)
-			+ " PawnClass=" + (CustomPawnClass ? CustomPawnClass->GetName().ToString() : "default")
-			+ " BehaviorTree=" + (CustomBehaviorTree ? CustomBehaviorTree->GetName().ToString() : "default")
-			+ " SpawnPoint=" + (SpawnPoint ? SpawnPoint->GetName().ToString() : "playerstart") + ")");
+		int32 Spawned = 0;
+		std::string LastError;
+		for (int32 i = 0; i < Count; i++) {
+			FBotSpawnOptions Options;
+			Options.SpawnPoint = SpawnPoint;
+			Options.Kind = EBotKind::AI;
+			Options.PawnClassOverride = CustomPawnClass;
+			Options.BehaviorTree = CustomBehaviorTree;
+			Options.Scale = Scale;
+			Options.Health = Health;
+			Options.MaxHealth = MaxHealth;
+			Options.BrainMode = CustomBehaviorTree ? EBotBrainMode::BehaviorTree : EBotBrainMode::None;
+
+			if (CoreBotManager::Get().SpawnBot(Options, LastError))
+				Spawned++;
+		}
+
+		if (Spawned > 0)
+			This->ClientMessage("Spawned " + std::to_string(Spawned) + "/" + std::to_string(Count) + " custom bots.");
+		else
+			This->ClientMessage("Failed to spawn custom bot: " + LastError);
 		return;
 	}
 	else if (Parser.IsCommand("SetHealth")) {
@@ -1229,19 +1288,30 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		if (Count > 32) Count = 32;
 
 		int32 SpawnedBots = 0;
+		std::string LastError;
 		for (int32 i = 0; i < Count; i++) {
-			if (GameMode->SpawnPlayerBot(This->MyFortPawn))
+			FBotSpawnOptions Options;
+			Options.SpawnPoint = This->MyFortPawn;
+			Options.Kind = EBotKind::PlayerBot;
+
+			if (CoreBotManager::Get().SpawnBot(Options, LastError))
 				SpawnedBots++;
 		}
 
-		This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " bots. March!");
+		if (SpawnedBots > 0)
+			This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " bots. March!");
+		else
+			This->ClientMessage("Failed to spawn bots: " + LastError);
 		return;
 	}
 	else if (Parser.IsCommand("DespawnAllBots")) {
+		// Manager-tracked bots first; the IsBotControlled sweep below catches any stray bot pawns
+		// the manager doesn't know about.
+		int32 Removed = CoreBotManager::Get().DespawnAll();
+
 		TArray<AActor*> Pawns;
 		UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
 
-		int32 Removed = 0;
 		for (AActor* Actor : Pawns) {
 			APawn* TargetPawn = (APawn*)Actor;
 			if (!TargetPawn || TargetPawn == This->K2_GetPawn())
