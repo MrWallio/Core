@@ -5,8 +5,8 @@
 #include <string>
 
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/Controller.h"
-#include "FortniteGame/Public/FortPawn/FortPlayerPawn.h"
-#include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
+
+class APlayerState;
 
 enum class EBotBrainMode : uint8 {
 	None,
@@ -41,7 +41,7 @@ struct FBotEntry {
 	int32 BotId = 0;
 	AController* Controller = nullptr;
 	APawn* Pawn = nullptr;
-	AFortPlayerStateAthena* PlayerState = nullptr;
+	APlayerState* PlayerState = nullptr;
 	UObject* BehaviorTree = nullptr;
 	EBotKind Kind = EBotKind::PlayerBot;
 	EBotBrainMode BrainMode = EBotBrainMode::None;
@@ -65,7 +65,10 @@ public:
 private:
 	AController* SpawnBotController(const FBotSpawnOptions& Options, class AFortGameMode* GameMode, std::string& OutError);
 	APawn* SpawnBotPawn(UClass* PawnClass, const FVector& Location, const FRotator& Rotation, std::string& OutError);
-	APawn* RegisterBot(const FBotSpawnOptions& Options, AController* Controller, APawn* Pawn);
+	APawn* RegisterBot(const FBotSpawnOptions& Options, int32 BotId, AController* Controller, APawn* Pawn, APlayerState* PlayerState);
+	bool PossessBot(AController* Controller, APawn* Pawn, std::string& OutError);
+	APlayerState* InitBotPlayerState(AController* Controller, AFortGameMode* GameMode, int32 BotId, std::string& OutError);
+	void ApplyBotCosmetics(APawn* Pawn);
 
 	class AFortGameMode* ResolveGameMode(UWorld* World);
 	AActor* ResolveSpawnPoint(const FBotSpawnOptions& Options);
