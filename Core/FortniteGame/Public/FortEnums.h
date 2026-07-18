@@ -88,7 +88,6 @@ public:
 	DefineEnumProperty(ResourceTypeNotPermittedByLayoutRequirement);
 	DefineEnumProperty(BuildingAtRequirementsDisabled);
 	DefineEnumProperty(BuildingOtherThanRequirementsDisabled);
-	DefineEnumProperty(EFortStructuralGridQueryResults_MAX);
 };
 
 class EFortBuildPreviewMarkerOptionalAdjustment {
@@ -98,7 +97,6 @@ public:
 	DefineEnumProperty(None);
 	DefineEnumProperty(FreeWallPieceOnTop);
 	DefineEnumProperty(FreeWallPieceOnBottom);
-	DefineEnumProperty(EFortBuildPreviewMarkerOptionalAdjustment_MAX);
 };
 
 class EFortItemEntryState {
@@ -116,7 +114,6 @@ public:
 	DefineEnumProperty(OwnerBuildingHandle);
 	DefineEnumProperty(FromDroppedPickup);
 	DefineEnumProperty(CraftAndSlotTarget);
-	DefineEnumProperty(EFortItemEntryState_MAX);
 };
 
 enum class ELootQuotaLevel : uint8
@@ -184,7 +181,6 @@ public:
 	DefineEnumProperty(BRT_None);
 	DefineEnumProperty(BRT_Edited);
 	DefineEnumProperty(BRT_Conversion);
-	DefineEnumProperty(BRT_MAX);
 };
 
 class EFortItemType
@@ -258,7 +254,6 @@ public:
 	DefineEnumProperty(CollectionBookPage);
 	DefineEnumProperty(Profile);
 	DefineEnumProperty(Max_None);
-	DefineEnumProperty(EFortItemType_MAX);
 };
 
 enum EAnalyticsProviderType : int32
@@ -288,7 +283,6 @@ public:
 	DefineEnumProperty(UpdateFailure_PatchCheck);
 	DefineEnumProperty(UpdateFailure_HotfixCheck);
 	DefineEnumProperty(UpdateFailure_NotLoggedIn);
-	DefineEnumProperty(EUpdateCompletionStatus_MAX);
 };
 
 class ETInteractionType {
@@ -301,7 +295,6 @@ public:
 	DefineEnumProperty(IT_BuildingEdit);
 	DefineEnumProperty(IT_BuildingImprovement);
 	DefineEnumProperty(IT_TrapPlacement);
-	DefineEnumProperty(IT_MAX);
 };
 
 class ESubGame {
@@ -311,7 +304,6 @@ public:
 	DefineEnumProperty(Campaign);
 	DefineEnumProperty(Athena);
 	DefineEnumProperty(Invalid);
-	DefineEnumProperty(ESubGame_MAX);
 };
 
 class EFortQuestObjectiveStatEvent {
@@ -357,7 +349,6 @@ public:
 	DefineEnumProperty(HasConverted);
 	DefineEnumProperty(HasLeveledUpCollectionBook);
 	DefineEnumProperty(Max_None);
-	DefineEnumProperty(EFortQuestObjectiveStatEvent_MAX);
 };
 
 class EGameplayAbilityInstancingPolicy {
@@ -367,7 +358,6 @@ public:
 	DefineEnumProperty(NonInstanced);
 	DefineEnumProperty(InstancedPerActor);
 	DefineEnumProperty(InstancedPerExecution);
-	DefineEnumProperty(EGameplayAbilityInstancingPolicy_MAX);
 };
 
 class EDeathCause {
@@ -387,7 +377,6 @@ public:
 	DefineEnumProperty(Banhammer);
 	DefineEnumProperty(RemovedFromGame);
 	DefineEnumProperty(Unspecified);
-	DefineEnumProperty(EDeathCause_MAX);
 };
 
 class EStatMod {
@@ -397,5 +386,13 @@ public:
 	DefineEnumProperty(Delta);
 	DefineEnumProperty(Set);
 	DefineEnumProperty(Maximum);
-	DefineEnumProperty(EStatMod_MAX);
+};
+
+class EWorldItemDropBehavior {
+public:
+	DefineUnrealEnum(EWorldItemDropBehavior);
+
+	DefineEnumProperty(DropAsPickup);
+	DefineEnumProperty(DestroyOnDrop);
+	DefineEnumProperty(DropAsPickupDestroyOnEmpty);
 };
