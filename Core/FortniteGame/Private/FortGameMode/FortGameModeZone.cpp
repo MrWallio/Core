@@ -86,12 +86,10 @@ void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFort
 		return;
 	}
 
-	AFortGameModeAthena* FortGameModeAthena = This->Cast<AFortGameModeAthena>();
-
 	FortGameStateZone->GameDifficulty = 10.f;
 	FortGameStateZone->OnRep_GameDifficulty();
 
-	if (!FortGameModeAthena && FortGameStateZone->MissionManager) {
+	if (This->AssociatedSubGame == ESubGame::GetCampaign() && FortGameStateZone->MissionManager) {
 		UFortMissionInfo* MissionInfo = StaticLoadObject<UFortMissionInfo>("/Game/Missions/Primary/EvacuateTheSurvivors/EvacuteTheSurvivors.EvacuteTheSurvivors");
 
 		if (MissionInfo) {
