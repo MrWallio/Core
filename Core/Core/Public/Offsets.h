@@ -246,8 +246,8 @@ namespace ServerOffsets {
 	inline uintptr_t AGameMode_EndMatch = 0;
 	inline uintptr_t AGameMode_FindInactivePlayer = 0;
 	inline uintptr_t AGameMode_GetNetworkNumber = 0;
-	inline uintptr_t AGameMode_HandleMatchHasEnded = 0;
-	inline uintptr_t AGameMode_HandleMatchHasStarted = 0;
+	inline uintptr_t AGameMode_HandleMatchHasEndedVFT = 0;
+	inline uintptr_t AGameMode_HandleMatchHasStartedVFT = 0;
 	inline uintptr_t AGameMode_HandleMatchIsWaitingToStart = 0;
 	inline uintptr_t AGameMode_HandleSeamlessTravelPlayer = 0;
 	inline uintptr_t AGameMode_HandleStartingNewPlayer = 0;

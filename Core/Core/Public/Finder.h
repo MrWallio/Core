@@ -323,9 +323,9 @@ public:
 
 	static uintptr_t FindAGameMode_GetNetworkNumber();
 
-	static uintptr_t FindAGameMode_HandleMatchHasEnded();
+	static uintptr_t FindAGameMode_HandleMatchHasEndedVFT();
 
-	static uintptr_t FindAGameMode_HandleMatchHasStarted();
+	static uintptr_t FindAGameMode_HandleMatchHasStartedVFT();
 
 	static uintptr_t FindAGameMode_HandleMatchIsWaitingToStart();
 

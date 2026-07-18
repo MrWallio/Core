@@ -100,6 +100,8 @@ DWORD Main(LPVOID)
         Utils::DumpGObjects(false);
         Utils::DumpClassProperties("NetDriver"); // DEBUG
 
+        Utils::Hook();
+
         if (!Utils::SetupDedicatedServer(Config)) {
             Log("Failed to setup dedicated server!");
         }
@@ -115,8 +117,6 @@ DWORD Main(LPVOID)
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-
-        Utils::Hook();
 
 		if (!Config.bListenServer) {
             Utils::RemoveLocalPlayer();

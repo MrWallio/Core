@@ -3108,30 +3108,54 @@ uintptr_t Finder::FindAGameMode_GetNetworkNumber() {
 	return ServerOffsets::AGameMode_GetNetworkNumber;
 }
 
-uintptr_t Finder::FindAGameMode_HandleMatchHasEnded() {
-	if (ServerOffsets::AGameMode_HandleMatchHasEnded)
-		return ServerOffsets::AGameMode_HandleMatchHasEnded;
+uintptr_t Finder::FindAGameMode_HandleMatchHasEndedVFT() {
+	if (ServerOffsets::AGameMode_HandleMatchHasEndedVFT)
+		return ServerOffsets::AGameMode_HandleMatchHasEndedVFT;
 	static uintptr_t Addr = 0;
-	Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 48 8B D9 48 8B 89 ? ? ? ? 48 8B 01 FF 90 ? ? ? ? 48 8B 03").Get();
 
-	if (Addr) {
-		ServerOffsets::AGameMode_HandleMatchHasEnded = Addr - ImageBase;
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"FortGameModeAthena: Set AthenaGamePhase to [EndGame].");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
-	Log("AGameMode_HandleMatchHasEnded found at: 0x" + std::format("{:X}", ServerOffsets::AGameMode_HandleMatchHasEnded));
-	return ServerOffsets::AGameMode_HandleMatchHasEnded;
+
+	void** VFT = AFortGameModeAthena::StaticClass()->GetDefaultObj()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(Addr))
+		{
+			ServerOffsets::AGameMode_HandleMatchHasEndedVFT = i;
+			break;
+		}
+	}
+
+	Log("AGameMode_HandleMatchHasEndedVFT found at: 0x" + std::format("{:X}", ServerOffsets::AGameMode_HandleMatchHasEndedVFT));
+	return ServerOffsets::AGameMode_HandleMatchHasEndedVFT;
 }
 
-uintptr_t Finder::FindAGameMode_HandleMatchHasStarted() {
-	if (ServerOffsets::AGameMode_HandleMatchHasStarted)
-		return ServerOffsets::AGameMode_HandleMatchHasStarted;
+uintptr_t Finder::FindAGameMode_HandleMatchHasStartedVFT() {
+	if (ServerOffsets::AGameMode_HandleMatchHasStartedVFT)
+		return ServerOffsets::AGameMode_HandleMatchHasStartedVFT;
 	static uintptr_t Addr = 0;
-	Addr = Memcury::Scanner::FindPattern("48 8B C4 55 48 8B EC 48 81 EC ? ? ? ? 48 89 58 ? 48 89 78").Get();
 
-	if (Addr) {
-		ServerOffsets::AGameMode_HandleMatchHasStarted = Addr - ImageBase;
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"BugRot");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
-	Log("AGameMode_HandleMatchHasStarted found at: 0x" + std::format("{:X}", ServerOffsets::AGameMode_HandleMatchHasStarted));
-	return ServerOffsets::AGameMode_HandleMatchHasStarted;
+
+	void** VFT = AGameMode::StaticClass()->GetDefaultObj()->VTable;
+
+	for (int i = 0; i < 2048; i++)
+	{
+		if (VFT[i] == (void*)(Addr))
+		{
+			ServerOffsets::AGameMode_HandleMatchHasStartedVFT = i;
+			break;
+		}
+	}
+
+	Log("AGameMode_HandleMatchHasStartedVFT found at: 0x" + std::format("{:X}", ServerOffsets::AGameMode_HandleMatchHasStartedVFT));
+	return ServerOffsets::AGameMode_HandleMatchHasStartedVFT;
 }
 
 uintptr_t Finder::FindAGameMode_HandleMatchIsWaitingToStart() {
@@ -11458,6 +11482,9 @@ void Finder::SetupOffsets() {
 	FindABuildingTrap_FinishTrigger();
 
 	FindUPackageMap_WriteObject();
+
+	FindAGameMode_HandleMatchHasEndedVFT();
+	FindAGameMode_HandleMatchHasStartedVFT();
 
 	return;
 }

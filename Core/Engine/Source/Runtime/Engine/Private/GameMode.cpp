@@ -56,3 +56,13 @@ void AGameMode::AddInactivePlayer(APlayerState* PlayerState, APlayerController* 
 	void (*&AddInactivePlayerInternal)(AGameMode*, APlayerState*, APlayerController*) = decltype(AddInactivePlayerInternal)(VTable[Finder::FindAGameMode_AddInactivePlayerVFT()]);
 	AddInactivePlayerInternal(this, PlayerState, PC);
 }
+
+void AGameMode::RestartGame()
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("RestartGame");
+
+	return Call(Func);
+}

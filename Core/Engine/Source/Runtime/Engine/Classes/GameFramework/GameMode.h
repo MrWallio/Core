@@ -54,6 +54,8 @@ public:
 	static inline void (*AddInactivePlayerOG)(AGameMode* This, APlayerState* PlayerState, APlayerController* PC);
 	void AddInactivePlayer(APlayerState* PlayerState, APlayerController* PC);
 
+	void RestartGame();
+
 	static void Hook() {
 		CreateVTableOriginal(AGameMode::GetDefaultObj(), Finder::FindAGameMode_AddInactivePlayerVFT(), (LPVOID*)&AddInactivePlayerOG);
 
