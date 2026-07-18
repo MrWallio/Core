@@ -1567,39 +1567,35 @@ void AFortPlayerController::ClientReportDamagedResourceBuilding(ABuildingSMActor
 	return Call(Func, BuildingSMActor, PotentialResourceType, PotentialResourceCount, bDestroyed, bJustHitWeakspot);
 }
 
-void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* This, FGuid& ItemGuid, int Count, bool bTrash) {
+void AFortPlayerController::ServerAttemptInventoryDrop(FGuid& ItemGuid, int Count, bool bTrash) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("AFortPlayerController::ServerAttemptInventoryDrop: World is null!");
 		return;
 	}
 
-	if (!This->MyFortPawn) {
+	if (!MyFortPawn) {
 		Log("AFortPlayerController::ServerAttemptInventoryDrop: MyFortPawn is null!");
 		return;
 	}
 
-	FVector FinalLoc = This->MyFortPawn->K2_GetActorLocation();
+	FVector FinalLoc = MyFortPawn->K2_GetActorLocation();
 
 	Log("AFortPlayerController::ServerAttemptInventoryDrop: Attempting to drop item with GUID: " + ItemGuid.FormatGuid() + ", Count: " + std::to_string(Count) + ", bTrash: " + std::to_string(bTrash));
-	FFortItemEntry* ItemEntry = This->FindItemEntry(ItemGuid);
+	FFortItemEntry* ItemEntry = FindItemEntry(ItemGuid);
 	if (!ItemEntry) {
 		Log("AFortPlayerController::ServerAttemptInventoryDrop: ItemEntry not found for GUID: " + ItemGuid.FormatGuid());
 		return;
 	}
 
-	if (!ItemEntry->ItemDefinition) {
-		Log("AFortPlayerController::ServerAttemptInventoryDrop: ItemDefinition is null for GUID: " + ItemGuid.FormatGuid());
-		return;
-	}
-
+	AFortPickup* Pickup = nullptr;
 	if (!bTrash) {
-		AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+		Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
 			World,
 			ItemEntry->ItemDefinition,
 			Count,
 			FinalLoc,
-			This->GetDropFinalLocation(),
+			GetDropFinalLocation(),
 			-1,
 			true,
 			true,
@@ -1607,18 +1603,104 @@ void AFortPlayerController::ServerAttemptInventoryDrop(AFortPlayerController* Th
 			-1,
 			EFortPickupSourceTypeFlag::GetPlayer(),
 			EFortPickupSpawnSource::GetTossedByPlayer(),
-			This,
+			this,
 			false
 		);
+		if (Pickup) {
+			Pickup->PrimaryPickupItemEntry.LoadedAmmo = ItemEntry->LoadedAmmo;
+			Pickup->PrimaryPickupItemEntry.Durability = ItemEntry->Durability;
+			Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+
+			Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+			Pickup->OnRep_PrimaryPickupItemEntry();
+		}
+	}
+	
+	if (bTrash || Pickup) {
+		WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
+	}
+}
+
+void AFortPlayerController::execServerAttemptInventoryDrop(AFortPlayerController* Context, FFrame& Stack) {
+	static UFunction* ServerAttemptInventoryDropFn = StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerAttemptInventoryDrop");
+	if (!ServerAttemptInventoryDropFn) {
+		Log("AFortPlayerController::execServerAttemptInventoryDrop: Failed to find function!");
+		return;
+	}
+	
+	FGuid& ItemGuid = Stack.StepCompiledInRef<FGuid>();
+	int32 Count = 0;
+	bool bTrash = false;
+	Stack.StepCompiledIn(&Count);
+	
+	for (auto& Param : ServerAttemptInventoryDropFn->GetParams().NameOffsetMap)
+	{
+		std::string Name = Param.Name.ToString();
+		if (Name == "bTrash") {
+			Stack.StepCompiledIn(&bTrash);
+		}
+	}
+	Stack.IncrementCode();
+
+	Context->ServerAttemptInventoryDrop(ItemGuid, Count, bTrash);
+}
+
+void AFortPlayerController::ServerSpawnInventoryDrop(FGuid& ItemGuid, int32 Count) {
+	UWorld* World = UWorld::GetWorld();
+	if (!World) {
+		Log("AFortPlayerController::ServerSpawnInventoryDrop: World is null!");
+		return;
+	}
+
+	if (!MyFortPawn) {
+		Log("AFortPlayerController::ServerSpawnInventoryDrop: MyFortPawn is null!");
+		return;
+	}
+
+	FVector FinalLoc = MyFortPawn->K2_GetActorLocation();
+
+	Log("AFortPlayerController::ServerSpawnInventoryDrop: Attempting to drop item with GUID: " + ItemGuid.FormatGuid() + ", Count: " + std::to_string(Count));
+	FFortItemEntry* ItemEntry = FindItemEntry(ItemGuid);
+	if (!ItemEntry) {
+		Log("AFortPlayerController::ServerSpawnInventoryDrop: ItemEntry not found for GUID: " + ItemGuid.FormatGuid());
+		return;
+	}
+
+	AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+		World,
+		ItemEntry->ItemDefinition,
+		Count,
+		FinalLoc,
+		GetDropFinalLocation(),
+		-1,
+		true,
+		true,
+		true,
+		-1,
+		EFortPickupSourceTypeFlag::GetPlayer(),
+		EFortPickupSpawnSource::GetTossedByPlayer(),
+		this,
+		false
+	);
+	if (Pickup) {
 		Pickup->PrimaryPickupItemEntry.LoadedAmmo = ItemEntry->LoadedAmmo;
 		Pickup->PrimaryPickupItemEntry.Durability = ItemEntry->Durability;
 		Pickup->PrimaryPickupItemEntry.bIsDirty = true;
 
 		Pickup->PrimaryPickupItemEntry.ReplicationKey++;
 		Pickup->OnRep_PrimaryPickupItemEntry();
-	}
 
-	This->WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
+		WorldInventory->RemoveItem(ItemEntry->ItemGuid, Count);
+	}
+}
+
+void AFortPlayerController::execServerSpawnInventoryDrop(AFortPlayerController* Context, FFrame& Stack) {
+	FGuid& ItemGuid = Stack.StepCompiledInRef<FGuid>();
+	int32 Count = 0;
+	Stack.StepCompiledIn(&Count);
+	Stack.IncrementCode();
+
+	Context->ServerSpawnInventoryDrop(ItemGuid, Count);
 }
 
 void AFortPlayerController::ClientForceUpdateQuickbar(uint8 QuickbarToRefresh)
@@ -1670,27 +1752,48 @@ void AFortPlayerController::ServerClientPawnLoaded(AFortPlayerController* This, 
 	}
 }
 
-bool AFortPlayerController::RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval)
+bool AFortPlayerController::RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoveFromQuickBars, bool bForceRemoval)
 {
 	static auto InterfaceOffset = StaticClass()->SuperStruct->PropertiesSize + (Version::Engine_Version >= 4.27 ? 16 : 8);
 	AFortPlayerController* PlayerController = (AFortPlayerController*)(__int64(This) - InterfaceOffset); // this is so wierd
 	if (!PlayerController) {
-		Log("RemoveInventoryItem: Failed to get PlayerController from interface pointer!");
-		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoveFromQuickBars, bForceRemoval);
 	}
 
 	AFortInventory* Inventory = PlayerController->WorldInventory;
 	if (!Inventory) {
-		Log("RemoveInventoryItem: WorldInventory is null!");
-		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoveFromQuickBars, bForceRemoval);
 	}
 
 	if (!ItemGuid.IsValid()) {
-		Log("RemoveInventoryItem: Invalid ItemGuid!");
-		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoval);
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoveFromQuickBars, bForceRemoval);
 	}
 
-	return Inventory->RemoveItem(ItemGuid, Count);
+	FFortItemEntry* ItemEntry = Inventory->FindItemEntry(ItemGuid);
+	if (!ItemEntry) {
+		return RemoveInventoryItemOG(This, ItemGuid, Count, bForceRemoveFromQuickBars, bForceRemoval);
+	}
+
+	UFortWorldItemDefinition* WorldItemDefinition = ItemEntry->ItemDefinition->Cast<UFortWorldItemDefinition>();
+
+	bool bForceRemoveItem = bForceRemoveFromQuickBars || bForceRemoval;
+	if (!bForceRemoveItem) {
+		bool bShouldRemoveCount = ItemEntry->Count > Count;
+		if (WorldItemDefinition && WorldItemDefinition->bPersistInInventoryWhenFinalStackEmpty) {
+			bShouldRemoveCount = ItemEntry->Count >= Count;
+		}
+
+		if (bShouldRemoveCount) {
+			ItemEntry->Count -= Count;
+			return Inventory->Update(ItemEntry);
+		}
+		else {
+			return Inventory->RemoveItem(ItemGuid, Count);
+		}
+	}
+	else {
+		return Inventory->RemoveItem(ItemGuid, Count);
+	}
 }
 
 void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored) {

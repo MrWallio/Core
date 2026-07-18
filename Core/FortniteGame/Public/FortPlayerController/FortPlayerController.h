@@ -81,7 +81,11 @@ public:
 
 	void ClientReportDamagedResourceBuilding(ABuildingSMActor* BuildingSMActor, uint8 PotentialResourceType, int32 PotentialResourceCount, bool bDestroyed, bool bJustHitWeakspot);
 
-	static void ServerAttemptInventoryDrop(AFortPlayerController* This, FGuid& ItemGuid, int Count, bool bTrash);
+	void ServerAttemptInventoryDrop(FGuid& ItemGuid, int Count, bool bTrash);
+	static void execServerAttemptInventoryDrop(AFortPlayerController* Context, FFrame& Stack);
+
+	void ServerSpawnInventoryDrop(FGuid& ItemGuid, int32 Count);
+	static void execServerSpawnInventoryDrop(AFortPlayerController* Context, FFrame& Stack);
 
 	void ClientForceUpdateQuickbar(uint8 QuickbarToRefresh);
 
@@ -92,8 +96,8 @@ public:
 	static inline void (*ServerClientPawnLoadedOG)(AFortPlayerController* This, bool bIsPawnLoaded);
 	static void ServerClientPawnLoaded(AFortPlayerController* This, bool bIsPawnLoaded);
 
-	static inline bool (*RemoveInventoryItemOG)(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval);
-	static bool RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoval);
+	static inline bool (*RemoveInventoryItemOG)(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoveFromQuickBars, bool bForceRemoval);
+	static bool RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoveFromQuickBars, bool bForceRemoval);
 
 	static inline void (*ServerCreateBuildingActorOldOG)(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored);
 	static void ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored);
@@ -185,23 +189,8 @@ public:
 			(LPVOID*)&ServerExecuteInventoryItemOG
 		);
 
-		UFunction* ServerAttemptInventoryDropFunc = AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerAttemptInventoryDrop");
-		if (ServerAttemptInventoryDropFunc) {
-			HookEveryVTableIdx(
-				AFortPlayerController::StaticClass(),
-				ServerAttemptInventoryDropFunc->GetVTableIndex(),
-				ServerAttemptInventoryDrop,
-				nullptr
-			);
-		}
-		else {
-			HookEveryVTableIdx(
-				AFortPlayerController::StaticClass(),
-				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerSpawnInventoryDrop")->GetVTableIndex(),
-				ServerAttemptInventoryDrop,
-				nullptr
-			);
-		}
+		ExecHook("Function /Script/FortniteGame.FortPlayerController.ServerAttemptInventoryDrop", execServerAttemptInventoryDrop);
+		ExecHook("Function /Script/FortniteGame.FortPlayerController.ServerSpawnInventoryDrop", execServerSpawnInventoryDrop);
 
 		HookEveryVTable(
 			AFortPlayerController::StaticClass(),

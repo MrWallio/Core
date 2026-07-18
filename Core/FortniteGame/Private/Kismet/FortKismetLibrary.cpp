@@ -112,11 +112,6 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 	EFortPickupSpawnSource Source,
 	AFortPlayerController* OptionalOwnerPC,
 	bool bPickupOnlyRelevantToOwner) {
-	if (!ItemDefinition) {
-		Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Failed to get item definition from stack!");
-		return nullptr;
-	}
-
 	UWorld* World = WorldContextObject->GetWorld();
 	if (!World) {
 		Log("UFortKismetLibrary::K2_SpawnPickupInWorld: Failed to get world!");
