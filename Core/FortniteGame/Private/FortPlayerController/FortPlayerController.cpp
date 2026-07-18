@@ -26,6 +26,7 @@
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 #include "FortniteGame/Public/FortQuest/FortQuestManager.h"
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
+#include "Engine/Source/Runtime/Engine/Classes/GameFramework/WorldSettings.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -171,6 +172,15 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("DestroyTarget - Destroys the actor under the crosshair.");
 		This->ClientMessage("-- QuickBars --");
 		This->ClientMessage("SpawnQuickBars / DestroyQuickBars / DumpQuickBars - Manage the player's quickbars.");
+		This->ClientMessage("-- Fun --");
+		This->ClientMessage("LootRain [Count] [Radius] [TierGroup] - Rains loot-table drops down around you.");
+		This->ClientMessage("SetGameSpeed [Multiplier] - Sets the game speed. 0.2 = slow motion, 5 = turbo, 1 = normal.");
+		This->ClientMessage("BotArmy [Count] - Spawns a squad of bots at your location.");
+		This->ClientMessage("DespawnAllBots - Removes every bot pawn from the world.");
+		This->ClientMessage("TeleportAllToMe - Teleports every other pawn into a ring around you.");
+		This->ClientMessage("SwapPlaces <PawnName> - Swaps locations with a pawn (case-insensitive, substring).");
+		This->ClientMessage("LaunchPawn [PawnName] [ZVelocity] - Yeets a pawn (default: you) into the sky.");
+		This->ClientMessage("SetScale <Multiplier> - Scales your pawn (body, weapon and collision).");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -909,6 +919,337 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		PlayerState->SetKillScore(NewScore);
 		This->ClientMessage("Set kill score to " + std::to_string(NewScore));
 
+		return;
+	}
+	else if (Parser.IsCommand("LootRain")) {
+		if (!This->Pawn) {
+			This->ClientMessage("Pawn is null!");
+			return;
+		}
+
+		int32 Count = Parser.GetArgInt(0, 20);
+		float Radius = Parser.GetArgFloat(1, 600.0f);
+		if (Count < 1) Count = 1;
+		if (Count > 100) Count = 100;
+		if (Radius < 100.0f) Radius = 100.0f;
+
+		FName TierGroup;
+		std::string TierGroupArg = Parser.GetArg(2);
+		if (!TierGroupArg.empty()) {
+			TierGroup = UKismetStringLibrary::Conv_StringToName(TierGroupArg);
+		}
+		else if (GameMode->Cast<AFortGameModeAthena>()) {
+			static FName Loot_AthenaTreasure = UKismetStringLibrary::Conv_StringToName("Loot_AthenaTreasure");
+			TierGroup = Loot_AthenaTreasure;
+		}
+		else {
+			static FName Loot_Treasure = UKismetStringLibrary::Conv_StringToName("Loot_Treasure");
+			TierGroup = Loot_Treasure;
+		}
+
+		FVector Center = This->Pawn->K2_GetActorLocation();
+		int32 Spawned = 0;
+
+		for (int32 Roll = 0; Spawned < Count && Roll < Count * 4; Roll++) {
+			TArray<FFortItemEntry> LootDrops;
+			if (!UFortKismetLibrary::PickLootDrops(This, &LootDrops, TierGroup, 0, -1) || LootDrops.Num() == 0)
+				break;
+
+			for (int32 i = 0; i < LootDrops.Num() && Spawned < Count; i++) {
+				FFortItemEntry& Entry = LootDrops.GetWithSize(i, FFortItemEntry::GetSize());
+				if (!Entry.ItemDefinition)
+					continue;
+
+				const float Angle = ((float)rand() / (float)RAND_MAX) * 6.2831853f;
+				const float Dist = ((float)rand() / (float)RAND_MAX) * Radius;
+
+				FVector DropLoc = Center;
+				DropLoc.X += cosf(Angle) * Dist;
+				DropLoc.Y += sinf(Angle) * Dist;
+
+				FVector AirLoc = DropLoc;
+				AirLoc.Z += 400.0f + ((float)rand() / (float)RAND_MAX) * 400.0f;
+
+				AFortPickup* Pickup = UFortKismetLibrary::K2_SpawnPickupInWorld(
+					World,
+					Entry.ItemDefinition,
+					Entry.Count,
+					AirLoc,
+					DropLoc,
+					-1,
+					true,
+					true,
+					true,
+					-1,
+					EFortPickupSourceTypeFlag::GetOther(),
+					EFortPickupSpawnSource::GetUnset(),
+					This,
+					false
+				);
+
+				if (!Pickup)
+					continue;
+
+				UFortWeaponItemDefinition* WeaponDef = Pickup->PrimaryPickupItemEntry.ItemDefinition->Cast<UFortWeaponItemDefinition>();
+				if (WeaponDef) {
+					int32 Level = Pickup->PrimaryPickupItemEntry.Level;
+					Pickup->PrimaryPickupItemEntry.LoadedAmmo = WeaponDef->GetClipSize(Level);
+					Pickup->PrimaryPickupItemEntry.Durability = WeaponDef->GetDurability(Level);
+					Pickup->PrimaryPickupItemEntry.bIsDirty = true;
+					Pickup->PrimaryPickupItemEntry.ReplicationKey++;
+					Pickup->OnRep_PrimaryPickupItemEntry();
+				}
+
+				Spawned++;
+			}
+		}
+
+		if (Spawned > 0)
+			This->ClientMessage("Rained " + std::to_string(Spawned) + " items from '" + TierGroup.ToString().ToString() + "'.");
+		else
+			This->ClientMessage("PickLootDrops found nothing for tier group '" + TierGroup.ToString().ToString() + "'.");
+		return;
+	}
+	else if (Parser.IsCommand("SetGameSpeed")) {
+		float Speed = Parser.GetArgFloat(0, 1.0f);
+		if (Speed < 0.05f) Speed = 0.05f;
+		if (Speed > 10.0f) Speed = 10.0f;
+
+		AWorldSettings* WorldSettings = World->GetWorldSettings();
+		if (!WorldSettings) {
+			This->ClientMessage("WorldSettings is null!");
+			return;
+		}
+
+		WorldSettings->TimeDilation = Speed;
+		WorldSettings->ForceNetUpdate();
+
+		if (Speed == 1.0f)
+			This->ClientMessage("Game speed back to normal.");
+		else
+			This->ClientMessage("Game speed set to x" + std::to_string(Speed) + ". Use SetGameSpeed 1 to reset.");
+		return;
+	}
+	else if (Parser.IsCommand("BotArmy")) {
+		int32 Count = Parser.GetArgInt(0, 5);
+		if (Count < 1) Count = 1;
+		if (Count > 32) Count = 32;
+
+		int32 SpawnedBots = 0;
+		for (int32 i = 0; i < Count; i++) {
+			if (GameMode->SpawnPlayerBot(This->MyFortPawn))
+				SpawnedBots++;
+		}
+
+		This->ClientMessage("Spawned " + std::to_string(SpawnedBots) + "/" + std::to_string(Count) + " bots. March!");
+		return;
+	}
+	else if (Parser.IsCommand("DespawnAllBots")) {
+		TArray<AActor*> Pawns;
+		UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+		int32 Removed = 0;
+		for (AActor* Actor : Pawns) {
+			APawn* TargetPawn = (APawn*)Actor;
+			if (!TargetPawn || TargetPawn == This->K2_GetPawn())
+				continue;
+
+			if (!TargetPawn->IsBotControlled())
+				continue;
+
+			TargetPawn->K2_DestroyActor();
+			Removed++;
+		}
+
+		This->ClientMessage("Despawned " + std::to_string(Removed) + " bot pawns.");
+		return;
+	}
+	else if (Parser.IsCommand("TeleportAllToMe")) {
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		TArray<AActor*> Pawns;
+		UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+		FVector Center = This->MyFortPawn->K2_GetActorLocation();
+		int32 Moved = 0;
+		for (AActor* Actor : Pawns) {
+			APawn* TargetPawn = (APawn*)Actor;
+			if (!TargetPawn || TargetPawn == This->MyFortPawn)
+				continue;
+
+			const float Angle = (Moved % 8) * 0.785398f;
+			const float Ring = 300.0f + 150.0f * (Moved / 8);
+
+			FVector NewLocation = Center;
+			NewLocation.X += cosf(Angle) * Ring;
+			NewLocation.Y += sinf(Angle) * Ring;
+			NewLocation.Z += 50.0f;
+
+			FHitResult HitResult;
+			TargetPawn->K2_SetActorLocation(NewLocation, false, &HitResult, true);
+			Moved++;
+		}
+
+		This->ClientMessage("Teleported " + std::to_string(Moved) + " pawns to you.");
+		return;
+	}
+	else if (Parser.IsCommand("SwapPlaces")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SwapPlaces <PawnName> (case-insensitive, matches substrings)");
+			return;
+		}
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		std::string PawnName = Parser.GetArg(0);
+		std::string PawnNameLower = Utils::StringToLower(PawnName);
+
+		TArray<AActor*> Pawns;
+		UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+		APawn* ExactMatch = nullptr;
+		TArray<APawn*> PartialMatches;
+
+		for (AActor* Actor : Pawns) {
+			if (!Actor || Actor == This->MyFortPawn)
+				continue;
+
+			std::string ActorNameLower = Utils::StringToLower(Actor->GetName().ToString());
+
+			if (ActorNameLower == PawnNameLower) {
+				ExactMatch = (APawn*)Actor;
+				break;
+			}
+
+			if (ActorNameLower.find(PawnNameLower) != std::string::npos) {
+				PartialMatches.Add((APawn*)Actor);
+			}
+		}
+
+		APawn* TargetPawn = nullptr;
+
+		if (ExactMatch) {
+			TargetPawn = ExactMatch;
+		}
+		else if (PartialMatches.Num() == 1) {
+			TargetPawn = PartialMatches[0];
+		}
+		else if (PartialMatches.Num() > 1) {
+			This->ClientMessage("'" + PawnName + "' is ambiguous, matches " + std::to_string(PartialMatches.Num()) + " pawns:");
+			for (int32 i = 0; i < PartialMatches.Num(); i++) {
+				This->ClientMessage("  " + PartialMatches[i]->GetName().ToString());
+			}
+			This->ClientMessage("Be more specific.");
+			return;
+		}
+		else {
+			This->ClientMessage("Pawn with name '" + PawnName + "' not found.");
+			return;
+		}
+
+		FVector MyLocation = This->MyFortPawn->K2_GetActorLocation();
+		FVector TheirLocation = TargetPawn->K2_GetActorLocation();
+
+		FHitResult HitResult;
+		This->MyFortPawn->K2_SetActorLocation(TheirLocation, false, &HitResult, true);
+		TargetPawn->K2_SetActorLocation(MyLocation, false, &HitResult, true);
+
+		This->ClientMessage("Swapped places with " + TargetPawn->GetName().ToString());
+		return;
+	}
+	else if (Parser.IsCommand("LaunchPawn")) {
+		std::string PawnName;
+		float ZVelocity = 3000.0f;
+
+		if (Parser.GetArgCount() >= 1) {
+			std::string FirstArg = Parser.GetArg(0);
+
+			char* End = nullptr;
+			float ParsedVelocity = strtof(FirstArg.c_str(), &End);
+			if (End != FirstArg.c_str() && *End == '\0') {
+				ZVelocity = ParsedVelocity;
+			}
+			else {
+				PawnName = FirstArg;
+				ZVelocity = Parser.GetArgFloat(1, 3000.0f);
+			}
+		}
+
+		APawn* TargetPawn = This->K2_GetPawn();
+
+		if (!PawnName.empty()) {
+			std::string PawnNameLower = Utils::StringToLower(PawnName);
+
+			TArray<AActor*> Pawns;
+			UGameplayStatics::GetAllActorsOfClass(World, APawn::StaticClass(), &Pawns);
+
+			TargetPawn = nullptr;
+			for (AActor* Actor : Pawns) {
+				if (!Actor)
+					continue;
+
+				std::string ActorNameLower = Utils::StringToLower(Actor->GetName().ToString());
+				if (ActorNameLower == PawnNameLower || ActorNameLower.find(PawnNameLower) != std::string::npos) {
+					TargetPawn = (APawn*)Actor;
+					break;
+				}
+			}
+
+			if (!TargetPawn) {
+				This->ClientMessage("Pawn with name '" + PawnName + "' not found.");
+				return;
+			}
+		}
+
+		if (!TargetPawn) {
+			This->ClientMessage("No pawn to launch!");
+			return;
+		}
+
+		ACharacter* TargetCharacter = TargetPawn->Cast<ACharacter>();
+		if (!TargetCharacter) {
+			This->ClientMessage(TargetPawn->GetName().ToString() + " is not a Character, cannot launch it.");
+			return;
+		}
+
+		TargetCharacter->LaunchCharacter(FVector(0.0f, 0.0f, ZVelocity), false, true);
+		This->ClientMessage("Launched " + TargetCharacter->GetName().ToString() + " with ZVelocity " + std::to_string(ZVelocity) + ".");
+		return;
+	}
+	else if (Parser.IsCommand("SetScale")) {
+		if (Parser.GetArgCount() < 1)
+		{
+			This->ClientMessage("Usage: SetScale <Multiplier>");
+			return;
+		}
+
+		float Scale = Parser.GetArgFloat(0, 1.0f);
+		if (Scale < 0.1f) Scale = 0.1f;
+		if (Scale > 10.0f) Scale = 10.0f;
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		UCapsuleComponent* Capsule = This->MyFortPawn->GetCapsuleComponent();
+		if (!Capsule) {
+			This->ClientMessage("Pawn has no capsule component!");
+			return;
+		}
+
+		Capsule->SetIsReplicated(true);
+		This->MyFortPawn->SetActorScale3D(FVector(Scale, Scale, Scale));
+		This->MyFortPawn->ForceNetUpdate();
+
+		This->ClientMessage("Set scale to x" + std::to_string(Scale) + ".");
 		return;
 	}
 

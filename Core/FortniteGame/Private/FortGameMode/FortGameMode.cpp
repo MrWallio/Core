@@ -53,116 +53,24 @@ bool AFortGameMode::SpawnPlayerBot(AActor* SpawnPoint)
 	int32 MaxSpawnLocations = PlayerStarts.Num();
 	static int32 BotSpawnLocationIndex = 0;
 
+	if (!SpawnPoint && PlayerStarts.Num() > 0) {
+		if (BotSpawnLocationIndex >= MaxSpawnLocations) {
+			BotSpawnLocationIndex = 0;
+		}
+		SpawnPoint = PlayerStarts.IsValidIndex(BotSpawnLocationIndex) ? PlayerStarts[BotSpawnLocationIndex] : nullptr;
+		BotSpawnLocationIndex++;
+	}
+
+	if (!SpawnPoint) {
+		Log("AFortGameMode::SpawnPlayerBot: Failed to find spawn point!");
+		return false;
+	}
+
+	FVector SpawnLocation = SpawnPoint->K2_GetActorLocation();
+	FRotator SpawnRotation = SpawnPoint->K2_GetActorRotation();
+
 	if (Version::Fortnite_Version <= 1.72) {
-		if (!SpawnPoint && PlayerStarts.Num() > 0) {
-			if (BotSpawnLocationIndex >= MaxSpawnLocations) {
-				BotSpawnLocationIndex = 0;
-			}
-			SpawnPoint = PlayerStarts.IsValidIndex(BotSpawnLocationIndex) ? PlayerStarts[BotSpawnLocationIndex] : nullptr;
-			BotSpawnLocationIndex++;
-		}
-
-		if (!SpawnPoint) {
-			Log("AFortGameMode::SpawnPlayerBot: Failed to find spawn point!");
-			return false;
-		}
-
-		FVector SpawnLocation = SpawnPoint->K2_GetActorLocation();
-		FRotator SpawnRotation = SpawnPoint->K2_GetActorRotation();
-
-		APlayerController* BotController = SpawnPlayerController(ROLE_SimulatedProxy, SpawnLocation, SpawnRotation);
-		if (!BotController) {
-			Log("AFortGameMode::SpawnPlayerBot: Failed to spawn BotController!");
-			return false;
-		}
-
-		AFortPlayerController* FortPC = BotController->Cast<AFortPlayerController>();
-		AFortPlayerControllerAthena* FortPCAthena = BotController->Cast<AFortPlayerControllerAthena>();
-
-		BotController->InitPlayerState();
-		if (!BotController->PlayerState) {
-			Log("AFortGameMode::SpawnPlayerBot: Failed to initialize BotController's PlayerState!");
-			return false;
-		}
-
-		AFortPlayerState* FortPS = BotController->PlayerState->Cast<AFortPlayerState>();
-		AFortPlayerStateAthena* FortPSAthena = BotController->PlayerState->Cast<AFortPlayerStateAthena>();
-
-		BotController->PlayerState->bIsABot = true;
-
-		if (FortGameModeAthena) {
-			FortGameModeAthena->AddToAlivePlayers(FortPCAthena);
-			NumBots++;
-		}
-
-		RestartPlayerAtTransform(BotController, SpawnPoint->GetTransform());
-		if (!BotController->Pawn) {
-			Log("AFortGameMode::SpawnPlayerBot: Failed to spawn bot pawn!");
-			return false;
-		}
-
-		AFortPawn* FortPawn = BotController->Pawn->Cast<AFortPawn>();
-		AFortPlayerPawn* FortPlayerPawn = BotController->Pawn->Cast<AFortPlayerPawn>();
-		AFortPlayerPawnAthena* FortPlayerPawnAthena = BotController->Pawn->Cast<AFortPlayerPawnAthena>();
-
-		if (FortPawn) {
-			FortPawn->SetMaxHealth(100.0f);
-			FortPawn->SetHealth(100.0f);
-			FortPawn->SetMaxShield(100.0f);
-			FortPawn->SetShield(0.0f);
-		}
-
-		if (FortPC && FortPlayerPawn) {
-			if (!FortPC->MyFortPawn) {
-				FortPC->MyFortPawn = FortPlayerPawn;
-			}
-		}
-		
-		if (FortPCAthena) {
-			if (FortPS) {
-				if (!FortPS->HeroType && FortPCAthena->DefaultHeroes.Num() > 0) {
-					UFortHeroType* RandomHeroType = FortPCAthena->DefaultHeroes[UKismetMathLibrary::RandomIntegerInRange(0, FortPCAthena->DefaultHeroes.Num() - 1)];
-					if (RandomHeroType) {
-						FortPS->HeroType = RandomHeroType;
-						FortPS->HeroId = RandomHeroType->GetName();
-					}
-				}
-
-				UFortHeroType* HeroType = FortPS->HeroType;
-
-				if (Version::Fortnite_Version <= 1.91 && Version::Fortnite_Version != 1.1 && Version::Fortnite_Version != 1.11) {
-					if (FortPlayerPawn && HeroType && HeroType->GetSpecializationsAssetPtr().Num() > 0) {
-						UFortHeroSpecialization* RandomSpecialization = HeroType->GetSpecializationsAssetPtr()[UKismetMathLibrary::RandomIntegerInRange(0, HeroType->GetSpecializationsAssetPtr().Num() - 1)].Get();
-						if (RandomSpecialization) {
-							int32 NumParts = RandomSpecialization->GetCharacterPartsAssetPtr().Num();
-
-							for (int32 i = 0; i < NumParts; i++) {
-								TAssetPtr<UCustomCharacterPart>& PartPtr = RandomSpecialization->GetCharacterPartsAssetPtr()[i];
-
-								UCustomCharacterPart* CharacterPartAsset = PartPtr.Get();
-
-								if (CharacterPartAsset) {
-									FortPlayerPawnAthena->ServerChoosePart(CharacterPartAsset, CharacterPartAsset->CharacterPartType);
-								}
-								else {
-									Log("AFortGameMode::SpawnPlayerBot: Failed to load character part asset for part index: " + std::to_string(i));
-								}
-							}
-						}
-						else {
-							Log("AFortGameMode::SpawnPlayerBot: Failed to get random specialization!");
-						}
-					}
-
-					FortPS->OnRep_CharacterParts();
-				}
-				else {
-					FortPS->ApplyCharacterCustomization(FortPlayerPawn);
-				}
-			}
-		}
-
-		return true;
+		// we gotta do this manually since there are no actual player bots
 	}
 
 	return false;
