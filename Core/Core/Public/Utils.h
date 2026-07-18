@@ -1,6 +1,8 @@
 #pragma once
 #include "pch.h"
 
+#include <unordered_map>
+
 #include "Configuration.h"
 
 #include "Engine/Source/Runtime/Core/Public/Containers/UnrealString.h"
@@ -49,6 +51,7 @@ class FCommandParser
 {
 private:
     std::vector<std::string> Args;
+    std::unordered_map<std::string, std::string> NamedArgs;
     std::string FullCommand;
 
 public:
@@ -68,6 +71,17 @@ public:
         return Args.size() > 0 ? (int32)(Args.size() - 1) : 0;
     }
 
+    bool HasNamedArg(const std::string& Name) const
+    {
+        return NamedArgs.find(Utils::StringToLower(Name)) != NamedArgs.end();
+    }
+
+    std::string GetNamedArg(const std::string& Name, const std::string& DefaultValue = "") const
+    {
+        auto It = NamedArgs.find(Utils::StringToLower(Name));
+        return It != NamedArgs.end() ? It->second : DefaultValue;
+    }
+
     std::string GetArg(int32 Index) const
     {
         int32 ActualIndex = Index + 1;
@@ -76,49 +90,43 @@ public:
         return "";
     }
 
+    std::string GetArg(const std::string& Name, int32 Index, const std::string& DefaultValue = "") const
+    {
+        if (HasNamedArg(Name))
+            return GetNamedArg(Name);
+
+        std::string Arg = GetArg(Index);
+        return Arg.empty() ? DefaultValue : Arg;
+    }
+
     int32 GetArgInt(int32 Index, int32 DefaultValue = 0) const
     {
-        std::string arg = GetArg(Index);
-        if (arg.empty())
-            return DefaultValue;
+        return ParseInt(GetArg(Index), DefaultValue);
+    }
 
-        try {
-            return std::stoi(arg);
-        }
-        catch (...) {
-            return DefaultValue;
-        }
+    int32 GetArgInt(const std::string& Name, int32 Index, int32 DefaultValue = 0) const
+    {
+        return ParseInt(GetArg(Name, Index), DefaultValue);
     }
 
     float GetArgFloat(int32 Index, float DefaultValue = 0.0f) const
     {
-        std::string arg = GetArg(Index);
-        if (arg.empty())
-            return DefaultValue;
+        return ParseFloat(GetArg(Index), DefaultValue);
+    }
 
-        try {
-            return std::stof(arg);
-        }
-        catch (...) {
-            return DefaultValue;
-        }
+    float GetArgFloat(const std::string& Name, int32 Index, float DefaultValue = 0.0f) const
+    {
+        return ParseFloat(GetArg(Name, Index), DefaultValue);
     }
 
     bool GetArgBool(int32 Index, bool DefaultValue = false) const
     {
-        std::string arg = GetArg(Index);
-        if (arg.empty())
-            return DefaultValue;
+        return ParseBool(GetArg(Index), DefaultValue);
+    }
 
-        std::string lower = arg;
-        std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-
-        if (lower == "true" || lower == "1" || lower == "yes" || lower == "on")
-            return true;
-        if (lower == "false" || lower == "0" || lower == "no" || lower == "off")
-            return false;
-
-        return DefaultValue;
+    bool GetArgBool(const std::string& Name, int32 Index, bool DefaultValue = false) const
+    {
+        return ParseBool(GetArg(Name, Index), DefaultValue);
     }
 
     std::string GetRemainingArgs(int32 StartIndex = 0) const
@@ -154,13 +162,64 @@ public:
     }
 
 private:
+    static int32 ParseInt(const std::string& Value, int32 DefaultValue)
+    {
+        if (Value.empty())
+            return DefaultValue;
+
+        try {
+            return std::stoi(Value);
+        }
+        catch (...) {
+            return DefaultValue;
+        }
+    }
+
+    static float ParseFloat(const std::string& Value, float DefaultValue)
+    {
+        if (Value.empty())
+            return DefaultValue;
+
+        try {
+            return std::stof(Value);
+        }
+        catch (...) {
+            return DefaultValue;
+        }
+    }
+
+    static bool ParseBool(const std::string& Value, bool DefaultValue)
+    {
+        if (Value.empty())
+            return DefaultValue;
+
+        std::string lower = Value;
+        std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+
+        if (lower == "true" || lower == "1" || lower == "yes" || lower == "on")
+            return true;
+        if (lower == "false" || lower == "0" || lower == "no" || lower == "off")
+            return false;
+
+        return DefaultValue;
+    }
+
+    void AddNamedArg(const std::string& Piece, size_t Equals)
+    {
+        std::string Name = (Equals == std::string::npos) ? Piece : Piece.substr(0, Equals);
+        std::string Value = (Equals == std::string::npos) ? "true" : Piece.substr(Equals + 1);
+
+        std::transform(Name.begin(), Name.end(), Name.begin(), ::tolower);
+        if (!Name.empty())
+            NamedArgs[Name] = Value;
+    }
+
     void ParseArguments(const std::string& Command)
     {
-        std::istringstream stream(Command);
-        std::string token;
         bool inQuotes = false;
         std::string currentArg;
 
+        std::vector<std::string> Tokens;
         for (char c : Command)
         {
             if (c == '"')
@@ -171,7 +230,7 @@ private:
             {
                 if (!currentArg.empty())
                 {
-                    Args.push_back(currentArg);
+                    Tokens.push_back(currentArg);
                     currentArg.clear();
                 }
             }
@@ -182,8 +241,35 @@ private:
         }
 
         if (!currentArg.empty())
+            Tokens.push_back(currentArg);
+
+        for (const std::string& Token : Tokens)
         {
-            Args.push_back(currentArg);
+            size_t Cursor = 0;
+            bool bFirstPiece = true;
+
+            while (true)
+            {
+                size_t Next = Token.find('?', Cursor);
+                std::string Piece = (Next == std::string::npos) ? Token.substr(Cursor) : Token.substr(Cursor, Next - Cursor);
+
+                if (!Piece.empty())
+                {
+                    size_t Equals = Piece.find('=');
+
+                    if (bFirstPiece && Args.empty())
+                        Args.push_back(Piece);
+                    else if (!bFirstPiece || Equals != std::string::npos)
+                        AddNamedArg(Piece, Equals);
+                    else
+                        Args.push_back(Piece);
+                }
+
+                bFirstPiece = false;
+                if (Next == std::string::npos)
+                    break;
+                Cursor = Next + 1;
+            }
         }
     }
 };
