@@ -21,7 +21,7 @@
 void AFortGameModeZone::HandleStartingNewPlayer(AFortGameModeZone* This, AFortPlayerControllerZone* NewPlayer) {
 	Log("HandleStartingNewPlayer Called!");
 
-	if (Version::Fortnite_Version <= 3.6 && Version::Fortnite_Version >= 1.8) {
+	if (Version::Fortnite_Version <= 4.1 && Version::Fortnite_Version >= 1.8) {
 		if (NewPlayer->PlayerCameraManager) {
 			NewPlayer->PlayerCameraManager->ViewRollMin = 0.0f;
 			NewPlayer->PlayerCameraManager->ViewRollMax = 0.0f;
