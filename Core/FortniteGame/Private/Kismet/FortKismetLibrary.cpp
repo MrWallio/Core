@@ -150,7 +150,7 @@ AFortPickup* UFortKismetLibrary::K2_SpawnPickupInWorld(
 	}
 
 	FVector FinalLocation = Position;
-	if (Direction.X || Direction.Y || Direction.Z)
+	if (Direction.X && Direction.Y && Direction.Z)
 		FinalLocation = Direction;
 
 	Pickup->TossPickup(

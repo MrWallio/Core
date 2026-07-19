@@ -154,7 +154,6 @@ bool AFortPickup::CheckForRePickup(AFortPlayerPawn* FortPlayerPawn) {
 
 UClass* AFortPickup::GetDefaultPickupClass(const UFortItemDefinition* ItemDefinition)
 {
-	return AFortPickup::StaticClass();
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("AFortPickup::GetDefaultPickupClass: World is null!");
