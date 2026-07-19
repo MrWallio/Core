@@ -5927,55 +5927,56 @@ uintptr_t Finder::FindAFortPickup_SetPickupItems() {
 		return ServerOffsets::AFortPickup_SetPickupItems;
 	
 	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortPickup_SetPickupItems;
 
-	if (!bInitialized)
-	{
-		bInitialized = true;
+	if (Version::Engine_Version == 4.16 || Version::Engine_Version == 4.19) {
+		Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9").Get();
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 80 B9 ? ? ? ? ? 45 0F B6 F1").Get();
+		}
+	}
+	else if (Version::Fortnite_Version <= 3.3) {
+		Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9 49 8B F8 48 8B F1 0F 85 ? ? ? ? 48 83 7A").Get();
+	}
+	else if (Version::Engine_Version == 4.20 || Version::Engine_Version == 4.21) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC 20 80 B9 ? ? ? ? ? 45 0F B6 F1 49 8B E8").Get();
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 41 0F B6", false).Get();
+		}
 
-		if (Version::Engine_Version == 4.16 || Version::Engine_Version == 4.19) {
+		if (!Addr) {
 			Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9").Get();
-			if (!Addr) {
-				Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 80 B9 ? ? ? ? ? 45 0F B6 F1").Get();
-			}
 		}
-		else if (Version::Fortnite_Version <= 3.3) {
-			Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9 49 8B F8 48 8B F1 0F 85 ? ? ? ? 48 83 7A").Get();
-		}
-		else if (Version::Engine_Version == 4.20 || Version::Engine_Version == 4.21) {
-			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC 20 80 B9 ? ? ? ? ? 45 0F B6 F1 49 8B E8").Get();
-			if (!Addr) {
-				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 41 0F B6", false).Get();
-			}
 
-			if (!Addr) {
-				Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC 20 80 B9 ? ? ? ? ? 41 0F B6 E9").Get();
-			}
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 80 B9 ? ? ? ? ? 45 0F B6 F1").Get();
 		}
-		else if (Version::Engine_Version == 4.22) {
-			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 41 56 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 45 0F B6 F1").Get();
+	}
+	else if (Version::Engine_Version == 4.22) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 41 56 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 45 0F B6 F1").Get();
+	}
+	else if (Version::Engine_Version == 4.23) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 41 56 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 45 0F B6 F1 4D").Get();
+	}
+	else if (Version::Engine_Version == 4.24 || Version::Engine_Version == 4.25) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC ? 80 B9").Get();
+	}
+	else if (Version::Engine_Version == 4.26)
+	{
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC ? 80 B9").Get();
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 56 57 41 57 48 83 EC ? 80 B9").Get();
 		}
-		else if (Version::Engine_Version == 4.23) {
-			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 57 41 56 41 57 48 83 EC 30 80 B9 ? ? ? ? ? 45 0F B6 F1 4D").Get();
-		}
-		else if (Version::Engine_Version == 4.24 || Version::Engine_Version == 4.25) {
-			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC ? 80 B9").Get();
-		}
-		else if (Version::Engine_Version == 4.26)
-		{
-			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 55 57 41 57 48 83 EC ? 80 B9").Get();
-			if (!Addr) {
-				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 56 57 41 57 48 83 EC ? 80 B9").Get();
-			}
-		}
-		else if (Version::Engine_Version == 4.27) {
-			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A").Get();
-		}
-		else if (Version::Engine_Version >= 5.0)
-		{
-			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A F9").Get();
-			if (!Addr) {
-				Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A F1").Get();
-			}
+	}
+	else if (Version::Engine_Version == 4.27) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A").Get();
+	}
+	else if (Version::Engine_Version >= 5.0)
+	{
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A F9").Get();
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 56 41 57 48 83 EC ? 80 B9 ? ? ? ? ? 45 8A F1").Get();
 		}
 	}
 	
@@ -5983,6 +5984,7 @@ uintptr_t Finder::FindAFortPickup_SetPickupItems() {
 		ServerOffsets::AFortPickup_SetPickupItems = Addr - ImageBase;
 	}
 
+	bInitialized = true;
 	Log("AFortPickup_SetPickupItems found at: 0x" + std::format("{:X}", ServerOffsets::AFortPickup_SetPickupItems));
 	return ServerOffsets::AFortPickup_SetPickupItems;
 }
@@ -8877,6 +8879,9 @@ uintptr_t Finder::FindUFortWorldItem_SetPhantomReserveAmmoVFT() {
 
 		ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT = uint32(SetOwningInventoryIdx - (Version::Engine_Version < 4.27 ? 1 : 2));
 	}
+	else {
+		return 0;
+	}
 
 	Log("UFortWorldItem_SetPhantomReserveAmmoVFT found at: 0x" + std::format("{:X}", ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT));
 	return ServerOffsets::UFortWorldItem_SetPhantomReserveAmmoVFT;
@@ -10056,21 +10061,13 @@ uintptr_t Finder::FindUFortQuestManager_ProcessPendingStatEvents() {
 		return ServerOffsets::UFortQuestManager_ProcessPendingStatEvents;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ProcessPendingStatEvents for %s: %s").Get();
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"LogPendingChanges: ProcessPendingStatEvents for %s: Context:(%s) %d Changes:%s").Get();
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"ProcessPendingStatEvents for %s: %s");
+	if (!StringAddr.IsValid()) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"LogPendingChanges: ProcessPendingStatEvents for %s: Context:(%s) %d Changes:%s");
 	}
 
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x4C)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 
 	if (Addr) {

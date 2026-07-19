@@ -84,8 +84,7 @@ void AFortAIGoalManager::Hook() {
 			StubCallsites::BySignature("48 89 5C 24 ? 56 57 41 56 48 83 EC 30 48 8B F1") } },
 
 		{ "AFortAIGoalManager::RemoveWorldAssignment", {
-			StubCallsites::BySignature("40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 90 ? ? ? ? 48 8B C8 E8 ? ? ? ? 48 85 C0 74 ? 48 8B D3 48 8B C8 48 83 C4 20 5B E9 ? ? ? ? 48 83 C4 20 5B C3 CC CC CC CC CC CC CC CC CC CC CC 48 89 5C 24"), // 1.9
-			StubCallsites::BySignature("40 53 48 83 EC 20 48 8B 01 48 8B D9 FF 90 ? ? ? ? 48 8B C8 E8 ? ? ? ? 48 85 C0 74 ? 48 8B D3 48 8B C8 48 83 C4 20 5B E9 ? ? ? ? 48 83 C4 20 5B C3 90 11 C3") } }, // 3.6
+			StubCallsites::ByXref("48 89 5C 24 ? 56 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B 82") } },
 
 		{ "AFortAIGoalManager::GetGoalLocations", {
 			StubCallsites::BySignature("40 53 48 83 EC 50 48 8B D9 E8 ? ? ? ? 48 85 C0") } },

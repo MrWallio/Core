@@ -289,7 +289,7 @@ uint8 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 void AFortGameModeAthena::InitGameState(AFortGameModeAthena* This) {
 	InitGameStateOG(This);
 
-	if (Version::Fortnite_Version >= 3.5 && Version::Fortnite_Version <= 3.6) {
+	if (Version::Fortnite_Version >= 3.5 && Version::Fortnite_Version <= 4.0) {
 		std::thread([This]() {
 			while (true) {
 				UWorld* World = UWorld::GetWorld();

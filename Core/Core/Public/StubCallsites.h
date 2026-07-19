@@ -82,6 +82,32 @@ namespace StubCallsites {
 		return Memcury::Scanner::FindPattern(Signature, false).Get();
 	}
 
+	// A function located by one of its callees. Match the callee by signature, take the single branch
+	// (E8 call or E9 tail-jmp) that targets it, and walk back to the function that makes it. Prefer this
+	// to signing the caller's own prologue whenever the callee is reached from exactly one place: the
+	// callee's body is a far more stable anchor across builds than the caller's register and stack
+	// allocation, and a leaf helper often keeps the same shape where the caller's prologue drifts.
+	//
+	// The branch must include E9: the folded getter is frequently reached through a tail-call wrapper
+	// that makes the stub call itself and then jmp-tails into the named body -- so the "caller" holding
+	// the stub call is the wrapper, and its link to the body is a jmp, not a call. A call-only scan
+	// misses it entirely.
+	//
+	// The exactly-one requirement is the point -- zero or several branch-refs make the caller ambiguous,
+	// so this yields nothing and the next locator is tried rather than guessing which xref is wanted.
+	inline uintptr_t FromXref(const char* CalleeSignature)
+	{
+		uintptr_t Callee = Memcury::Scanner::FindPattern(CalleeSignature, false).Get();
+		if (!Callee)
+			return 0;
+
+		auto Refs = FindBranchRefsToAddress(Callee);
+		if (Refs.size() != 1)
+			return 0;
+
+		return Memcury::Scanner(Refs[0]).FindFunctionStart().Get();
+	}
+
 	// ---- locating the call ---------------------------------------------------------------------
 
 	// The return-null stub that Function calls. Anchor this on a function that calls the wanted getter
@@ -160,6 +186,7 @@ namespace StubCallsites {
 	inline FLocator ByVTable(UClass* Class, uintptr_t Index) { return [=] { return FromVTable(Class, Index); }; }
 	inline FLocator ByOffset(uintptr_t Offset) { return [=] { return FromOffset(Offset); }; }
 	inline FLocator BySignature(const char* Signature) { return [=] { return FromSignature(Signature); }; }
+	inline FLocator ByXref(const char* CalleeSignature) { return [=] { return FromXref(CalleeSignature); }; }
 
 	// ---- patching ------------------------------------------------------------------------------
 

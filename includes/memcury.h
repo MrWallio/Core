@@ -1811,6 +1811,33 @@ inline std::vector<uintptr_t> FindCallRefsToAddress(uintptr_t Target)
     return Refs;
 }
 
+// Every E8 CALL or E9 JMP in .text whose resolved target == Target. Same rel32 encoding for both, so
+// this also catches tail-call thunks -- a small wrapper that does its work and then jmp-tails into the
+// real function, which is exactly how some getters are reached (the wrapper makes the folded stub call,
+// then tail-jumps into the named body). FindCallRefsToAddress alone misses those.
+inline std::vector<uintptr_t> FindBranchRefsToAddress(uintptr_t Target)
+{
+    std::vector<uintptr_t> Refs;
+
+    auto textSection = Memcury::PE::Section::GetSection(".text");
+    auto* textBytes = reinterpret_cast<uint8_t*>(textSection.GetSectionStart().Get());
+    size_t textSize = textSection.GetSectionSize();
+
+    for (size_t i = 0; i + 5 <= textSize; i++)
+    {
+        auto* Ptr = textBytes + i;
+
+        if (Ptr[0] == 0xE8 || Ptr[0] == 0xE9)
+        {
+            int32_t Rel = *reinterpret_cast<int32_t*>(Ptr + 1);
+            if (reinterpret_cast<uintptr_t>(Ptr) + 5 + Rel == Target)
+                Refs.push_back(reinterpret_cast<uintptr_t>(Ptr));
+        }
+    }
+
+    return Refs;
+}
+
 inline std::vector<uintptr_t> FindLeaRefsToAddress(uintptr_t Target)
 {
     std::vector<uintptr_t> Refs;
