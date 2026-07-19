@@ -118,7 +118,6 @@ public:
 
 	bool CanAddItem(UFortItemDefinition* Def, int32 Count = 1) const;
 	bool CanAddItem(const FFortItemEntry& ItemEntry) const;
-	bool CanRemoveItem(FGuid Guid, int32 Count) const;
 
 	bool IsPrimaryItem(UFortItemDefinition* Def) const;
 	bool IsSecondaryItem(UFortItemDefinition* Def) const;

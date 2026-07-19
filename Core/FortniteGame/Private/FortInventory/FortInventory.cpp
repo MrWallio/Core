@@ -521,9 +521,6 @@ int32 AFortInventory::GetOverflowFromAddingItem(const FFortItemEntry& ItemEntry)
 
 bool AFortInventory::RemoveItem(FGuid Guid, int32 Count, bool bDeferUpdate)
 {
-	if (!CanRemoveItem(Guid, Count))
-		return false;
-
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC)
 		return false;
@@ -1005,17 +1002,6 @@ bool AFortInventory::CanAddItem(UFortItemDefinition* Def, int32 Count) const
 bool AFortInventory::CanAddItem(const FFortItemEntry& ItemEntry) const
 {
 	return Owner && ItemEntry.ItemDefinition && ItemEntry.Count > 0;
-}
-
-bool AFortInventory::CanRemoveItem(FGuid Guid, int32 Count) const
-{
-	if (!Guid.IsValid())
-		return false;
-
-	if (Count <= 0)
-		return false;
-
-	return GetOwnerPlayerController() != nullptr;
 }
 
 bool AFortInventory::IsPrimaryItem(UFortItemDefinition* Def) const
