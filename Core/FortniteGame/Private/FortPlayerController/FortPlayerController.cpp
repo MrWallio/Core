@@ -189,6 +189,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("EmoteAll - Everyone in the world uses a random emote.");
 		This->ClientMessage("EmoteAllSpecific [EmoteItemDefinitionName] - Everyone in the world uses a specific emote.");
 		This->ClientMessage("EmotePlayerByName <PlayerName> [EmoteItemDefinitionName] - make a player use a specific emote.");
+		This->ClientMessage("TogglePersonalVehicle - Toggle the personal vehicle.");
 		return;
 	}
 	else if (Parser.IsCommand("GiveItem")) {
@@ -1480,6 +1481,12 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 			This->ClientMessage("Player: " + PlayerName + " is emoting!");
 			return;
 		}
+	}
+	else if (Parser.IsCommand("TogglePersonalVehicle")) {
+		bool bOn = !This->IsPersonalVehicleActive();
+		This->TogglePersonalVehicle(bOn);
+		This->ClientMessage("Toggled Personal Vehicle!");
+		return;
 	}
 
 	if (Version::Fortnite_Version >= 2.2) {
