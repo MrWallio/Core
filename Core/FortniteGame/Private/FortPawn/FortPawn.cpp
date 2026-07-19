@@ -62,7 +62,7 @@ void AFortPawn::SetMaxHealth(float NewHealthVal)
 
 void AFortPawn::SetShield(float NewShieldValue)
 {
-	if (Version::Fortnite_Version > 4.0) {
+	if (Version::Fortnite_Version > 4.1) {
 		static UFunction* Func = nullptr;
 
 		if (Func == nullptr)
