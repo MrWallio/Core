@@ -207,6 +207,8 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 
 		Log("Set Custom Supply Drop Class: " + SupplyDropClass->GetName().ToString());
 	}
+
+	GameState->OnRep_Aircraft();
 }
 
 void AFortGameModeAthena::AddToAlivePlayers(AFortPlayerControllerAthena* PC) {

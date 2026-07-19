@@ -135,6 +135,15 @@ void AFortGameStateAthena::OnRep_CurrentPlaylistInfo()
 	Call(Func);
 }
 
+void AFortGameStateAthena::OnRep_Aircraft() {
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_Aircraft");
+
+	Call(Func);
+}
+
 void AFortGameStateAthena::Hook() {
 	HookEveryVTableIdx(
 		AFortGameStateAthena::StaticClass(),

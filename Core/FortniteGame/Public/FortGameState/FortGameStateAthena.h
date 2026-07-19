@@ -57,5 +57,7 @@ public:
 
 	void OnRep_CurrentPlaylistInfo();
 
+	void OnRep_Aircraft();
+
 	static void Hook();
 };
