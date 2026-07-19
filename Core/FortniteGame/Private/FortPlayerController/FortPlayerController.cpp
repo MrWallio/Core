@@ -30,6 +30,7 @@
 #include "FortniteGame/Public/Athena/FortAthenaMapInfo.h"
 #include "FortniteGame/Public/AI/FortAIController.h"
 #include "FortniteGame/Public/AI/FortAIPawn.h"
+#include "FortniteGame/Public/Athena/FortAthenaAircraft.h"
 
 void AFortPlayerController::ClientForceProfileQuery()
 {
@@ -172,6 +173,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("-- World / Actors --");
 		This->ClientMessage("SpawnActor <ActorClassName> [bSetOwnerAsThis] - Spawns an actor at the player.");
 		This->ClientMessage("DumpActorsWithClass <ClassName> - Lists all actors of a class with their locations.");
+		This->ClientMessage("DumpAircrafts - Dumps the aircrafts in the gamestate.");
 		This->ClientMessage("DestroyTarget - Destroys the actor under the crosshair.");
 		This->ClientMessage("-- QuickBars --");
 		This->ClientMessage("SpawnQuickBars / DestroyQuickBars / DumpQuickBars - Manage the player's quickbars.");
@@ -1487,6 +1489,25 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->TogglePersonalVehicle(bOn);
 		This->ClientMessage("Toggled Personal Vehicle!");
 		return;
+	}
+	else if (Parser.IsCommand("DumpAircrafts")) {
+		AFortGameStateAthena* GameState = World->GameState->Cast<AFortGameStateAthena>();
+		if (!GameState) {
+			This->ClientMessage("GameState is null or not an AFortGameStateAthena!");
+			return;
+		}
+
+		TArray<AFortAthenaAircraft*>& Aircrafts = GameState->Aircrafts;
+		if (Aircrafts.IsEmpty()) {
+			This->ClientMessage("Aircrafts array is empty!");
+			return;
+		}
+
+		This->ClientMessage("===== Start Aircrafts Dump =====");
+		for (AFortAthenaAircraft* Aircraft : Aircrafts) {
+			This->ClientMessage("Aircraft: " + Aircraft->GetName().ToString());
+		}
+		This->ClientMessage("===== End Aircrafts Dump =====");
 	}
 
 	if (Version::Fortnite_Version >= 2.2) {
