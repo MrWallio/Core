@@ -2,7 +2,7 @@
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 
 #include "FortniteGame/Public/FortItem/FortWorldItem.h"
-#include "FortniteGame/Public/FortItemDefinition/FortWorldItemDefinition.h"
+#include "FortniteGame/Public/FortItemDefinition/FortGadgetItemDefinition.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
 #include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
@@ -806,6 +806,23 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 	AFortPlayerController* PC = GetOwnerPlayerController();
 	if (!PC) {
 		return false;
+	}
+
+	UFortGadgetItemDefinition* GadgetItemDefinition = ItemEntry.ItemDefinition->Cast<UFortGadgetItemDefinition>();
+	if (GadgetItemDefinition && GadgetItemDefinition->bDropAllOnEquip) {
+		DropAllItems(true, false);
+
+		FFortItemEntry* AddedGadget = AddItem(ItemEntry);
+		if (AddedGadget && GadgetItemDefinition->bForceFocusWhenAdded) {
+			if (PC->QuickBars) {
+				PC->QuickBars->EquipItem(AddedGadget->ItemGuid);
+			}
+			if (PC->ClientQuickBars) {
+				PC->ClientQuickBars->EquipItem(AddedGadget->ItemGuid);
+			}
+		}
+
+		return AddedGadget;
 	}
 
 	int32 Overflow = GetOverflowFromAddingItem(ItemEntry);

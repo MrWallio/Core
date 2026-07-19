@@ -5,6 +5,7 @@
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortItemDefinition/FortGadgetItemDefinition.h"
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"

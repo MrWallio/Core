@@ -18,6 +18,7 @@ public:
 	DefineBitfieldUProperty(bSupportsQuickbarFocus);
 	DefineBitfieldUProperty(bSupportsQuickbarFocusForGamepadOnly);
 	DefineBitfieldUProperty(bShouldActivateWhenFocused);
+	DefineBitfieldUProperty(bForceFocusWhenAdded);
 	DefineBitfieldUProperty(bShowDirectionalArrowWhenFarOff);
 	DefineBitfieldUProperty(bItemCanBeStolen);
 	DefineBitfieldUProperty(bCanBeDepositedInStorageVault);

@@ -139,7 +139,7 @@ AFortPlayerController* UFortQuestManager::GetPlayerControllerBP() {
 			Log("UFortQuestManager::GetPlayerControllerBP: World is null!");
 			return nullptr;
 		}
-
+		
 		UFortRegisteredPlayerInfo* PlayerInfo = OuterPrivate->Cast<UFortRegisteredPlayerInfo>();
 		if (!PlayerInfo) {
 			Log("UFortQuestManager::GetPlayerControllerBP: PlayerInfo is null!");
