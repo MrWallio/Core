@@ -375,15 +375,9 @@ bool UFortKismetLibrary::PickLootDrops(
 			if (UDataTable* MainLTD = FortGameStateAthena->GetLootTierData()) {
 				LootTierDataTables.Add(MainLTD);
 			}
-			else {
-				Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot tier data table from playlist!");
-			}
 
 			if (UDataTable* MainLP = FortGameStateAthena->GetLootPackages()) {
 				LootPackagesDataTables.Add(MainLP);
-			}
-			else {
-				Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot packages data table from playlist!");
 			}
 		}
 		if (LootTierDataTables.Num() == 0) {
