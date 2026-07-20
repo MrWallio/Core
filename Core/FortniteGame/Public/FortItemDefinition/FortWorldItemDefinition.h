@@ -24,6 +24,7 @@ public:
 	DefineBitfieldUProperty(bCanBeDepositedInStorageVault);
 	DefineBitfieldUProperty(bItemHasDurability);
 	DefineBitfieldUProperty(bOverridePickupMeshTransform);
+	DefineUProperty(int32, PreferredQuickbarSlot);
 public:
 	bool ServerExecute(UFortItem* Item, AFortPlayerController* Instigator);
 

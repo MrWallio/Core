@@ -67,4 +67,6 @@ public:
 	void OnRep_IsDBNO();
 
 	bool IsDBNO() const;
+
+	bool IsAllowedToPickup();
 };

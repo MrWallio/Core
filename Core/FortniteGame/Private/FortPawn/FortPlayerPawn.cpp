@@ -94,6 +94,10 @@ void AFortPlayerPawn::ServerHandlePickup(AFortPlayerPawn* This, AFortPickup* Pic
 		return;
 	}
 
+	if (!This->IsAllowedToPickup()) {
+		return;
+	}
+
 	AFortGameModeAthena* FortGameModeAthena = World->AuthorityGameMode->Cast<AFortGameModeAthena>();
 	
 	float PickupSpeedMultiplier = This->_HasPickupSpeedMultiplier() ? This->PickupSpeedMultiplier : (FortGameModeAthena ? 3 : 1);

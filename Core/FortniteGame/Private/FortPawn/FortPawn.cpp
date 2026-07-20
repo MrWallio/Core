@@ -3,7 +3,10 @@
 
 #include "FortniteGame/Public/FortSet/FortHealthSet.h"
 #include "FortniteGame/Public/FortItemDefinition/FortWeaponItemDefinition.h"
+#include "FortniteGame/Public/FortItemDefinition/FortGadgetItemDefinition.h"
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
+#include "FortniteGame/Public/FortPlayerController/FortPlayerControllerAthena.h"
+#include "FortniteGame/Public/FortInventory/FortInventory.h"
 
 AFortWeapon* AFortPawn::EquipWeaponDefinition(const UFortWeaponItemDefinition* WeaponData, const FGuid& ItemEntryGuid)
 {
@@ -191,4 +194,22 @@ bool AFortPawn::IsDBNO() const
 	}
 
 	return const_cast<AFortPawn*>(this)->Call<bool>(Func);
+}
+
+bool AFortPawn::IsAllowedToPickup() {
+	AFortPlayerController* PC = Controller->Cast<AFortPlayerController>();
+	if (PC && PC->WorldInventory) {
+		for (int32 i = 0; i < PC->WorldInventory->Inventory.ReplicatedEntries.Num(); i++) {
+			FFortItemEntry& ItemEntry = PC->WorldInventory->Inventory.ReplicatedEntries.GetWithSize(i, FFortItemEntry::GetSize());
+			if (!ItemEntry.ItemDefinition)
+				continue;
+
+			UFortGadgetItemDefinition* GadgetItemDefinition = ItemEntry.ItemDefinition->Cast<UFortGadgetItemDefinition>();
+			if (GadgetItemDefinition && GadgetItemDefinition->bDropAllOnEquip) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }

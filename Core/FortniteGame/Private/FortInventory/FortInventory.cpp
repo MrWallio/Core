@@ -811,15 +811,12 @@ bool AFortInventory::AddItemAndHandleOverflow(const FFortItemEntry& ItemEntry, b
 	UFortGadgetItemDefinition* GadgetItemDefinition = ItemEntry.ItemDefinition->Cast<UFortGadgetItemDefinition>();
 	if (GadgetItemDefinition && GadgetItemDefinition->bDropAllOnEquip) {
 		DropAllItems(true, false);
+		Inventory.ReplicatedEntries.Free();
+		Inventory.ItemInstances.Free();
 
-		FFortItemEntry* AddedGadget = AddItem(ItemEntry);
+		FFortItemEntry* AddedGadget = AddItem(ItemEntry, false, GadgetItemDefinition->PreferredQuickbarSlot);
 		if (AddedGadget && GadgetItemDefinition->bForceFocusWhenAdded) {
-			if (PC->QuickBars) {
-				PC->QuickBars->EquipItem(AddedGadget->ItemGuid);
-			}
-			if (PC->ClientQuickBars) {
-				PC->ClientQuickBars->EquipItem(AddedGadget->ItemGuid);
-			}
+			PC->ClientExecuteInventoryItem(AddedGadget->ItemGuid, 0.f, false, false);
 		}
 
 		return AddedGadget;
