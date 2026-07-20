@@ -44,6 +44,7 @@ struct FFortItemEntryStateValue;
 class UFortMcpProfileAccount;
 class UFortMcpProfileAthena;
 class UFortQuestManager;
+class UAthenaSprayItemDefinition;
 
 class AFortPlayerController : public APlayerController {
 public:
@@ -133,6 +134,8 @@ public:
 
 	static inline void (*ServerPlayEmoteItemOG)(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset);
 	static void ServerPlayEmoteItem(AFortPlayerController* This, UFortMontageItemDefinitionBase* EmoteAsset, float EmoteRandomNumber);
+
+	static void ServerPlaySprayItem(AFortPlayerController* This, UAthenaSprayItemDefinition* SprayAsset);
 
 	static inline void (*GetPlayerViewPointOG)(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation);
 	static void GetPlayerViewPoint(AFortPlayerController* This, FVector& out_Location, FRotator& out_Rotation);
@@ -264,6 +267,12 @@ public:
 			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerPlayEmoteItem"),
 			ServerPlayEmoteItem,
 			(LPVOID*)&ServerPlayEmoteItemOG
+		);
+
+		HookEveryVTable(
+			AFortPlayerController::StaticClass(),
+			AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerPlaySprayItem"),
+			ServerPlaySprayItem
 		);
 
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_GetPlayerViewPoint()), GetPlayerViewPoint, (LPVOID*)&GetPlayerViewPointOG);

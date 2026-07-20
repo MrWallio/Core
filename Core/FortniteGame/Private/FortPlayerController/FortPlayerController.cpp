@@ -2167,26 +2167,56 @@ void AFortPlayerController::ServerPlayEmoteItem(AFortPlayerController* This, UFo
 		return;
 	}
 
-	AFortPlayerState* PlayerState = This->PlayerState->Cast<AFortPlayerState>();
-	if (!PlayerState) {
-		Log("ServerPlayEmoteItem: PlayerState is null or not AFortPlayerState!");
-		return;
-	}
-
-	UFortAbilitySystemComponent* ASC = PlayerState->AbilitySystemComponent;
+	UFortAbilitySystemComponent* ASC = This->MyFortPawn->AbilitySystemComponent;
 	if (!ASC) {
 		Log("ServerPlayEmoteItem: AbilitySystemComponent is null!");
 		return;
 	}
 
 	UFortGameplayAbility* EmoteAbility = nullptr;
-	if (UAthenaDanceItemDefinition* DanceItemDef = EmoteAsset->Cast<UAthenaDanceItemDefinition>()) {
+	if (UAthenaSprayItemDefinition* SprayItemDef = EmoteAsset->Cast<UAthenaSprayItemDefinition>()) {
+		UClass* Ability = StaticLoadObject<UClass>("/Game/Abilities/Sprays/GAB_Spray_Generic.GAB_Spray_Generic_C");
+		if (Ability) {
+			EmoteAbility = Ability->GetDefaultObj()->Cast<UFortGameplayAbility>();
+		}
+	}
+	else if (UAthenaDanceItemDefinition* DanceItemDef = EmoteAsset->Cast<UAthenaDanceItemDefinition>()) {
 		UClass* Ability = StaticLoadObject<UClass>("/Game/Abilities/Emotes/GAB_Emote_Generic.GAB_Emote_Generic_C");
-		EmoteAbility = Ability->GetDefaultObj()->Cast<UFortGameplayAbility>();
+		if (Ability) {
+			EmoteAbility = Ability->GetDefaultObj()->Cast<UFortGameplayAbility>();
+		}
 	}
 
 	if (EmoteAbility) {
 		FGameplayAbilitySpec* EmoteAbilitySpec = FGameplayAbilitySpec::ConstructAbilitySpec(EmoteAbility, 1, -1, EmoteAsset);
+		ASC->GiveAbilityAndActivateOnce(EmoteAbilitySpec, nullptr);
+	}
+}
+
+void AFortPlayerController::ServerPlaySprayItem(AFortPlayerController* This, UAthenaSprayItemDefinition* SprayAsset) {
+	if (!SprayAsset) {
+		Log("ServerPlaySprayItem: SprayAsset is null!");
+		return;
+	}
+
+	if (!This->MyFortPawn) {
+		Log("ServerPlaySprayItem: MyFortPawn is null!");
+		return;
+	}
+
+	UFortAbilitySystemComponent* ASC = This->MyFortPawn->AbilitySystemComponent;
+	if (!ASC) {
+		Log("ServerPlaySprayItem: AbilitySystemComponent is null!");
+		return;
+	}
+
+	UFortGameplayAbility* SprayAbility = nullptr;
+	if (UClass* Ability = StaticLoadObject<UClass>("/Game/Abilities/Sprays/GAB_Spray_Generic.GAB_Spray_Generic_C")) {
+		SprayAbility = Ability->GetDefaultObj()->Cast<UFortGameplayAbility>();
+	}
+
+	if (SprayAbility) {
+		FGameplayAbilitySpec* EmoteAbilitySpec = FGameplayAbilitySpec::ConstructAbilitySpec(SprayAbility, 1, -1, SprayAsset);
 		ASC->GiveAbilityAndActivateOnce(EmoteAbilitySpec, nullptr);
 	}
 }
