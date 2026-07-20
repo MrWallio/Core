@@ -47,48 +47,6 @@ void AFortAIGoalManager::Hook() {
 		{ "AFortMission::RemoveGoalsFromEncounterAssignment", {
 			StubCallsites::ByReflection("Function /Script/FortniteGame.FortMission.RemoveGoalsFromEncounterAssignment") } },
 
-		{ "UFortAIEncounterInfo::CreateEncounterAssignment", {
-			StubCallsites::ByReflection("Function /Script/FortniteGame.FortAIEncounterInfo.CreateEncounterAssignment") } },
-
-		{ "AFortAIController::UnregisterForGoalDetection", {
-			StubCallsites::ByReflection("Function /Script/FortniteGame.FortAIController.UnregisterForGoalDetection") } },
-
-		{ "AFortAIDirector::IsAnyEncounterGoalWithinDistanceOfPoint", {
-			StubCallsites::ByReflection("Function /Script/FortniteGame.FortAIDirector.IsAnyEncounterGoalWithinDistanceOfPoint") } },
-
-		{ "AFortAIController::OnReceiveGoalQueryResult", {
-			StubCallsites::ByString(L"OnReceiveGoalQueryResult received by AFortAIController when no Goal Manager exists!") } },
-
-		{ "UFortAIEncounterInfo::OnEnemyPawnSpawned", {
-			StubCallsites::ByString(L"Failed to find spawn group info on enemy pawn spawning for pawn %s. Associated Mission Name: %s. %s Group GUID is %s. Num active groups %i.") } },
-
-		{ "AFortAIGoalManager::GetCurrentForAssignment", {
-			StubCallsites::ByString(L"%s failed due to NULL WorldContextObject.  Without WorldContextObject, cannot find Goal Manager!  Assignment Identifier: %s.") } },
-
-		{ "AFortAIGoalManager::GetDefaultAssignmentSettings", {
-			StubCallsites::BySignature("40 57 48 83 EC 20 48 8B F9 48 85 D2 0F 85") } },
-
-		{ "AFortAIGoalManager::GetDefaultAssignmentSettings", {
-			StubCallsites::BySignature("40 57 48 83 EC 20 48 8B F9 48 85 D2 0F 85") } },
-
-		{ "UFortAIEncounterInfo::NotifyDirectorEnd", {
-			StubCallsites::BySignature("48 89 5C 24 ? 57 48 83 EC 20 48 8B 01 8B FA 48 8B D9 FF 90 ? ? ? ? 48 8B C8 E8 ? ? ? ? 48 85 C0") } },
-
-		{ "AFortAIController::OnPawnSpawned", {
-			StubCallsites::BySignature("40 55 53 56 57 41 54 48 8D 6C 24 ? 48 81 EC 00 01 00 00 45 33 E4 4C 89 B4 24") } },
-
-		{ "UAIGoalComponent::SetActiveGoal", {
-			StubCallsites::BySignature("40 53 48 83 EC 20 48 8B D9 48 85 D2 74 ? 48 39 91") } },
-
-		{ "AFortAIGoalManager::SelectDefaultAssignmentSettings", {
-			StubCallsites::BySignature("48 89 5C 24 ? 56 57 41 56 48 83 EC 30 48 8B F1") } },
-
-		{ "AFortAIGoalManager::RemoveWorldAssignment", {
-			StubCallsites::ByXref("48 89 5C 24 ? 56 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B 82") } },
-
-		{ "AFortAIGoalManager::GetGoalLocations", {
-			StubCallsites::BySignature("40 53 48 83 EC 50 48 8B D9 E8 ? ? ? ? 48 85 C0") } },
-
 		{ "UFortQueryGenerator::GenerateItems", {
 			StubCallsites::BySignature("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B DA 48 8B F1 48 85 D2 74 ? E8 ? ? ? ? 48 8B D0 48 8B CB E8 ? ? ? ? 48 8B F8 48 85 C0 74") } },
 

@@ -1193,6 +1193,45 @@ namespace Memcury
             return *this;
         }
 
+        // Walks forward (or, with bGoUp, backward) from the current address -- up to Radius bytes --
+        // for the first `call rel32` (0xE8) whose resolved target lands inside .text. Validating the
+        // target -- instead of just matching the raw 0xE8 opcode byte -- skips E8 bytes that are
+        // actually operand/immediate data belonging to some other instruction (those resolve to
+        // garbage outside .text), so this finds the first *real* call regardless of how the bytes in
+        // between are encoded (disp8 vs disp32, SIB, differing register allocation across builds,
+        // etc). Returns a Scanner positioned at the resolved call target, or an invalid Scanner if no
+        // valid call is found within Radius.
+        inline auto FindFirstCall(int Radius = 0x40, bool bGoUp = false) -> Scanner
+        {
+            auto Start = _address.Get();
+
+            if (!Start)
+            {
+                return Scanner(PE::Address(nullptr));
+            }
+
+            auto TextSection = PE::Section::GetSection(".text");
+            uintptr_t TextStart = TextSection.GetSectionStart().Get();
+            uintptr_t TextEnd = TextSection.GetSectionEnd().Get();
+
+            for (int i = 0; i < Radius; i++)
+            {
+                auto Cursor = bGoUp ? Start - i : Start + i;
+
+                if (*reinterpret_cast<uint8_t*>(Cursor) != 0xE8)
+                    continue;
+
+                uintptr_t Target = Cursor + 5 + *reinterpret_cast<int32_t*>(Cursor + 1);
+
+                if (Target >= TextStart && Target < TextEnd)
+                {
+                    return Scanner(PE::Address(Target));
+                }
+            }
+
+            return Scanner(PE::Address(nullptr));
+        }
+
         auto FindFunctionBoundary(bool forward = false) -> Scanner
         {
             const auto scanBytes = _address.GetAs<std::uint8_t*>();
