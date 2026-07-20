@@ -7,6 +7,33 @@
 
 UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictCheck, EClassCastFlags Flags)
 {
+	std::string LowerFull = Utils::StringToLower(FullName);
+
+	if (bStrictCheck)
+	{
+		size_t Sep = FullName.find_last_of('.');
+		FName ShortFName((Sep == std::string::npos ? FullName : FullName.substr(Sep + 1)).c_str());
+
+		for (int i = 0; i < Num(); ++i)
+		{
+			FUObjectItem* Item = IndexToObject(i);
+			if (!Item)
+				continue;
+
+			UObject* Object = (UObject*)Item->Object;
+			if (!Object)
+				continue;
+
+			if (!Object->GetFName().IsEqual(ShortFName, ENameCase::IgnoreCase, false))
+				continue;
+
+			if (Utils::StringToLower(Object->GetFullName()) == LowerFull)
+				return Object;
+		}
+
+		return nullptr;
+	}
+
 	for (int i = 0; i < Num(); ++i)
 	{
 		FUObjectItem* Item = IndexToObject(i);
@@ -14,13 +41,11 @@ UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictChec
 			continue;
 
 		UObject* Object = (UObject*)Item->Object;
-
 		if (!Object)
 			continue;
 
 		std::string objectFullName = Utils::StringToLower(Object->GetFullName());
-		if (bStrictCheck ? (objectFullName == Utils::StringToLower(FullName)) : (objectFullName.contains(Utils::StringToLower(FullName)))
-			&& (Flags == EClassCastFlags::RF_NoFlags || Object->IsA(Flags)))
+		if (objectFullName.contains(LowerFull) && (Flags == EClassCastFlags::RF_NoFlags || Object->IsA(Flags)))
 		{
 			return Object;
 		}
@@ -31,6 +56,33 @@ UObject* FUObjectArray::FindObject(const std::string& FullName, bool bStrictChec
 
 UObject* FUObjectArray::FindObjectWithClass(const std::string& FullName, bool bStrictCheck, UClass* Class)
 {
+	std::string LowerFull = Utils::StringToLower(FullName);
+
+	if (bStrictCheck)
+	{
+		size_t Sep = FullName.find_last_of('.');
+		FName ShortFName((Sep == std::string::npos ? FullName : FullName.substr(Sep + 1)).c_str());
+
+		for (int i = 0; i < Num(); ++i)
+		{
+			FUObjectItem* Item = IndexToObject(i);
+			if (!Item)
+				continue;
+
+			UObject* Object = (UObject*)Item->Object;
+			if (!Object)
+				continue;
+
+			if (!Object->GetFName().IsEqual(ShortFName, ENameCase::IgnoreCase, false))
+				continue;
+
+			if (Utils::StringToLower(Object->GetFullName()) == LowerFull)
+				return Object;
+		}
+
+		return nullptr;
+	}
+
 	for (int i = 0; i < Num(); ++i)
 	{
 		FUObjectItem* Item = IndexToObject(i);
@@ -38,13 +90,11 @@ UObject* FUObjectArray::FindObjectWithClass(const std::string& FullName, bool bS
 			continue;
 
 		UObject* Object = (UObject*)Item->Object;
-
 		if (!Object)
 			continue;
 
 		std::string objectFullName = Utils::StringToLower(Object->GetFullName());
-		if (bStrictCheck ? (objectFullName == Utils::StringToLower(FullName)) : (objectFullName.contains(Utils::StringToLower(FullName)))
-			&& (!Class || Object->IsA(Class)))
+		if (objectFullName.contains(LowerFull) && (!Class || Object->IsA(Class)))
 		{
 			return Object;
 		}
@@ -53,7 +103,7 @@ UObject* FUObjectArray::FindObjectWithClass(const std::string& FullName, bool bS
 	return nullptr;
 }
 
-UObject* FUObjectArray::FindObjectFast(const std::string& Name)
+UObject* FUObjectArray::FindObjectFast(FName Name)
 {
 	for (int i = 0; i < Num(); ++i)
 	{
@@ -66,11 +116,21 @@ UObject* FUObjectArray::FindObjectFast(const std::string& Name)
 		if (!Object)
 			continue;
 
-		if (Utils::StringToLower(Object->GetName().ToString()) == Utils::StringToLower(Name))
+		if (Object->GetFName() == Name)
 			return static_cast<UObject*>(Object);
 	}
 
 	return nullptr;
+}
+
+UObject* FUObjectArray::FindObjectFast(const char* Name)
+{
+	return FindObjectFast(FName(Name));
+}
+
+UObject* FUObjectArray::FindObjectFast(const std::string& Name)
+{
+	return FindObjectFast(FName(Name.c_str()));
 }
 
 UObject* FUObjectArray::DefaultObjImpl(const UClass* TargetClass)
@@ -116,6 +176,8 @@ TArray<UObject*> FUObjectArray::FindObjects(const std::string& SearchString)
 {
 	TArray<UObject*> Objects;
 
+	std::string LowerSearch = Utils::StringToLower(SearchString);
+
 	for (int i = 0; i < Num(); i++)
 	{
 		FUObjectItem* Item = IndexToObject(i);
@@ -127,7 +189,7 @@ TArray<UObject*> FUObjectArray::FindObjects(const std::string& SearchString)
 			continue;
 
 		std::string objectFullName = Utils::StringToLower(Object->GetFullName());
-		if (objectFullName.contains(Utils::StringToLower(SearchString)))
+		if (objectFullName.contains(LowerSearch))
 		{
 			Objects.Add(Object);
 		}

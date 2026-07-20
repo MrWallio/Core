@@ -290,6 +290,8 @@ public:
 	static UObject* FindObject(const std::string& FullName, bool bStrictCheck = true, EClassCastFlags Flags = EClassCastFlags::RF_NoFlags);
 	static UObject* FindObjectWithClass(const std::string& FullName, bool bStrictCheck = true, UClass* Class = nullptr);
 
+	static UObject* FindObjectFast(FName Name);
+	static UObject* FindObjectFast(const char* Name);
 	static UObject* FindObjectFast(const std::string& Name);
 
 	static UObject* DefaultObjImpl(const UClass* TargetClass);
