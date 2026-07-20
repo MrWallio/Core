@@ -1,6 +1,6 @@
 # Core
 
-**Core** is a community made Fortnite gameserver focused on recreating original behavior as accurately as possible across our current supported Fortnite builds. We aim to get our unsupported versions of Fortnite working 1:1 before moving on to supporting another version.
+**Core** is a community made Fortnite gameserver focused on recreating original behavior as accurately as possible across our current supported Fortnite builds. We prioritize fixing reported issues and completing functionality for supported versions over expanding version support. When work begins on a new Fortnite version, we aim to make it fully functional before moving on to another version.
 
 Core runs inside Fortnite to provide server-side systems to load maps, apply playlists, accept players, run matches, and support gameplay. This repository does NOT include Fortnite game files, a launcher, or backend services.
 
@@ -19,7 +19,7 @@ Core runs inside Fortnite to provide server-side systems to load maps, apply pla
 | 1.7.2–4.1 | Full support ✅|
 | 4.2+ | Unsupported ⚠️|
 
-- **Full support** means the versions listed have little to no bugs and it should feel like 1:1 Fortnite
+- **Full support** means that a version is actively supported. We prioritize fixes and missing functionality for fully supported versions before adding support for other versions.
 - **Unsupported** means the build may start and have some gameplay features, but it may be unfinished, untested, or have gamebreaking bugs.
 - **Save the World is experimental and unfinished.** Expect missing or incomplete mission, inventory, quest, AI, and progression behavior.
 
