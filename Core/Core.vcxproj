@@ -201,6 +201,7 @@
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\ProjectileMovementComponent.h" />
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\SpectatorPawn.h" />
     <ClInclude Include="Engine\Source\Runtime\GameplayTags\Classes\GameplayTagContainer.h" />
+    <ClInclude Include="Engine\Source\Runtime\GameplayTags\Classes\GameplayTagAssetInterface.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Interface.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\NoExportTypes.h" />
     <ClInclude Include="Engine\Source\Runtime\CoreUObject\Public\UObject\Object.h" />

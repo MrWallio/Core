@@ -62,39 +62,22 @@ void UFortQuestManager::SendCustomStatEvent(UFortQuestManager* This, FDataTableR
 }
 
 void UFortQuestManager::SendStatEvent(
-	UFortQuestManager* This,
 	FDataTableRowHandle* InObjectiveStat,
-	uint8 InType,
+	EFortQuestObjectiveStatEvent InType,
 	UObject* InTargetObject,
-	FGameplayTagContainer* InTargetTags,
-	FGameplayTagContainer* InSourceTags,
-	FGameplayTagContainer* InContextTags,
+	FGameplayTagContainer& InTargetTags,
+	FGameplayTagContainer& InSourceTags,
+	FGameplayTagContainer& InContextTags,
 	int32 InCount,
 	bool bForceFlush
 ) {
-	/*Log("FortQuestManager: " + This->GetName().ToString());
-	Log("InObjectiveStat: " + std::to_string((uintptr_t)InObjectiveStat));
-	Log("InType: " + std::to_string(InType));
-	Log("InTargetObject: " + (InTargetObject ? InTargetObject->GetName().ToString() : "nullptr"));
-	for (int32 i = 0; i < InTargetTags->Num(); i++) {
-		Log("InTargetTags[" + std::to_string(i) + "]: " + InTargetTags->GetByIndex(i).ToString().ToString());
-	}
-	for (int32 i = 0; i < InSourceTags->Num(); i++) {
-		Log("InSourceTags[" + std::to_string(i) + "]: " + InSourceTags->GetByIndex(i).ToString().ToString());
-	}
-	for (int32 i = 0; i < InContextTags->Num(); i++) {
-		Log("InContextTags[" + std::to_string(i) + "]: " + InContextTags->GetByIndex(i).ToString().ToString());
-	}
-	Log("InCount: " + std::to_string(InCount));
-	Log("bForceFlush: " + std::string(bForceFlush ? "true" : "false"));*/
-
-	AFortPlayerController* PlayerController = This->GetPlayerControllerBP();
+	AFortPlayerController* PlayerController = GetPlayerControllerBP();
 	if (!PlayerController) {
 		Log("UFortQuestManager::SendStatEvent: PlayerController is null!");
-		return SendStatEventOG(This, InObjectiveStat, InType, InTargetObject, InTargetTags, InSourceTags, InContextTags, InCount, bForceFlush);
+		return;
 	}
 
-	for (UFortQuestItem* QuestItem : This->CurrentQuests) {
+	for (UFortQuestItem* QuestItem : CurrentQuests) {
 		if (QuestItem->HasCompletedQuest())
 			continue;
 
@@ -114,17 +97,32 @@ void UFortQuestManager::SendStatEvent(
 					FFortQuestObjectiveStatTableRow* Value = (FFortQuestObjectiveStatTableRow*)*RowPtr;
 
 					if (Value->Type == InType
-						&& InTargetTags->HasAll(Value->TargetTagContainer)
-						&& InSourceTags->HasAll(Value->SourceTagContainer)) {
+						&& InTargetTags.HasAll(Value->TargetTagContainer)
+						&& InSourceTags.HasAll(Value->SourceTagContainer)) {
 						/* InContextTags->HasAll(Value->ContextTagContainer) intentionally not checked */
-						This->ProgressQuest(QuestItem, Objective.BackendName, InCount);
+						ProgressQuest(QuestItem, Objective.BackendName, InCount);
 					}
 				}
 			}
 		}
 	}
+}
 
-	return SendStatEventOG(This, InObjectiveStat, InType, InTargetObject, InTargetTags, InSourceTags, InContextTags, InCount, bForceFlush);
+void UFortQuestManager::SendStatEventHook(
+	UFortQuestManager* This,
+	FDataTableRowHandle* InObjectiveStat,
+	EFortQuestObjectiveStatEvent InType,
+	UObject* InTargetObject,
+	FGameplayTagContainer& InTargetTags,
+	FGameplayTagContainer& InSourceTags,
+	FGameplayTagContainer& InContextTags,
+	int32 InCount,
+	bool bForceFlush
+) {
+	This->SendStatEvent(InObjectiveStat, InType, InTargetObject, InTargetTags, InSourceTags, InContextTags, InCount, bForceFlush);
+	if (SendStatEventOG) {
+		SendStatEventOG(This, InObjectiveStat, InType, InTargetObject, InTargetTags, InSourceTags, InContextTags, InCount, bForceFlush);
+	}
 }
 
 FScriptContainerElement* UFortQuestManager::ProcessPendingStatEvents() {
@@ -212,12 +210,8 @@ void UFortQuestManager::ProgressQuest(UFortQuestItem* QuestItem, FName Objective
 		}
 	}
 
-	if (bCompletedObjective) {
-		ObjectiveInfo->AchievedCount = ObjectiveInfo->RequiredCount;
-	}
-	else {
-		ObjectiveInfo->AchievedCount = NewCount;
-	}
+	ObjectiveInfo->AchievedCount = bCompletedObjective ? ObjectiveInfo->RequiredCount : NewCount;
+	OnDisplayDynamicQuestUpdate.ProcessMulticastDelegate(&ObjectiveInfo);
 
 	Log("UFortQuestManager::ProgressQuest: Quest: " + QuestItem->GetName().ToString() + " Objective: " + ObjectiveInfo->GetName().ToString() + " InCount: " + std::to_string(InCount) + " AchievedCount: " + std::to_string(ObjectiveInfo->AchievedCount));
 
@@ -263,4 +257,13 @@ void UFortQuestManager::GetSourceAndContextTags(FGameplayTagContainer* OutSource
 		Func = FindFunction("GetSourceAndContextTags");
 
 	return const_cast<UFortQuestManager*>(this)->Call<void>(Func, OutSourceTags, OutContextTags);
+}
+
+UFortQuestItem* UFortQuestManager::GetQuestWithDefinition(UFortQuestItemDefinition* Definition) {
+	for (UFortQuestItem* Quest : CurrentQuests) {
+		if (Quest && Quest->ItemDefinition == Definition)
+			return Quest;
+	}
+
+	return nullptr;
 }

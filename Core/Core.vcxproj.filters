@@ -630,6 +630,9 @@
     <ClInclude Include="Engine\Source\Runtime\GameplayTags\Classes\GameplayTagContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Source\Runtime\GameplayTags\Classes\GameplayTagAssetInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\Engine\HitResult.h">
       <Filter>Header Files</Filter>
     </ClInclude>

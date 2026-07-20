@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "Core/Public/Utils.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/PlayerController.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h"
@@ -24,6 +25,7 @@
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/NetDriver.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/WorldSettings.h"
+#include "Engine\Source\Runtime\GameplayTags\Classes\GameplayTagAssetInterface.h"
 
 class AFortPlayerPawn;
 class ABuildingSMActor;
@@ -121,7 +123,7 @@ public:
 
 	UFortRegisteredPlayerInfo* GetRegisteredPlayerInfo() const;
 
-	UFortQuestManager* GetQuestManager(uint8 SubGame) const;
+	UFortQuestManager* GetQuestManager(ESubGame SubGame) const;
 
 	void ServerRepairBuildingActor(ABuildingSMActor* BuildingActorToRepair);
 	static inline void (*execServerRepairBuildingActorOG)(AFortPlayerController* Context, FFrame& Stack);

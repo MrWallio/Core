@@ -2106,7 +2106,7 @@ UFortRegisteredPlayerInfo* AFortPlayerController::GetRegisteredPlayerInfo() cons
 	return const_cast<AFortPlayerController*>(this)->Call<UFortRegisteredPlayerInfo*>(Func);
 }
 
-UFortQuestManager* AFortPlayerController::GetQuestManager(uint8 SubGame) const
+UFortQuestManager* AFortPlayerController::GetQuestManager(ESubGame SubGame) const
 {
 	static UFunction* Func = nullptr;
 
@@ -2227,10 +2227,36 @@ void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, A
 		return;
 	}
 
+	UFortQuestManager* QuestManager = This->GetQuestManager(ESubGame::GetAthena());
+
 	if (ABuildingItemCollectorActor* ItemCollector = ReceivingActor->Cast<ABuildingItemCollectorActor>()) {
 		ItemCollector->ControllingPlayer = This;
 		ItemCollector->bCurrentInteractionSuccess = ItemCollector->GrantOutput();
 		ItemCollector->ControllingPlayer = nullptr;
+	}
+
+	if (QuestManager) {
+		FGameplayTagContainer TargetTags{};
+
+		IGameplayTagAssetInterface* Interface = (IGameplayTagAssetInterface*)ReceivingActor->GetInterfaceAddress(IGameplayTagAssetInterface::StaticClass());
+		if (Interface) {
+			Interface->GetOwnedGameplayTags(&TargetTags);
+		}
+
+		FGameplayTagContainer SourceTags;
+		FGameplayTagContainer ContextTags;
+		QuestManager->GetSourceAndContextTags(&SourceTags, &ContextTags);
+
+		QuestManager->SendStatEvent(
+			nullptr,
+			EFortQuestObjectiveStatEvent::GetInteract(),
+			ReceivingActor,
+			TargetTags,
+			SourceTags,
+			ContextTags,
+			1,
+			false
+		);
 	}
 
 	//Log("ReceivingActor: " + ReceivingActor->GetName().ToString());

@@ -144,7 +144,7 @@ bool ABuildingItemCollectorActor::Setup() {
 		UCurveTable* CurveTable = GameStateAthena->GetGameData();
 		if (!CurveTable) {
 			CurveTable = RarityCurve.CurveTable;
-			Log("ABuildingItemCollectorActor::Setup: Using fallback CurveTable for vending machine!");
+			//Log("ABuildingItemCollectorActor::Setup: Using fallback CurveTable for vending machine!");
 		}
 		if (!CurveTable) {
 			Log("ABuildingItemCollectorActor::Setup: CurveTable is nullptr!");

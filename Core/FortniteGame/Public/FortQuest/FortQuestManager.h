@@ -10,6 +10,7 @@
 #include "Engine/Source/Runtime/Core/Public/Misc/OutputDevice.h"
 #include "Engine/Source/Runtime/Core/Public/Templates/TypeCompatibleBytes.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/ScriptInterface.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/ScriptDelegates.h"
 #include "Engine/Source/Runtime/Net/Core/Classes/Net/Serialization/FastArraySerializer.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/DataAsset.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/CurveTable.h"
@@ -19,16 +20,19 @@
 #include "Engine/Source/Runtime/GameplayTags/Classes/GameplayTagContainer.h"
 
 #include "FortniteGame/Public/FortQuest/FortQuestObjectiveCompletion.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 class UFortQuestItem;
 struct FScriptContainerElement;
 class AFortPlayerController;
 struct FFortQuestObjectiveCompletion;
+class UFortQuestItemDefinition;
 
 class UFortQuestManager : public UObject {
 public:
 	DefineUnrealClass(UFortQuestManager);
 
+	DefineUProperty(FMulticastScriptDelegate, OnDisplayDynamicQuestUpdate);
 	DefineUProperty(TArray<UFortQuestItem*>, CurrentQuests);
 	DefineUProperty(TArray<FFortQuestObjectiveCompletion>, PendingChanges);
 	DefineUProperty(TArray<FString>, ActiveEventFlags);
@@ -39,22 +43,32 @@ public:
 	static inline void (*SendStatEventOG)(
 		UFortQuestManager* This,
 		FDataTableRowHandle* InObjectiveStat,
-		uint8 InType,
+		EFortQuestObjectiveStatEvent InType,
 		UObject* InTargetObject,
-		FGameplayTagContainer* InTargetTags,
-		FGameplayTagContainer* InSourceTags,
-		FGameplayTagContainer* InContextTags,
+		FGameplayTagContainer& InTargetTags,
+		FGameplayTagContainer& InSourceTags,
+		FGameplayTagContainer& InContextTags,
 		int32 InCount,
 		bool bForceFlush
 	);
-	static void SendStatEvent(
+	void SendStatEvent(
+		FDataTableRowHandle* InObjectiveStat,
+		EFortQuestObjectiveStatEvent InType,
+		UObject* InTargetObject,
+		FGameplayTagContainer& InTargetTags,
+		FGameplayTagContainer& InSourceTags,
+		FGameplayTagContainer& InContextTags,
+		int32 InCount,
+		bool bForceFlush
+	);
+	static void SendStatEventHook(
 		UFortQuestManager* This,
 		FDataTableRowHandle* InObjectiveStat,
-		uint8 InType,
+		EFortQuestObjectiveStatEvent InType,
 		UObject* InTargetObject,
-		FGameplayTagContainer* InTargetTags,
-		FGameplayTagContainer* InSourceTags,
-		FGameplayTagContainer* InContextTags,
+		FGameplayTagContainer& InTargetTags,
+		FGameplayTagContainer& InSourceTags,
+		FGameplayTagContainer& InContextTags,
 		int32 InCount,
 		bool bForceFlush
 	);
@@ -69,11 +83,13 @@ public:
 
 	void GetSourceAndContextTags(FGameplayTagContainer* OutSourceTags, FGameplayTagContainer* OutContextTags) const;
 
+	UFortQuestItem* GetQuestWithDefinition(UFortQuestItemDefinition* Definition);
+
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindUFortQuestManager_SendCustomStatEvent()), (LPVOID)SendCustomStatEvent, (LPVOID*)&SendCustomStatEventOG);
 		
 		if (Finder::FindUFortQuestManager_SendStatEvent()) {
-			MH_CreateHook((LPVOID)(ImageBase + Finder::FindUFortQuestManager_SendStatEvent()), (LPVOID)SendStatEvent, (LPVOID*)&SendStatEventOG);
+			MH_CreateHook((LPVOID)(ImageBase + Finder::FindUFortQuestManager_SendStatEvent()), (LPVOID)SendStatEventHook, (LPVOID*)&SendStatEventOG);
 		}
 
 		Log("UFortQuestManager Hooked!");

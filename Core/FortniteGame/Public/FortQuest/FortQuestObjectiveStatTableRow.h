@@ -21,7 +21,7 @@ struct FFortQuestObjectiveStatTableRow : public FTableRowBase {
 public:
 	DefineUnrealStruct(FFortQuestObjectiveStatTableRow);
 
-	DefineStructProperty(uint8, Type);
+	DefineStructProperty(EFortQuestObjectiveStatEvent, Type);
 	DefineStructProperty(FString, TargetTags);
 	DefineStructProperty(FString, SourceTags);
 	DefineStructProperty(FString, ContextTags);
