@@ -1,6 +1,7 @@
-<img width="128" height="128" alt="corelogo" src="https://github.com/user-attachments/assets/4c48054f-baa1-4c70-85a9-c300efda7be2" />
-
-# Core
+<h1>
+  <img src="https://github.com/user-attachments/assets/28d73a41-1c02-4343-8365-3a19d0771d48" width="50" height="50" align="absmiddle" />
+  &nbsp;Core
+</h1>
 
 **Core** is a community made Fortnite gameserver focused on recreating original behavior as accurately as possible across our current supported Fortnite builds. We prioritize fixing reported issues and completing functionality for supported versions over expanding version support. When work begins on a new Fortnite version, we aim to make it fully functional before moving on to another version.
 
