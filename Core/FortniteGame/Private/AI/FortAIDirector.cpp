@@ -80,8 +80,7 @@ void AFortAIDirector::Hook() {
 				StubCallsites::BySignature("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 0F 29 74 24 ? 48 8B D9") } },
 
 			{ "AFortPlayerController::CreateAIDirectorDataManager", {
-				StubCallsites::BySignature("40 57 48 83 EC ? 48 83 B9 A8 14 00 00 00 48 8B F9 0F 85"),
-				StubCallsites::BySignature("40 57 48 83 EC ? 48 83 B9 ? ? ? ? 00 48 8B F9 0F 85 ? ? ? ? ? ? ? 48 89 5C 24") } },
+				StubCallsites::ByXref("48 8B 81 ? ? ? ? 48 85 C0 74 ? 48 8B 40 ? ? ? ? 48 8B C2") } },
 
 			{ "AFortUIZone::InitUtilitiesGraph", {
 				StubCallsites::BySignature("48 89 5C 24 ? 57 48 83 EC ? 48 8B 99 88 03 00 00 48 8B F9 48 85 DB 74"),
@@ -163,8 +162,8 @@ void AFortAIDirector::Hook() {
 
 			{ "UFortCheatManager::ToggleEncounterModifierTags", {
 				StubCallsites::ByReflection("Function /Script/FortniteGame.FortCheatManager.ToggleEncounterModifierTags") } },
-			}
-		);
+			
+		}, false);
 	}
 
 	Log("AFortAIDirector Hooked");

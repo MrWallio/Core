@@ -76,7 +76,7 @@ void AFortAIGoalManager::Hook() {
 
 		{ "UFortQueryTest::RunTest", {
 			StubCallsites::BySignature("40 55 53 56 57 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC F0 00 00 00 48 8D 7A") } },
-	});
+	}, false);
 
 	Log("AFortAIGoalManager Hooked");
 }

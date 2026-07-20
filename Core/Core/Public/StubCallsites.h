@@ -197,7 +197,7 @@ namespace StubCallsites {
 
 	// Point every site's call at Detour. A site that doesn't resolve is logged by name and skipped, so
 	// one missing anchor never takes the rest down with it.
-	inline void Patch(const char* Label, uintptr_t Stub, void* Detour, std::initializer_list<FSite> Sites)
+	inline void Patch(const char* Label, uintptr_t Stub, void* Detour, std::initializer_list<FSite> Sites, bool bWarnIfNotFound = true)
 	{
 		for (const auto& Site : Sites)
 		{
@@ -215,7 +215,9 @@ namespace StubCallsites {
 			}
 
 			if (!Addr) {
-				Log(std::string("Failed to find patch for ") + Label + ": " + Site.Name);
+				if (bWarnIfNotFound) {
+					Log(std::string("Failed to find patch for ") + Label + ": " + Site.Name);
+				}
 				continue;
 			}
 
