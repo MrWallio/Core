@@ -1,48 +1,174 @@
-<h1>
-  <img src="https://github.com/user-attachments/assets/28d73a41-1c02-4343-8365-3a19d0771d48" width="50" height="50" align="absmiddle" />
-  &nbsp;Core
-</h1>
-A Universal Gameserver For Fortnite that aims for accuracy over version support (took by requests)!
+# Core
 
-> **Everyone may use this for personal use or a project but please credit me, many thanks!**
+**Core** is a community made Fortnite gameserver focused on recreating original behavior as accurately as possible across our current supported Fortnite builds. We aim to get our unsupported versions of Fortnite working 1:1 before moving on to supporting another version.
 
----
+Core runs inside Fortnite to provide server-side systems to load maps, apply playlists, accept players, run matches, and support gameplay. This repository does NOT include Fortnite game files, a launcher, or backend services.
 
-Stuck or need help? Join our community information / help server!
-### -> [Discord Server](https://discord.gg/coreuni)
-## Version Support
-| Version | Status |
-|---------|--------|
-| 1.7.2 - 4.1 | ✅ Full Support |
-| 4.2+ | ⚠️ Partial Support |
+> Core is an independent community project. It is not affiliated with, endorsed by, or supported by Epic Games.
 
-> ⚠️ Please note Save the World is very unfinished!
+**Please refer to the [Contributing](#contributing) section before posting an issue, Thank you!**
 
----
+[Join the Core Discord](https://discord.gg/auzEaKs7AS) · [Report an issue](https://github.com/PongooDev/Core/issues)
+
+## 📥[Download](https://github.com/PongooDev/Core/releases)📥
+
+## Version support
+
+| Fortnite version | Status |
+| --- | --- |
+| 1.7.2–4.1 | Full support ✅|
+| 4.2+ | Unsupported ⚠️|
+
+- **Full support** means the versions listed have little to no bugs and it should feel like 1:1 Fortnite
+- **Unsupported** means the build may start and have some gameplay features, but it may be unfinished, untested, or have gamebreaking bugs.
+- **Save the World is experimental and unfinished.** Expect missing or incomplete mission, inventory, quest, AI, and progression behavior.
+
+### When reporting a problem refer to the [Contributing](#contributing) section.
+
+## Contents
+
+- [Building](#building)
+- [Server config options](#server-config-options)
+- [Playlist selection](#playlist-selection)
+- [Commands](#commands)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [Credits](#credits)
 
 ## Building
 
-Build the project using **Visual Studio** in **Release** configuration.
+### Requirements
+- Windows 10 or Windows 11
+- Visual Studio 2022 or 2026
+- Desktop development with C++ workload
+- MSVC v143 C++ x64/x86 build tools
+- Windows 10 SDK
 
-**Tested on:**
-- Visual Studio 2022
-- Visual Studio 2026
+### Build steps
+1. Clone the repository:
+
+   ```
+   git clone https://github.com/PongooDev/Core
+
+   cd Core
+   ```
+
+2. Open [`Core.sln`](Core.sln) in Visual Studio
+3. Select **Release** and **x64** in the solution toolbar.
+4. Build it
+
+## Server config options
+
+Core reads configuration from the Fortnite process command line during startup. Boolean options are enabled by including their name as a command-line flag.
+
+| Option | Default | Purpose |
+| --- | ---: | --- |
+| `Playlist=<id-or-name>` | `2` | Selects an Athena playlist by numeric ID or internal object name. |
+| `MapToLoad=<map>` | automatic | Overrides Core's default map selection. |
+| `-bIsProd` | off | Enables production behavior and disables Core's custom development commands. |
+| `-bEnableClientConsole` | off | Allows Core's console window when running in client mode. |
+| `-bIsClient` | off | Runs Core's client initialization path instead of the gameserver path. |
+| `-bSetClientLogVerbosity` | off | Applies Core's log-verbosity setup in client mode. |
+| `-bUseGameSessions` | off | Uses the game-session validation and assignment path. |
+| `-bSkipSessionValidation` | off | Skips session validation when game sessions are enabled. |
+| `-bListenServer` | off | Uses Core's listen-server path instead of dedicated-server setup. |
+| `-bDevSameTeam` | off | Places players on the same development team. |
+
+Example:
+
+```
+Playlist=Playlist_DefaultSolo -bUseGameSessions
+```
+
+Core logs the resolved configuration at startup. Check the console or `Server_log.txt` to confirm that the intended values were received.
+
+> These are developer focused options. Some combinations are version-specific or experimental.
+
+## Playlist selection
+
+`Playlist=` accepts either:
+
+- a numeric playlist ID, such as `Playlist=2`; or
+- an internal playlist name, such as `Playlist=Playlist_DefaultSolo`.
+
+Playlist names and availability differ by Fortnite build. If a playlist cannot be found, double check the internal name in the game assets or in an object dump.
+
+## Commands
+
+When `-bIsProd` isn't enabled, Core extends Fortnite's `ServerCheat` path with development and testing commands.
+
+Core supports positional arguments and named parameters:
+
+```
+cheat GiveItem WID_Assault_Auto_Athena_R_Ore_T03 1
+cheat GiveItem?ItemDefinitionName=WID_Assault_Auto_Athena_R_Ore_T03?Count=1
+```
+
+Current command groups include:
+
+| Category | Commands |
+| --- | --- |
+| Items and ammo | `GiveItem`, `ForceGiveItem`, `SpawnPickup`, `SetLoadedAmmo`, `GiveAmmo`, `ClearEquippedItem`, `GetWeaponStats`, `ServerExecuteInventoryItem`, `DumpInventory` |
+| Player state | `SetHealth`, `SetMaxHealth`, `SetShield`, `SetMaxShield`, `SetKillScore`, `TeleportToLocation`, `DumpCurrentLocation` |
+| Pawns and bots | `DumpAllPawns`, `PossessPawnByIndex`, `PossessPawnByName`, `DespawnAllBots` |
+| World and actors | `SpawnActor`, `DumpActorsWithClass`, `DumpAircrafts`, `DestroyTarget` |
+| QuickBars | `SpawnQuickBars`, `DestroyQuickBars`, `DumpQuickBars` |
+| Testing and fun | `LootRain`, `SetGameSpeed`, `TeleportAllToMe`, `SwapPlaces`, `LaunchPawn`, `SetScale`, `ScalePawn`, `Goto`, `DestroyBuildings`, `EmoteAll`, `EmoteAllSpecific`, `EmotePlayerByName`, `TogglePersonalVehicle` |
+
+Run `cheat Help` in game for all commands, syntax, and descriptions.
+
+## Troubleshooting
+
+### The project does not build
+
+- Confirm **Release | x64** is selected.
+- Build from [`Core.sln`](Core.sln)
+- Look at the actual compiler errors near the end of the output, the project can have many warnings.
+
+### A feature works on one build but not another
+
+Core functions differently on every version. Reference the next section about making an issue report.
+
+## Contributing
+
+Contributions are welcome, whether it is code or an issue report.
+
+### Issue reports
+
+Include all of the following in a report if possible:
+
+1. Fortnite version and CL
+2. Playlist
+3. Number of players
+4. Reproduction steps
+5. Screenshots
+6. Server log
+7. Core commit
+8. Anything else that may help
+
+**Issues that are overly broad, contain only a crash log without context, or provide too little information to accurately show or reproduce the problem may be closed until the required details are supplied.**
+
+### Code
+
+Before submitting code:
+
+1. Keep unrelated fixes in separate pull requests
+2. Keep your code clean and readable. You may create helper functions if needed for better readability.
+3. Test your code and include the versions you tested it on.
+4. Necessary or helpful logging is encouraged however remove excessive or temporary logging from the final change.
+5. Avoid broad version gates unless the compatibility boundary is understood and supported by testing or other evidence.
+
+**Pull requests may be declined when they are inaccurate, untested, overly broad, unrelated to the reported issue, or harmful to other supported versions.**
+
+## Credits
+
+- **PongooDev** — project creator and primary maintainer
+- **Ploosh** — crash reporter and finder work
+- **Milxnor** — finder work
+- **MrWallio** — This README and general Core contributions
+- [Core contributors](https://github.com/PongooDev/Core/graphs/contributors)
+
+For more help, join the [Core Discord](https://discord.gg/auzEaKs7AS).
 
 ---
-
-## Contributing:
-We would love to see contributions made to the repo and encourage it! We have a few things we would like you to consider when contributing:
-- **Accurate code** — We don't have access to the Fortnite source of course, but if there is any code that should be moved somewhere else or you add new code, please make sure that you have taken into consideration where it should go.
-- **Clean code** — In your code we would like it to be as clean and readable as possible. You may create helper functions if needed for better readability.
-- **It must work** — It must not cause a crash on the gameserver that stops it from working completely or bugs out the game too much. (We will test your PR before merging.)
-- **detailed issues** - When creating an issue please provide as much detail as possible.
-
-- **Your requests will be closed / declined if the code is not accurate or if the request is made for purely troll purposes.**
-
-> **If you find any issues or missing features please create an issue! Issues help us to fix bugs quickly and ensure each individual user has the best possible experience at this time!**
-
----
-
-## Credits:
-- Crashreporter: Ploosh
-- Some finders: Ploosh, Milxnor
+If you use Core in another project, please credit the Core project.
