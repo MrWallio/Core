@@ -371,42 +371,19 @@ bool UFortKismetLibrary::PickLootDrops(
 	TArray<UDataTable*> LootTierDataTables;
 	TArray<UDataTable*> LootPackagesDataTables;
 	if (LootTierDataTables.Num() == 0 || LootPackagesDataTables.Num() == 0) {
-		if (FortGameModeAthena) {
-			UFortPlaylistAthena* CurrentPlaylist = FortGameStateAthena->CurrentPlaylistData;
-			if (!CurrentPlaylist) {
-				CurrentPlaylist = FortGameStateAthena->CurrentPlaylistInfo.BasePlaylist;
+		if (FortGameStateAthena) {
+			if (UDataTable* MainLTD = FortGameStateAthena->GetLootTierData()) {
+				LootTierDataTables.Add(MainLTD);
 			}
-			if (CurrentPlaylist && CurrentPlaylist->LootTierData && CurrentPlaylist->LootPackages) {
-				UDataTable* MainLTD = nullptr;
-				UDataTable* MainLP = nullptr;
+			else {
+				Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot tier data table from playlist!");
+			}
 
-				if (CurrentPlaylist->LootTierData) {
-					MainLTD = (UDataTable*)StaticLoadObject(
-						CurrentPlaylist->LootTierData.ObjectID.AssetPathName.ToString().ToString()
-					);
-				}
-
-				if (CurrentPlaylist->LootPackages) {
-					MainLP = (UDataTable*)StaticLoadObject(
-						CurrentPlaylist->LootPackages.ObjectID.AssetPathName.ToString().ToString()
-					);
-				}
-
-				if (MainLTD) {
-					//Log("UFortKismetLibrary::PickLootDrops: Added to LootTierDataTables: " + MainLTD->GetName().ToString());
-					LootTierDataTables.Add(MainLTD);
-				}
-				else {
-					Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot tier data table from playlist!");
-				}
-
-				if (MainLP) {
-					//Log("UFortKismetLibrary::PickLootDrops: Added to LootPackagesDataTables: " + MainLP->GetName().ToString());
-					LootPackagesDataTables.Add(MainLP);
-				}
-				else {
-					Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot packages data table from playlist!");
-				}
+			if (UDataTable* MainLP = FortGameStateAthena->GetLootPackages()) {
+				LootPackagesDataTables.Add(MainLP);
+			}
+			else {
+				Log("UFortKismetLibrary::PickLootDrops: Failed to load main loot packages data table from playlist!");
 			}
 		}
 		if (LootTierDataTables.Num() == 0) {

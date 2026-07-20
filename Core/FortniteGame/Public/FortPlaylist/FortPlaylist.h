@@ -34,4 +34,9 @@ public:
 public:
 	int32& GetPlaylistId();
 	FName& GetPlaylistName();
+
+	UDataTable* GetLootTierData();
+	UDataTable* GetLootPackages();
+
+	UCurveTable* GetGameData();
 };

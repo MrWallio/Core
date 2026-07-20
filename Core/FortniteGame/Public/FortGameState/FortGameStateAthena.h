@@ -10,6 +10,7 @@ class UAthenaBattleBusItemDefinition;
 class AFortAthenaPlaylistBase;
 class UFortPlaylistAthena;
 class AFortAthenaAircraft;
+class UCurveTable;
 
 class AFortGameStateAthena : public AFortGameStateZone {
 public:
@@ -58,6 +59,11 @@ public:
 	void OnRep_CurrentPlaylistInfo();
 
 	void OnRep_Aircraft();
+
+	UDataTable* GetLootTierData();
+	UDataTable* GetLootPackages();
+
+	UCurveTable* GetGameData();
 
 	static void Hook();
 };

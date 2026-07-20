@@ -18,3 +18,19 @@ FName& UFortPlaylist::GetPlaylistName() {
 
 	return PlaylistName;
 }
+
+UDataTable* UFortPlaylist::GetLootTierData() {
+	return LootTierData.Get();
+}
+
+UDataTable* UFortPlaylist::GetLootPackages() {
+	return LootPackages.Get();
+}
+
+UCurveTable* UFortPlaylist::GetGameData() {
+	if (GameData.Get()) {
+		return GameData.Get();
+	}
+
+	return nullptr;
+}

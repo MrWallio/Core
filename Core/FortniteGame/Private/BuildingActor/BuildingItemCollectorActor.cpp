@@ -118,8 +118,6 @@ bool ABuildingItemCollectorActor::Setup() {
 	AFortGameModeAthena* GameModeAthena = GameMode->Cast<AFortGameModeAthena>();
 	AFortGameStateAthena* GameStateAthena = GameState->Cast<AFortGameStateAthena>();
 
-	int32 Rarity = -1;
-
 	UClass* VendingMachineClass = nullptr;
 	if (GameStateAthena && GameStateAthena->MapInfo) {
 		VendingMachineClass = GameStateAthena->MapInfo->VendingMachineClass.Class;
@@ -128,18 +126,28 @@ bool ABuildingItemCollectorActor::Setup() {
 	if (VendingMachineClass && IsA(VendingMachineClass))
 	{
 		if (!GameModeAthena || !GameStateAthena) {
-			Log("ABuildingItemCollectorActor::BeginPlay: GameModeAthena or GameStateAthena is null!");
+			Log("ABuildingItemCollectorActor::Setup: GameModeAthena or GameStateAthena is null!");
 			return false;
 		}
 
 		if (!GameStateAthena->MapInfo) {
-			Log("ABuildingItemCollectorActor::BeginPlay: MapInfo is null!");
+			Log("ABuildingItemCollectorActor::Setup: MapInfo is null!");
 			return false;
 		}
 
 		const auto& RarityCurve = GameStateAthena->MapInfo->VendingMachineRarityCount.Curve;
-		if (!RarityCurve.CurveTable) {
-			Log("ABuildingItemCollectorActor::BeginPlay: RarityCurve.CurveTable is null!");
+		if (RarityCurve.RowName.IsNone()) {
+			Log("ABuildingItemCollectorActor::Setup: RarityCurve.RowName is None!");
+			return false;
+		}
+
+		UCurveTable* CurveTable = GameStateAthena->GetGameData();
+		if (!CurveTable) {
+			CurveTable = RarityCurve.CurveTable;
+			Log("ABuildingItemCollectorActor::Setup: Using fallback CurveTable for vending machine!");
+		}
+		if (!CurveTable) {
+			Log("ABuildingItemCollectorActor::Setup: CurveTable is nullptr!");
 			return false;
 		}
 
@@ -150,7 +158,7 @@ bool ABuildingItemCollectorActor::Setup() {
 		{
 			float Weight = 0.0f;
 			UDataTableFunctionLibrary::EvaluateCurveTableRow(
-				RarityCurve.CurveTable,
+				CurveTable,
 				RarityCurve.RowName,
 				(float)i,
 				nullptr,
@@ -176,7 +184,7 @@ bool ABuildingItemCollectorActor::Setup() {
 
 				if (RandomNumber <= Weights[i])
 				{
-					Rarity = i;
+					StartingGoalLevel = i;
 					break;
 				}
 
@@ -184,8 +192,6 @@ bool ABuildingItemCollectorActor::Setup() {
 			}
 		}
 	}
-
-	StartingGoalLevel = Rarity == -1 ? StartingGoalLevel : Rarity;
 
 	// build the items for each collector unit
 	for (int32 i = 0; i < ItemCollections.Num(); i++)
@@ -205,8 +211,8 @@ bool ABuildingItemCollectorActor::Setup() {
 			World,
 			&LootDrops,
 			DefaultItemLootTierGroupName,
-			-1,
-			Rarity
+			GameState->WorldLevel,
+			StartingGoalLevel
 		);
 
 		if (!bSuccess || LootDrops.Num() <= 0)

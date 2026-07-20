@@ -4,6 +4,7 @@
 #include "FortniteGame/Public/FortHero/FortHero.h"
 #include "FortniteGame/Public/FortHero/FortHeroSpecialization.h"
 #include "FortniteGame/Public/FortHero/FortHeroType.h"
+#include "FortniteGame/Public/FortPlaylist/FortPlaylistAthena.h"
 
 void AFortGameStateAthena::OnRep_CurrentPlaylistId()
 {
@@ -142,6 +143,42 @@ void AFortGameStateAthena::OnRep_Aircraft() {
 		Func = FindFunction("OnRep_Aircraft");
 
 	Call(Func);
+}
+
+UDataTable* AFortGameStateAthena::GetLootTierData() {
+	if (CurrentPlaylistData) {
+		return CurrentPlaylistData->GetLootTierData();
+	}
+
+	if (CurrentPlaylistInfo.BasePlaylist) {
+		return CurrentPlaylistInfo.BasePlaylist->GetLootTierData();
+	}
+
+	return nullptr;
+}
+
+UDataTable* AFortGameStateAthena::GetLootPackages() {
+	if (CurrentPlaylistData) {
+		return CurrentPlaylistData->GetLootPackages();
+	}
+
+	if (CurrentPlaylistInfo.BasePlaylist) {
+		return CurrentPlaylistInfo.BasePlaylist->GetLootPackages();
+	}
+
+	return nullptr;
+}
+
+UCurveTable* AFortGameStateAthena::GetGameData() {
+	if (CurrentPlaylistData) {
+		return CurrentPlaylistData->GetGameData();
+	}
+
+	if (CurrentPlaylistInfo.BasePlaylist) {
+		return CurrentPlaylistInfo.BasePlaylist->GetGameData();
+	}
+
+	return nullptr;
 }
 
 void AFortGameStateAthena::Hook() {

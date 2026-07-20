@@ -2,6 +2,7 @@
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 
 #include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
+#include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "FortniteGame/Public/FortPickup/FortPickup.h"
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
@@ -25,7 +26,8 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 	}
 
 	AFortGameModeZone* GameMode = World->AuthorityGameMode->Cast<AFortGameModeZone>();
-	if (!GameMode) {
+	AFortGameStateZone* GameState = World->GameState->Cast<AFortGameStateZone>();
+	if (!GameMode || !GameState) {
 		return false;
 	}
 
@@ -37,7 +39,7 @@ bool ABuildingContainer::SpawnLoot(ABuildingContainer* This, AFortPlayerPawn* Pl
 		(This->GetActorUpVector() * This->LootFinalLocation.Z);
 
 	TArray<FFortItemEntry> LootDrops;
-	bool bSuccess = UFortKismetLibrary::PickLootDrops(This, &LootDrops, This->SearchLootTierGroup, 0, This->ReplicatedLootTier);
+	bool bSuccess = UFortKismetLibrary::PickLootDrops(This, &LootDrops, This->SearchLootTierGroup, GameState->WorldLevel, This->ReplicatedLootTier);
 
 	for (int i = 0; i < LootDrops.Num(); i++) {
 		FFortItemEntry& ItemEntry = LootDrops.GetWithSize(i, FFortItemEntry::GetSize());
