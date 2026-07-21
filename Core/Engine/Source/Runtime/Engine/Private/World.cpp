@@ -184,12 +184,10 @@ bool UWorld::Listen(FURL& InURL)
 			NetDriver->MaxClientRate = NetDriver->MaxInternetClientRate;
 		}
 
-		if (!NavigationSystem)
-		{
-			UNavigationSystem* NavSys = UNavigationSystem::CreateNavigationSystem(this);
-			if (NavSys)
+		if (Version::Engine_Version <= 4.0) {
+			if (!NavigationSystem)
 			{
-				SetNavigationSystem(NavSys);
+				SetNavigationSystem(UNavigationSystem::CreateNavigationSystem(this));
 			}
 		}
 

@@ -5882,11 +5882,18 @@ uintptr_t Finder::FindABuildingContainer_SpawnLootVFT() {
 	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ABuildingContainer::ServerOnAttemptInteract %s failed for %s").Get();
 	if (StringAddr)
 	{
-		for (int i = 0; i < 512; i++)
+		// SpawnLoot is the virtual call right before the "failed" log, so walk back from the string ref
+		// and take the FIRST `41 FF` (call [r8-r15+disp32]). Stop at the function start: without the bound
+		// the scan runs into the previous function and grabs a stray 41 FF there, and without taking the
+		// first match (breaking) the furthest-back match wins -- both bugs picked a wrong index on 4.5.
+		uintptr_t FuncStart = Memcury::Scanner(StringAddr).FindFunctionStart().Get();
+
+		for (int i = 0; i < 512 && (StringAddr - i) >= FuncStart; i++)
 		{
 			if (*(uint8*)(StringAddr - i + 0) == 0x41 && *(uint8*)(StringAddr - i + 1) == 0xff)
 			{
 				ServerOffsets::ABuildingContainer_SpawnLootVFT = *(uint32_t*)(StringAddr - i + 3) / 8;
+				break;
 			}
 		}
 	}
@@ -5901,6 +5908,7 @@ uintptr_t Finder::FindABuildingContainer_SpawnLootVFT() {
 			if (*(uint8*)(ServerOnAttemptInteractAddr + i) == 0x41 && *(uint8*)(ServerOnAttemptInteractAddr + i + 1) == 0xff)
 			{
 				ServerOffsets::ABuildingContainer_SpawnLootVFT = *(uint32_t*)(ServerOnAttemptInteractAddr + i + 3) / 8;
+				break;
 			}
 		}
 	}
@@ -9899,7 +9907,7 @@ uintptr_t Finder::FindUWorld_ListenPatch() {
 
 	uintptr_t Addr = 0;
 
-	if (Version::Fortnite_Version >= 1.91 && Version::Fortnite_Version <= 3.5) {
+	if (Version::Fortnite_Version >= 1.91 && Version::Fortnite_Version <= 4.5) {
 		if (Version::Fortnite_CL == 4008490) {
 			Addr = ImageBase + 0x250397C;
 		}

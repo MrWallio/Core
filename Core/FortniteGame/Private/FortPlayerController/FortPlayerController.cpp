@@ -2265,30 +2265,6 @@ void AFortPlayerController::ServerAttemptInteract(AFortPlayerController* This, A
 		ItemCollector->ControllingPlayer = nullptr;
 	}
 
-	if (QuestManager) {
-		FGameplayTagContainer TargetTags{};
-
-		IGameplayTagAssetInterface* Interface = (IGameplayTagAssetInterface*)ReceivingActor->GetInterfaceAddress(IGameplayTagAssetInterface::StaticClass());
-		if (Interface) {
-			Interface->GetOwnedGameplayTags(&TargetTags);
-		}
-
-		FGameplayTagContainer SourceTags;
-		FGameplayTagContainer ContextTags;
-		QuestManager->GetSourceAndContextTags(&SourceTags, &ContextTags);
-
-		QuestManager->SendStatEvent(
-			nullptr,
-			EFortQuestObjectiveStatEvent::GetInteract(),
-			ReceivingActor,
-			TargetTags,
-			SourceTags,
-			ContextTags,
-			1,
-			false
-		);
-	}
-
 	//Log("ReceivingActor: " + ReceivingActor->GetName().ToString());
 	ReceivingActor->ForceNetUpdate();
 }
