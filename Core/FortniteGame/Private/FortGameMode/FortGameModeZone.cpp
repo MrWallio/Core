@@ -106,7 +106,7 @@ void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFort
 		ABuildingItemCollectorActor* ItemCollector = ItemCollectorActor->Cast<ABuildingItemCollectorActor>();
 		if (ItemCollector) {
 			if (!ItemCollector->Setup()) {
-				Log("AFortGameModeZone::FinishWorldInitialization: Failed to setup ItemCollector: " + ItemCollector->GetName().ToString());
+				//Log("AFortGameModeZone::FinishWorldInitialization: Failed to setup ItemCollector: " + ItemCollector->GetName().ToString());
 			}
 		}
 	}
@@ -117,7 +117,7 @@ void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFort
 		ABGAConsumableSpawner* BGAConsumeableSpawner = BGAConsumeableSpawnerActor->Cast<ABGAConsumableSpawner>();
 		if (BGAConsumeableSpawner) {
 			if (!BGAConsumeableSpawner->AttemptSpawn()) {
-				Log("AFortGameModeZone::FinishWorldInitialization: Failed to spawn BGAConsumable: " + BGAConsumeableSpawner->GetName().ToString());
+				//Log("AFortGameModeZone::FinishWorldInitialization: Failed to spawn BGAConsumable: " + BGAConsumeableSpawner->GetName().ToString());
 			}
 		}
 	}

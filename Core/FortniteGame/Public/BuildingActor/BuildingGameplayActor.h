@@ -27,6 +27,13 @@ public:
 	DefineUnrealClass(ABuildingGameplayActor);
 };
 
+class ABuildingGameplayActorConsumable : public ABuildingGameplayActor {
+public:
+	DefineUnrealClass(ABuildingGameplayActorConsumable);
+
+	DefineUProperty(bool, bSpawnerCalculateRandomRotation);
+};
+
 class AFortAthenaSupplyDrop : public ABuildingGameplayActor {
 public:
 	DefineUnrealClass(AFortAthenaSupplyDrop);

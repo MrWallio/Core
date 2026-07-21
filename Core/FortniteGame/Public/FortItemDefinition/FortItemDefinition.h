@@ -47,6 +47,13 @@ public:
 	uint8 GetQuickBarForItem();
 };
 
+class UBGAConsumableWrapperItemDefinition : public UFortItemDefinition {
+public:
+	DefineUnrealClass(UBGAConsumableWrapperItemDefinition);
+
+	DefineUProperty(TSoftClassPtr<UClass>, ConsumableClass);
+};
+
 class UFortAccountItemDefinition : public UFortItemDefinition {
 public:
 	DefineUnrealClass(UFortAccountItemDefinition);

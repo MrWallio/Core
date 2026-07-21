@@ -48,6 +48,24 @@ void UKismetSystemLibrary::ExecuteConsoleCommand(UObject* WorldContextObject, co
 	}
 }
 
+bool UKismetSystemLibrary::LineTraceSingle(UObject* WorldContextObject, const FVector& Start, const FVector& End, uint8 TraceChannel, bool bTraceComplex, TArray<AActor*>& ActorsToIgnore, uint8 DrawDebugType, FHitResult* OutHit, bool bIgnoreSelf, const FLinearColor& TraceColor, const FLinearColor& TraceHitColor, float DrawTime)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.KismetSystemLibrary.LineTraceSingle");
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/Engine.KismetSystemLibrary.LineTraceSingle_NEW");
+
+	if (!Func) {
+		Log("UKismetSystemLibrary::LineTraceSingle: Failed to find function!");
+		return false;
+	}
+
+	return GetDefaultObj()->Call<bool>(Func, WorldContextObject, Start, End, TraceChannel, bTraceComplex, ActorsToIgnore, DrawDebugType, OutHit, bIgnoreSelf, TraceColor, TraceHitColor, DrawTime);
+}
+
 FTimerHandle UKismetSystemLibrary::K2_SetTimer(UObject* Object, const FString& FunctionName, float Time, bool bLooping)
 {
 	static UFunction* Func = nullptr;
