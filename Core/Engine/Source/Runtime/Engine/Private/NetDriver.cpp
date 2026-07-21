@@ -93,6 +93,10 @@ void UNetDriver::SetWorld(UWorld* InWorld)
 
 void UNetDriver::TickFlush(UNetDriver* This, float DeltaSeconds)
 {
+	if (!This) {
+		return TickFlushOG(This, DeltaSeconds);
+	}
+
 	if (Version::Engine_Version >= 4.16 && Version::Engine_Version <= 5.0) {
 		if (This->ClientConnections.Num() > 0 && This->ClientConnections[0]->InternalAck == false) {
 			int32 Updated = This->ServerReplicateActors(DeltaSeconds);
@@ -331,6 +335,10 @@ void UNetDriver::UpdateStandbyCheatStatus(void)
 
 int32 UNetDriver::ServerReplicateActors(float DeltaSeconds)
 {
+	if (!this) {
+		return 0;
+	}
+
 	ServerReplicateActorsTimeStart = Utils::NowSeconds();
 
 	UEngine* GEngine = UEngine::GetEngine();

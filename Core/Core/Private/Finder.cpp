@@ -857,7 +857,7 @@ uintptr_t Finder::FindStepExplicitProperty() {
 	else if (Version::Fortnite_Version >= 20.20)
 		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 41 8B 40 ? 49 8B D8 48 8B F2").Get();
 	else
-		Addr = Memcury::Scanner::FindPattern("41 8B 40 ? 4D 8B C8").Get();
+		Addr = Memcury::Scanner::FindPattern("41 8B 40 ? 4D 8B C8 4C 8B D1").Get();
 
 	if (Addr) {
 		ServerOffsets::StepExplicitProperty = Addr - ImageBase;
@@ -7124,19 +7124,12 @@ uintptr_t Finder::FindUNetConnection_CreateChannel() {
 	if (ServerOffsets::UNetConnection_CreateChannel)
 		return ServerOffsets::UNetConnection_CreateChannel;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"No free channel could be found in the channel list (current limit is %d channels). Consider increasing the max channels allowed using CVarMaxChannelSize.").Get();
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"Created channel %i of type %i").Get();
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"No free channel could be found in the channel list (current limit is %d channels). Consider increasing the max channels allowed using CVarMaxChannelSize.");
+	if (!StringAddr.IsValid()) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"Created channel %i of type %i");
 	}
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x56) {
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 
 	if (Addr) {

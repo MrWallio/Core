@@ -32,6 +32,14 @@ class UFortQuestManager : public UObject {
 public:
 	DefineUnrealClass(UFortQuestManager);
 
+	DefineUProperty(FMulticastScriptDelegate, OnQuestsUpdated);
+	DefineUProperty(FMulticastScriptDelegate, OnQuestsCompleted);
+	DefineUProperty(FMulticastScriptDelegate, OnQuestsGranted);
+	DefineUProperty(FMulticastScriptDelegate, OnQuestRewardClaimed);
+	DefineUProperty(FMulticastScriptDelegate, OnQuestSeen);
+	DefineUProperty(FMulticastScriptDelegate, OnNoQuestRewardsToClaim);
+	DefineUProperty(FMulticastScriptDelegate, OnPinnedQuestsChanged);
+	DefineUProperty(FMulticastScriptDelegate, OnDailyQuestRerolled);
 	DefineUProperty(FMulticastScriptDelegate, OnDisplayDynamicQuestUpdate);
 	DefineUProperty(TArray<UFortQuestItem*>, CurrentQuests);
 	DefineUProperty(TArray<FFortQuestObjectiveCompletion>, PendingChanges);

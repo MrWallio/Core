@@ -102,8 +102,8 @@ public:
 	static inline bool (*RemoveInventoryItemOG)(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoveFromQuickBars, bool bForceRemoval);
 	static bool RemoveInventoryItem(AFortPlayerController* This, FGuid& ItemGuid, int32 Count, bool bForceRemoveFromQuickBars, bool bForceRemoval);
 
-	static inline void (*ServerCreateBuildingActorOldOG)(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored);
-	static void ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored);
+	static inline void (*ServerCreateBuildingActorOldOG)(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored, float SyncKey);
+	static void ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored, float SyncKey);
 
 	bool CanAffordToPlaceBuildableClass(FBuildingClassData* ClassToBuildData);
 
@@ -212,7 +212,7 @@ public:
 		);*/
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortPlayerController_RemoveInventoryItem()), RemoveInventoryItem, (LPVOID*)&RemoveInventoryItemOG);
 
-		if (Version::Fortnite_Version <= 4.2 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
+		if (Version::Fortnite_Version <= 4.4 || Version::Fortnite_Version == 1.10 || Version::Fortnite_Version == 1.11) {
 			HookEveryVTable(
 				AFortPlayerController::StaticClass(),
 				AFortPlayerController::StaticClass()->GetFunction("Function /Script/FortniteGame.FortPlayerController.ServerCreateBuildingActor"),

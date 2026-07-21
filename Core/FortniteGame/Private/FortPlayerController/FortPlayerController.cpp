@@ -1824,7 +1824,7 @@ bool AFortPlayerController::RemoveInventoryItem(AFortPlayerController* This, FGu
 	}
 }
 
-void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored) {
+void AFortPlayerController::ServerCreateBuildingActorOld(AFortPlayerController* This, FBuildingClassData& BuildingClassData, FVector& BuildLoc, FRotator& BuildRot, bool bMirrored, float SyncKey) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {
 		Log("ServerCreateBuildingActor: World is null!");

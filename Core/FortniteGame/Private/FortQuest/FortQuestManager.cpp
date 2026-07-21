@@ -211,7 +211,6 @@ void UFortQuestManager::ProgressQuest(UFortQuestItem* QuestItem, FName Objective
 	}
 
 	ObjectiveInfo->AchievedCount = bCompletedObjective ? ObjectiveInfo->RequiredCount : NewCount;
-	OnDisplayDynamicQuestUpdate.ProcessMulticastDelegate(&ObjectiveInfo);
 
 	Log("UFortQuestManager::ProgressQuest: Quest: " + QuestItem->GetName().ToString() + " Objective: " + ObjectiveInfo->GetName().ToString() + " InCount: " + std::to_string(InCount) + " AchievedCount: " + std::to_string(ObjectiveInfo->AchievedCount));
 
@@ -230,8 +229,6 @@ void UFortQuestManager::ProgressQuest(UFortQuestItem* QuestItem, FName Objective
 		FDedicatedServerUrlContext Context;
 		PlayerController->AthenaProfile->UpdateQuests(Advanced, &Context);
 	}
-
-	ForceTriggerQuestsUpdated();
 }
 
 void UFortQuestManager::ForceTriggerQuestsUpdated()
