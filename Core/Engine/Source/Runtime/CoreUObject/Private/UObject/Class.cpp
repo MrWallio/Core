@@ -7,35 +7,44 @@
 
 UClass* UField::GetOwnerClass() const
 {
-	for (UObject* Outer = GetOuter(); Outer; Outer = Outer->GetOuter())
-	{
-		if (UClass* Class = Outer->Cast<UClass>())
-			return Class;
-	}
-	return nullptr;
+	UClass* (*GetOwnerClassInternal)(const UField*) = decltype(GetOwnerClassInternal)(ImageBase + Finder::FindUField_GetOwnerClass());
+	return GetOwnerClassInternal(this);
 }
 
 UStruct* UField::GetOwnerStruct() const
 {
-	for (UObject* Obj = (UObject*)this; Obj; Obj = Obj->GetOuter())
-	{
-		if (UStruct* Struct = Obj->Cast<UStruct>())
-			return Struct;
-	}
-	return nullptr;
+	UStruct* (*GetOwnerStructInternal)(const UField*) = decltype(GetOwnerStructInternal)(ImageBase + Finder::FindUField_GetOwnerStruct());
+	return GetOwnerStructInternal(this);
 }
 
 UProperty* UStruct::FindPropertyByName(FName InName) const
 {
-	for (UField* Field = GetChildrenOrChildProperties(); Field; Field = Field->Next)
-	{
-		UProperty* Prop = (UProperty*)Field;
-		if (Prop && Prop->GetFName() == InName)
-			return Prop;
-	}
+	if (Finder::FindUStruct_FindPropertyByName()) {
+		UProperty* (*FindPropertyByNameInternal)(const UStruct*, FName) = decltype(FindPropertyByNameInternal)(ImageBase + Finder::FindUStruct_FindPropertyByName());
+		UProperty* Prop = FindPropertyByNameInternal(this, InName);
 
-	if (SuperStruct)
-		return SuperStruct->FindPropertyByName(InName);
+		if (!Prop) {
+			//Log("Failed to find property for object: " + GetFName().ToString().ToString() + " with name: " + InName);
+			return nullptr;
+		}
+
+		return Prop;
+	}
+	else {
+		for (UField* Field = GetChildrenOrChildProperties(); Field; Field = Field->Next)
+		{
+			if (!Field) continue;
+			UProperty* Prop = (UProperty*)Field;
+
+			if (Prop && Prop->GetFName() == InName) {
+				return Prop;
+			}
+		}
+
+		if (SuperStruct) {
+			return SuperStruct->FindPropertyByName(InName);
+		}
+	}
 
 	return nullptr;
 }
@@ -138,19 +147,8 @@ int64 UEnum::GetValueByIndex(int32 Index) const
 
 UFunction* UClass::FindFunctionByName(FName InName, EIncludeSuperFlag::Type IncludeSuper) const
 {
-	for (const UStruct* Struct = this; Struct; Struct = Struct->SuperStruct)
-	{
-		for (UField* Field = Struct->Children; Field; Field = Field->Next)
-		{
-			if (Field->IsA(EClassCastFlags::CASTCLASS_UFunction) && Field->GetFName() == InName)
-				return (UFunction*)Field;
-		}
-
-		if (IncludeSuper == EIncludeSuperFlag::ExcludeSuper)
-			break;
-	}
-
-	return nullptr;
+	UFunction* (*FindFunctionByNameInternal)(const UClass*, FName, EIncludeSuperFlag::Type) = decltype(FindFunctionByNameInternal)(ImageBase + Finder::FindUClass_FindFunctionByName());
+	return FindFunctionByNameInternal(this, InName, IncludeSuper);
 }
 
 UFunction* UClass::GetFunction(const std::string& ClassName, const std::string& FuncName) const

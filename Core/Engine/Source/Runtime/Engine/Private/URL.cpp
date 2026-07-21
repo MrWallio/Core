@@ -3,54 +3,32 @@
 
 bool FURL::IsInternal() const
 {
-	return Protocol == FString(L"unreal");
+	bool (*IsInternalInternal)(const FURL*) = decltype(IsInternalInternal)(ImageBase + Finder::FindFURL_IsInternal());
+	return IsInternalInternal(this);
 }
 
 bool FURL::IsLocalInternal() const
 {
-	return IsInternal() && Host.Len() == 0;
-}
-
-const TCHAR* FURL::GetOption(const TCHAR* Match, const TCHAR* Default) const
-{
-	const int32 Len = (int32)wcslen(Match);
-	if (Len > 0)
-	{
-		for (int32 i = 0; i < Op.Num(); i++)
-		{
-			const TCHAR* s = *Op[i];
-			if (_wcsnicmp(s, Match, Len) == 0)
-			{
-				if (s[Len - 1] == L'=' || s[Len] == L'=' || s[Len] == L'\0')
-					return s + Len;
-			}
-		}
-	}
-	return Default;
+	bool (*IsLocalInternalInternal)(const FURL*) = decltype(IsLocalInternalInternal)(ImageBase + Finder::FindFURL_IsLocalInternal());
+	return IsLocalInternalInternal(this);
 }
 
 bool FURL::HasOption(const TCHAR* Test) const
 {
-	return GetOption(Test, nullptr) != nullptr;
+	bool (*HasOptionInternal)(const FURL*, const TCHAR*) = decltype(HasOptionInternal)(ImageBase + Finder::FindFURL_HasOption());
+	return HasOptionInternal(this, Test);
+}
+
+const TCHAR* FURL::GetOption(const TCHAR* Match, const TCHAR* Default) const
+{
+	const TCHAR* (*GetOptionInternal)(const FURL*, const TCHAR*, const TCHAR*) = decltype(GetOptionInternal)(ImageBase + Finder::FindFURL_GetOption());
+	return GetOptionInternal(this, Match, Default);
 }
 
 void FURL::AddOption(const TCHAR* Str)
 {
-	const TCHAR* Equals = wcschr(Str, L'=');
-	const int32 Match = Equals ? (int32)(Equals - Str) : (int32)wcslen(Str);
-
-	int32 i;
-	for (i = 0; i < Op.Num(); i++)
-	{
-		const TCHAR* s = *Op[i];
-		if (_wcsnicmp(s, Str, Match) == 0 && (s[Match] == L'=' || s[Match] == L'\0'))
-			break;
-	}
-
-	if (i == Op.Num())
-		Op.Add(FString(Str));
-	else
-		Op[i] = FString(Str);
+	void (*AddOptionInternal)(FURL*, const TCHAR*) = decltype(AddOptionInternal)(ImageBase + Finder::FindFURL_AddOption());
+	AddOptionInternal(this, Str);
 }
 
 void FURL::RemoveOption(const TCHAR* Key, const TCHAR* Section, const FString& Filename)
@@ -61,46 +39,14 @@ void FURL::RemoveOption(const TCHAR* Key, const TCHAR* Section, const FString& F
 
 FString FURL::ToString(bool FullyQualified) const
 {
-	FString Result;
-
-	if (Protocol != FString(L"unreal") || FullyQualified)
-	{
-		Result += Protocol;
-		Result += L":";
-		if (Host.Len() != 0)
-			Result += L"//";
-	}
-
-	if (Host.Len() != 0 || Port != 7777)
-	{
-		Result += Host;
-		if (Port != 7777)
-		{
-			Result += L":";
-			Result += FString::FromInt(Port);
-		}
-		Result += L"/";
-	}
-
-	if (Map.Len() > 0)
-		Result += Map;
-
-	for (int32 i = 0; i < Op.Num(); i++)
-	{
-		Result += L"?";
-		Result += Op[i];
-	}
-
-	if (Portal.Len() > 0)
-	{
-		Result += L"#";
-		Result += Portal;
-	}
-
-	return Result;
+	FString& (*ToStringInternal)(const FURL*, FString&, bool) = decltype(ToStringInternal)(ImageBase + Finder::FindFURL_ToString());
+	FString Result = FString();
+	return ToStringInternal(this, Result, FullyQualified);
 }
 
 FString FURL::GetHostPortString() const
 {
-	return Host + FString(L":") + FString::FromInt(Port);
+	FString& (*GetHostPortStringInternal)(const FURL*, FString&) = decltype(GetHostPortStringInternal)(ImageBase + Finder::FindFURL_GetHostPortString());
+	FString Result = FString();
+	return GetHostPortStringInternal(this, Result);
 }

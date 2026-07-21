@@ -3,5 +3,6 @@
 
 APlayerController* UPlayer::GetPlayerController(UWorld* InWorld) const
 {
-	return PlayerController;
+	APlayerController* (*GetPlayerControllerInternal)(const UPlayer*, UWorld*) = decltype(GetPlayerControllerInternal)(ImageBase + Finder::FindUPlayer_GetPlayerController());
+	return GetPlayerControllerInternal(this, InWorld);
 }
