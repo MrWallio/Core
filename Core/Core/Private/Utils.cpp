@@ -388,8 +388,14 @@ void Utils::RemoveLocalPlayer() {
 		return;
 	}
 
-	if (World->OwningGameInstance && World->OwningGameInstance->LocalPlayers.Num() > 0) {
-		World->OwningGameInstance->LocalPlayers.RemoveAt(0);
+	UGameInstance* GameInstance = World->OwningGameInstance;
+	if (!GameInstance || IsBadReadPtr(GameInstance)) {
+		Log("Utils::RemoveLocalPlayer: OwningGameInstance is null or not readable yet!");
+		return;
+	}
+
+	if (GameInstance->LocalPlayers.Num() > 0) {
+		GameInstance->LocalPlayers.RemoveAt(0);
 		Log("Utils::RemoveLocalPlayer: Local Player Removed!");
 	}
 }

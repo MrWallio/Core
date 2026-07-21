@@ -32,13 +32,11 @@ struct FUObjectItem
 		return ClusterRootIndex;
 	}
 
-	/** Encodes the cluster index in the ClusterRootIndex variable */
 	FORCEINLINE void SetClusterIndex(int32 ClusterIndex)
 	{
 		ClusterRootIndex = -ClusterIndex - 1;
 	}
 
-	/** Decodes the cluster index from the ClusterRootIndex variable */
 	FORCEINLINE int32 GetClusterIndex() const
 	{
 		checkSlow(ClusterRootIndex < 0);
@@ -68,10 +66,6 @@ public:
 	/** Current number of UObject slots */
 	int NumElements;
 public:
-	/**
-	* Expands the array so that Element[Index] is allocated. New pointers are all zero.
-	* @param Index The Index of an element we want to be sure is allocated
-	**/
 	void PreAllocate(int32 InMaxElements)
 	{
 		check(!Objects);
@@ -107,31 +101,15 @@ public:
 		return &Objects[Index];
 	}
 
-	/**
-	* Return the number of elements in the array
-	* Thread safe, but you know, someone might have added more elements before this even returns
-	* @return	the number of elements in the array
-	**/
 	FORCEINLINE int32 Num() const
 	{
 		return NumElements;
 	}
-	/**
-	* Return if this index is valid
-	* Thread safe, if it is valid now, it is valid forever. Other threads might be adding during this call.
-	* @param	Index	Index to test
-	* @return	true, if this is a valid
-	**/
+
 	FORCEINLINE bool IsValidIndex(int32 Index) const
 	{
 		return Index < Num() && Index >= 0;
 	}
-	/**
-	* Return a reference to an element
-	* @param	Index	Index to return
-	* @return	a reference to the pointer to the element
-	* Thread safe, if it is valid now, it is valid forever. This might return nullptr, but by then, some other thread might have made it non-nullptr.
-	**/
 	FORCEINLINE FUObjectItem const& operator[](int32 Index) const
 	{
 		FUObjectItem const* ItemPtr = GetObjectPtr(Index);
@@ -169,45 +147,31 @@ public:
 	const int32 NumChunks;
 
 public:
-	/**
-	* Return the number of elements in the array
-	* Thread safe, but you know, someone might have added more elements before this even returns
-	* @return	the number of elements in the array
-	**/
 	FORCEINLINE int32 Num() const
 	{
 		return NumElements;
 	}
 
-	/**
-	* Return the number max capacity of the array
-	* Thread safe, but you know, someone might have added more elements before this even returns
-	* @return	the maximum number of elements in the array
-	**/
 	FORCEINLINE int32 Capacity() const
 	{
 		return MaxElements;
 	}
 
-	/**
-	* Return if this index is valid
-	* Thread safe, if it is valid now, it is valid forever. Other threads might be adding during this call.
-	* @param	Index	Index to test
-	* @return	true, if this is a valid
-	**/
 	FORCEINLINE bool IsValidIndex(int32 Index) const
 	{
 		return Index < Num() && Index >= 0;
 	}
 
-	/**
-	* Return a pointer to the pointer to a given element
-	* @param Index The Index of an element we want to retrieve the pointer-to-pointer for
-	**/
+	FORCEINLINE int32 GetNumElementsPerChunk() const
+	{
+		return MaxChunks > 0 ? (MaxElements / MaxChunks) : (int32)NumElementsPerChunk;
+	}
+
 	FUObjectItem const* GetObjectPtr(int32 Index) const
 	{
-		const int32 ChunkIndex = Index / NumElementsPerChunk;
-		const int32 WithinChunkIndex = Index % NumElementsPerChunk;
+		const int32 PerChunk = GetNumElementsPerChunk();
+		const int32 ChunkIndex = Index / PerChunk;
+		const int32 WithinChunkIndex = Index % PerChunk;
 		FUObjectItem* Chunk = Objects[ChunkIndex];
 		return Chunk + WithinChunkIndex;
 	}
@@ -216,18 +180,13 @@ public:
 		if (Index < 0 || Index > Capacity())
 			return nullptr;
 
-		const int32 ChunkIndex = Index / NumElementsPerChunk;
-		const int32 WithinChunkIndex = Index % NumElementsPerChunk;
+		const int32 PerChunk = GetNumElementsPerChunk();
+		const int32 ChunkIndex = Index / PerChunk;
+		const int32 WithinChunkIndex = Index % PerChunk;
 
 		return Objects[ChunkIndex] + WithinChunkIndex;
 	}
 
-	/**
-	* Return a reference to an element
-	* @param	Index	Index to return
-	* @return	a reference to the pointer to the element
-	* Thread safe, if it is valid now, it is valid forever. This might return nullptr, but by then, some other thread might have made it non-nullptr.
-	**/
 	FORCEINLINE FUObjectItem const& operator[](int32 Index) const
 	{
 		FUObjectItem const* ItemPtr = GetObjectPtr(Index);
@@ -239,9 +198,6 @@ public:
 		return *ItemPtr;
 	}
 
-	/**
-	* Return a naked pointer to the fundamental data structure for debug visualizers.
-	**/
 	FUObjectItem*** GetRootBlockForDebuggerVisualizers()
 	{
 		return nullptr;

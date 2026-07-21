@@ -21,17 +21,6 @@
 #include "FortniteGame/Public/FortManager/FortCheatManager.h"
 
 void Client::Init(FCoreConfig& Config) {
-    Version::SetupVersion();
-    Log(std::format("ImageBase: 0x{:X}", ImageBase).c_str());
-    Log("FullVersion: " + Version::VersionString);
-    Log(std::format("Engine Version: {}", Version::Engine_Version));
-
-    if (Version::Fortnite_Version) {
-        Log(std::format("Fortnite Build: {:.2f}", Version::Fortnite_Version));
-        SetConsoleTitleA(std::format("CoreClient ({:.2f}) | Starting...", Version::Fortnite_Version).c_str());
-    }
-    Log(std::format("Fortnite CL: {}", Version::Fortnite_CL));
-
     Finder::SetupOffsets();
 
     UEngine* Engine = UEngine::GetEngine();

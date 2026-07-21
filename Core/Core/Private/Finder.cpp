@@ -955,24 +955,29 @@ uintptr_t Finder::FindFName_ToStringOut() {
 
 	static uintptr_t Addr = 0;
 
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B DA 48 8B E9 E8 ? ? ? ? 48 8B F0").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 45 33 ED 48 8B FA 4C 89 2A").Get();
+	if (Version::Engine_Version <= 4.20) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B DA 48 8B E9 E8 ? ? ? ? 48 8B F0").Get();
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 45 33 ED 48 8B FA 4C 89 2A").Get();
+		}
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 33 ED 48 8B FA 48 89 2A 48 89 6A ? 8B 19").Get();
+		}
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 8B 01 48 8B DA").Get();
+		}
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 8B 01").Get();
+		}
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B DA 4C 8B F1").Get();
+		}
+		if (!Addr) {
+			Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B DA 48 8B E9 E8 ? ? ? ? 48 8B C8").Get();
+		}
 	}
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 33 ED 48 8B FA 48 89 2A 48 89 6A ? 8B 19").Get();
-	}
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 8B 01 48 8B DA").Get();
-	}
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 8B 01").Get();
-	}
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B DA 4C 8B F1").Get();
-	}
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B DA 48 8B E9 E8 ? ? ? ? 48 8B C8").Get();
+	else if (Version::Engine_Version == 4.21) {
+		Addr = Memcury::Scanner::FindPattern("48 89 6C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 41 56 48 83 EC ? 48 8B FA 4C 8B F1").Get();
 	}
 
 	if (Addr) {
@@ -1500,12 +1505,9 @@ uintptr_t Finder::FindUClass_FindFunctionByName() {
 		return ServerOffsets::UClass_FindFunctionByName;
 	static uintptr_t Addr = 0;
 
-	Addr = Memcury::Scanner::FindPattern("40 53 55 56 57 41 55 48 83 EC ? 41 8B F0").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 54 24 ? 53 56 48 83 EC ? 8B 81").Get();
-	}
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 89 54 24 ? 53 57 48 83 EC ? 8B 81 ? ? ? ? 41 8B D8").Get();
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"Failed to find function %s in %s");
+	if (StringAddr.IsValid()) {
+		Addr = Utils::GetCallDestination(StringAddr.FindFunctionStart().ScanFor({ 0xE8 }).Get());
 	}
 
 	if (Addr) {
@@ -6359,6 +6361,9 @@ uintptr_t Finder::FindUNetDriver__ReplicationFrame() {
 			AbsoluteOffset = 2;
 		}
 	}
+	else if (Version::Engine_Version == 4.21) {
+		AbsoluteOffset = 2;
+	}
 
 	std::vector<uint8_t> Pattern = { 0x41, 0xFF };
 	if (Version::Fortnite_Version >= 3.3) {
@@ -6476,19 +6481,21 @@ uintptr_t Finder::FindUNetConnection__ActorChannels() {
 		return ServerOffsets::UNetConnection__ActorChannels;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"NotifyStreamingLevelUnload: %s").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 512; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr + i);
-			if (*Ptr == 0x4D && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0x8B) {
-				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
-				Addr = static_cast<uintptr_t>(Offset);
-				break;
+	if (Version::Engine_Version <= 4.20) {
+		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"NotifyStreamingLevelUnload: %s").Get();
+		if (StringAddr) {
+			for (int i = 0; i < 512; i++)
+			{
+				auto Ptr = (uint8_t*)(StringAddr + i);
+				if (*Ptr == 0x4D && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0x8B) {
+					int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+					Addr = static_cast<uintptr_t>(Offset);
+					break;
+				}
 			}
 		}
 	}
-
+	
 	if (!Addr) {
 		uintptr_t StringAddr2 = Memcury::Scanner::FindStringRef(L"ServerUpdateLevelVisibility() Removed '%s'").Get();
 		if (StringAddr2) {
@@ -6496,6 +6503,11 @@ uintptr_t Finder::FindUNetConnection__ActorChannels() {
 			{
 				auto Ptr = (uint8_t*)(StringAddr2 + i);
 				if (*Ptr == 0x49 && *(Ptr + 1) == 0x8D) {
+					int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+					Addr = static_cast<uintptr_t>(Offset);
+					break;
+				}
+				else if (*Ptr == 0x49 && *(Ptr + 1) == 0x8B) {
 					int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
 					Addr = static_cast<uintptr_t>(Offset);
 					break;
@@ -6783,6 +6795,11 @@ uintptr_t Finder::FindUNetDriver__DestroyedStartupOrDormantActors() {
 				break;
 			}
 			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0x9E) {
+				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+				Addr = static_cast<uintptr_t>(Offset);
+				break;
+			}
+			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8D && *(Ptr + 2) == 0x8E) {
 				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
 				Addr = static_cast<uintptr_t>(Offset);
 				break;
@@ -7482,16 +7499,9 @@ uintptr_t Finder::FindUNetDriver_TickDispatch() {
 	if (ServerOffsets::UNetDriver_TickDispatch)
 		return ServerOffsets::UNetDriver_TickDispatch;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UNetDriver::TickDispatch: Very long time between ticks. DeltaTime: %2.2f, Realtime: %2.2f. %s").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 512; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x57) {
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"UNetDriver::TickDispatch: Very long time between ticks. DeltaTime: %2.2f, Realtime: %2.2f. %s");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 
 	if (Addr) {
@@ -7514,10 +7524,19 @@ uintptr_t Finder::FindUNetDriver__SendCycles() {
 		for (int i = 0; i < 512; i++)
 		{
 			auto Ptr = (uint8_t*)(BaseAddr + i);
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89) {
-				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
-				Addr = static_cast<uintptr_t>(Offset);
-				break;
+			if (Version::Engine_Version <= 4.20) {
+				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89) {
+					int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
+					Addr = static_cast<uintptr_t>(Offset);
+					break;
+				}
+			}
+			else if (Version::Engine_Version >= 4.21) {
+				if (*Ptr == 0x89 && *(Ptr + 1) == 0x99) {
+					int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 2);
+					Addr = static_cast<uintptr_t>(Offset);
+					break;
+				}
 			}
 		}
 	}
@@ -8229,17 +8248,9 @@ uintptr_t Finder::FindAFortGameModeAthena_FinishWorldInitialization() {
 	if (ServerOffsets::AFortGameModeAthena_FinishWorldInitialization)
 		return ServerOffsets::AFortGameModeAthena_FinishWorldInitialization;
 	
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Can't find a FortAthenaMapInfo placed in map.  Skipping warmup and aircraft phases.").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1000; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"Can't find a FortAthenaMapInfo placed in map.  Skipping warmup and aircraft phases.");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 	
 	if (Addr) {
@@ -8316,17 +8327,9 @@ uintptr_t Finder::FindAFortPlayerControllerZone_OnReadyToStartMatch() {
 	if (ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch)
 		return ServerOffsets::AFortPlayerControllerZone_OnReadyToStartMatch;
 	
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"ClearCachedReports IN OnReadyToStartMatch!").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1000; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x4C && *(Ptr + 1) == 0x8B)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"ClearCachedReports IN OnReadyToStartMatch!");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 	
 	if (Addr) {
@@ -11201,8 +11204,6 @@ void Finder::SetupOffsets() {
 	FindAActor__CreationTime();
 
 	FindGHandle();
-
-	FindAGameSession__NextPlayerID();
 
 	FindAFortGameMode_FinishWorldInitializationVFT();
 

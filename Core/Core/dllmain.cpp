@@ -69,10 +69,26 @@ DWORD Main(LPVOID)
 
     Finder::SetupCoreOffsets();
 
-    if (!Config.bIsClient) {
-        UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "open FortniteEmptyDedicated", nullptr);
+    Version::SetupVersion();
+    Log(std::format("ImageBase: 0x{:X}", ImageBase).c_str());
+    Log("FullVersion: " + Version::VersionString);
+    Log(std::format("Engine Version: {}", Version::Engine_Version));
+    if (Version::Fortnite_Version) {
+        Log(std::format("Fortnite Build: {:.2f}", Version::Fortnite_Version));
+        if (Config.bIsClient) {
+            SetConsoleTitleA(std::format("CoreClient ({:.2f}) | Starting...", Version::Fortnite_Version).c_str());
+        }
+        else {
+            SetConsoleTitleA(std::format("Core ({:.2f}) | Starting...", Version::Fortnite_Version).c_str());
+        }
     }
+    Log(std::format("Fortnite CL: {}", Version::Fortnite_CL));
+
     if (!Config.bIsClient || !Config.bListenServer) {
+        UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "open FortniteEmptyDedicated", nullptr);
+
+        Sleep(3000);
+
         Utils::RemoveLocalPlayer();
     }
 
@@ -83,17 +99,6 @@ DWORD Main(LPVOID)
         Utils::SetLogVerbosity();
 
         UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "Fort.Pickup.ServerSideWeaponAutoPickupsEnabled 1", nullptr);
-
-        Version::SetupVersion();
-        Log(std::format("ImageBase: 0x{:X}", ImageBase).c_str());
-        Log("FullVersion: " + Version::VersionString);
-        Log(std::format("Engine Version: {}", Version::Engine_Version));
-
-        if (Version::Fortnite_Version) {
-            Log(std::format("Fortnite Build: {:.2f}", Version::Fortnite_Version));
-            SetConsoleTitleA(std::format("Core ({:.2f}) | Starting...", Version::Fortnite_Version).c_str());
-        }
-        Log(std::format("Fortnite CL: {}", Version::Fortnite_CL));
 
         if (!Config.bListenServer) {
             *GIsClient = false;
