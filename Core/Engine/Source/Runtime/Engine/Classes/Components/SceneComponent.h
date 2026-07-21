@@ -7,6 +7,8 @@
 
 class APhysicsVolume;
 class USceneComponent;
+struct FTransform;
+struct FHitResult;
 
 class USceneComponent : public UActorComponent {
 public:
@@ -34,6 +36,8 @@ public:
 	FORCEINLINE FVector GetRelativeScale3D() const { return RelativeScale3D; }
 
 	void SetRelativeScale3D(FVector NewScale3D);
+
+	void K2_SetWorldTransform(const FTransform& NewTransform, bool bSweep, FHitResult* SweepHitResult, bool bTeleport);
 
 	FORCEINLINE bool IsVisible() const { return bVisible; }
 

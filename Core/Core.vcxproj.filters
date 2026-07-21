@@ -903,6 +903,9 @@
     <ClInclude Include="FortniteGame\Public\Athena\FortAthenaMapInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortAthenaVehicle\FortAthenaVehicle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="FortniteGame\Public\FortSafeZone\FortSafeZoneDefinition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1251,6 +1254,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\FortAthenaVehicle\FortAthenaVehicle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\FortSafeZone\FortSafeZoneIndicator.cpp">

@@ -17,4 +17,8 @@ public:
 	DefineUProperty(int32, VisibilityId);
 public:
 	FORCEINLINE bool GetGenerateOverlapEvents() const { return bGenerateOverlapEvents; }
+
+	void SetPhysicsLinearVelocity(const FVector& NewVel, bool bAddToCurrent, FName BoneName);
+
+	void SetPhysicsAngularVelocityInRadians(const FVector& NewAngVel, bool bAddToCurrent, FName BoneName);
 };

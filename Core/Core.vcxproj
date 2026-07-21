@@ -346,6 +346,7 @@
     <ClInclude Include="FortniteGame\Public\QuickChat\AthenaQuickChatActiveEntry.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaRewardResult.h" />
     <ClInclude Include="FortniteGame\Public\Athena\FortAthenaMapInfo.h" />
+    <ClInclude Include="FortniteGame\Public\FortAthenaVehicle\FortAthenaVehicle.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingGameplayActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingItemCollectorActor.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTrap.h" />
@@ -500,6 +501,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\Character.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\Components\ActorComponent.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\Components\SceneComponent.cpp" />
+    <ClCompile Include="Engine\Source\Runtime\Engine\Private\Components\PrimitiveComponent.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\CheatManager.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\Controller.cpp" />
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\DataBunch.cpp" />
@@ -531,6 +533,7 @@
     <ClCompile Include="FortniteGame\Private\AI\FortAIGoalManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Asset\FortAssetManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortAthenaVehicle\FortAthenaVehicle.cpp" />
     <ClCompile Include="FortniteGame\Private\FortSafeZone\FortSafeZoneIndicator.cpp" />
     <ClCompile Include="FortniteGame\Private\Events\Events.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BGAConsumableSpawner.cpp" />

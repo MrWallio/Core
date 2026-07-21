@@ -84,12 +84,21 @@ DWORD Main(LPVOID)
     }
     Log(std::format("Fortnite CL: {}", Version::Fortnite_CL));
 
+    while (true) {
+        UWorld* World = UWorld::GetWorld();
+        if (World && World->AuthorityGameMode) {
+            AGameMode* GameMode = World->AuthorityGameMode->Cast<AGameMode>();
+            if (GameMode && GameMode->MatchState == MatchState::WaitingToStart) {
+                break;
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
     if (!Config.bIsClient || !Config.bListenServer) {
-        UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "open FortniteEmptyDedicated", nullptr);
-
-        Sleep(3000);
-
         Utils::RemoveLocalPlayer();
+        UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "open FortniteEmptyDedicated", nullptr);
     }
 
     if (Config.bIsClient) {
