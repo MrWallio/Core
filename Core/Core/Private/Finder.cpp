@@ -1076,35 +1076,6 @@ uintptr_t Finder::FindUObjectBase_EmitBaseReferences() {
 	return ServerOffsets::UObjectBase_EmitBaseReferences;
 }
 
-uintptr_t Finder::FindUObjectBase_IsValidLowLevel() {
-	if (ServerOffsets::UObjectBase_IsValidLowLevel)
-		return ServerOffsets::UObjectBase_IsValidLowLevel;
-	static uintptr_t Addr = 0;
-
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"NULL object").Get();
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"Object is not registered").Get();
-	}
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x83 && *(Ptr + 2) == 0xEC)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
-	}
-
-	if (Addr) {
-		ServerOffsets::UObjectBase_IsValidLowLevel = Addr - ImageBase;
-	}
-
-	Log("UObjectBase::IsValidLowLevel found at: 0x" + std::format("{:X}", ServerOffsets::UObjectBase_IsValidLowLevel));
-	return ServerOffsets::UObjectBase_IsValidLowLevel;
-}
-
 uintptr_t Finder::FindUObjectBase_IsValidLowLevelFast() {
 	if (ServerOffsets::UObjectBase_IsValidLowLevelFast)
 		return ServerOffsets::UObjectBase_IsValidLowLevelFast;
@@ -1452,71 +1423,6 @@ uintptr_t Finder::FindUObject_FindFunctionChecked() {
 	return ServerOffsets::UObject_FindFunctionChecked;
 }
 
-uintptr_t Finder::FindUField_GetOwnerClass() {
-	if (ServerOffsets::UField_GetOwnerClass)
-		return ServerOffsets::UField_GetOwnerClass;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 33 C0 48 8B D9 48 85 C9").Get();
-
-	if (Addr) {
-		ServerOffsets::UField_GetOwnerClass = Addr - ImageBase;
-	}
-
-	Log("UField::GetOwnerClass found at: 0x" + std::format("{:X}", ServerOffsets::UField_GetOwnerClass));
-	return ServerOffsets::UField_GetOwnerClass;
-}
-
-uintptr_t Finder::FindUField_GetOwnerStruct() {
-	if (ServerOffsets::UField_GetOwnerStruct)
-		return ServerOffsets::UField_GetOwnerStruct;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 48 8B D9 48 85 C9 74 ? E8 ? ? ? ? 48 8B 53 ? 4C 8D 40 ? 48 63 40 ? 3B 42 ? 7F ? 48 8B C8 48 8B 42 ? 4C 39 04 C8 74 ? 48 8B 5B").Get();
-
-	if (Addr) {
-		ServerOffsets::UField_GetOwnerStruct = Addr - ImageBase;
-	}
-
-	Log("UField::GetOwnerStruct found at: 0x" + std::format("{:X}", ServerOffsets::UField_GetOwnerStruct));
-	return ServerOffsets::UField_GetOwnerStruct;
-}
-
-uintptr_t Finder::FindUStruct_FindPropertyByName() {
-	if (ServerOffsets::UStruct_FindPropertyByName)
-		return ServerOffsets::UStruct_FindPropertyByName;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("48 8B 49 ? 48 85 C9 74 ? 4C 8B CA").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 8B 41 ? 48 85 C0 74 ? 0F 1F 80 ? ? ? ? 48 39 50").Get();
-	}
-
-	if (Addr) {
-		ServerOffsets::UStruct_FindPropertyByName = Addr - ImageBase;
-	}
-
-	Log("UStruct_FindPropertyByName found at: 0x" + std::format("{:X}", ServerOffsets::UStruct_FindPropertyByName));
-	return ServerOffsets::UStruct_FindPropertyByName;
-}
-
-uintptr_t Finder::FindUClass_FindFunctionByName() {
-	if (ServerOffsets::UClass_FindFunctionByName)
-		return ServerOffsets::UClass_FindFunctionByName;
-	static uintptr_t Addr = 0;
-
-	auto StringAddr = Memcury::Scanner::FindStringRef(L"Failed to find function %s in %s");
-	if (StringAddr.IsValid()) {
-		Addr = Utils::GetCallDestination(StringAddr.FindFunctionStart().ScanFor({ 0xE8 }).Get());
-	}
-
-	if (Addr) {
-		ServerOffsets::UClass_FindFunctionByName = Addr - ImageBase;
-	}
-
-	Log("UClass_FindFunctionByName found at: 0x" + std::format("{:X}", ServerOffsets::UClass_FindFunctionByName));
-	return ServerOffsets::UClass_FindFunctionByName;
-}
 
 uintptr_t Finder::FindFName_GetPlainNameString1() {
 	if (ServerOffsets::FName_GetPlainNameString1)
@@ -2384,21 +2290,6 @@ uintptr_t Finder::FindUWorld_WelcomePlayer() {
 
 	Log("UWorld_WelcomePlayer found at: 0x" + std::format("{:X}", ServerOffsets::UWorld_WelcomePlayer));
 	return ServerOffsets::UWorld_WelcomePlayer;
-}
-
-uintptr_t Finder::FindFGuid_ToString() {
-	if (ServerOffsets::FGuid_ToString)
-		return ServerOffsets::FGuid_ToString;
-	static uintptr_t Addr = 0;
-
-	Addr = Memcury::Scanner::FindPattern("41 56 41 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 41 FF C8").Get();
-
-	if (Addr) {
-		ServerOffsets::FGuid_ToString = Addr - ImageBase;
-	}
-
-	Log("FGuid_ToString found at: 0x" + std::format("{:X}", ServerOffsets::FGuid_ToString));
-	return ServerOffsets::FGuid_ToString;
 }
 
 uintptr_t Finder::FindUGameInstance_StartGameInstance() {
@@ -4041,75 +3932,6 @@ uintptr_t Finder::FindUEngine_LoadMapVFT() {
 	return ServerOffsets::UEngine_LoadMapVFT;
 }
 
-uintptr_t Finder::FindFURL_IsInternal() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FURL_IsInternal)
-		return ServerOffsets::FURL_IsInternal;
-	Addr = Memcury::Scanner::FindPattern("48 83 EC ? 83 3D ? ? ? ? ? 48 8B C1").Get();
-
-	if (Addr) {
-		ServerOffsets::FURL_IsInternal = Addr - ImageBase;
-	}
-	Log("FURL_IsInternal found at: 0x" + std::format("{:X}", ServerOffsets::FURL_IsInternal));
-	return ServerOffsets::FURL_IsInternal;
-	return 0;
-}
-
-uintptr_t Finder::FindFURL_IsLocalInternal() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FURL_IsLocalInternal)
-		return ServerOffsets::FURL_IsLocalInternal;
-	Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 83 3D ? ? ? ? ? 48 8B D9 48 8D 0D").Get();
-
-	if (Addr) {
-		ServerOffsets::FURL_IsLocalInternal = Addr - ImageBase;
-	}
-	Log("FURL_IsLocalInternal found at: 0x" + std::format("{:X}", ServerOffsets::FURL_IsLocalInternal));
-	return ServerOffsets::FURL_IsLocalInternal;
-}
-
-uintptr_t Finder::FindFURL_HasOption() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FURL_HasOption)
-		return ServerOffsets::FURL_HasOption;
-	Addr = Memcury::Scanner::FindPattern("41 54 41 56 41 57 48 83 EC ? 4C 8B FA 4C 8B F1 48 C7 C0").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 83 EC ? 45 33 C0 E8 ? ? ? ? 48 85 C0").Get();
-	}
-
-	if (Addr) {
-		ServerOffsets::FURL_HasOption = Addr - ImageBase;
-	}
-	Log("FURL_HasOption found at: 0x" + std::format("{:X}", ServerOffsets::FURL_HasOption));
-	return ServerOffsets::FURL_HasOption;
-}
-
-uintptr_t Finder::FindFURL_GetOption() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FURL_GetOption)
-		return ServerOffsets::FURL_GetOption;
-	Addr = Memcury::Scanner::FindPattern("41 54 41 56 41 57 48 83 EC ? 4D 8B E0 4C 8B FA 4C 8B F1").Get();
-
-	if (Addr) {
-		ServerOffsets::FURL_GetOption = Addr - ImageBase;
-	}
-	Log("FURL_GetOption found at: 0x" + std::format("{:X}", ServerOffsets::FURL_GetOption));
-	return ServerOffsets::FURL_GetOption;
-}
-
-uintptr_t Finder::FindFURL_AddOption() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FURL_AddOption)
-		return ServerOffsets::FURL_AddOption;
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 57 48 83 EC ? 48 8B FA").Get();
-
-	if (Addr) {
-		ServerOffsets::FURL_AddOption = Addr - ImageBase;
-	}
-	Log("FURL_AddOption found at: 0x" + std::format("{:X}", ServerOffsets::FURL_AddOption));
-	return ServerOffsets::FURL_AddOption;
-}
-
 uintptr_t Finder::FindFURL_RemoveOption() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::FURL_RemoveOption)
@@ -4121,34 +3943,6 @@ uintptr_t Finder::FindFURL_RemoveOption() {
 	}
 	Log("FURL_RemoveOption found at: 0x" + std::format("{:X}", ServerOffsets::FURL_RemoveOption));
 	return ServerOffsets::FURL_RemoveOption;
-}
-
-uintptr_t Finder::FindFURL_ToString() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FURL_ToString)
-		return ServerOffsets::FURL_ToString;
-	Addr = Memcury::Scanner::FindPattern("40 53 57 41 57 48 83 EC ? 45 33 FF 48 89 6C 24").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("40 53 55 56 41 55 41 56 48 83 EC ? 45 33 ED").Get();
-	}
-
-	if (Addr) {
-		ServerOffsets::FURL_ToString = Addr - ImageBase;
-	}
-	Log("FURL_ToString found at: 0x" + std::format("{:X}", ServerOffsets::FURL_ToString));
-	return ServerOffsets::FURL_ToString;
-}
-
-uintptr_t Finder::FindFURL_GetHostPortString() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FURL_GetHostPortString)
-		return ServerOffsets::FURL_GetHostPortString;
-	Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 48 8B DA 48 81 C1 ? ? ? ? 48 8D 54 24 ? E8 ? ? ? ? 83 78").Get();
-	if (Addr) {
-		ServerOffsets::FURL_GetHostPortString = Addr - ImageBase;
-	}
-	Log("FURL_GetHostPortString found at: 0x" + std::format("{:X}", ServerOffsets::FURL_GetHostPortString));
-	return ServerOffsets::FURL_GetHostPortString;
 }
 
 uintptr_t Finder::FindFWorldContext_SetCurrentWorld() {
@@ -5541,24 +5335,6 @@ uintptr_t Finder::FindAFortGameMode_SpawnDefaultPawnFor() {
 	return ServerOffsets::AFortGameMode_SpawnDefaultPawnFor;
 }
 
-uintptr_t Finder::FindFRotator_Quaternion() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FRotator_Quaternion)
-		return ServerOffsets::FRotator_Quaternion;
-
-	Addr = Memcury::Scanner::FindPattern("48 83 EC ? 0F 28 2D ? ? ? ? F3 0F 10 51").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("48 83 EC ? F3 0F 10 41 ? 0F 57 C9 F3 0F 10 51 ? F3 0F 10 19").Get();
-	}
-
-	if (Addr) {
-		ServerOffsets::FRotator_Quaternion = Addr - ImageBase;
-	}
-
-	Log("FRotator_Quaternion found at: 0x" + std::format("{:X}", ServerOffsets::FRotator_Quaternion));
-	return ServerOffsets::FRotator_Quaternion;
-}
-
 uintptr_t Finder::FindAActor_SetNetDormancy() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AActor_SetNetDormancy)
@@ -6257,18 +6033,6 @@ uintptr_t Finder::FindUEngine_CreateNetDriver_Local() {
 	bInitialized = true;
 	Log("UEngine_CreateNetDriver_Local found at: 0x" + std::format("{:X}", ServerOffsets::UEngine_CreateNetDriver_Local));
 	return ServerOffsets::UEngine_CreateNetDriver_Local;
-}
-
-uintptr_t Finder::FindUPlayer_GetPlayerController() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::UPlayer_GetPlayerController)
-		return ServerOffsets::UPlayer_GetPlayerController;
-	Addr = Memcury::Scanner::FindPattern("40 57 48 83 EC ? 48 8B C2 48 8B F9 48 85 D2 75 ? 48 8B 41").Get();
-	if (Addr) {
-		ServerOffsets::UPlayer_GetPlayerController = Addr - ImageBase;
-	}
-	Log("UPlayer_GetPlayerController found at: 0x" + std::format("{:X}", ServerOffsets::UPlayer_GetPlayerController));
-	return ServerOffsets::UPlayer_GetPlayerController;
 }
 
 uintptr_t Finder::FindUPlayer_SwitchController() {
@@ -8196,51 +7960,6 @@ uintptr_t Finder::FindFName_GetComparisonNameEntry() {
 
 	Log("FName_GetComparisonNameEntry found at: 0x" + std::format("{:X}", ServerOffsets::FName_GetComparisonNameEntry));
 	return ServerOffsets::FName_GetComparisonNameEntry;
-}
-
-uintptr_t Finder::FindFString_Append() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FString_Append)
-		return ServerOffsets::FString_Append;
-	
-	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 49 63 F0 48 8B FA 48 8B D9").Get();
-	
-	if (Addr) {
-		ServerOffsets::FString_Append = Addr - ImageBase;
-	}
-
-	Log("FString_Append found at: 0x" + std::format("{:X}", ServerOffsets::FString_Append));
-	return ServerOffsets::FString_Append;
-}
-
-uintptr_t Finder::FindFString_AppendInt() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FString_AppendInt)
-		return ServerOffsets::FString_AppendInt;
-	
-	Addr = Memcury::Scanner::FindPattern("4C 8B DC 49 89 5B ? 55 56 41 56 48 81 EC ? ? ? ? 48 8B 05").Get();
-	
-	if (Addr) {
-		ServerOffsets::FString_AppendInt = Addr - ImageBase;
-	}
-
-	Log("FString_AppendInt found at: 0x" + std::format("{:X}", ServerOffsets::FString_AppendInt));
-	return ServerOffsets::FString_AppendInt;
-}
-
-uintptr_t Finder::FindFString_ToBool() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::FString_ToBool)
-		return ServerOffsets::FString_ToBool;
-	
-	Addr = Memcury::Scanner::FindPattern("83 79 ? 00 74 ? ? ? ? E9 ? ? ? ? 48 8D 0D").Get();
-	
-	if (Addr) {
-		ServerOffsets::FString_ToBool = Addr - ImageBase;
-	}
-
-	Log("FString_ToBool found at: 0x" + std::format("{:X}", ServerOffsets::FString_ToBool));
-	return ServerOffsets::FString_ToBool;
 }
 
 uintptr_t Finder::FindAFortGameModeAthena_FinishWorldInitialization() {
@@ -10195,39 +9914,6 @@ uintptr_t Finder::FindAFortGameMode_ProcessServerTravelPatch1() {
 	return ServerOffsets::AFortGameMode_ProcessServerTravelPatch1;
 }
 
-uintptr_t Finder::FindUWorld_RemovePIEPrefix() {
-	if (ServerOffsets::UWorld_RemovePIEPrefix)
-		return ServerOffsets::UWorld_RemovePIEPrefix;
-	uintptr_t Addr = 0;
-
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Looks like World path invalid PIE prefix (expected '_' characeter after PIE prefix): %s").Get();
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"Looks like World have invalid PIE prefix (PIE instance not number): %s").Get();
-	}
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"Looks like World path invalid PIE prefix (can't find end of PIE prefix): %s").Get();
-	}
-	
-	if (StringAddr) {
-		for (int i = 0; i < 2048; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
-	}
-
-	if (Addr) {
-		ServerOffsets::UWorld_RemovePIEPrefix = Addr - ImageBase;
-	}
-
-	Log("UWorld_RemovePIEPrefix found at: 0x" + std::format("{:X}", ServerOffsets::UWorld_RemovePIEPrefix));
-	return ServerOffsets::UWorld_RemovePIEPrefix;
-}
-
 uintptr_t Finder::FindBeginLoad() {
 	if (ServerOffsets::BeginLoad)
 		return ServerOffsets::BeginLoad;
@@ -11133,8 +10819,6 @@ void Finder::SetupOffsets() {
 
 	FindProcessEventVFT();
 
-	FindUStruct_FindPropertyByName();
-
 	FindUWorld_ServerTravel();
 	FindUWorld__TimeSeconds();
 	FindUWorld__NextSwitchCountdown();
@@ -11148,7 +10832,6 @@ void Finder::SetupOffsets() {
 
 	FindFWorldContext__ThisCurrentWorld();
 
-	FindUObjectBase_IsValidLowLevel();
 	FindUObjectBase_IsValidLowLevelFast();
 
 	FindUObject_NeedsLoadForClientVFT();
@@ -11213,7 +10896,6 @@ void Finder::SetupOffsets() {
 	FindAGameModeBase_GetGameSessionClass();
 	FindAGameModeBase_GetGameSessionClassVFT();
 
-	FindUClass_FindFunctionByName();
 	FindUClass_GetSparseClassData();
 
 	FindUEngine_LoadMap();
@@ -11258,8 +10940,6 @@ void Finder::SetupOffsets() {
 
 	FindStaticFindObject();
 	FindStaticLoadObject();
-
-	FindFRotator_Quaternion();
 
 	FindAFortGameModeZone_CreateAIDirectorVFT();
 	FindAFortGameModeZone_CreateAIGoalManagerVFT();
@@ -11353,8 +11033,6 @@ void Finder::SetupOffsets() {
 
 	FindUNavigationSystem_CreateNavigationSystem();
 
-	FindFURL_HasOption();
-
 	FindCollectGarbageInternal();
 
 	FindABuildingActor_ServerOnAttemptInteractVFT();
@@ -11385,8 +11063,6 @@ void Finder::SetupOffsets() {
 	FindAGameModeBase_ProcessServerTravelVFT();
 
 	FindAFortGameMode_ProcessServerTravelPatch1();
-
-	FindUWorld_RemovePIEPrefix();
 
 	FindBeginLoad();
 	FindEndLoad();
@@ -11425,8 +11101,6 @@ void Finder::SetupOffsets() {
 	FindFName_Constructor1();
 
 	FindAFortGameModeAthena_RemoveFromAlivePlayers();
-
-	FindFURL_ToString();
 
 	FindUEngine_BroadcastNetworkFailure();
 

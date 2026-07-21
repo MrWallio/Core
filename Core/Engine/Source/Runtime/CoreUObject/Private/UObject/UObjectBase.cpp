@@ -2,15 +2,15 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectBase.h"
 
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h"
+#include "Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectArray.h"
 
 bool UObjectBase::IsValidLowLevel() const
 {
-	if (Finder::FindUObjectBase_IsValidLowLevel()) {
-		bool (*IsValidLowLevelInternal)(const UObjectBase*) = decltype(IsValidLowLevelInternal)(ImageBase + Finder::FindUObjectBase_IsValidLowLevel());
-		return IsValidLowLevelInternal(this);
-	}
+	if (this == nullptr || ClassPrivate == nullptr)
+		return false;
 
-	return true;
+	FUObjectItem* Item = FUObjectArray::IndexToObject(InternalIndex);
+	return Item && Item->Object == this;
 }
 
 bool UObjectBase::IsValidLowLevelFast(bool bRecursive) const

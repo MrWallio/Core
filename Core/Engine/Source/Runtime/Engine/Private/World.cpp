@@ -262,6 +262,25 @@ void UWorld::SetNavigationSystem(UNavigationSystem* InNavigationSystem)
 }
 
 FString UWorld::RemovePIEPrefix(const FString& Source) {
-	FString(*RemovePIEPrefixInternal)(const FString&) = decltype(RemovePIEPrefixInternal)(ImageBase + Finder::FindUWorld_RemovePIEPrefix());
-	return RemovePIEPrefixInternal(Source);
+	const FString Prefix(L"UEDPIE");
+
+	const int32 PrefixPos = Source.Find(Prefix, ESearchCase::CaseSensitive);
+	if (PrefixPos == -1)
+		return Source;
+
+	int32 Pos = PrefixPos + Prefix.Len();
+
+	if (Pos >= Source.Len() || Source[Pos] != L'_')
+		return Source;
+	Pos++;
+
+	const int32 DigitsStart = Pos;
+	while (Pos < Source.Len() && ::iswdigit(Source[Pos]))
+		Pos++;
+
+	if (Pos == DigitsStart || Pos >= Source.Len() || Source[Pos] != L'_')
+		return Source;
+	Pos++;
+
+	return Source.Left(PrefixPos) + Source.RightChop(Pos);
 }

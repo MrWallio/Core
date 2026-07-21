@@ -57,7 +57,6 @@ namespace ServerOffsets {
 	inline uintptr_t UObjectBase_AtomicallyClearFlags = 0;
 	inline uintptr_t UObjectBase_DeferredRegister = 0;
 	inline uintptr_t UObjectBase_EmitBaseReferences = 0;
-	inline uintptr_t UObjectBase_IsValidLowLevel = 0;
 	inline uintptr_t UObjectBase_IsValidLowLevelFast = 0;
 	inline uintptr_t UObjectBase_LowLevelRename = 0;
 	inline uintptr_t UObjectBase_Register = 0;
@@ -85,17 +84,11 @@ namespace ServerOffsets {
 	inline uintptr_t UObject_NeedsLoadForClientVFT = 0;
 	inline uintptr_t UObject_CanCreateInCurrentContext = 0;
 
-	inline uintptr_t UField_GetOwnerClass = 0;
-	inline uintptr_t UField_GetOwnerStruct = 0;
-
-	inline uintptr_t UStruct_FindPropertyByName = 0;
-
 	inline uintptr_t UStruct__SuperStruct = 0;
 	inline uintptr_t UStruct__Children = 0;
 	inline uintptr_t UStruct__PropertiesSize = 0;
 	inline uintptr_t UStruct__MinAlignment = 0;
 
-	inline uintptr_t UClass_FindFunctionByName = 0;
 	inline uintptr_t UClass_GetSparseClassData = 0;
 
 	inline uintptr_t FName_GetPlainNameString1 = 0;
@@ -174,9 +167,6 @@ namespace ServerOffsets {
 	inline uintptr_t UWorld_FindCollectionByType = 0;
 	inline uintptr_t UWorld__NextSwitchCountdown = 0;
 	inline uintptr_t UWorld_ListenPatch = 0;
-	inline uintptr_t UWorld_RemovePIEPrefix = 0;
-
-	inline uintptr_t FGuid_ToString = 0;
 
 	inline uintptr_t UGameInstance_StartGameInstance = 0;
 	inline uintptr_t UGameInstance_Shutdown = 0;
@@ -311,14 +301,7 @@ namespace ServerOffsets {
 	inline uintptr_t ULevel_RegisterActorForAutoReceiveInput = 0;
 	inline uintptr_t ULevel_PushPendingAutoReceiveInput = 0;
 
-	inline uintptr_t FURL_IsInternal = 0;
-	inline uintptr_t FURL_IsLocalInternal = 0;
-	inline uintptr_t FURL_HasOption = 0;
-	inline uintptr_t FURL_GetOption = 0;
-	inline uintptr_t FURL_AddOption = 0;
 	inline uintptr_t FURL_RemoveOption = 0;
-	inline uintptr_t FURL_ToString = 0;
-	inline uintptr_t FURL_GetHostPortString = 0;
 
 	inline uintptr_t FWorldContext_SetCurrentWorld = 0;
 	inline uintptr_t FWorldContext__ThisCurrentWorld = 0;
@@ -432,8 +415,6 @@ namespace ServerOffsets {
 	inline uintptr_t UFortKismetLibrary_CanPlaceBuildableClassInStructuralGrid = 0;
 	inline uintptr_t UFortKismetLibrary_GetWeaponStatsRow = 0;
 
-	inline uintptr_t FRotator_Quaternion = 0;
-
 	inline uintptr_t ABuildingSMActor_ReplaceBuildingActor = 0;
 	inline uintptr_t ABuildingSMActor_ReplaceBuildingActorVFT = 0;
 	inline uintptr_t ABuildingSMActor_PostUpdate = 0;
@@ -472,7 +453,6 @@ namespace ServerOffsets {
 	inline uintptr_t UKismetSystemLibrary_GetEngineVersion = 0;
 	inline uintptr_t UKismetSystemLibrary_ExecuteConsoleCommand = 0;
 
-	inline uintptr_t UPlayer_GetPlayerController = 0;
 	inline uintptr_t UPlayer_SwitchController = 0;
 
 	inline uintptr_t UNetConnection_IsNetReady = 0;
@@ -589,10 +569,6 @@ namespace ServerOffsets {
 	inline uintptr_t AFortPlayerState_InitializeHero = 0;
 	inline uintptr_t AFortPlayerState_RefreshCharacterCustomization = 0;
 	inline uintptr_t AFortPlayerState_ApplyCharacterCustomization = 0;
-
-	inline uintptr_t FString_Append = 0;
-	inline uintptr_t FString_AppendInt = 0;
-	inline uintptr_t FString_ToBool = 0;
 
 	inline uintptr_t AFortPlayerController_OnReadyToStartMatch = 0;
 	inline uintptr_t AFortPlayerController_OnReadyToStartMatchVFT = 0;

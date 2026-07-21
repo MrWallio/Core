@@ -77,8 +77,6 @@ public:
 
 	static uintptr_t FindUObjectBase_EmitBaseReferences();
 
-	static uintptr_t FindUObjectBase_IsValidLowLevel();
-
 	static uintptr_t FindUObjectBase_IsValidLowLevelFast();
 
 	static uintptr_t FindUObjectBase_LowLevelRename();
@@ -120,14 +118,6 @@ public:
 	static uintptr_t FindUObject_PostLoadVFT();
 
 	static uintptr_t FindUObject_FindFunctionChecked();
-
-	static uintptr_t FindUField_GetOwnerClass();
-
-	static uintptr_t FindUField_GetOwnerStruct();
-
-	static uintptr_t FindUStruct_FindPropertyByName();
-
-	static uintptr_t FindUClass_FindFunctionByName();
 
 	static uintptr_t FindFName_GetPlainNameString1();
 
@@ -230,8 +220,6 @@ public:
 	static uintptr_t FindUWorld_SetNavigationSystem();
 
 	static uintptr_t FindUWorld_WelcomePlayer();
-
-	static uintptr_t FindFGuid_ToString();
 
 	static uintptr_t FindUGameInstance_StartGameInstance();
 
@@ -451,21 +439,7 @@ public:
 
 	static uintptr_t FindUEngine_LoadMapVFT();
 
-	static uintptr_t FindFURL_IsInternal();
-
-	static uintptr_t FindFURL_IsLocalInternal();
-
-	static uintptr_t FindFURL_HasOption();
-
-	static uintptr_t FindFURL_GetOption();
-
-	static uintptr_t FindFURL_AddOption();
-
 	static uintptr_t FindFURL_RemoveOption();
-
-	static uintptr_t FindFURL_ToString();
-
-	static uintptr_t FindFURL_GetHostPortString();
 
 	static uintptr_t FindFWorldContext_SetCurrentWorld();
 
@@ -627,8 +601,6 @@ public:
 
 	static uintptr_t FindAFortGameMode_SpawnDefaultPawnFor();
 
-	static uintptr_t FindFRotator_Quaternion();
-
 	static uintptr_t FindAActor_SetNetDormancy();
 
 	static uintptr_t FindABuildingSMActor_ReplaceBuildingActor();
@@ -688,8 +660,6 @@ public:
 	static uintptr_t FindUEngine_CreateNewWorldContext();
 
 	static uintptr_t FindUEngine_CreateNetDriver_Local();
-
-	static uintptr_t FindUPlayer_GetPlayerController();
 
 	static uintptr_t FindUPlayer_SwitchController();
 
@@ -861,12 +831,6 @@ public:
 
 	static uintptr_t FindFName_GetComparisonNameEntry();
 
-	static uintptr_t FindFString_Append();
-
-	static uintptr_t FindFString_AppendInt();
-
-	static uintptr_t FindFString_ToBool();
-
 	static uintptr_t FindAFortGameModeAthena_FinishWorldInitialization();
 
 	static uintptr_t FindAFortGameMode_FinishWorldInitializationVFT();
@@ -1024,8 +988,6 @@ public:
 	static uintptr_t FindAGameModeBase_ProcessServerTravelVFT();
 
 	static uintptr_t FindAFortGameMode_ProcessServerTravelPatch1();
-
-	static uintptr_t FindUWorld_RemovePIEPrefix();
 
 	static uintptr_t FindBeginLoad();
 

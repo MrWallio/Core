@@ -100,18 +100,30 @@ public:
 
 	FString& Append(const TCHAR* Text, int32 Count)
 	{
-		FString& (*AppendInternal)(FString&, const TCHAR*, int32) = decltype(AppendInternal)(ImageBase + Finder::FindFString_Append());
-		return AppendInternal(*this, Text, Count);
+		if (Text && Count > 0)
+		{
+			for (int32 i = 0; i < Count; ++i)
+				AppendChar(Text[i]);
+		}
+		return *this;
 	}
 
-	void AppendInt(int32 InNum) {
-		void (*AppendIntInternal)(FString&, int32) = decltype(AppendIntInternal)(ImageBase + Finder::FindFString_AppendInt());
-		AppendIntInternal(*this, InNum);
+	void AppendInt(int32 InNum)
+	{
+		Append(FString::FromInt(InNum));
 	}
 
-	bool ToBool() const {
-		bool (*ToBoolInternal)(const FString&) = decltype(ToBoolInternal)(ImageBase + Finder::FindFString_ToBool());
-		return ToBoolInternal(*this);
+	bool ToBool() const
+	{
+		const TCHAR* Str = **this;
+
+		if (_wcsicmp(Str, TEXT("True")) == 0 || _wcsicmp(Str, TEXT("Yes")) == 0 || _wcsicmp(Str, TEXT("On")) == 0)
+			return true;
+
+		if (_wcsicmp(Str, TEXT("False")) == 0 || _wcsicmp(Str, TEXT("No")) == 0 || _wcsicmp(Str, TEXT("Off")) == 0)
+			return false;
+
+		return _wtoi(Str) != 0;
 	}
 
 public:

@@ -10,10 +10,22 @@
 
 FQuat FRotator::Quaternion() const
 {
-	FQuat& (*QuaternionInternal)(const FRotator*, FQuat&) = decltype(QuaternionInternal)(ImageBase + Finder::FindFRotator_Quaternion());
-	FQuat Result = FQuat();
-	QuaternionInternal(this, Result);
-	return Result;
+	const float RADS_DIVIDED_BY_2 = (PI / 180.f) / 2.f;
+
+	float SP, SY, SR;
+	float CP, CY, CR;
+
+	FMath::SinCos(&SP, &CP, FMath::Fmod(Pitch, 360.f) * RADS_DIVIDED_BY_2);
+	FMath::SinCos(&SY, &CY, FMath::Fmod(Yaw, 360.f) * RADS_DIVIDED_BY_2);
+	FMath::SinCos(&SR, &CR, FMath::Fmod(Roll, 360.f) * RADS_DIVIDED_BY_2);
+
+	FQuat RotationQuat;
+	RotationQuat.X = CR * SP * SY - SR * CP * CY;
+	RotationQuat.Y = -CR * SP * CY - SR * CP * SY;
+	RotationQuat.Z = CR * CP * SY - SR * SP * CY;
+	RotationQuat.W = CR * CP * CY + SR * SP * SY;
+
+	return RotationQuat;
 }
 
 // ---- FRotator -------------------------------------------------------------
