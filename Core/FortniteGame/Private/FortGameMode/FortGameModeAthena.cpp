@@ -276,7 +276,7 @@ uint8 AFortGameModeAthena::PickTeam(AFortGameModeAthena* This, uint8 PreferredTe
 			}
 		}
 
-		if (TeamMemberCount <= GameState->TeamSize) {
+		if (TeamMemberCount < GameState->TeamSize) {
 			Log("AFortGameModeAthena::PickTeam: Assigning player to team " + std::to_string(TeamInfo->Team) + " with " + std::to_string(TeamMemberCount) + " members.");
 			return TeamInfo->Team;
 		}
