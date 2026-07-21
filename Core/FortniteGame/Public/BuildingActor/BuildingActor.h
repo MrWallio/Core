@@ -17,6 +17,7 @@ class AFortPlayerController;
 class AFortPlayerStateZone;
 class UFortWorldItemDefinition;
 class UFortBuildingActorSet;
+class USceneComponent;
 
 struct FBuildingClassData
 {

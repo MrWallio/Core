@@ -336,6 +336,7 @@
     <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchTeamStats.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaPlayerMatchReport.h" />
     <ClInclude Include="FortniteGame\Public\Athena\FortAthenaAircraft.h" />
+    <ClInclude Include="FortniteGame\Public\BuildingActor\BGAConsumableSpawner.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTimeOfDayLights.h" />
     <ClInclude Include="FortniteGame\Public\FortItemDefinition\FortGadgetItemDefinition.h" />
     <ClInclude Include="FortniteGame\Public\FortLoadout\FortCampaignLoadout.h" />
@@ -528,6 +529,7 @@
     <ClCompile Include="FortniteGame\Private\AI\FortAIGoalManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Asset\FortAssetManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp" />
+    <ClCompile Include="FortniteGame\Private\BuildingActor\BGAConsumableSpawner.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingActor.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingGameplayActor.cpp" />

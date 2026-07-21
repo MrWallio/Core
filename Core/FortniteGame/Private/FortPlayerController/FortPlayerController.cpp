@@ -165,6 +165,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("SetShield <Shield> / SetMaxShield <MaxShield> - Sets the player's shield / max shield.");
 		This->ClientMessage("SetKillScore <NewScore> - Sets the player's kill score.");
 		This->ClientMessage("TeleportToLocation <X> <Y> <Z> - Teleports the player to a specific location.");
+		This->ClientMessage("TeleportToActor <ActorName> - Teleports the player to a specific actor.");
 		This->ClientMessage("DumpCurrentLocation - Dumps the player's current location and rotation.");
 		This->ClientMessage("-- Pawns / Bots --");
 		This->ClientMessage("DumpAllPawns - Lists every pawn in the world with its index.");
@@ -678,6 +679,64 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->MyFortPawn->K2_SetActorLocation(NewLocation, false, &HitResult, true);
 		This->ClientMessage("Teleported to location: X=" + std::to_string(X) + " Y=" + std::to_string(Y) + " Z=" + std::to_string(Z));
 		
+		return;
+	}
+	else if (Parser.IsCommand("TeleportToActor")) {
+		std::string ActorName = Parser.GetArg("ActorName", 0, "");
+		if (ActorName.empty()) {
+			This->ClientMessage("Usage: TeleportToActor <ActorName>");
+			return;
+		}
+
+		if (!This->MyFortPawn) {
+			This->ClientMessage("MyFortPawn is null!");
+			return;
+		}
+
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(World, AActor::StaticClass(), &FoundActors);
+
+		std::string LowerActorName = Utils::StringToLower(ActorName);
+		AActor* TargetActor = nullptr;
+		int32 Matches = 0;
+
+		for (int32 i = 0; i < FoundActors.Num(); i++) {
+			AActor* Actor = FoundActors[i];
+			if (!Actor || Actor == This->MyFortPawn)
+				continue;
+
+			std::string LowerName = Utils::StringToLower(Actor->GetName().ToString());
+			if (LowerName == LowerActorName) {
+				TargetActor = Actor;
+				Matches = 1;
+				break;
+			}
+
+			if (LowerName.find(LowerActorName) != std::string::npos) {
+				if (!TargetActor)
+					TargetActor = Actor;
+				Matches++;
+			}
+		}
+
+		if (!TargetActor) {
+			This->ClientMessage("No actor found matching: " + ActorName);
+			return;
+		}
+
+		FVector TargetLocation = TargetActor->K2_GetActorLocation();
+		TargetLocation.Z += 100.f;
+
+		FHitResult HitResult;
+		This->MyFortPawn->K2_SetActorLocation(TargetLocation, false, &HitResult, true);
+
+		std::string Message = "Teleported to " + TargetActor->GetName().ToString()
+			+ " @ X=" + std::to_string(TargetLocation.X) + " Y=" + std::to_string(TargetLocation.Y) + " Z=" + std::to_string(TargetLocation.Z);
+		if (Matches > 1) {
+			Message += " (" + std::to_string(Matches) + " matches, teleported to first)";
+		}
+		This->ClientMessage(Message);
+
 		return;
 	}
 	else if (Parser.IsCommand("DumpCurrentLocation")) {
