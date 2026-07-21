@@ -909,6 +909,9 @@
     <ClInclude Include="FortniteGame\Public\FortSafeZone\FortSafeZoneIndicator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\Events\Events.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="FortniteGame\Public\QuickChat\AthenaQuickChatActiveEntry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1251,6 +1254,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FortniteGame\Private\FortSafeZone\FortSafeZoneIndicator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FortniteGame\Private\Events\Events.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\CheatManager.cpp">

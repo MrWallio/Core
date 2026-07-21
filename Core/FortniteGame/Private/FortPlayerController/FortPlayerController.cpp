@@ -11,6 +11,7 @@
 #include "FortniteGame/Public/FortWeapon/FortWeapon.h"
 #include "FortniteGame/Public/FortItem/FortWorldItem.h"
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
+#include "FortniteGame/Public/Events/Events.h"
 #include "FortniteGame/Public/FortItem/FortItemEntry.h"
 #include "FortniteGame/Public/Info/FortRegisteredPlayerInfo.h"
 #include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
@@ -176,6 +177,7 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 		This->ClientMessage("DumpActorsWithClass <ClassName> - Lists all actors of a class with their locations.");
 		This->ClientMessage("DumpAircrafts - Dumps the aircrafts in the gamestate.");
 		This->ClientMessage("DestroyTarget - Destroys the actor under the crosshair.");
+		This->ClientMessage("StartEvent - Starts this version's live event.");
 		This->ClientMessage("-- QuickBars --");
 		This->ClientMessage("SpawnQuickBars / DestroyQuickBars / DumpQuickBars - Manage the player's quickbars.");
 		This->ClientMessage("-- Fun --");
@@ -736,6 +738,16 @@ void AFortPlayerController::ServerCheat(AFortPlayerController* This, FString& Ms
 			Message += " (" + std::to_string(Matches) + " matches, teleported to first)";
 		}
 		This->ClientMessage(Message);
+
+		return;
+	}
+	else if (Parser.IsCommand("StartEvent")) {
+		if (Events::StartEvent()) {
+			This->ClientMessage("Event started!");
+		}
+		else {
+			This->ClientMessage("Failed to start event, check the log.");
+		}
 
 		return;
 	}
