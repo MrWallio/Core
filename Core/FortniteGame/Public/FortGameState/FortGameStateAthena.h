@@ -11,6 +11,8 @@ class AFortAthenaPlaylistBase;
 class UFortPlaylistAthena;
 class AFortAthenaAircraft;
 class UCurveTable;
+class AFortPlayerState;
+class AFortSafeZoneIndicator;
 
 class AFortGameStateAthena : public AFortGameStateZone {
 public:
@@ -35,6 +37,7 @@ public:
 	DefineUProperty(TArray<AFortAthenaAircraft*>, Aircrafts);
 	DefineUProperty(uint8, CachedSafeZoneStartUp);
 	DefineUProperty(bool, bIsLargeTeamGame);
+	DefineUProperty(AFortSafeZoneIndicator*, SafeZoneIndicator);
 public:
 	void OnRep_CurrentPlaylistId();
 
@@ -64,6 +67,8 @@ public:
 	UDataTable* GetLootPackages();
 
 	UCurveTable* GetGameData();
+
+	UFortPlaylistAthena* GetPlaylist();
 
 	static void Hook();
 };

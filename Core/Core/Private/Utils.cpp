@@ -405,8 +405,6 @@ bool Utils::SetupDedicatedServer(FCoreConfig& Config) {
 		return false;
 	}
 
-	RemoveLocalPlayer();
-
 	FString TravelURL = "/Game/Maps/FortniteEmptyDedicated";
 
 	UFortGameInstance* FortGameInstance = World->OwningGameInstance->Cast<UFortGameInstance>();

@@ -154,6 +154,10 @@ void AFortPlayerControllerZone::ClientOnPawnDied_Implementation(FFortPlayerDeath
 		return;
 	}
 
+	FVector PawnDeathLocation = Pawn ? Pawn->K2_GetActorLocation() : *FVector::Allocate();
+
+	PlayerStateZone->PawnDeathLocation = PawnDeathLocation;
+
 	UFortAbilitySystemComponent* AbilitySystemComponent = PlayerStateZone->AbilitySystemComponent;
 	if (AbilitySystemComponent) {
 		AbilitySystemComponent->EndDBNOAbilities();

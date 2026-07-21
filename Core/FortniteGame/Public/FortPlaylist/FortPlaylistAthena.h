@@ -2,6 +2,7 @@
 #include "pch.h"
 
 #include "FortPlaylist.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 class UFortPlaylistAthena : public UFortPlaylist {
 public:
@@ -9,4 +10,5 @@ public:
 
 	DefineUProperty(uint8, SafeZoneStartUp);
 	DefineUProperty(bool, bIsLargeTeamGame);
+	DefineUProperty(EAthenaRespawnType, RespawnType);
 };

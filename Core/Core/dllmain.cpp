@@ -53,6 +53,8 @@ DWORD Main(LPVOID)
 
     Finder::FindFMsg_Logf();
 
+    GCanUseEngineLog = true;
+
     Utils::InitConsole(Config);
 
     Finder::FindGUObjectArray();
@@ -61,13 +63,18 @@ DWORD Main(LPVOID)
     Finder::FindGEngine();
     Finder::FindGWorld();
 
-    GCanUseEngineLog = true;
-
     GEngine = reinterpret_cast<UEngine**>(ImageBase + ServerOffsets::GEngine);
     GWorld = reinterpret_cast<UWorld**>(ImageBase + ServerOffsets::GWorld);
     CoreGlobals::Init();
 
     Finder::SetupCoreOffsets();
+
+    if (!Config.bIsClient) {
+        UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), "open FortniteEmptyDedicated", nullptr);
+    }
+    if (!Config.bIsClient || !Config.bListenServer) {
+        Utils::RemoveLocalPlayer();
+    }
 
     if (Config.bIsClient) {
         Client::Init(Config);
@@ -101,28 +108,6 @@ DWORD Main(LPVOID)
         Utils::DumpClassProperties("NetDriver"); // DEBUG
 
         Utils::Hook();
-
-        Sleep(3000);
-
-        if (!Utils::SetupDedicatedServer(Config)) {
-            Log("Failed to setup dedicated server!");
-        }
-
-        while (true) {
-            UWorld* World = UWorld::GetWorld();
-            if (World && World->AuthorityGameMode && World->GetName().ToString() != "Frontend") {
-                AGameMode* GameMode = World->AuthorityGameMode->Cast<AGameMode>();
-                if (GameMode && GameMode->MatchState == MatchState::InProgress) {
-                    break;
-                }
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-
-		if (!Config.bListenServer) {
-            Utils::RemoveLocalPlayer();
-		}
 
 		if (!Utils::LoadWorld(Config)) {
 			Log("Failed to load world!");

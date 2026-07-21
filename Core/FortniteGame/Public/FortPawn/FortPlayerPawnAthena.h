@@ -6,4 +6,6 @@
 class AFortPlayerPawnAthena : public AFortPlayerPawn {
 public:
 	DefineUnrealClass(AFortPlayerPawnAthena);
+
+	DefineUProperty(float, LastFallDistance);
 };

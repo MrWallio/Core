@@ -18,6 +18,7 @@ public:
 	DefineUProperty(UFortHeroType*, HeroType);
 	DefineUProperty(FName, HeroSquadId);
 	DefineUProperty(int32, WorldPlayerId);
+	DefineUProperty(FVector, PawnDeathLocation);
 public:
 	void OnRep_bHasStartedPlaying();
 

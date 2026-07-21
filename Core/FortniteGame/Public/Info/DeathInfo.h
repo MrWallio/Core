@@ -16,6 +16,10 @@ public:
 	DefineStructProperty(AFortPlayerStateAthena*, FinisherOrDowner);
 	DefineStructProperty(bool, bDBNO);
 	DefineStructProperty(uint8, DeathCause);
+	DefineStructProperty(float, Distance);
+	DefineStructProperty(FVector, DeathLocation);
+	DefineStructProperty(bool, bInitialized);
+	DefineStructProperty(int32, DeathCircumstance);
 public:
 	uint8 Padding[0x50];
 };

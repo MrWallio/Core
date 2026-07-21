@@ -383,6 +383,7 @@
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveInfo.h" />
     <ClInclude Include="FortniteGame\Public\FortQuest\FortQuestObjectiveStatTableRow.h" />
     <ClInclude Include="FortniteGame\Public\FortSafeZone\FortSafeZoneDefinition.h" />
+    <ClInclude Include="FortniteGame\Public\FortSafeZone\FortSafeZoneIndicator.h" />
     <ClInclude Include="FortniteGame\Public\FortSet\FortAttributeSet.h" />
     <ClInclude Include="FortniteGame\Public\FortSet\FortBuildingActorSet.h" />
     <ClInclude Include="FortniteGame\Public\FortManager\FortCheatManager.h" />
@@ -529,6 +530,7 @@
     <ClCompile Include="FortniteGame\Private\AI\FortAIGoalManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Asset\FortAssetManager.cpp" />
     <ClCompile Include="FortniteGame\Private\Athena\FortAthenaMapInfo.cpp" />
+    <ClCompile Include="FortniteGame\Private\FortSafeZone\FortSafeZoneIndicator.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BGAConsumableSpawner.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingActor.cpp" />
     <ClCompile Include="FortniteGame\Private\BuildingActor\BuildingContainer.cpp" />

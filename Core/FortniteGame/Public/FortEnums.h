@@ -396,3 +396,12 @@ public:
 	DefineEnumProperty(DestroyOnDrop);
 	DefineEnumProperty(DropAsPickupDestroyOnEmpty);
 };
+
+class EAthenaRespawnType {
+public:
+	DefineUnrealEnum(EAthenaRespawnType);
+
+	DefineEnumProperty(None);
+	DefineEnumProperty(InfiniteRespawn);
+	DefineEnumProperty(InfiniteRespawnExceptStorm);
+};
