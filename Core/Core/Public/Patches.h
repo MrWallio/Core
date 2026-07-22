@@ -32,8 +32,11 @@ public:
 			}
 		}*/
 
-		if (Version::Fortnite_Version >= 3.5 && Version::Fortnite_Version <= 4.5) {
+		if (Version::Fortnite_Version >= 3.5 && Version::Fortnite_Version <= 5.0) {
 			uintptr_t Patch8 = Memcury::Scanner::FindPattern("48 8B C4 57 48 81 EC ? ? ? ? 4C 8B 82").Get();
+			if (!Patch8) {
+				Patch8 = Memcury::Scanner::FindPattern("48 8B C4 48 89 58 ? 48 89 70 ? 57 48 81 EC ? ? ? ? 48 8B BA").Get();
+			}
 			if (Patch8) {
 				MH_CreateHook((LPVOID)Patch8, True, nullptr);
 				Log("Patched: " + std::to_string(Patch8 - ImageBase) + " with True"); // bool AFortPoiVolume::OverlapsPawn

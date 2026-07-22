@@ -870,23 +870,12 @@ uintptr_t Finder::FindStepExplicitProperty() {
 uintptr_t Finder::FindFMemory_Free() {
 	if (ServerOffsets::FMemory_Free)
 		return ServerOffsets::FMemory_Free;
+	uintptr_t Addr = 0;
 
-	int skipped = 0;
+	Addr = Memcury::Scanner::FindPattern("48 85 C9 74 ? 53 48 83 EC ? 48 8B D9 48 8B 0D").Get();
 
-	auto straddr = Memcury::Scanner::FindStringRef(L"GiveAbilityAndActivateOnce called on ability %s on the client, not allowed!").Get();
-
-	for (int i = 0; i < 100; i++)
-	{
-		uintptr_t Addy = straddr + i;
-		if (*(uint8*)(Addy) == 0xE8)
-		{
-			if (skipped == 1)
-			{
-				ServerOffsets::FMemory_Free = Utils::GetCallDestination(Addy) - ImageBase;
-				break;
-			}
-			skipped++;
-		}
+	if (Addr) {
+		ServerOffsets::FMemory_Free = Addr - ImageBase;
 	}
 
 	Log("FMemory_Free found at: 0x" + std::format("{:X}", ServerOffsets::FMemory_Free));
@@ -898,7 +887,6 @@ uintptr_t Finder::FindFMemory_Realloc() {
 		return ServerOffsets::FMemory_Realloc;
 	static uintptr_t Addr = 0;
 
-	// 12.41 sig
 	Addr = Memcury::Scanner::FindPattern("48 89 5C 24 08 48 89 74 24 10 57 48 83 EC ? 48 8B F1 41 8B D8 48 8B 0D ? ? ? ?").Get();
 
 	if (Addr) {
@@ -1423,17 +1411,22 @@ uintptr_t Finder::FindUObject_PostLoadVFT() {
 	if (ServerOffsets::UObject_PostLoadVFT)
 		return ServerOffsets::UObject_PostLoadVFT;
 	void** VFT = ABuildingSMActor::StaticClass()->GetDefaultObject()->VTable;
+
+	if (!FindABuildingSMActor_PostLoad())
+		return ServerOffsets::UObject_PostLoadVFT;
+
+	uintptr_t Addr = FindABuildingSMActor_PostLoad() + ImageBase;
 	
 	for (int i = 0; i < 2048; i++)
 	{
-		if (VFT[i] == (void*)(FindABuildingSMActor_PostLoad() + ImageBase))
+		if (VFT[i] == (void*)(Addr))
 		{
 			ServerOffsets::UObject_PostLoadVFT = i;
 			break;
 		}
 	}
 
-	Log("UObject::PostLoad found at: 0x" + std::format("{:X}", ServerOffsets::UObject_PostLoadVFT));
+	Log("UObject_PostLoadVFT found at: 0x" + std::format("{:X}", ServerOffsets::UObject_PostLoadVFT));
 	return ServerOffsets::UObject_PostLoadVFT;
 }
 
@@ -3017,6 +3010,9 @@ uintptr_t Finder::FindAGameMode_AddInactivePlayer() {
 	static uintptr_t Addr = 0;
 
 	Addr = Memcury::Scanner::FindPattern("40 53 56 57 41 54 48 83 EC ? ? ? ? 49 8B F0").Get();
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("48 89 4C 24 ? 53 56 57 41 56 48 83 EC ? ? ? ? 49 8B F0").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::AGameMode_AddInactivePlayer = Addr - ImageBase;
@@ -4130,6 +4126,9 @@ uintptr_t Finder::FindFURL_ToString() {
 	Addr = Memcury::Scanner::FindPattern("40 53 57 41 57 48 83 EC ? 45 33 FF 48 89 6C 24").Get();
 	if (!Addr) {
 		Addr = Memcury::Scanner::FindPattern("40 53 55 56 41 55 41 56 48 83 EC ? 45 33 ED").Get();
+	}
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 41 54 41 55 41 56 41 57 48 83 EC ? 45 33 ED 4C 8D 3D").Get();
 	}
 
 	if (Addr) {
@@ -6230,24 +6229,19 @@ uintptr_t Finder::FindUEngine_CreateNetDriver_Local() {
 		return ServerOffsets::UEngine_CreateNetDriver_Local;
 	static bool bInitialized = false;
 
-	Addr = Memcury::Scanner::FindPattern("4C 89 44 24 ? 53 56 57 41 56 41 57 48 81 EC ? ? ? ? 48 63 81").Get();
-	if (!Addr) {
-		Addr = Memcury::Scanner::FindPattern("4C 89 44 24 ? 53 56 57 41 56 41 57 48 81 EC ? ? ? ? 48 63 81").Get();
+	// Anchor on the failure string, which lives inside the real
+	// CreateNetDriver(UEngine*, FWorldContext&, FName) overload that adds the
+	// driver to the passed context. The byte pattern below matched the
+	// CreateNetDriver(UEngine*, UWorld*, FName) wrapper on 5.0, which re-derives
+	// the world context internally, fails ("invalid context object"), and
+	// orphans the driver in a throwaway context.
+	auto StringRef = Memcury::Scanner::FindStringRef(L"CreateNamedNetDriver failed to create driver from definition %s");
+	if (StringRef.IsValid()) {
+		Addr = StringRef.FindFunctionStart().Get();
 	}
 
 	if (!Addr) {
-		uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"CreateNamedNetDriver failed to create driver from definition %s").Get();
-		if (StringAddr)
-		{
-			for (int i = 0; i < 1024; i++)
-			{
-				auto Ptr = (uint8_t*)(StringAddr - i);
-				if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C) {
-					Addr = uint64_t(Ptr);
-					break;
-				}
-			}
-		}
+		Addr = Memcury::Scanner::FindPattern("4C 89 44 24 ? 53 56 57 41 56 41 57 48 81 EC ? ? ? ? 48 63 81").Get();
 	}
 	
 	if (Addr) {
@@ -7348,24 +7342,9 @@ uintptr_t Finder::FindUActorChannel_SetChannelActor() {
 	if (ServerOffsets::UActorChannel_SetChannelActor)
 		return ServerOffsets::UActorChannel_SetChannelActor;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"UActorChannel::SetChannelActor: actor %s is not in the same level collection as the net driver (%s)!").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x4C && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xDC) {
-				Addr = uint64_t(Ptr);
-				break;
-			}
-			else if (*Ptr == 0x4C && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
-				Addr = uint64_t(Ptr);
-				break;
-			}
-			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x8B && *(Ptr + 2) == 0xC4) {
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"UActorChannel::SetChannelActor: actor %s is not in the same level collection as the net driver (%s)!");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 
 	if (!Addr) {
@@ -8277,34 +8256,6 @@ uintptr_t Finder::FindAFortGameMode_FinishWorldInitializationVFT() {
 
 	Log("AFortGameMode_FinishWorldInitializationVFT found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameMode_FinishWorldInitializationVFT));
 	return ServerOffsets::AFortGameMode_FinishWorldInitializationVFT;
-}
-
-uintptr_t Finder::FindAFortGameStateAthena_SetCurrentPlaylistId() {
-	static uintptr_t Addr = 0;
-	if (ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId)
-		return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
-	static bool bInitialized = false;
-	if (bInitialized)
-		return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
-	
-	auto StringAddr = Memcury::Scanner::FindStringRef(L"PLAYLIST: Playlist Object found in AFortGameStateAthena::SetCurrentPlaylistId() PlaylistName is %s (Server Only)");
-	if (!StringAddr.IsValid()) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"PLAYLIST: Playlist name was already set, Applying property overrides.");
-	}
-	if (StringAddr.IsValid()) {
-		Addr = StringAddr.FindFunctionStart().Get();
-	}
-	else {
-		return 0;
-	}
-
-	if (Addr) {
-		ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId = Addr - ImageBase;
-	}
-
-	bInitialized = true;
-	Log("AFortGameStateAthena_SetCurrentPlaylistId found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId));
-	return ServerOffsets::AFortGameStateAthena_SetCurrentPlaylistId;
 }
 
 uintptr_t Finder::FindAFortPlayerController_OnReadyToStartMatch() {
@@ -9398,22 +9349,9 @@ uintptr_t Finder::FindAFortGameSessionDedicated_FinalizeCreation() {
 		return ServerOffsets::AFortGameSessionDedicated_FinalizeCreation;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Dedicated Server Ready!").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x55)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-			else if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"Dedicated Server Ready!");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 
 	if (Addr) {
@@ -9427,29 +9365,22 @@ uintptr_t Finder::FindAFortGameSessionDedicated_FinalizeCreation() {
 uintptr_t Finder::FindAFortGameSessionDedicated_FinalizeCreationPatch1() {
 	if (ServerOffsets::AFortGameSessionDedicated_FinalizeCreationPatch1)
 		return ServerOffsets::AFortGameSessionDedicated_FinalizeCreationPatch1;
-	uintptr_t Addr = 0;
-	uintptr_t FinalizeCreationAddr = FindAFortGameSessionDedicated_FinalizeCreation() + ImageBase;
 
-	for (int i = 0; i < 512; i++)
-	{
-		auto Ptr = (uint8_t*)(FinalizeCreationAddr + i);
-		if (*Ptr == 0x0F && *(Ptr + 1) == 0x84 && *(Ptr + 2) == 0x9C)
+	uintptr_t Addr = 0;
+
+	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Dedicated Server Ready!").Get();
+	if (StringAddr) {
+		for (int i = 0; i < 1024; i++)
 		{
-			Addr = uint64_t(Ptr + 1);
-			break;
-		}
-		else if (*Ptr == 0x0F && *(Ptr + 1) == 0x84 && *(Ptr + 2) == 0x97)
-		{
-			Addr = uint64_t(Ptr + 1);
-			break;
-		}
-		else if (*Ptr == 0x0F && *(Ptr + 1) == 0x84 && *(Ptr + 2) == 0x9E)
-		{
-			Addr = uint64_t(Ptr + 1);
-			break;
+			auto Ptr = (uint8_t*)(StringAddr - i);
+			if (*Ptr == 0x0F)
+			{
+				Addr = uint64_t(Ptr);
+				break;
+			}
 		}
 	}
-	
+
 	if (Addr) {
 		ServerOffsets::AFortGameSessionDedicated_FinalizeCreationPatch1 = Addr - ImageBase;
 	}
@@ -9482,17 +9413,9 @@ uintptr_t Finder::FindAFortPlayerController_CanAffordToPlaceBuildableClass() {
 		return ServerOffsets::AFortPlayerController_CanAffordToPlaceBuildableClass;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Resource not found! Resource Type is %i, might be invalid").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x57)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"Resource not found! Resource Type is %i, might be invalid");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 
 	if (Addr) {
@@ -10274,21 +10197,13 @@ uintptr_t Finder::FindUGameplayAbility_CanActivateAbility() {
 		return ServerOffsets::UGameplayAbility_CanActivateAbility;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"CanActivateAbility called with invalid Handle").Get();
-	if (!StringAddr) {
-		StringAddr = Memcury::Scanner::FindStringRef(L"CanActivateAbility %s failed, blueprint refused").Get();
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"CanActivateAbility called with invalid Handle");
+	if (!StringAddr.IsValid()) {
+		StringAddr = Memcury::Scanner::FindStringRef(L"CanActivateAbility %s failed, blueprint refused");
 	}
 
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x89 && *(Ptr + 1) == 0x54)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 	
 	if (Addr) {
@@ -10371,17 +10286,9 @@ uintptr_t Finder::FindABuildingSMActor_PostLoad() {
 		return ServerOffsets::ABuildingSMActor_PostLoad;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"Building actor %s has no StaticMeshComponent!").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0x89 && *(Ptr + 2) == 0x5C)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"Building actor %s has no StaticMeshComponent!");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 
 	if (Addr) {
@@ -10431,17 +10338,9 @@ uintptr_t Finder::FindAFortGameSessionDedicated_OnAllPlayersUnregistered() {
 		return ServerOffsets::AFortGameSessionDedicated_OnAllPlayersUnregistered;
 	uintptr_t Addr = 0;
 
-	uintptr_t StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameSessionDedicated::OnAllPlayersUnregistered: Completing restart of dedicated server").Get();
-	if (StringAddr) {
-		for (int i = 0; i < 1024; i++)
-		{
-			auto Ptr = (uint8_t*)(StringAddr - i);
-			if (*Ptr == 0x40 && *(Ptr + 1) == 0x53)
-			{
-				Addr = uint64_t(Ptr);
-				break;
-			}
-		}
+	auto StringAddr = Memcury::Scanner::FindStringRef(L"AFortGameSessionDedicated::OnAllPlayersUnregistered: Completing restart of dedicated server");
+	if (StringAddr.IsValid()) {
+		Addr = StringAddr.FindFunctionStart().Get();
 	}
 
 	if (Addr) {
@@ -10520,10 +10419,15 @@ uintptr_t Finder::FindAFortGameSessionDedicated_OnServerConfigurationRequestVFT(
 	if (ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT)
 		return ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT;
 	void** VFT = AFortGameSessionDedicated::StaticClass()->GetDefaultObject()->VTable;
+
+	if (!FindAFortGameSessionDedicated_OnServerConfigurationRequest())
+		return ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT;
+
+	uintptr_t Addr = FindAFortGameSessionDedicated_OnServerConfigurationRequest() + ImageBase;
 	
 	for (int i = 0; i < 2048; i++)
 	{
-		if (VFT[i] == (void*)(FindAFortGameSessionDedicated_OnServerConfigurationRequest() + ImageBase))
+		if (VFT[i] == (void*)(Addr))
 		{
 			ServerOffsets::AFortGameSessionDedicated_OnServerConfigurationRequestVFT = i;
 			break;
@@ -11072,6 +10976,50 @@ uintptr_t Finder::FindABuildingTrap_FinishTrigger() {
 	return ServerOffsets::ABuildingTrap_FinishTrigger;
 }
 
+uintptr_t Finder::FindAFortGameStateAthena_LoadCurrentPlaylistData() {
+	if (ServerOffsets::AFortGameStateAthena_LoadCurrentPlaylistData)
+		return ServerOffsets::AFortGameStateAthena_LoadCurrentPlaylistData;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortGameStateAthena_LoadCurrentPlaylistData;
+
+	auto StringRef = Memcury::Scanner::FindStringRef(L"PLAYLIST: Playlist Object is loading its assets in AFortGameStateAthena::LoadCurrentPlaylistData(), PlaylistName is %s (Server Side)");
+	if (!StringRef.IsValid()) {
+		StringRef = Memcury::Scanner::FindStringRef(L"PLAYLIST: Playlist Object is loading its assets in AFortGameStateAthena::LoadCurrentPlaylistData(), PlaylistName is %s (Client Side)");
+	}
+	if (StringRef.IsValid()) {
+		Addr = StringRef.FindFunctionStart().Get();
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameStateAthena_LoadCurrentPlaylistData = Addr - ImageBase;
+	}
+
+	bInitialized = true;
+	Log("AFortGameStateAthena_LoadCurrentPlaylistData found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameStateAthena_LoadCurrentPlaylistData));
+	return ServerOffsets::AFortGameStateAthena_LoadCurrentPlaylistData;
+}
+
+uintptr_t Finder::FindAFortGameStateAthena_InitializePlaylistDataPreDataLoad() {
+	if (ServerOffsets::AFortGameStateAthena_InitializePlaylistDataPreDataLoad)
+		return ServerOffsets::AFortGameStateAthena_InitializePlaylistDataPreDataLoad;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortGameStateAthena_InitializePlaylistDataPreDataLoad;
+
+	Addr = Memcury::Scanner::FindPattern("40 53 48 83 EC ? 48 8B D9 48 8B 89 ? ? ? ? 48 85 C9 74 ? 80 BB").Get();
+
+	if (Addr) {
+		ServerOffsets::AFortGameStateAthena_InitializePlaylistDataPreDataLoad = Addr - ImageBase;
+	}
+
+	bInitialized = true;
+	Log("AFortGameStateAthena_InitializePlaylistDataPreDataLoad found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameStateAthena_InitializePlaylistDataPreDataLoad));
+	return ServerOffsets::AFortGameStateAthena_InitializePlaylistDataPreDataLoad;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -11471,8 +11419,6 @@ void Finder::SetupOffsets() {
 	FindAFortGameMode_SetCurrentPlaylistNameVFT();
 	FindAFortGameMode_SetCurrentPlaylistIdVFT();
 
-	FindAFortGameStateAthena_SetCurrentPlaylistId();
-
 	FindAFortGameModeAthena_OnGivenMatchAssignmentVFT();
 
 	FindStaticConstructObject_Internal();
@@ -11487,6 +11433,9 @@ void Finder::SetupOffsets() {
 
 	FindAGameMode_HandleMatchHasEndedVFT();
 	FindAGameMode_HandleMatchHasStartedVFT();
+
+	FindAFortGameStateAthena_LoadCurrentPlaylistData();
+	FindAFortGameStateAthena_InitializePlaylistDataPreDataLoad();
 
 	return;
 }

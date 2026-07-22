@@ -11,6 +11,7 @@
 #include "FortniteGame/Public/FortGameState/FortGameStateAthena.h"
 #include "FortniteGame/Public/AI/FortAIDirector.h"
 #include "FortniteGame/Public/AI/FortAIGoalManager.h"
+#include "FortniteGame/Public/AI/AthenaAISettings.h"
 #include "FortniteGame/Public/FortInventory/FortInventory.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 #include "FortniteGame/Public/FortInventory/FortQuickBarsAthena.h"
@@ -54,6 +55,13 @@ APawn* AFortGameModeAthena::SpawnDefaultPawnFor(AFortGameModeAthena* This, ACont
 
 	Log("AFortGameModeAthena::SpawnDefaultPawnFor: Spawned default pawn. NewPlayer=" + (NewPlayer ? NewPlayer->GetName().ToString() : "None") + " Pawn=" + (Pawn ? Pawn->GetName().ToString() : "None"));
 	return Pawn;
+}
+
+void AFortGameModeAthena::OverrideAISettings(UAthenaAISettings* NewAISettings) {
+	if (!NewAISettings)
+		return;
+
+	AISettings = NewAISettings;
 }
 
 bool AFortGameModeAthena::SetupPlaylist() {

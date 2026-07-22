@@ -871,8 +871,6 @@ public:
 
 	static uintptr_t FindAFortGameMode_FinishWorldInitializationVFT();
 
-	static uintptr_t FindAFortGameStateAthena_SetCurrentPlaylistId();
-
 	static uintptr_t FindAFortPlayerController_OnReadyToStartMatch();
 
 	static uintptr_t FindAFortPlayerControllerZone_OnReadyToStartMatch();
@@ -1094,6 +1092,10 @@ public:
 	static uintptr_t FindAFortMission_CreateEncounterSequence();
 
 	static uintptr_t FindABuildingTrap_FinishTrigger();
+
+	static uintptr_t FindAFortGameStateAthena_LoadCurrentPlaylistData();
+
+	static uintptr_t FindAFortGameStateAthena_InitializePlaylistDataPreDataLoad();
 public:
 	static void SetupCoreOffsets();
 

@@ -405,3 +405,11 @@ public:
 	DefineEnumProperty(InfiniteRespawn);
 	DefineEnumProperty(InfiniteRespawnExceptStorm);
 };
+
+class EAirCraftBehavior {
+public:
+	DefineUnrealEnum(EAirCraftBehavior);
+
+	DefineEnumProperty(Default);
+	DefineEnumProperty(OpposingAirCraftForEachTeam);
+};

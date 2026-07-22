@@ -3,6 +3,7 @@
 
 #include "FortGameStateZone.h"
 #include "FortniteGame/Public/FortPlaylist/PlaylistPropertyArray.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 class AFortAthenaMapInfo;
 class APlayerState;
@@ -33,10 +34,14 @@ public:
 	DefineUProperty(int32, CurrentPlaylistId);
 	DefineUProperty(UAthenaBattleBusItemDefinition*, DefaultBattleBus);
 	DefineUProperty(AFortAthenaPlaylistBase*, FortAthenaPlaylistCDO);
-	DefineUProperty(uint8, AirCraftBehavior);
+	DefineUProperty(EAirCraftBehavior, AirCraftBehavior);
 	DefineUProperty(TArray<AFortAthenaAircraft*>, Aircrafts);
 	DefineUProperty(uint8, CachedSafeZoneStartUp);
 	DefineUProperty(bool, bIsLargeTeamGame);
+	DefineUProperty(bool, bStormReachedFinalPosition);
+	DefineUProperty(bool, bDrawSafeZoneFinalPosIconEnabled);
+	DefineUProperty(bool, bPlaylistDataIsLoaded);
+	DefineUProperty(bool, bPlaylistDataIsActivelyLoading);
 	DefineUProperty(AFortSafeZoneIndicator*, SafeZoneIndicator);
 public:
 	void OnRep_CurrentPlaylistId();
@@ -69,6 +74,10 @@ public:
 	UCurveTable* GetGameData();
 
 	UFortPlaylistAthena* GetPlaylist();
+
+	void LoadCurrentPlaylistData();
+
+	void InitializePlaylistDataPreDataLoad();
 
 	static void Hook();
 };

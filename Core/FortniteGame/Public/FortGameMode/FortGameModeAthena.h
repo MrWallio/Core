@@ -13,6 +13,7 @@ class AFortWorldManager;
 class UFortWeaponItemDefinition;
 class AFortAthenaPlaylistBase;
 class UAthenaBattleBusItemDefinition;
+class UAthenaAISettings;
 
 class AFortGameModeAthena : public AFortGamePvPBase {
 public:
@@ -30,7 +31,10 @@ public:
 	DefineUProperty(bool, bAllowSpectateAfterDeath);
 	DefineUProperty(bool, bAlwaysDBNO);
 	DefineUProperty(AFortAthenaPlaylistBase*, FortAthenaPlaylist);
+	DefineUProperty(UAthenaAISettings*, AISettings);
 public:
+	void OverrideAISettings(UAthenaAISettings* NewAISettings);
+
 	static inline bool (*ReadyToStartMatchOG)(AFortGameModeAthena* This);
 	static bool ReadyToStartMatch(AFortGameModeAthena* This);
 

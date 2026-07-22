@@ -1771,13 +1771,23 @@ inline uintptr_t FindWideString(const wchar_t* target)
 // A trivial `return nullptr` stub body (the shared, folded target).
 inline bool IsReturnNullStub(uintptr_t Addr)
 {
-    if (!Addr)
+    // Callers resolve this from arbitrary E8 bytes, so the target is frequently garbage that points
+    // outside the image. Everything below dereferences Addr, so bounds-check it against .text first.
+    static const uintptr_t TextStart = Memcury::PE::Section::GetSection(".text").GetSectionStart().Get();
+    static const uintptr_t TextEnd = Memcury::PE::Section::GetSection(".text").GetSectionEnd().Get();
+
+    auto IsReadableCode = [](uintptr_t A) -> bool
+    {
+        return A >= TextStart && (A + 0x10) <= TextEnd;
+    };
+
+    if (!IsReadableCode(Addr))
         return false;
 
     // Follow leading jmp thunks. Incremental-linked / hot-patched builds (e.g. 3.6) don't call the folded
     // body directly -- every call goes through an `EB rel8` / `E9 rel32` jump thunk (sometimes `EB 01 CC`,
     // a short jump over an int3 pad, then the real `E9`). Chase those to the actual body before matching.
-    for (int hops = 0; Addr && hops < 4; hops++)
+    for (int hops = 0; hops < 4; hops++)
     {
         auto* j = reinterpret_cast<const uint8_t*>(Addr);
         if (j[0] == 0xE9)
@@ -1786,9 +1796,10 @@ inline bool IsReturnNullStub(uintptr_t Addr)
             Addr = Addr + 2 + *reinterpret_cast<const int8_t*>(Addr + 1);
         else
             break;
+
+        if (!IsReadableCode(Addr))
+            return false;
     }
-    if (!Addr)
-        return false;
 
     auto b = reinterpret_cast<const uint8_t*>(Addr);
 

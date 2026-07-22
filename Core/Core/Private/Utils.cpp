@@ -285,7 +285,7 @@ FString Utils::BuildTravelURL(FString MapName, std::vector<std::pair<std::string
 	UWorld* World = (UWorld*)FUObjectArray::FindObjectFast(MapNameStr);
 	std::string URL = "";
 	if (!World) {
-		Log("Utils::BuildTravelURL: World not found: " + MapNameStr);
+		//Log("Utils::BuildTravelURL: World not found: " + MapNameStr);
 		URL = MapNameStr;
 	}
 	else {

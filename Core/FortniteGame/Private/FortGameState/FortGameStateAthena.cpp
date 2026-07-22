@@ -5,7 +5,9 @@
 #include "FortniteGame/Public/FortHero/FortHeroSpecialization.h"
 #include "FortniteGame/Public/FortHero/FortHeroType.h"
 #include "FortniteGame/Public/FortPlaylist/FortPlaylistAthena.h"
+#include "FortniteGame/Public/FortPlaylist/FortPlaylistManager.h"
 #include "FortniteGame/Public/FortPlayerState/FortPlayerStateAthena.h"
+#include "FortniteGame/Public/FortGameMode/FortGameModeAthena.h"
 
 void AFortGameStateAthena::OnRep_CurrentPlaylistId()
 {
@@ -28,13 +30,40 @@ void AFortGameStateAthena::UpdatePlaylistDependentData() {
 }
 
 void AFortGameStateAthena::SetCurrentPlaylistId(int InPlaylistId) {
-	if (Finder::FindAFortGameStateAthena_SetCurrentPlaylistId()) {
-		void (*SetCurrentPlaylistIdInternal)(AFortGameStateAthena* This, int InPlaylistId) = decltype(SetCurrentPlaylistIdInternal)(ImageBase + Finder::FindAFortGameStateAthena_SetCurrentPlaylistId());
-		SetCurrentPlaylistIdInternal(this, InPlaylistId);
+	if (!UFortPlaylistAthena::GetDefaultObj()->_HasAirCraftBehavior()) {
+		if (InPlaylistId == 50 || InPlaylistId == 11)
+			AirCraftBehavior = EAirCraftBehavior::GetOpposingAirCraftForEachTeam();
+
+		bDrawSafeZoneFinalPosIconEnabled = (InPlaylistId == 11 || InPlaylistId == 26 || InPlaylistId == 50);
 	}
-	else {
-		CurrentPlaylistId = InPlaylistId;
-		OnRep_CurrentPlaylistId();
+
+	bStormReachedFinalPosition = false;
+
+	if (CurrentPlaylistId == InPlaylistId && (bPlaylistDataIsLoaded || bPlaylistDataIsActivelyLoading))
+		return;
+
+	CurrentPlaylistId = InPlaylistId;
+
+	UFortPlaylistManager* PlaylistManager = UFortPlaylistManager::Get();
+	if (!PlaylistManager)
+		return;
+
+	UFortPlaylistAthena* Playlist = PlaylistManager->GetPlaylist(InPlaylistId);
+	if (Playlist) {
+		CurrentPlaylistData = Playlist;
+
+		if (Playlist->_HasAirCraftBehavior())
+			AirCraftBehavior = Playlist->AirCraftBehavior;
+
+		if (Playlist->AISettings) {
+			if (AFortGameModeAthena* GameMode = GetWorld()->AuthorityGameMode->Cast<AFortGameModeAthena>())
+				GameMode->OverrideAISettings(Playlist->AISettings);
+		}
+
+		TeamCount = Playlist->MaxTeamCount;
+
+		InitializePlaylistDataPreDataLoad();
+		LoadCurrentPlaylistData();
 	}
 }
 
@@ -168,6 +197,20 @@ UFortPlaylistAthena* AFortGameStateAthena::GetPlaylist() {
 	}
 
 	return nullptr;
+}
+
+void AFortGameStateAthena::LoadCurrentPlaylistData() {
+	if (Finder::FindAFortGameStateAthena_LoadCurrentPlaylistData()) {
+		void (*Fn)(AFortGameStateAthena*) = decltype(Fn)(ImageBase + Finder::FindAFortGameStateAthena_LoadCurrentPlaylistData());
+		return Fn(this);
+	}
+}
+
+void AFortGameStateAthena::InitializePlaylistDataPreDataLoad() {
+	if (Finder::FindAFortGameStateAthena_InitializePlaylistDataPreDataLoad()) {
+		void (*Fn)(AFortGameStateAthena*) = decltype(Fn)(ImageBase + Finder::FindAFortGameStateAthena_InitializePlaylistDataPreDataLoad());
+		return Fn(this);
+	}
 }
 
 void AFortGameStateAthena::Hook() {
