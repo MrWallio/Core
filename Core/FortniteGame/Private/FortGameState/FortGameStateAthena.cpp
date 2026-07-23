@@ -30,7 +30,7 @@ void AFortGameStateAthena::UpdatePlaylistDependentData() {
 }
 
 void AFortGameStateAthena::SetCurrentPlaylistId(int InPlaylistId) {
-	if (!UFortPlaylistAthena::GetDefaultObj()->_HasAirCraftBehavior()) {
+	if (!UFortPlaylistAthena::StaticClass() || !UFortPlaylistAthena::GetDefaultObj()->_HasAirCraftBehavior()) {
 		if (InPlaylistId == 50 || InPlaylistId == 11)
 			AirCraftBehavior = EAirCraftBehavior::GetOpposingAirCraftForEachTeam();
 
@@ -43,6 +43,7 @@ void AFortGameStateAthena::SetCurrentPlaylistId(int InPlaylistId) {
 		return;
 
 	CurrentPlaylistId = InPlaylistId;
+	OnRep_CurrentPlaylistId();
 
 	UFortPlaylistManager* PlaylistManager = UFortPlaylistManager::Get();
 	if (!PlaylistManager)
@@ -176,15 +177,30 @@ void AFortGameStateAthena::OnRep_Aircraft() {
 }
 
 UDataTable* AFortGameStateAthena::GetLootTierData() {
-	return GetPlaylist()->GetLootTierData();
+	UFortPlaylistAthena* Playlist = GetPlaylist();
+	if (!Playlist) {
+		return nullptr;
+	}
+
+	return Playlist->GetLootTierData();
 }
 
 UDataTable* AFortGameStateAthena::GetLootPackages() {
-	return GetPlaylist()->GetLootPackages();
+	UFortPlaylistAthena* Playlist = GetPlaylist();
+	if (!Playlist) {
+		return nullptr;
+	}
+
+	return Playlist->GetLootPackages();
 }
 
 UCurveTable* AFortGameStateAthena::GetGameData() {
-	return GetPlaylist()->GetGameData();
+	UFortPlaylistAthena* Playlist = GetPlaylist();
+	if (!Playlist) {
+		return nullptr;
+	}
+
+	return Playlist->GetGameData();
 }
 
 UFortPlaylistAthena* AFortGameStateAthena::GetPlaylist() {
