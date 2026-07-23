@@ -2705,10 +2705,6 @@ uintptr_t Finder::FindAGameSession_KickPlayerVFT() {
 	if (ServerOffsets::AGameSession_KickPlayerVFT)
 		return ServerOffsets::AGameSession_KickPlayerVFT;
 	static uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0xC9;
-	}
 	
 	if (Addr) {
 		ServerOffsets::AGameSession_KickPlayerVFT = Addr;
@@ -4029,9 +4025,6 @@ uintptr_t Finder::FindUEngine_LoadMapVFT() {
 	if (ServerOffsets::UEngine_LoadMapVFT)
 		return ServerOffsets::UEngine_LoadMapVFT;
 
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::UEngine_LoadMapVFT = 0x7E;
-	}
 
 	Log("UEngine_LoadMapVFT found at: 0x" + std::format("{:X}", ServerOffsets::UEngine_LoadMapVFT));
 	return ServerOffsets::UEngine_LoadMapVFT;
@@ -5323,10 +5316,6 @@ uintptr_t Finder::FindAGameModeBase_FinishRestartPlayerVFT() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AGameModeBase_FinishRestartPlayerVFT)
 		return ServerOffsets::AGameModeBase_FinishRestartPlayerVFT;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0xF3;
-	}
 	
 	if (Addr) {
 		ServerOffsets::AGameModeBase_FinishRestartPlayerVFT = Addr;
@@ -5364,10 +5353,6 @@ uintptr_t Finder::FindUAbilitySystemComponent_ClientActivateAbilityFailed() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::UAbilitySystemComponent_ClientActivateAbilityFailed)
 		return ServerOffsets::UAbilitySystemComponent_ClientActivateAbilityFailed;
-	
-	if (Version::Engine_Version == 4.16) {
-		Addr = Memcury::Scanner::FindPattern("89 54 24 ? 55 53 57 41 56 48 8B EC").Get();
-	}
 	
 	if (Addr) {
 		ServerOffsets::UAbilitySystemComponent_ClientActivateAbilityFailed = Addr - ImageBase;
@@ -5763,10 +5748,6 @@ uintptr_t Finder::FindAFortPlayerPawn_ForceFinishIncomingPickupsVFT() {
 	static uintptr_t Addr = 0;
 	if (ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickupsVFT)
 		return ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickupsVFT;
-	
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x194;
-	}
 
 	if (Addr) {
 		ServerOffsets::AFortPlayerPawn_ForceFinishIncomingPickupsVFT = Addr;
@@ -6741,9 +6722,6 @@ uintptr_t Finder::FindUNetDriver__LastPrioritizedActors() {
 		return ServerOffsets::UNetDriver__LastPrioritizedActors;
 
 	uintptr_t Addr = 0;
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x1A8;
-	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver__LastPrioritizedActors = Addr;
@@ -7214,10 +7192,6 @@ uintptr_t Finder::FindUNetDriver__LastRelevantActors() {
 		return ServerOffsets::UNetDriver__LastRelevantActors;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x1B4;
-	}
-
 	if (Addr) {
 		ServerOffsets::UNetDriver__LastRelevantActors = Addr;
 	}
@@ -7231,10 +7205,6 @@ uintptr_t Finder::FindUNetDriver__LastSentActors() {
 		return ServerOffsets::UNetDriver__LastSentActors;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x1C4;
-	}
-
 	if (Addr) {
 		ServerOffsets::UNetDriver__LastSentActors = Addr;
 	}
@@ -7247,10 +7217,6 @@ uintptr_t Finder::FindUNetDriver__LastNonRelevantActors() {
 	if (ServerOffsets::UNetDriver__LastNonRelevantActors)
 		return ServerOffsets::UNetDriver__LastNonRelevantActors;
 	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x1D4;
-	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver__LastNonRelevantActors = Addr;
@@ -7594,10 +7560,6 @@ uintptr_t Finder::FindUNetConnection_CleanUpVFT() {
 		return ServerOffsets::UNetConnection_CleanUpVFT;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x55;
-	}
-
 	if (Addr) {
 		ServerOffsets::UNetConnection_CleanUpVFT = Addr;
 	}
@@ -7611,10 +7573,6 @@ uintptr_t Finder::FindUNetDriver__bIsStandbyCheckingEnabled() {
 		return ServerOffsets::UNetDriver__bIsStandbyCheckingEnabled;
 
 	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x180;
-	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver__bIsStandbyCheckingEnabled = Addr;
@@ -7630,10 +7588,6 @@ uintptr_t Finder::FindUNetDriver__bHasStandbyCheatTriggered() {
 
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x181;
-	}
-
 	if (Addr) {
 		ServerOffsets::UNetDriver__bHasStandbyCheatTriggered = Addr;
 	}
@@ -7646,10 +7600,6 @@ uintptr_t Finder::FindAActor__CreationTime() {
 	if (ServerOffsets::AActor__CreationTime)
 		return ServerOffsets::AActor__CreationTime;
 	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x14C;
-	}
 
 	if (Addr) {
 		ServerOffsets::AActor__CreationTime = Addr;
@@ -7664,10 +7614,6 @@ uintptr_t Finder::FindUNetDriver__JoinInProgressStandbyWaitTime() {
 		return ServerOffsets::UNetDriver__JoinInProgressStandbyWaitTime;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x330;
-	}
-
 	if (Addr) {
 		ServerOffsets::UNetDriver__JoinInProgressStandbyWaitTime = Addr;
 	}
@@ -7680,10 +7626,6 @@ uintptr_t Finder::FindUNetConnection__LastRecvAckTime() {
 	if (ServerOffsets::UNetConnection__LastRecvAckTime)
 		return ServerOffsets::UNetConnection__LastRecvAckTime;
 	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x200;
-	}
 
 	if (Addr) {
 		ServerOffsets::UNetConnection__LastRecvAckTime = Addr;
@@ -7698,10 +7640,6 @@ uintptr_t Finder::FindUNetDriver__StandbyRxCheatTime() {
 		return ServerOffsets::UNetDriver__StandbyRxCheatTime;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x184;
-	}
-
 	if (Addr) {
 		ServerOffsets::UNetDriver__StandbyRxCheatTime = Addr;
 	}
@@ -7714,10 +7652,6 @@ uintptr_t Finder::FindUNetDriver__StandbyTxCheatTime() {
 	if (ServerOffsets::UNetDriver__StandbyTxCheatTime)
 		return ServerOffsets::UNetDriver__StandbyTxCheatTime;
 	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x188;
-	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver__StandbyTxCheatTime = Addr;
@@ -7732,10 +7666,6 @@ uintptr_t Finder::FindUNetDriver__BadPingThreshold() {
 		return ServerOffsets::UNetDriver__BadPingThreshold;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x184;
-	}
-
 	if (Addr) {
 		ServerOffsets::UNetDriver__BadPingThreshold = Addr;
 	}
@@ -7748,10 +7678,6 @@ uintptr_t Finder::FindUNetDriver__PercentMissingForRxStandby() {
 	if (ServerOffsets::UNetDriver__PercentMissingForRxStandby)
 		return ServerOffsets::UNetDriver__PercentMissingForRxStandby;
 	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x190;
-	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver__PercentMissingForRxStandby = Addr;
@@ -7766,10 +7692,6 @@ uintptr_t Finder::FindUNetDriver__PercentMissingForTxStandby() {
 		return ServerOffsets::UNetDriver__PercentMissingForTxStandby;
 	uintptr_t Addr = 0;
 
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x194;
-	}
-
 	if (Addr) {
 		ServerOffsets::UNetDriver__PercentMissingForTxStandby = Addr;
 	}
@@ -7782,10 +7704,6 @@ uintptr_t Finder::FindUNetDriver__PercentForBadPing() {
 	if (ServerOffsets::UNetDriver__PercentForBadPing)
 		return ServerOffsets::UNetDriver__PercentForBadPing;
 	uintptr_t Addr = 0;
-
-	if (Version::Engine_Version == 4.16) {
-		Addr = 0x198;
-	}
 
 	if (Addr) {
 		ServerOffsets::UNetDriver__PercentForBadPing = Addr;
@@ -7856,10 +7774,6 @@ uintptr_t Finder::FindUChannel_SendBunch() {
 uintptr_t Finder::FindUChannel_SendBunchVFT() {
 	if (ServerOffsets::UChannel_SendBunchVFT)
 		return ServerOffsets::UChannel_SendBunchVFT;
-	
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::UChannel_SendBunchVFT = 0x4F;
-	}
 
 	Log("UChannel_SendBunchVFT found at: 0x" + std::format("{:X}", ServerOffsets::UChannel_SendBunchVFT));
 	return ServerOffsets::UChannel_SendBunchVFT;
@@ -8358,10 +8272,6 @@ uintptr_t Finder::FindAActor_GetNetOwnerVFT() {
 	if (ServerOffsets::AActor_GetNetOwnerVFT)
 		return ServerOffsets::AActor_GetNetOwnerVFT;
 
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::AActor_GetNetOwnerVFT = 0x89;
-	}
-
 	Log("AActor_GetNetOwnerVFT found at: 0x" + std::format("{:X}", ServerOffsets::AActor_GetNetOwnerVFT));
 	return ServerOffsets::AActor_GetNetOwnerVFT;
 }
@@ -8457,10 +8367,6 @@ uintptr_t Finder::FindUNetConnection_GetUChildConnectionVFT() {
 	if (ServerOffsets::UNetConnection_GetUChildConnectionVFT)
 		return ServerOffsets::UNetConnection_GetUChildConnectionVFT;
 
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::UNetConnection_GetUChildConnectionVFT = 0x46;
-	}
-
 	Log("UNetConnection_GetUChildConnectionVFT found at: 0x" + std::format("{:X}", ServerOffsets::UNetConnection_GetUChildConnectionVFT));
 	return ServerOffsets::UNetConnection_GetUChildConnectionVFT;
 }
@@ -8468,10 +8374,6 @@ uintptr_t Finder::FindUNetConnection_GetUChildConnectionVFT() {
 uintptr_t Finder::FindUNetDriver_IsServerVFT() {
 	if (ServerOffsets::UNetDriver_IsServerVFT)
 		return ServerOffsets::UNetDriver_IsServerVFT;
-
-	if (Version::Engine_Version == 4.16) {
-		ServerOffsets::UNetDriver_IsServerVFT = 0x5E;
-	}
 
 	Log("UNetDriver_IsServerVFT found at: 0x" + std::format("{:X}", ServerOffsets::UNetDriver_IsServerVFT));
 	return ServerOffsets::UNetDriver_IsServerVFT;
@@ -11094,7 +10996,6 @@ void Finder::SetupOffsets() {
 	FindUObjectBase_IsValidLowLevel();
 	FindUObjectBase_IsValidLowLevelFast();
 
-	FindUObject_NeedsLoadForClientVFT();
 	FindUObject_GetWorldVFT();
 
 	FindUNetDriver__ReplicationFrame();
@@ -11124,7 +11025,6 @@ void Finder::SetupOffsets() {
 	FindUNetDriver_SetWorld();
 	FindUNetDriver_SetWorldVFT();
 	FindUNetDriver_InitListenVFT();
-	FindUNetDriver_IsServerVFT();
 	FindUNetDriver_GetNetMode();
 
 	FindUNetConnection__ActorChannels();
