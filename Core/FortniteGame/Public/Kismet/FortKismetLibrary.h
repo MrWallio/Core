@@ -149,6 +149,8 @@ public:
 
 	static ABuildingGameplayActor* SpawnBuildingGameplayActor(TSubclassOf<class ABuildingGameplayActor> BGAClass, const FTransform& Transform, class AActor* Instigator);
 
+	static bool GetSafeZoneLocation(UObject* WorldContextObject, int32 SafeZoneIndex, FVector* OutLocation);
+
 	static void Hook() {
 		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.K2_SpawnPickupInWorld", execK2_SpawnPickupInWorld);
 		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.GiveItemToInventoryOwner", execGiveItemToInventoryOwner);

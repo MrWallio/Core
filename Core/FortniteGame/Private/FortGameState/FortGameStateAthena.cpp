@@ -62,6 +62,18 @@ void AFortGameStateAthena::SetCurrentPlaylistId(int InPlaylistId) {
 			CurrentPlaylistData = Playlist;
 		}
 
+		if (_HasTeamSize()) {
+			TeamSize = Playlist->MaxTeamSize;
+		}
+
+		if (_HasTeamCount()) {
+			TeamCount = Playlist->MaxTeamCount;
+		}
+
+		if (_HasCachedSafeZoneStartUp() && Playlist->_HasSafeZoneStartUp()) {
+			CachedSafeZoneStartUp = Playlist->SafeZoneStartUp;
+		}
+
 		if (Playlist->_HasAirCraftBehavior())
 			AirCraftBehavior = Playlist->AirCraftBehavior;
 
@@ -388,6 +400,13 @@ void AFortGameStateAthena::UpdateGamePhaseStep() {
 	}
 
 	Log("AFortGameStateAthena::UpdateGamePhaseStep: GamePhaseStep -> " + std::to_string(NewStep));
+}
+
+FVector AFortGameStateAthena::GetSafeZoneCenter() {
+	if (!SafeZoneIndicator)
+		return *FVector::Allocate();
+
+	return SafeZoneIndicator->GetSafeZoneCenter();
 }
 
 void AFortGameStateAthena::Tick(AFortGameStateAthena* This, float DeltaSeconds) {

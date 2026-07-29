@@ -4,6 +4,7 @@
 #include "FortniteGame/Public/Kismet/FortKismetLibrary.h"
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "FortniteGame/Public/BuildingActor/AthenaBarrierObjective.h"
+#include "FortniteGame/Public/FortPlaylist/FortPlaylistAthena.h"
 
 void AFortAthenaMutator_Barrier::CheckHealthThreshold(uint8 TeamNum)
 {
@@ -18,21 +19,6 @@ void AFortAthenaMutator_Barrier::CheckHealthThreshold(uint8 TeamNum)
 	}
 
 	return Call<void>(Func, TeamNum);
-}
-
-void AFortAthenaMutator_Barrier::OnGamePhaseStepChanged(uint8 GamePhaseStep)
-{
-	static UFunction* Func = nullptr;
-
-	if (Func == nullptr)
-		Func = FindFunction("OnGamePhaseStepChanged");
-
-	if (!Func) {
-		Log("AFortAthenaMutator_Barrier::OnGamePhaseStepChanged: Failed to find function!");
-		return;
-	}
-
-	return Call<void>(Func, GamePhaseStep);
 }
 
 void AFortAthenaMutator_Barrier::OnMutatorGameplayEvent(int32 EventId, int32 EventParam1, int32 EventParam2, int32 EventParam3)
@@ -80,31 +66,52 @@ void AFortAthenaMutator_Barrier::SpawnBarrier(const FVector* WallStart, const FV
 	BigBaseWall = AAthenaBigBaseWall::CreateWall(GetWorld(), BigBaseWallClass, *WallStart, *WallEnd, ZLevel);
 }
 
+void AFortAthenaMutator_Barrier::SetupTeamStates()
+{
+	if (!CachedGameState)
+		return;
+
+	UFortPlaylistAthena* CurrentPlaylistData = CachedGameState->GetPlaylist();
+	if (!CurrentPlaylistData)
+		return;
+
+	Team_0_State.TeamNum = CurrentPlaylistData->DefaultFirstTeam;
+	Team_0_State.FoodTeam = EBarrierFoodTeam::GetBurger();
+
+	Team_1_State.TeamNum = (uint8)(CurrentPlaylistData->DefaultFirstTeam + 1);
+	Team_1_State.FoodTeam = EBarrierFoodTeam::GetTomato();
+}
+
 void AFortAthenaMutator_Barrier::BeginPlay(AFortAthenaMutator_Barrier* This)
 {
 	BeginPlayOG(This);
+
+	This->SetupTeamStates();
 
 	if (!This->BigBaseWall) // bSpawnedModeObjects was added later or its just unreflected ig
 		This->SpawnModeObjectives();
 }
 
-void AFortAthenaMutator_Barrier::SpawnObjectiveActor(TSubclassOf<AAthenaBarrierFlag> InActorClass, FVector InActorLocation, FRotator InActorRotation, FBarrierTeamState* TeamState, int32 TeamIdx)
+void AFortAthenaMutator_Barrier::SpawnObjectiveActor(TSubclassOf<AAthenaBarrierFlag> InActorClass, FVector InActorLocation, FRotator InActorRotation, FBarrierTeamState* TeamState)
 {
+	if (!TeamState)
+		return;
+
 	FTransform Transform(InActorRotation, InActorLocation, FVector(1, 1, 1));
-	auto Flag = (AAthenaBarrierFlag*)UFortKismetLibrary::SpawnBuildingGameplayActor(InActorClass, Transform, this);
+	auto Flag = (AAthenaBarrierFlag*)GetWorld()->SpawnActor(InActorClass.Class, Transform, this);
 
 	if (!Flag)
 		return;
 
-	const uint8 TeamNum = (uint8)(2 + TeamIdx);
-	const EBarrierFoodTeam FoodTeam = TeamIdx == 0 ? EBarrierFoodTeam::GetBurger() : EBarrierFoodTeam::GetTomato();
+	const uint8 TeamNum = TeamState->TeamNum;
+	const EBarrierFoodTeam FoodTeam = TeamState->FoodTeam;
 
 	Flag->TeamIndex = TeamNum;
 
 	Flag->SetFoodTeam(FoodTeam);
 	Flag->OnRep_CurrentState();
 
-	auto Objective = Flag->GetObjectiveActor();
+	auto Objective = AAthenaBarrierFlag::GetObjectiveActor(Flag);
 	if (Objective)
 	{
 		if (Objective->_HasTeamIndex())
@@ -115,29 +122,26 @@ void AFortAthenaMutator_Barrier::SpawnObjectiveActor(TSubclassOf<AAthenaBarrierF
 		Objective->OnRep_ObjectiveDamageState();
 	}
 
-	TeamState->TeamNum = TeamNum;
-	TeamState->FoodTeam = FoodTeam;
 	TeamState->ObjectiveFlag = Flag;
 	TeamState->ObjectiveObject = Objective;
 	TeamState->bRespawnEnabled = true;
 }
 
-void AFortAthenaMutator_Barrier::execOnGamePhaseStepChanged(UObject* Object, FFrame& Stack) {
-	execOnGamePhaseStepChangedOG(Object, Stack);
-	AFortAthenaMutator_Barrier* Mutator = (AFortAthenaMutator_Barrier*)Object;
-
-	AFortGameStateAthena* GameState = (AFortGameStateAthena*)UGameplayStatics::GetGameState(Object);
-	EAthenaGamePhaseStep GamePhaseStep = (EAthenaGamePhaseStep)GameState->GamePhaseStep;
+void AFortAthenaMutator_Barrier::OnGamePhaseStepChanged(EAthenaGamePhaseStep GamePhaseStep)
+{
+	AFortGameStateAthena* GameState = (AFortGameStateAthena*)UGameplayStatics::GetGameState(this);
 
 	if (GamePhaseStep == EAthenaGamePhaseStep::BusLocked)
 	{
-		FVector WallLoc = Mutator->BigBaseWall->K2_GetActorLocation();
-		FVector Right = Mutator->BigBaseWall->GetActorRightVector();
-		float Dist = Mutator->ObjectiveDistanceFromWall.Evaluate();
-		float ZOff = Mutator->ObjectiveZOffset.Evaluate();
+		FVector Center{};
+		UFortKismetLibrary::GetSafeZoneLocation(GetWorld(), 3, &Center);
 
-		FVector Loc0 = WallLoc + Right * Dist;
-		FVector Loc1 = WallLoc - Right * Dist;
+		FVector Right = BigBaseWall->GetActorRightVector();
+		float Dist = ObjectiveDistanceFromWall.Evaluate();
+		float ZOff = ObjectiveZOffset.Evaluate();
+
+		FVector Loc0 = Center + Right * Dist;
+		FVector Loc1 = Center - Right * Dist;
 
 		FVector Ground0 = UFortKismetLibrary::FindStaticGroundLocationAt(UWorld::GetWorld(), Loc0, nullptr, 20000.0f, -9800.0f);
 		FVector Ground1 = UFortKismetLibrary::FindStaticGroundLocationAt(UWorld::GetWorld(), Loc1, nullptr, 20000.0f, -9800.0f);
@@ -147,19 +151,28 @@ void AFortAthenaMutator_Barrier::execOnGamePhaseStepChanged(UObject* Object, FFr
 		Ground0.Z += ZOff * ObjectiveZOffsetScale;
 		Ground1.Z += ZOff * ObjectiveZOffsetScale;
 
-		Log("AFortAthenaMutator_Barrier: objective ground Z " + std::to_string((int)Ground0.Z)
-			+ " / " + std::to_string((int)Ground1.Z)
-			+ " (ZOffset " + std::to_string(ZOff) + " x " + std::to_string((int)ObjectiveZOffsetScale) + ")");
-
 		FVector Dir01 = Ground1 - Ground0;
 		FVector Dir10 = Ground0 - Ground1;
 
 		FRotator Rot0(0.f, FMath::RadiansToDegrees(FMath::Atan2(Dir01.Y, Dir01.X)), 0.f);
 		FRotator Rot1(0.f, FMath::RadiansToDegrees(FMath::Atan2(Dir10.Y, Dir10.X)), 0.f);
 
-		Mutator->SpawnObjectiveActor(Mutator->ObjectiveFlag, Ground0, Rot0, &Mutator->Team_0_State, 0);
-		Mutator->SpawnObjectiveActor(Mutator->ObjectiveFlag, Ground1, Rot1, &Mutator->Team_1_State, 1);
+		SpawnObjectiveActor(ObjectiveFlag, Ground0, Rot0, &Team_0_State);
+		SpawnObjectiveActor(ObjectiveFlag, Ground1, Rot1, &Team_1_State);
 	}
+}
+
+void AFortAthenaMutator_Barrier::execOnGamePhaseStepChanged(AFortAthenaMutator_Barrier* Context, FFrame& Stack) {
+	execOnGamePhaseStepChangedOG(Context, Stack);
+
+	struct FortAthenaMutator_Barrier_OnGamePhaseStepChanged
+	{
+	public:
+		EAthenaGamePhaseStep GamePhaseStep;
+	};
+	FortAthenaMutator_Barrier_OnGamePhaseStepChanged* Parms = (FortAthenaMutator_Barrier_OnGamePhaseStepChanged*)Stack.Locals;
+
+	Context->OnGamePhaseStepChanged(Parms->GamePhaseStep);
 }
 
 void AFortAthenaMutator_Barrier::Hook()

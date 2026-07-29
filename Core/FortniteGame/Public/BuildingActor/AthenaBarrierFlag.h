@@ -25,7 +25,10 @@ public:
 
 	FVector GetMeshScale();
 
-	AAthenaBarrierObjective* GetObjectiveActor();
-
 	void SetFoodTeam(EBarrierFoodTeam NewFoodTeam);
+
+	static inline AAthenaBarrierObjective* (*GetObjectiveActorOG)(AAthenaBarrierFlag* This);
+	static AAthenaBarrierObjective* GetObjectiveActor(AAthenaBarrierFlag* This);
+
+	static void Hook();
 };

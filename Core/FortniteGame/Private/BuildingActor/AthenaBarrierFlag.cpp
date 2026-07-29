@@ -2,6 +2,7 @@
 #include "FortniteGame/Public/BuildingActor/AthenaBarrierFlag.h"
 
 #include "FortniteGame/Public/BuildingActor/AthenaBarrierObjective.h"
+#include "Engine/Source/Runtime/Engine/Classes/Components/ChildActorComponent.h"
 
 void AAthenaBarrierFlag::OnRep_CurrentState()
 {
@@ -76,17 +77,51 @@ void AAthenaBarrierFlag::SetFoodTeam(EBarrierFoodTeam NewFoodTeam)
 	OnRep_FoodTeam();
 }
 
-AAthenaBarrierObjective* AAthenaBarrierFlag::GetObjectiveActor()
+AAthenaBarrierObjective* AAthenaBarrierFlag::GetObjectiveActor(AAthenaBarrierFlag* This)
 {
-	static UFunction* Func = nullptr;
-
-	if (Func == nullptr)
-		Func = FindFunction("GetObjectiveActor");
-
-	if (!Func) {
-		Log("AAthenaBarrierFlag::GetObjectiveActor: Failed to find function!");
+	if (!This)
 		return nullptr;
+
+	TArray<UActorComponent*> Components;
+	This->GetComponents(Components);
+
+	AAthenaBarrierObjective* Result = nullptr;
+	int32 ChildActorComponents = 0;
+
+	for (int32 i = 0; i < Components.Num(); i++)
+	{
+		UChildActorComponent* ChildActorComponent = Components[i] ? Components[i]->Cast<UChildActorComponent>() : nullptr;
+		if (!ChildActorComponent || !ChildActorComponent->_HasChildActor())
+			continue;
+
+		ChildActorComponents++;
+
+		if (AAthenaBarrierObjective* Objective = ChildActorComponent->ChildActor->Cast<AAthenaBarrierObjective>())
+		{
+			Result = Objective;
+			break;
+		}
 	}
 
-	return Call<AAthenaBarrierObjective*>(Func);
+	Log("AAthenaBarrierFlag::GetObjectiveActor: " + This->GetName().ToString()
+		+ " role " + std::to_string((int)This->Role)
+		+ ", " + std::to_string(Components.Num()) + " components, "
+		+ std::to_string(ChildActorComponents) + " child actors -> "
+		+ (Result ? Result->GetName().ToString() : "<none>"));
+
+	Components.Free();
+
+	return Result;
+}
+
+void AAthenaBarrierFlag::Hook()
+{
+	HookEveryVTable(
+		AAthenaBarrierFlag::StaticClass(),
+		AAthenaBarrierFlag::StaticClass()->GetFunction("Function /Script/FortniteGame.AthenaBarrierFlag.GetObjectiveActor"),
+		(void*)GetObjectiveActor,
+		(LPVOID*)&GetObjectiveActorOG
+	);
+
+	Log("AAthenaBarrierFlag Hooked!");
 }

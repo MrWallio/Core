@@ -56,21 +56,22 @@ public:
 public:
 	void CheckHealthThreshold(uint8 TeamNum);
 
-	void OnGamePhaseStepChanged(uint8 GamePhaseStep);
-
 	void OnMutatorGameplayEvent(int32 EventId, int32 EventParam1, int32 EventParam2, int32 EventParam3);
 
 	static inline void (*BeginPlayOG)(AFortAthenaMutator_Barrier* This);
 	static void BeginPlay(AFortAthenaMutator_Barrier* This);
 
-	static inline void (*execOnGamePhaseStepChangedOG)(UObject* Object, FFrame& Stack);
-	static void execOnGamePhaseStepChanged(UObject* Object, FFrame& Stack);
+	void OnGamePhaseStepChanged(EAthenaGamePhaseStep GamePhaseStep);
+	static inline void (*execOnGamePhaseStepChangedOG)(AFortAthenaMutator_Barrier* Context, FFrame& Stack);
+	static void execOnGamePhaseStepChanged(AFortAthenaMutator_Barrier* Context, FFrame& Stack);
 
 	void SpawnBarrier(const FVector* WallStart, const FVector* WallEnd);
 
 	void SpawnModeObjectives();
 
-	void SpawnObjectiveActor(TSubclassOf<AAthenaBarrierFlag> InActorClass, FVector InActorLocation, FRotator InActorRotation, FBarrierTeamState* TeamState, int32 TeamIdx);
+	void SetupTeamStates();
+
+	void SpawnObjectiveActor(TSubclassOf<AAthenaBarrierFlag> InActorClass, FVector InActorLocation, FRotator InActorRotation, FBarrierTeamState* TeamState);
 
 	static void Hook();
 };

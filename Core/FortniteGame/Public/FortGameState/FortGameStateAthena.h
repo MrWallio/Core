@@ -104,6 +104,8 @@ public:
 	uint8 GetGamePhaseStep(float& OutTimeRemaining);
 	void UpdateGamePhaseStep();
 
+	FVector GetSafeZoneCenter();
+
 	static inline void (*TickOG)(AFortGameStateAthena* This, float DeltaSeconds);
 	static void Tick(AFortGameStateAthena* This, float DeltaSeconds);
 

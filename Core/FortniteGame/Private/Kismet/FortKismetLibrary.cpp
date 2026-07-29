@@ -929,6 +929,21 @@ FVector UFortKismetLibrary::FindStaticGroundLocationAt(UWorld* World, const FVec
 	return GetDefaultObj()->Call<FVector>(Func, World, InLocation, IgnoreActor, TraceStartZ, TraceEndZ);
 }
 
+bool UFortKismetLibrary::GetSafeZoneLocation(UObject* WorldContextObject, int32 SafeZoneIndex, FVector* OutLocation)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.GetSafeZoneLocation");
+
+	if (!Func) {
+		Log("FortKismetLibrary::GetSafeZoneLocation: Failed to find function!");
+		return false;
+	}
+
+	return GetDefaultObj()->Call<bool>(Func, WorldContextObject, SafeZoneIndex, OutLocation);
+}
+
 ABuildingGameplayActor* UFortKismetLibrary::SpawnBuildingGameplayActor(TSubclassOf<ABuildingGameplayActor> BGAClass, const FTransform& Transform, AActor* Instigator)
 {
 	static UFunction* Func = nullptr;

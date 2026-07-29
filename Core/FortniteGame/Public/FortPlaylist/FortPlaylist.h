@@ -20,6 +20,8 @@ public:
 
 	DefineUProperty(float, GarbageCollectionFrequency);
 
+	DefineUProperty(uint8, DefaultFirstTeam);
+
 	DefineUProperty(int32, MaxPlayers);
 	DefineUProperty(int32, MaxTeamCount);
 	DefineUProperty(int32, MaxTeamSize);

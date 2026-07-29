@@ -102,14 +102,6 @@ bool AFortGameModeAthena::SetupPlaylist() {
 	MaxPlayerCount = MaxPlayerCount;
 
 	if (Playlist) {
-		if (FortGameState->_HasTeamSize()) {
-			FortGameState->TeamSize = Playlist->MaxTeamSize;
-		}
-
-		if (FortGameState->_HasTeamCount()) {
-			FortGameState->TeamCount = Playlist->MaxTeamCount;
-		}
-
 		SetCurrentPlaylistName(Playlist->GetPlaylistName());
 		SetCurrentPlaylistId(Playlist->GetPlaylistId());
 	}
