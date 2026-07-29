@@ -461,7 +461,7 @@ bool Utils::LoadWorld(FCoreConfig& Config) {
 		Options.push_back({ "Playlist", Config.Playlist });
 	}
 
-	FString TravelURL = Utils::BuildTravelURL(MapName, );
+	FString TravelURL = Utils::BuildTravelURL(MapName, Options);
 
 	Log("Travel URL: " + TravelURL.ToString());
 
