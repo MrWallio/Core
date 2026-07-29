@@ -15,6 +15,8 @@
 #include "Engine/Source/Runtime/Engine/Classes/Kismet/KismetStringLibrary.h"
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/SoftObjectPtr.h"
 #include "Engine/Source/Runtime/Engine/Classes/Engine/World.h"
+#include "FortniteGame/Public/BuildingActor/BuildingGameplayActor.h"
+
 
 #include "FortniteGame/Public/FortEnums.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySet.h"
@@ -142,6 +144,10 @@ public:
 	static void execK2_RemoveItemFromPlayerByGuid(UObject* Object, FFrame& Stack, int32* Result);
 
 	static bool GetWeaponStatsRow(const FDataTableRowHandle& DataTableRowHandle, FFortBaseWeaponStats* OutRow);
+
+	static FVector FindStaticGroundLocationAt(UWorld* World, const FVector& InLocation, const AActor* IgnoreActor, float TraceStartZ, float TraceEndZ);
+
+	static ABuildingGameplayActor* SpawnBuildingGameplayActor(TSubclassOf<class ABuildingGameplayActor> BGAClass, const FTransform& Transform, class AActor* Instigator);
 
 	static void Hook() {
 		ExecHook("Function /Script/FortniteGame.FortKismetLibrary.K2_SpawnPickupInWorld", execK2_SpawnPickupInWorld);

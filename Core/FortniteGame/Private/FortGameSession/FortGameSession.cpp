@@ -16,3 +16,8 @@ void AFortGameSession::CreateServerGame() {
 	void (*CreateServerGameInternal)(AFortGameSession * This) = decltype(CreateServerGameInternal)(ImageBase + Finder::FindAFortGameSession_CreateServerGame());
 	CreateServerGame();
 }
+
+void AFortGameSession::Hook() {
+	MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameSession_ValidatePlayer()), (LPVOID)ValidatePlayer, (LPVOID*)&ValidatePlayerOG);
+	Log("Hooked AFortGameSession");
+}

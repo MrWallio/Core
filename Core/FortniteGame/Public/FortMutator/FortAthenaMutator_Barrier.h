@@ -8,8 +8,11 @@
 #include "BarrierTypes.h"
 #include "FortniteGame/Public/Athena/AthenaGameMessageData.h"
 #include "FortniteGame/Public/FortItem/ItemsToSpawn.h"
+#include "FortniteGame/Public/BuildingActor/AthenaBigBaseWall.h"
+#include "Engine/Source/Runtime/Core/Public/Math/TransformNonVectorized.h"
+#include "FortniteGame/Public/BuildingActor/AthenaBarrierFlag.h"
 
-class AAthenaBigBaseWall;
+
 class AAthenaBarrierFlag;
 
 class AFortAthenaMutator_Barrier : public AFortAthenaMutator {
@@ -56,4 +59,16 @@ public:
 	void OnGamePhaseStepChanged(uint8 GamePhaseStep);
 
 	void OnMutatorGameplayEvent(int32 EventId, int32 EventParam1, int32 EventParam2, int32 EventParam3);
+
+	static inline void (*BeginPlayOG)(AFortAthenaMutator_Barrier* This);
+	static void BeginPlay(AFortAthenaMutator_Barrier* This);
+
+	static inline void (*execOnGamePhaseStepChangedOG)(UObject* Object, FFrame& Stack);
+	static void execOnGamePhaseStepChanged(UObject* Object, FFrame& Stack);
+
+	void SpawnBarrier(const FVector* WallStart, const FVector* WallEnd);
+
+	void SpawnModeObjectives();
+
+	static void Hook();
 };

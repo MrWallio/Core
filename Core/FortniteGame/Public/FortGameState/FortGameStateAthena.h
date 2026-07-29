@@ -5,6 +5,7 @@
 #include "Engine/Source/Runtime/CoreUObject/Public/UObject/ScriptDelegates.h"
 #include "FortniteGame/Public/FortPlaylist/PlaylistPropertyArray.h"
 #include "FortniteGame/Public/FortEnums.h"
+#include "FortniteGame/Public/Athena/AircraftFlightInfo.h"
 
 class AFortAthenaMapInfo;
 class APlayerState;
@@ -60,6 +61,7 @@ public:
 	DefineUProperty(bool, bDrawSafeZoneFinalPosIconEnabled);
 	DefineUProperty(bool, bPlaylistDataIsLoaded);
 	DefineUProperty(bool, bPlaylistDataIsActivelyLoading);
+	DefineUProperty(FAircraftFlightInfo, FlightPathMidLine);
 	DefineUProperty(AFortSafeZoneIndicator*, SafeZoneIndicator);
 public:
 	void OnRep_CurrentPlaylistId();

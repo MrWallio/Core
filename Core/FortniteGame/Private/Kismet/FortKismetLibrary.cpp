@@ -913,3 +913,33 @@ bool UFortKismetLibrary::GetWeaponStatsRow(const FDataTableRowHandle& DataTableR
 	bool (*GetWeaponStatsRowInternal)(const FDataTableRowHandle&, FFortBaseWeaponStats*) = decltype(GetWeaponStatsRowInternal)(ImageBase + Finder::FindUFortKismetLibrary_GetWeaponStatsRow());
 	return GetWeaponStatsRowInternal(DataTableRowHandle, OutRow);
 }
+
+FVector UFortKismetLibrary::FindStaticGroundLocationAt(UWorld* World, const FVector& InLocation, const AActor* IgnoreActor, float TraceStartZ, float TraceEndZ)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.FindStaticGroundLocationAt");
+
+	if (!Func) {
+		Log("FortKismetLibrary::FindStaticGroundLocationAt: Failed to find function!");
+		return FVector::ZeroVector;
+	}
+
+	return GetDefaultObj()->Call<FVector>(Func, World, InLocation, IgnoreActor, TraceStartZ, TraceEndZ);
+}
+
+ABuildingGameplayActor* UFortKismetLibrary::SpawnBuildingGameplayActor(TSubclassOf<ABuildingGameplayActor> BGAClass, const FTransform& Transform, AActor* Instigator)
+{
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = StaticClass()->GetFunction("Function /Script/FortniteGame.FortKismetLibrary.SpawnBuildingGameplayActor");
+
+	if (!Func) {
+		Log("FortKismetLibrary::SpawnBuildingGameplayActor: Failed to find function!");
+		return nullptr;
+	}
+
+	return GetDefaultObj()->Call<ABuildingGameplayActor*>(Func, BGAClass, Transform, Instigator);
+}
