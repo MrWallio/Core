@@ -105,3 +105,16 @@ bool AAthenaBarrierObjective::IsFriendlyTeam()
 
 	return Call<bool>(Func);
 }
+
+
+void AAthenaBarrierObjective::SetFoodTeam(EBarrierFoodTeam NewFoodTeam)
+{
+	if (Role != ROLE_Authority)
+		return;
+
+	FoodTeam = NewFoodTeam;
+
+	if (NewFoodTeam == 3) // EBarrierFoodTeam::MAX
+		return;
+	OnRep_FoodTeam(); // im not gonna redo the setheadmesh internal and this onrep calls it anyway
+}

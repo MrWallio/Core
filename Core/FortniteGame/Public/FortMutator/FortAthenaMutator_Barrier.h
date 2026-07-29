@@ -70,5 +70,7 @@ public:
 
 	void SpawnModeObjectives();
 
+	void SpawnObjectiveActor(TSubclassOf<AAthenaBarrierFlag> InActorClass, FVector InActorLocation, FRotator InActorRotation, FBarrierTeamState* TeamState);
+
 	static void Hook();
 };

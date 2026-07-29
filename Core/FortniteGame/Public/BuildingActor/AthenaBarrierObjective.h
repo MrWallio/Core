@@ -3,6 +3,7 @@
 
 #include "BuildingGameplayActor.h"
 #include "FortniteGame/Public/FortMutator/BarrierTypes.h"
+#include "FortniteGame/Public/FortEnums.h"
 
 class AAthenaBarrierObjective : public ABuildingGameplayActor {
 public:
@@ -27,4 +28,6 @@ public:
 	EBarrierObjectiveDamageState GetObjectiveDamageState();
 
 	bool IsFriendlyTeam();
+
+	void SetFoodTeam(EBarrierFoodTeam NewFoodTeam);
 };

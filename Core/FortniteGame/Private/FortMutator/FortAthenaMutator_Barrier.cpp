@@ -88,21 +88,58 @@ void AFortAthenaMutator_Barrier::BeginPlay(AFortAthenaMutator_Barrier* This)
 		This->SpawnModeObjectives();
 }
 
+void AFortAthenaMutator_Barrier::SpawnObjectiveActor(TSubclassOf<AAthenaBarrierFlag> InActorClass, FVector InActorLocation, FRotator InActorRotation, FBarrierTeamState* TeamState)
+{
+	FTransform Transform(InActorRotation, InActorLocation, FVector(1, 1, 1));
+	auto Flag = (AAthenaBarrierFlag*)UFortKismetLibrary::SpawnBuildingGameplayActor(InActorClass, Transform, this);
+
+	if (!Flag)
+		return;
+
+	Flag->OnRep_FoodTeam();
+	Flag->OnRep_CurrentState();
+
+	auto Objective = Flag->GetObjectiveActor();
+	if (Objective)
+	{
+		Objective->OnRep_FoodTeam();
+		Objective->OnRep_HeadRotationYaw();
+		Objective->OnRep_ObjectiveDamageState();
+	}
+
+	TeamState->ObjectiveFlag = Flag;
+	TeamState->ObjectiveObject = Objective;
+}
 
 void AFortAthenaMutator_Barrier::execOnGamePhaseStepChanged(UObject* Object, FFrame& Stack) {
 	execOnGamePhaseStepChangedOG(Object, Stack);
 	AFortAthenaMutator_Barrier* Mutator = (AFortAthenaMutator_Barrier*)Object;
 
-	UWorld* World = UWorld::GetWorld();
+	AFortGameStateAthena* GameState = (AFortGameStateAthena*)UGameplayStatics::GetGameState(Object);
+	EAthenaGamePhaseStep GamePhaseStep = (EAthenaGamePhaseStep)GameState->GamePhaseStep;
 
-	EAthenaGamePhaseStep GamePhaseStep = (EAthenaGamePhaseStep)((AFortGameStateAthena*)UGameplayStatics::GetGameState(Object))->GamePhaseStep;
-
-	// objectives are spawned when the bus spawns so thats probably the best way to spawn objectives universally 
 	if (GamePhaseStep == EAthenaGamePhaseStep::BusLocked)
 	{
+		FVector WallLoc = Mutator->BigBaseWall->K2_GetActorLocation();
+		FVector Right = Mutator->BigBaseWall->GetActorRightVector();
+		float Dist = Mutator->ObjectiveDistanceFromWall.Evaluate();
+		float ZOff = Mutator->ObjectiveZOffset.Evaluate();
 
+		FVector Loc0 = WallLoc + Right * Dist + FVector(0, 0, ZOff);
+		FVector Loc1 = WallLoc - Right * Dist + FVector(0, 0, ZOff);
+
+		FVector Ground0 = UFortKismetLibrary::FindStaticGroundLocationAt(UWorld::GetWorld(), Loc0, nullptr, -9800.0f, 20000.0f);
+		FVector Ground1 = UFortKismetLibrary::FindStaticGroundLocationAt(UWorld::GetWorld(), Loc1, nullptr, -9800.0f, 20000.0f);
+
+		FVector Dir01 = Ground1 - Ground0;
+		FVector Dir10 = Ground0 - Ground1;
+
+		FRotator Rot0(0.f, FMath::RadiansToDegrees(FMath::Atan2(Dir01.Y, Dir01.X)), 0.f);
+		FRotator Rot1(0.f, FMath::RadiansToDegrees(FMath::Atan2(Dir10.Y, Dir10.X)), 0.f);
+
+		Mutator->SpawnObjectiveActor(Mutator->ObjectiveFlag, Ground0, Rot0, &Mutator->Team_0_State);
+		Mutator->SpawnObjectiveActor(Mutator->ObjectiveFlag, Ground1, Rot1, &Mutator->Team_1_State);
 	}
-	std::cout << (int)GamePhaseStep << std::endl;
 }
 
 
