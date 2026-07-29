@@ -23,4 +23,6 @@ public:
 	void OnRep_TimeUntilWallComesDown();
 
 	void OnRep_WallGravity();
+
+	static AAthenaBigBaseWall* CreateWall(UWorld* World, TSubclassOf<AAthenaBigBaseWall> BigBaseWallClass, const FVector& MidlineStart, const FVector& MidlineEnd, float ZLevel);
 };

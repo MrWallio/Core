@@ -333,6 +333,7 @@
     <ClInclude Include="Engine\Source\Runtime\Net\Core\Public\Net\Core\Connection\NetEnums.h" />
     <ClInclude Include="FortniteGame\Public\AI\AthenaAIController.h" />
     <ClInclude Include="FortniteGame\Public\AI\AthenaAISettings.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\AircraftFlightInfo.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaLevelInfo.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchStats.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchTeamStats.h" />
@@ -594,6 +595,7 @@
     <ClCompile Include="Engine\Source\Runtime\Engine\Private\World.cpp" />
     <ClCompile Include="FortniteGame\Private\AI\FortAIDirector.cpp" />
     <ClCompile Include="FortniteGame\Private\AI\FortAIEncounterInfo.cpp" />
+    <ClCompile Include="FortniteGame\Private\Athena\AircraftFlightInfo.cpp" />
     <ClCompile Include="FortniteGame\Private\FortMission\FortMission_RiftSpawners.cpp" />
     <ClCompile Include="FortniteGame\Private\FortMission\FortMissionManager.cpp" />
     <ClCompile Include="FortniteGame\Private\AI\FortAIGoalManager.cpp" />

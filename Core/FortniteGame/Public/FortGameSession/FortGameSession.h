@@ -19,9 +19,5 @@ public:
 
 	void CreateServerGame();
 
-	static void Hook() {
-		MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameSession_ValidatePlayer()), (LPVOID)ValidatePlayer, (LPVOID*)&ValidatePlayerOG);
-
-		Log("Hooked AFortGameSession");
-	}
+	static void Hook();
 };
