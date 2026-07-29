@@ -63,6 +63,19 @@ FVector AAthenaBarrierFlag::GetMeshScale()
 	return Call<FVector>(Func);
 }
 
+void AAthenaBarrierFlag::SetFoodTeam(EBarrierFoodTeam NewFoodTeam)
+{
+	if (Role != ROLE_Authority)
+		return;
+
+	FoodTeam = NewFoodTeam;
+
+	if (NewFoodTeam == EBarrierFoodTeam::GetMAX())
+		return;
+
+	OnRep_FoodTeam();
+}
+
 AAthenaBarrierObjective* AAthenaBarrierFlag::GetObjectiveActor()
 {
 	static UFunction* Func = nullptr;

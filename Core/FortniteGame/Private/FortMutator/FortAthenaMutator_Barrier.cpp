@@ -88,7 +88,7 @@ void AFortAthenaMutator_Barrier::BeginPlay(AFortAthenaMutator_Barrier* This)
 		This->SpawnModeObjectives();
 }
 
-void AFortAthenaMutator_Barrier::SpawnObjectiveActor(TSubclassOf<AAthenaBarrierFlag> InActorClass, FVector InActorLocation, FRotator InActorRotation, FBarrierTeamState* TeamState)
+void AFortAthenaMutator_Barrier::SpawnObjectiveActor(TSubclassOf<AAthenaBarrierFlag> InActorClass, FVector InActorLocation, FRotator InActorRotation, FBarrierTeamState* TeamState, int32 TeamIdx)
 {
 	FTransform Transform(InActorRotation, InActorLocation, FVector(1, 1, 1));
 	auto Flag = (AAthenaBarrierFlag*)UFortKismetLibrary::SpawnBuildingGameplayActor(InActorClass, Transform, this);
@@ -96,19 +96,30 @@ void AFortAthenaMutator_Barrier::SpawnObjectiveActor(TSubclassOf<AAthenaBarrierF
 	if (!Flag)
 		return;
 
-	Flag->OnRep_FoodTeam();
+	const uint8 TeamNum = (uint8)(2 + TeamIdx);
+	const EBarrierFoodTeam FoodTeam = TeamIdx == 0 ? EBarrierFoodTeam::GetBurger() : EBarrierFoodTeam::GetTomato();
+
+	Flag->TeamIndex = TeamNum;
+
+	Flag->SetFoodTeam(FoodTeam);
 	Flag->OnRep_CurrentState();
 
 	auto Objective = Flag->GetObjectiveActor();
 	if (Objective)
 	{
-		Objective->OnRep_FoodTeam();
+		if (Objective->_HasTeamIndex())
+			Objective->TeamIndex = TeamNum;
+
+		Objective->SetFoodTeam(FoodTeam);
 		Objective->OnRep_HeadRotationYaw();
 		Objective->OnRep_ObjectiveDamageState();
 	}
 
+	TeamState->TeamNum = TeamNum;
+	TeamState->FoodTeam = FoodTeam;
 	TeamState->ObjectiveFlag = Flag;
 	TeamState->ObjectiveObject = Objective;
+	TeamState->bRespawnEnabled = true;
 }
 
 void AFortAthenaMutator_Barrier::execOnGamePhaseStepChanged(UObject* Object, FFrame& Stack) {
@@ -125,11 +136,20 @@ void AFortAthenaMutator_Barrier::execOnGamePhaseStepChanged(UObject* Object, FFr
 		float Dist = Mutator->ObjectiveDistanceFromWall.Evaluate();
 		float ZOff = Mutator->ObjectiveZOffset.Evaluate();
 
-		FVector Loc0 = WallLoc + Right * Dist + FVector(0, 0, ZOff);
-		FVector Loc1 = WallLoc - Right * Dist + FVector(0, 0, ZOff);
+		FVector Loc0 = WallLoc + Right * Dist;
+		FVector Loc1 = WallLoc - Right * Dist;
 
-		FVector Ground0 = UFortKismetLibrary::FindStaticGroundLocationAt(UWorld::GetWorld(), Loc0, nullptr, -9800.0f, 20000.0f);
-		FVector Ground1 = UFortKismetLibrary::FindStaticGroundLocationAt(UWorld::GetWorld(), Loc1, nullptr, -9800.0f, 20000.0f);
+		FVector Ground0 = UFortKismetLibrary::FindStaticGroundLocationAt(UWorld::GetWorld(), Loc0, nullptr, 20000.0f, -9800.0f);
+		FVector Ground1 = UFortKismetLibrary::FindStaticGroundLocationAt(UWorld::GetWorld(), Loc1, nullptr, 20000.0f, -9800.0f);
+
+		constexpr float ObjectiveZOffsetScale = 512.f;
+
+		Ground0.Z += ZOff * ObjectiveZOffsetScale;
+		Ground1.Z += ZOff * ObjectiveZOffsetScale;
+
+		Log("AFortAthenaMutator_Barrier: objective ground Z " + std::to_string((int)Ground0.Z)
+			+ " / " + std::to_string((int)Ground1.Z)
+			+ " (ZOffset " + std::to_string(ZOff) + " x " + std::to_string((int)ObjectiveZOffsetScale) + ")");
 
 		FVector Dir01 = Ground1 - Ground0;
 		FVector Dir10 = Ground0 - Ground1;
@@ -137,18 +157,16 @@ void AFortAthenaMutator_Barrier::execOnGamePhaseStepChanged(UObject* Object, FFr
 		FRotator Rot0(0.f, FMath::RadiansToDegrees(FMath::Atan2(Dir01.Y, Dir01.X)), 0.f);
 		FRotator Rot1(0.f, FMath::RadiansToDegrees(FMath::Atan2(Dir10.Y, Dir10.X)), 0.f);
 
-		Mutator->SpawnObjectiveActor(Mutator->ObjectiveFlag, Ground0, Rot0, &Mutator->Team_0_State);
-		Mutator->SpawnObjectiveActor(Mutator->ObjectiveFlag, Ground1, Rot1, &Mutator->Team_1_State);
+		Mutator->SpawnObjectiveActor(Mutator->ObjectiveFlag, Ground0, Rot0, &Mutator->Team_0_State, 0);
+		Mutator->SpawnObjectiveActor(Mutator->ObjectiveFlag, Ground1, Rot1, &Mutator->Team_1_State, 1);
 	}
 }
-
-
 
 void AFortAthenaMutator_Barrier::Hook()
 {
 	if (Finder::FindAActor_BeginPlayVFT()) {
 		HookEveryVTableIdx(AFortAthenaMutator_Barrier::StaticClass(), Finder::FindAActor_BeginPlayVFT(), BeginPlay, (LPVOID*)&BeginPlayOG);
 	}
-	ExecHook("Function /Script/FortniteGame.FortAthenaMutator_Barrier.OnGamePhaseStepChanged", execOnGamePhaseStepChanged, execOnGamePhaseStepChangedOG);
 
+	ExecHook("Function /Script/FortniteGame.FortAthenaMutator_Barrier.OnGamePhaseStepChanged", execOnGamePhaseStepChanged, execOnGamePhaseStepChangedOG);
 }
