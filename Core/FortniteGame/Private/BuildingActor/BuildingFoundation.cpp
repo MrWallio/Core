@@ -55,7 +55,7 @@ void ABuildingFoundation::SetDynamicFoundationEnabled(bool bEnabled)
 		return;
 	}
 
-	if (SelectAndSetupMyBuildingLevel()) {
+	if (SelectAndSetupMyBuildingLevel(nullptr)) {
 		StreamInMyBuilding(false);
 	}
 }

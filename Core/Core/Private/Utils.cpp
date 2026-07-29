@@ -449,17 +449,23 @@ bool Utils::LoadWorld(FCoreConfig& Config) {
 	FString MapName = Utils::GetDefaultMapName(Config);
 	Log("Loading World: " + MapName.ToString());
 
-	FString TravelURL = Utils::BuildTravelURL(MapName, {
+	std::vector<std::pair<std::string, std::string>> Options = {
 		{"listen", ""},
-		{"playlistId", Config.Playlist},
-		{"Playlist", Config.Playlist},
 		{"RequiredPlayers", "1"}
-	});
+	};
+
+	if (Config.Playlist.find_first_not_of("0123456789") == std::string::npos) {
+		Options.push_back({ "playlistId", Config.Playlist });
+	}
+	else {
+		Options.push_back({ "Playlist", Config.Playlist });
+	}
+
+	FString TravelURL = Utils::BuildTravelURL(MapName, );
 
 	Log("Travel URL: " + TravelURL.ToString());
 
 	UFortGameInstance* FortGameInstance = World->OwningGameInstance->Cast<UFortGameInstance>();
-	AFortGameMode* FortGameMode = World->AuthorityGameMode->Cast<AFortGameMode>();
 
 	bool bTravelOk = FortGameInstance
 		? FortGameInstance->ServerTravel(TravelURL)
