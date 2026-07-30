@@ -23,14 +23,25 @@ class Events {
 public:
 	static inline std::vector<FEvent> Registry = {
 		// 4.5 -- Blast Off (Geode): the rocket launch.
-		{ 4.5,
+		{
+			4.5,
 			nullptr,
 			"/Game/Athena/Maps/Test/Events/BP_GeodeScripting.BP_GeodeScripting_C",
 			nullptr,
 			{
 				{ false, "/Game/Athena/Maps/Test/Events/BP_GeodeScripting.BP_GeodeScripting_C.LaunchSequence" },
-			} 
+			}
 		},
+		// 6.21 -- Butterfly event: cube explodes
+		{
+			6.21,
+			"/Game/Athena/Prototype/Blueprints/Island/BP_Butterfly.BP_Butterfly_C",
+			nullptr,
+			"/Game/Athena/Prototype/Blueprints/Island/BP_Butterfly.BP_Butterfly_C.LoadButterflySublevel",
+			{
+				{ true, "/Game/Athena/Prototype/Blueprints/Island/BP_Butterfly.BP_Butterfly_C.ButterflySequence" },
+			}
+		}
 	};
 
 	static const FEvent* GetEventForCurrentVersion();
