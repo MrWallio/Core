@@ -161,3 +161,22 @@ void ABuildingActor::OnRep_CurrentBuildingLevel()
 
 	Call(Func);
 }
+
+void ABuildingActor::OnRep_Team() {
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_Team");
+
+	Call(Func);
+}
+
+void ABuildingActor::OnRep_TeamVFT() {
+	static UFunction* Func = nullptr;
+
+	if (Func == nullptr)
+		Func = FindFunction("OnRep_Team");
+
+	void (*&OnRep_TeamInternal)(ABuildingActor*) = decltype(OnRep_TeamInternal)(VTable[Func->GetVTableIndex()]);
+	OnRep_TeamInternal(this);
+}

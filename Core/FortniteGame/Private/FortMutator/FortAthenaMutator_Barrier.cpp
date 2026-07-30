@@ -106,20 +106,22 @@ void AFortAthenaMutator_Barrier::SpawnObjectiveActor(TSubclassOf<AAthenaBarrierF
 	const uint8 TeamNum = TeamState->TeamNum;
 	const EBarrierFoodTeam FoodTeam = TeamState->FoodTeam;
 
+	Flag->Team = TeamNum;
 	Flag->TeamIndex = TeamNum;
+	Flag->OnRep_TeamVFT();
 
 	Flag->SetFoodTeam(FoodTeam);
-	Flag->OnRep_CurrentState();
 
 	auto Objective = AAthenaBarrierFlag::GetObjectiveActor(Flag);
 	if (Objective)
 	{
-		if (Objective->_HasTeamIndex())
-			Objective->TeamIndex = TeamNum;
+		Objective->Team = TeamNum;
+		Objective->TeamIndex = TeamNum;
+		Objective->OnRep_TeamVFT();
 
 		Objective->SetFoodTeam(FoodTeam);
-		Objective->OnRep_HeadRotationYaw();
-		Objective->OnRep_ObjectiveDamageState();
+
+		Objective->bAllowDamage = true;
 	}
 
 	TeamState->ObjectiveFlag = Flag;

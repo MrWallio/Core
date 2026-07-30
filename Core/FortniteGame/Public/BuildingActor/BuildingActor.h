@@ -56,6 +56,9 @@ public:
 	float GetHealth() const;
 
 	void OnRep_CurrentBuildingLevel();
+
+	void OnRep_Team();
+	void OnRep_TeamVFT();
 public:
 	static void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + Finder::FindABuildingActor_OnDamageServer()), OnDamageServer, (LPVOID*)&OnDamageServerOG);

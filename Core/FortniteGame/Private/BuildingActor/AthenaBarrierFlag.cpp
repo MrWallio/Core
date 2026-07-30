@@ -103,12 +103,6 @@ AAthenaBarrierObjective* AAthenaBarrierFlag::GetObjectiveActor(AAthenaBarrierFla
 		}
 	}
 
-	Log("AAthenaBarrierFlag::GetObjectiveActor: " + This->GetName().ToString()
-		+ " role " + std::to_string((int)This->Role)
-		+ ", " + std::to_string(Components.Num()) + " components, "
-		+ std::to_string(ChildActorComponents) + " child actors -> "
-		+ (Result ? Result->GetName().ToString() : "<none>"));
-
 	Components.Free();
 
 	return Result;
