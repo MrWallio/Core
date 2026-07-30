@@ -55,19 +55,34 @@ uintptr_t GetVTableIndex(class UFunction* Func) {
 
 	int VirtualFuncIdx = 0;
 
+	int* DispPtr = nullptr;
 	if (bHasValidate)
 	{
-		VirtualFuncIdx = *Memcury::Scanner(Func->Func)
+		DispPtr = Memcury::Scanner(Func->Func)
 			.ScanFor({ 0xFF, 0x90 }, true, 1)
 			.AbsoluteOffset(2)
 			.GetAs<int*>();
 	}
 	else
 	{
-		VirtualFuncIdx = *Memcury::Scanner(Func->Func)
+		DispPtr = Memcury::Scanner(Func->Func)
 			.ScanFor({ 0xFF, 0x90 })
 			.AbsoluteOffset(2)
 			.GetAs<int*>();
+	}
+
+	if (!DispPtr)
+	{
+		Log("GetVTableIndex: no virtual call found in exec of " + FuncName);
+		return -1;
+	}
+
+	VirtualFuncIdx = *DispPtr;
+
+	if (VirtualFuncIdx <= 0 || VirtualFuncIdx >= 0x8000 || (VirtualFuncIdx & 7) != 0)
+	{
+		Log("GetVTableIndex: implausible displacement " + std::format("0x{:X}", VirtualFuncIdx) + " in exec of " + FuncName);
+		return -1;
 	}
 
 	int VTableIndex = 0;
@@ -95,9 +110,20 @@ void HookVTable(UObject* Object, UFunction* Func, void* Detour, void** Original)
 		return;
 	}
 	int VTableIndex = GetVTableIndex(Func);
+	if (VTableIndex <= 0 || VTableIndex >= 0x4000)
+	{
+		Log("HookVTable: refusing out of range index " + std::format("0x{:X}", VTableIndex));
+		return;
+	}
 
 	DWORD oldProtection;
 	void** VTable = *(void***)Object;
+
+	if (!IsExecutableAddress((uintptr_t)VTable[VTableIndex]))
+	{
+		Log("HookVTable: slot " + std::format("0x{:X}", VTableIndex) + " does not point at code, refusing to hook");
+		return;
+	}
 
 	if (Original)
 	{
@@ -119,6 +145,12 @@ void HookVTableIdx(void* Base, int Idx, void* Detour, void** OG)
 	DWORD oldProtection;
 
 	void** VTable = *(void***)Base;
+
+	if (!IsExecutableAddress((uintptr_t)VTable[Idx]))
+	{
+		Log("HookVTableIdx: slot " + std::format("0x{:X}", Idx) + " does not point at code, refusing to hook");
+		return;
+	}
 
 	if (OG)
 	{
@@ -176,6 +208,11 @@ void HookEveryVTable(UClass* Base, class UFunction* Func, void* Detour, void** O
 		return;
 	}
 	int VTableIndex = GetVTableIndex(Func);
+	if (VTableIndex <= 0 || VTableIndex >= 0x4000)
+	{
+		Log("HookEveryVTable: refusing out of range index " + std::format("0x{:X}", VTableIndex));
+		return;
+	}
 
 	bool OGSet = false;
 

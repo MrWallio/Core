@@ -13,6 +13,7 @@ class IAbilitySystemInterface;
 class AFortMissionManager;
 class AFortFeedbackManager;
 class AFortTeamInfo;
+class AFortWorldManager;
 
 class AFortGameState : public AGameState {
 public:
@@ -21,6 +22,7 @@ public:
 	DefineUProperty(TArray<FAdditionalLevelStreamed>, AdditionalPlaylistLevelsStreamed);
 	DefineUProperty(AFortFeedbackManager*, FeedbackManager);
 	DefineUProperty(AFortMissionManager*, MissionManager);
+	DefineUProperty(AFortWorldManager*, WorldManager);
 	DefineUProperty(FString, GameSessionID);
 	DefineUProperty(int32, TeamCount);
 	DefineUProperty(int32, TeamSize);

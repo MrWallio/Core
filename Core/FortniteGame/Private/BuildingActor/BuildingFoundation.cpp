@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "FortniteGame/Public/BuildingActor/BuildingFoundation.h"
 
+#include "FortniteGame/Public/FortGameState/FortGameState.h"
+#include "FortniteGame/Public/FortWorld/FortWorldManager.h"
+#include "FortniteGame/Public/FortWorld/FortWorldRecord.h"
+#include "FortniteGame/Public/FortWorld/FortZoneRecord.h"
+
 void ABuildingFoundation::OnRep_ServerStreamedInLevel()
 {
 	static UFunction* Func = nullptr;
@@ -48,11 +53,25 @@ void ABuildingFoundation::SetDynamicFoundationEnabled(bool bEnabled)
 	FoundationEnabledState = bEnabled ? EDynamicFoundationEnabledState::GetEnabled() : EDynamicFoundationEnabledState::GetDisabled();
 	OnRep_FoundationEnabledState();
 
+	if (!bEnabled || LevelToStream != "None") {
+		return;
+	}
+
 	bServerStreamedInLevel = true;
 	OnRep_ServerStreamedInLevel();
 
-	if (!bEnabled || LevelToStream != "None") {
-		return;
+	AFortGameState* GameState = GetWorld() ? GetWorld()->GameState->Cast<AFortGameState>() : nullptr;
+	if (GameState && GameState->_HasWorldManager())
+	{
+		AFortWorldManager* WorldManager = GameState->WorldManager;
+		if (!WorldManager)
+			return;
+
+		if (WorldManager->_HasCurrentWorldRecord() && !WorldManager->CurrentWorldRecord)
+			return;
+
+		if (WorldManager->_HasCurrentZoneRecord() && !WorldManager->CurrentZoneRecord)
+			return;
 	}
 
 	if (SelectAndSetupMyBuildingLevel(nullptr)) {

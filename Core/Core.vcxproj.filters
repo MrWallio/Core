@@ -474,6 +474,15 @@
     <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortWorld\FortGenericRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FortniteGame\Public\FortWorld\FortZoneRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Source\Runtime\Engine\Classes\GameFramework\GameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>

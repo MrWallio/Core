@@ -514,6 +514,9 @@
     <ClInclude Include="FortniteGame\Public\FortWorker\FortWorkerType.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\AdditionalLevelStreamed.h" />
     <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldManager.h" />
+    <ClInclude Include="FortniteGame\Public\FortWorld\FortGenericRecord.h" />
+    <ClInclude Include="FortniteGame\Public\FortWorld\FortWorldRecord.h" />
+    <ClInclude Include="FortniteGame\Public\FortWorld\FortZoneRecord.h" />
     <ClInclude Include="FortniteGame\Public\Info\DeathInfo.h" />
     <ClInclude Include="FortniteGame\Public\Info\FortRegisteredPlayerInfo.h" />
     <ClInclude Include="FortniteGame\Public\Info\FortTeamInfo.h" />
