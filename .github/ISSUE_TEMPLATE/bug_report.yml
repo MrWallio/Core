@@ -6,9 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Core is highly version-dependent, so the **exact Fortnite version + CL** and
-        **evidence of the bug** (video, screenshots, or clear steps) are the most important
-        parts of a report. Include the server log if one is relevant.
+        Core is acts very different across all versions, so please add the **exact Fortnite version + CL** and
+        **evidence of the bug** (video, screenshots, or clear steps if you cant record it) Include the server log if relevant.
   - type: input
     id: version
     attributes:
@@ -28,14 +27,14 @@ body:
     id: evidence
     attributes:
       label: Evidence
-      description: Video link, screenshots, and/or exact steps to reproduce.
+      description: Videos, screenshots, and/or steps to reproduce.
     validations:
       required: true
   - type: textarea
     id: log
     attributes:
       label: Server log (if applicable)
-      description: Paste relevant Server_log.txt output or a crash stack. No backticks needed.
+      description: Paste the server log here if relevant.
       render: text
     validations:
       required: false
