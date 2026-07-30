@@ -166,14 +166,13 @@ bool AFortGameModeAthena::SetupPlaylist() {
 
 void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, AFortWorldManager* WorldManager) {
 	FinishWorldInitializationOG(This, WorldManager);
+	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
+
 	AFortGameStateAthena* GameState = This->GameState->Cast<AFortGameStateAthena>();
 	if (!GameState) {
 		Log("AFortGameModeAthena::FinishWorldInitialization: GameState is null or not AFortGameStateAthena");
 		return;
 	}
-
-	ABuildingFoundation::SetupFoundations();
-	UGameplayStatics::FlushLevelStreaming(UWorld::GetWorld());
 
 	UFortPlaylistAthena* Playlist = GameState->GetPlaylist();
 	if (Playlist) {
@@ -181,8 +180,6 @@ void AFortGameModeAthena::FinishWorldInitialization(AFortGameModeAthena* This, A
 		Playlist->LoadAdditionalLevelsServerOnly();
 		GameState->OnRep_AdditionalPlaylistLevelsStreamed();
 	}
-
-	AFortGameModeZone::FinishWorldInitialization(This, WorldManager);
 
 	This->DefaultPawnClass = (UClass*)StaticLoadObject("/Game/Athena/PlayerPawn_Athena.PlayerPawn_Athena_C");
 	//This->PlayerControllerClass = (UClass*)StaticLoadObject("/Game/Athena/Athena_PlayerController.Athena_PlayerController_C");

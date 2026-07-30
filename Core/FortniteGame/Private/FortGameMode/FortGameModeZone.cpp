@@ -17,6 +17,7 @@
 #include "FortniteGame/Public/Kismet/FortMissionLibrary.h"
 #include "FortniteGame/Public/FortAbility/FortAbilitySystemComponent.h"
 #include "FortniteGame/Public/BuildingActor/BuildingItemCollectorActor.h"
+#include "FortniteGame/Public/BuildingActor/BuildingFoundation.h"
 #include "FortniteGame/Public/BuildingActor/BGAConsumableSpawner.h"
 #include "FortniteGame/Public/BuildingActor/BuildingContainer.h"
 
@@ -99,6 +100,9 @@ void AFortGameModeZone::FinishWorldInitialization(AFortGameModeZone* This, AFort
 			Log("AFortGameModeZone::FinishWorldInitialization: Loaded mission " + MissionInfo->GetName().ToString());
 		}
 	}
+
+	ABuildingFoundation::SetupFoundations();
+	UGameplayStatics::FlushLevelStreaming(UWorld::GetWorld());
 
 	TArray<AActor*> ItemCollectors;
 	UGameplayStatics::GetAllActorsOfClass(World, ABuildingItemCollectorActor::StaticClass(), &ItemCollectors);
