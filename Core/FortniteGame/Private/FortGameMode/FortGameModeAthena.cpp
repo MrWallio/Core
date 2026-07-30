@@ -486,3 +486,34 @@ bool AFortGameModeAthena::StartEndGamePhaseTeam(AFortGameModeAthena* This, int32
 
 	return bResult;
 }
+
+void AFortGameModeAthena::SpawnFortSpawnActors(AFortGameModeAthena* This, FFortSpawnActorData* SpawnActorData)
+{
+	void (*SpawnFortSpawnActorsInternal)(AFortGameModeAthena* , FFortSpawnActorData*) = decltype(SpawnFortSpawnActorsInternal)(ImageBase + Finder::FindAFortGameModeAthena_SpawnFortSpawnActors());
+	SpawnFortSpawnActorsInternal(This, SpawnActorData);
+}
+
+void AFortGameModeAthena::UpdateSpawnActorListDuringSafeZone(EAthenaGamePhaseStep GamePhaseStep)
+{
+	if (GamePhaseStep != EAthenaGamePhaseStep::StormHolding)
+		return;
+
+	for (int32 i = 0; i < SpawnActorDataList.Num(); ++i)
+	{
+		FFortSpawnActorData& SpawnData = SpawnActorDataList.GetWithSize(i, FFortSpawnActorData::GetSize());
+
+		if (!SpawnData.SpawnActorInfo)
+			continue;
+
+		if (!SpawnData.SpawnActorInfo || SpawnData.SpawnActorInfo->SpawnTiming != 1)
+			continue;
+		
+
+		float RequiredSafeZone = SpawnData.SpawnActorInfo->SafeZoneIndex.Evaluate(0.0f);
+
+		if (RequiredSafeZone == SafeZonePhase)
+		{
+			SpawnFortSpawnActors(this, &SpawnData);
+		}
+	}
+}

@@ -398,6 +398,10 @@ void AFortGameStateAthena::UpdateGamePhaseStep() {
 			}
 		}
 	}
+	AGameModeBase* GameModeBase = UGameplayStatics::GetGameMode(this);
+	if (GameModeBase->IsA(AFortGameModeAthena::StaticClass())) {
+		((AFortGameModeAthena*)GameModeBase)->UpdateSpawnActorListDuringSafeZone((EAthenaGamePhaseStep)NewStep);
+	}
 
 	Log("AFortGameStateAthena::UpdateGamePhaseStep: GamePhaseStep -> " + std::to_string(NewStep));
 }

@@ -4,6 +4,8 @@
 #include "FortGamePvPBase.h"
 #include "Engine/Source/Runtime/Engine/Classes/GameFramework/GameSession.h"
 #include "Engine/Source/Runtime/Core/Public/Containers/Map.h"
+#include "FortniteGame/Public/Athena/FortSpawnActorData.h"
+#include "FortniteGame/Public/Athena/FortSpawnActorInfo.h"
 
 class AFortPlayerControllerAthena;
 struct FVector;
@@ -31,6 +33,8 @@ public:
 	DefineUProperty(AFortAthenaPlaylistBase*, FortAthenaPlaylist);
 	DefineUProperty(UAthenaAISettings*, AISettings);
 	DefineUProperty(TArray<FVector>, SafeZoneLocations);
+	DefineUProperty(TArray<FFortSpawnActorData>, SpawnActorDataList);
+	DefineUProperty(int32, SafeZonePhase);
 public:
 	void OverrideAISettings(UAthenaAISettings* NewAISettings);
 
@@ -75,6 +79,10 @@ public:
 
 	static inline bool (*StartEndGamePhaseTeamOG)(AFortGameModeAthena* This, int32 TeamIndex, APlayerState* PlayerState, int32 Place, APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause);
 	static bool StartEndGamePhaseTeam(AFortGameModeAthena* This, int32 TeamIndex, APlayerState* PlayerState, int32 Place, APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause);
+
+	void UpdateSpawnActorListDuringSafeZone(EAthenaGamePhaseStep GamePhaseStep);
+
+	void SpawnFortSpawnActors(AFortGameModeAthena* This, FFortSpawnActorData* SpawnActorData);
 
 	static void Hook() {
 		//MH_CreateHook((LPVOID)(ImageBase + Finder::FindAFortGameModeAthena_ReadyToStartMatch()), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
