@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a crash or gameplay bug in Core.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Core is highly version-dependent, so the **exact Fortnite version + CL** and
+        **evidence of the bug** (video, screenshots, or clear steps) are the most important
+        parts of a report. Include the server log if one is relevant.
+  - type: input
+    id: version
+    attributes:
+      label: Fortnite version + CL
+      description: Exact build. Neighboring builds behave differently.
+      placeholder: e.g. 5.41 (CL 4363240)
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What's the bug?
+      description: What happens, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Video link, screenshots, and/or exact steps to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Server log (if applicable)
+      description: Paste relevant Server_log.txt output or a crash stack. No backticks needed.
+      render: text
+    validations:
+      required: false

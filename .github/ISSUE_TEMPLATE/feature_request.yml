@@ -1,0 +1,26 @@
+name: Feature suggestion
+description: Suggest a feature or improvement for Core.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What's your suggestion?
+      description: Describe the feature or improvement.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it useful?
+      description: What problem does it solve or what does it enable?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Relevant Fortnite version(s) (if applicable)
+      placeholder: e.g. 5.41, or "all supported"
+    validations:
+      required: false
