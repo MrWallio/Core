@@ -407,6 +407,7 @@ namespace ServerOffsets {
 	inline uintptr_t AFortGameModeAthena_RemoveFromAlivePlayers = 0;
 	inline uintptr_t AFortGameModeAthena_PlacePlayerOnTeam = 0;
 	inline uintptr_t AFortGameModeAthena_OnGivenMatchAssignmentVFT = 0;
+	inline uintptr_t AFortGameModeAthena_SpawnFortSpawnActors = 0;
 
 	inline uintptr_t AFortGameStateAthena_OnRep_CurrentPlaylistInfo = 0;
 	inline uintptr_t AFortGameStateAthena_OnPlaylistDataLoadCompleted = 0;

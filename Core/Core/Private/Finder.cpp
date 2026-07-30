@@ -11224,6 +11224,36 @@ uintptr_t Finder::FindABuildingFoundation_StreamInMyBuilding() {
 	return ServerOffsets::ABuildingFoundation_StreamInMyBuilding;
 }
 
+uintptr_t Finder::FindAFortGameModeAthena_SpawnFortSpawnActors() {
+
+	if (ServerOffsets::AFortGameModeAthena_SpawnFortSpawnActors)
+		return ServerOffsets::AFortGameModeAthena_SpawnFortSpawnActors;
+	uintptr_t Addr = 0;
+	static bool bInitialized = false;
+	if (bInitialized)
+		return ServerOffsets::AFortGameModeAthena_SpawnFortSpawnActors;
+
+	auto sRef = Memcury::Scanner::FindStringRef(L"AFortGameModeAthena::SpawnFortSpawnActors");
+
+	if (!sRef.IsValid()) {
+		sRef = Memcury::Scanner::FindStringRef(L"%s: SafeZoneIndicator is invalid. Falling back to SafeZoneDef");
+	}
+	if (!sRef.IsValid()) {
+		sRef = Memcury::Scanner::FindPattern("40 55 53 57 41 54 48 8D AC 24 ? ? ? ? 48 81 EC");
+	}
+	if (sRef.IsValid()) {
+		Addr = sRef.FindFunctionStart().Get();
+	}
+
+	if (Addr) {
+		ServerOffsets::AFortGameModeAthena_SpawnFortSpawnActors = Addr - ImageBase;
+	}
+
+	bInitialized = true;
+	Log("AFortGameModeAthena_SpawnFortSpawnActors found at: 0x" + std::format("{:X}", ServerOffsets::AFortGameModeAthena_SpawnFortSpawnActors));
+	return ServerOffsets::AFortGameModeAthena_SpawnFortSpawnActors;
+}
+
 void Finder::SetupCoreOffsets() {
 	ServerOffsets::FFrame__CurrentNativeFunction = Version::Fortnite_Version >= 20.20 ? 0x90 : 0x88;
 	ServerOffsets::FFrame__PropertyChainForCompiledIn = Version::Fortnite_Version >= 20.20 ? 0x88 : 0x80;
@@ -11653,6 +11683,8 @@ void Finder::SetupOffsets() {
 
 	FindABuildingFoundation_SelectAndSetupMyBuildingLevel();
 	FindABuildingFoundation_StreamInMyBuilding();
+
+	FindAFortGameModeAthena_SpawnFortSpawnActors();
 
 	return;
 }

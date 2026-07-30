@@ -1112,6 +1112,8 @@ public:
 	static uintptr_t FindAFortAIDirector_StartEncounterWithoutObjective();
 
 	static uintptr_t FindABuildingFoundation_StreamInMyBuilding();
+
+	static uintptr_t FindAFortGameModeAthena_SpawnFortSpawnActors();
 public:
 	static void SetupCoreOffsets();
 

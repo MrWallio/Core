@@ -340,6 +340,8 @@
     <ClInclude Include="FortniteGame\Public\Athena\AthenaMatchTeamStats.h" />
     <ClInclude Include="FortniteGame\Public\Athena\AthenaPlayerMatchReport.h" />
     <ClInclude Include="FortniteGame\Public\Athena\FortAthenaAircraft.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\FortSpawnActorData.h" />
+    <ClInclude Include="FortniteGame\Public\Athena\FortSpawnActorInfo.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BGAConsumableSpawner.h" />
     <ClInclude Include="FortniteGame\Public\BuildingActor\BuildingTimeOfDayLights.h" />
     <ClInclude Include="FortniteGame\Public\FortItemDefinition\FortGadgetItemDefinition.h" />
