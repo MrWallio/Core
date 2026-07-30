@@ -12,7 +12,6 @@ body:
     id: version
     attributes:
       label: Fortnite version + CL
-      description: Exact build. Neighboring builds behave differently.
       placeholder: e.g. 5.41 (CL 4363240)
     validations:
       required: true
