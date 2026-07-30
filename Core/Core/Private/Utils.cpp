@@ -410,6 +410,14 @@ void Utils::RemoveLocalPlayer() {
 	}
 
 	if (GameInstance->LocalPlayers.Num() > 0) {
+		ULocalPlayer* LocalPlayer = GameInstance->LocalPlayers[0];
+		APlayerController* PlayerController = (LocalPlayer && LocalPlayer->_HasPlayerController()) ? LocalPlayer->PlayerController : nullptr;
+
+		if (PlayerController) {
+			LocalPlayer->PlayerController = nullptr;
+			PlayerController->K2_DestroyActor();
+		}
+
 		GameInstance->LocalPlayers.RemoveAt(0);
 		Log("Utils::RemoveLocalPlayer: Local Player Removed!");
 	}
@@ -420,16 +428,26 @@ bool Utils::SetupDedicatedServer(FCoreConfig& Config) {
 		return false; // we dont wanna do this if we are a listen server (not a dedicated server)
 	}
 
-	UWorld* World = UWorld::GetWorld();
-	if (!World) {
-		Log("Utils::SetupDedicatedServer: World is nullptr!");
-		return false;
+	UWorld* World = nullptr;
+	while (true) {
+		UWorld* CurrentWorld = UWorld::GetWorld();
+		if (CurrentWorld && CurrentWorld->AuthorityGameMode && CurrentWorld->AuthorityGameMode->GetWorld()) {
+			World = CurrentWorld;
+			break;
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	FString TravelURL = "/Game/Maps/FortniteEmptyDedicated";
 
-	UFortGameInstance* FortGameInstance = World->OwningGameInstance->Cast<UFortGameInstance>();
-	bool bTravelOk = FortGameInstance
+	UFortGameInstance* FortGameInstance = World->OwningGameInstance ? World->OwningGameInstance->Cast<UFortGameInstance>() : nullptr;
+
+	const bool bUseGameInstance = FortGameInstance && FortGameInstance->GetWorld();
+
+	Log(std::string("Utils::SetupDedicatedServer: travelling via ") + (bUseGameInstance ? "game instance" : "world"));
+
+	bool bTravelOk = bUseGameInstance
 		? FortGameInstance->ServerTravel(TravelURL)
 		: World->ServerTravel(TravelURL);
 

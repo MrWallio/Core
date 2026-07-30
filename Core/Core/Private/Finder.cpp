@@ -926,6 +926,9 @@ uintptr_t Finder::FindFMemory_Free() {
 	uintptr_t Addr = 0;
 
 	Addr = Memcury::Scanner::FindPattern("48 85 C9 74 ? 53 48 83 EC ? 48 8B D9 48 8B 0D").Get();
+	if (!Addr) {
+		Addr = Memcury::Scanner::FindPattern("48 85 C9 74 ? 4C 8B 05 ? ? ? ? 4D 85 C0 0F 84").Get();
+	}
 
 	if (Addr) {
 		ServerOffsets::FMemory_Free = Addr - ImageBase;
@@ -5947,14 +5950,7 @@ uintptr_t Finder::FindAFortPickup_GivePickupToVFT() {
 		for (int i = 0; i < 2048; i++)
 		{
 			auto Ptr = (uint8_t*)(BaseAddr + i);
-			// `49 FF` also starts `call r9` and `call [r9+disp8]`, neither of which carries a disp32 - decode
-			// the ModRM rather than trusting the two opcode bytes.
-			if (IsCallRegDisp32(uintptr_t(Ptr))) {
-				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
-				Addr = static_cast<uintptr_t>(Offset) / 8;
-				break;
-			}
-			if (*Ptr == 0x48 && *(Ptr + 1) == 0xFF && *(Ptr + 2) == 0xA0) { // jmp qword [rax+disp32]
+			if (IsCallRegDisp32(uintptr_t(Ptr)) || IsJmpRegDisp32(uintptr_t(Ptr))) {
 				int32_t Offset = *reinterpret_cast<int32_t*>(Ptr + 3);
 				Addr = static_cast<uintptr_t>(Offset) / 8;
 				break;

@@ -284,23 +284,28 @@ static bool IsExecutableAddress(uintptr_t addr)
     return (mbi.Protect & Executable) != 0 && (mbi.Protect & PAGE_GUARD) == 0;
 }
 
-// True if addr is `FF /2 <disp32>` with an optional REX prefix - a `call qword [reg+disp32]`, which is how a
-// virtual call encodes its vtable byte-offset. Matching the opcode bytes alone is not enough: the same `41 FF`
-// also begins `call r8` (mod=11) and `call [r8+disp8]` (mod=01), and reading a disp32 out of either yields a
-// garbage index. Callers read the displacement at addr + 3.
 static bool IsCallRegDisp32(uintptr_t addr)
 {
     auto* b = reinterpret_cast<const uint8_t*>(addr);
 
-    // REX-prefixed only, so the displacement is always at addr + 3 for every caller.
     if ((b[0] & 0xF0) != 0x40 || b[1] != 0xFF)
         return false;
 
     const uint8_t ModRM = b[2];
 
-    // mod=10 carries the full disp32, and reg=/2 is the call form. rm=100 would add a SIB byte, which
-    // shifts the displacement along, so leave those to a real decoder.
     return (ModRM & 0xC0) == 0x80 && ((ModRM >> 3) & 7) == 2 && (ModRM & 7) != 4;
+}
+
+static bool IsJmpRegDisp32(uintptr_t addr)
+{
+    auto* b = reinterpret_cast<const uint8_t*>(addr);
+
+    if ((b[0] & 0xF0) != 0x40 || b[1] != 0xFF)
+        return false;
+
+    const uint8_t ModRM = b[2];
+
+    return (ModRM & 0xC0) == 0x80 && ((ModRM >> 3) & 7) == 4 && (ModRM & 7) != 4;
 }
 
 static bool IsAddressInModule(uintptr_t addr, HMODULE module)

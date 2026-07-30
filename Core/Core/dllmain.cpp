@@ -105,10 +105,6 @@ DWORD Main(LPVOID)
 
         Utils::Hook();
 
-        if (!Config.bListenServer) {
-            Utils::RemoveLocalPlayer();
-        }
-
         if (!Utils::SetupDedicatedServer(Config)) {
             Log("Failed to setup dedicated server!");
         }
@@ -123,6 +119,10 @@ DWORD Main(LPVOID)
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        if (!Config.bListenServer) {
+            Utils::RemoveLocalPlayer();
         }
 
 		if (!Utils::LoadWorld(Config)) {
