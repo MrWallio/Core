@@ -399,19 +399,22 @@ void AFortGameModeAthena::PreInitializeComponents(AFortGameModeAthena* This) {
 		return;
 	}
 }
-void AFortGameModeAthena::SendEndOfMatchTo(AFortPlayerControllerAthena* PC)
+void AFortGameModeAthena::SendEndOfMatchTo(AFortPlayerControllerAthena* PC, bool bMatchEnded)
 {
 	if (!PC)
 		return;
 
-	if (FAthenaRewardResult::StaticStruct())
-		PC->ClientSendEndBattleRoyaleMatchForPlayer(true, PC->ConstructAthenaRewardResult());
-
 	if (FAthenaMatchStats::StaticStruct())
 		PC->ClientSendMatchStatsForPlayer(PC->ConstructAthenaMatchStats());
 
+	if (!bMatchEnded && PC->HasAliveTeamMember())
+		return;
+
 	if (FAthenaMatchTeamStats::StaticStruct())
 		PC->ClientSendTeamStatsForPlayer(PC->ConstructAthenaMatchTeamStats());
+
+	if (FAthenaRewardResult::StaticStruct())
+		PC->ClientSendEndBattleRoyaleMatchForPlayer(true, PC->ConstructAthenaRewardResult());
 }
 
 bool AFortGameModeAthena::StartEndGamePhase(AFortGameModeAthena* This, AFortPlayerControllerAthena* WinningPlayer, APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause)
@@ -431,7 +434,7 @@ bool AFortGameModeAthena::StartEndGamePhase(AFortGameModeAthena* This, AFortPlay
 
 	if (!WinnerState->PlayerTeam) {
 		WinnerState->bHasWonAGame = true;
-		SendEndOfMatchTo(WinningPlayer);
+		SendEndOfMatchTo(WinningPlayer, true);
 		return bResult;
 	}
 
@@ -448,7 +451,7 @@ bool AFortGameModeAthena::StartEndGamePhase(AFortGameModeAthena* This, AFortPlay
 		if (TeamMemberController != WinningPlayer)
 			TeamMemberController->ClientNotifyTeamWon(FinisherPawn, FinishingWeapon, DeathCause);
 
-		SendEndOfMatchTo(TeamMemberController);
+		SendEndOfMatchTo(TeamMemberController, true);
 	}
 
 	return bResult;
@@ -479,7 +482,7 @@ bool AFortGameModeAthena::StartEndGamePhaseTeam(AFortGameModeAthena* This, int32
 		return bResult;
 
 	for (AController* TeamMember : Team->TeamMembers)
-		SendEndOfMatchTo(TeamMember ? TeamMember->Cast<AFortPlayerControllerAthena>() : nullptr);
+		SendEndOfMatchTo(TeamMember ? TeamMember->Cast<AFortPlayerControllerAthena>() : nullptr, true);
 
 	return bResult;
 }

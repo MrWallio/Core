@@ -46,6 +46,30 @@ void AFortPlayerControllerAthena::ServerAttemptAircraftJump(AFortPlayerControlle
 	}
 }
 
+bool AFortPlayerControllerAthena::HasAliveTeamMember() {
+	AFortPlayerStateAthena* PlayerStateAthena = PlayerState ? PlayerState->Cast<AFortPlayerStateAthena>() : nullptr;
+	if (!PlayerStateAthena || !PlayerStateAthena->PlayerTeam) {
+		return false;
+	}
+
+	for (AController* TeamMember : PlayerStateAthena->PlayerTeam->TeamMembers) {
+		AFortPlayerControllerAthena* TeamMemberController = TeamMember ? TeamMember->Cast<AFortPlayerControllerAthena>() : nullptr;
+		if (!TeamMemberController || TeamMemberController == this || !TeamMemberController->bMarkedAlive) {
+			continue;
+		}
+
+		AFortPlayerPawnAthena* TeamMemberPlayerPawn = TeamMemberController->MyFortPawn
+			? TeamMemberController->MyFortPawn->Cast<AFortPlayerPawnAthena>() : nullptr;
+		if (!TeamMemberPlayerPawn || TeamMemberPlayerPawn->bIsDBNO) {
+			continue;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 void AFortPlayerControllerAthena::ClientOnPawnDied_Implementation(FFortPlayerDeathReport& DeathReport) {
 	UWorld* World = UWorld::GetWorld();
 	if (!World) {

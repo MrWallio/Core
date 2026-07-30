@@ -68,7 +68,7 @@ public:
 	static inline void (*PreInitializeComponentsOG)(AFortGameModeAthena* This);
 	static void PreInitializeComponents(AFortGameModeAthena* This);
 
-	static void SendEndOfMatchTo(AFortPlayerControllerAthena* PC);
+	static void SendEndOfMatchTo(AFortPlayerControllerAthena* PC, bool bMatchEnded = false);
 
 	static inline bool (*StartEndGamePhaseOG)(AFortGameModeAthena* This, AFortPlayerControllerAthena* WinningPlayer, APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause);
 	static bool StartEndGamePhase(AFortGameModeAthena* This, AFortPlayerControllerAthena* WinningPlayer, APawn* FinisherPawn, const UFortWeaponItemDefinition* FinishingWeapon, uint8 DeathCause);

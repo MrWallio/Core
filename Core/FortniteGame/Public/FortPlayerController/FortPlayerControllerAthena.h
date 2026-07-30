@@ -44,6 +44,8 @@ public:
 
 	void ClientOnPawnDied_Implementation(FFortPlayerDeathReport& DeathReport);
 
+	bool HasAliveTeamMember();
+
 	static inline void (*OnReadyToStartMatchOG)(AFortPlayerControllerAthena* This);
 	static void OnReadyToStartMatch(AFortPlayerControllerAthena* This);
 
